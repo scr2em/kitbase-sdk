@@ -22,13 +22,39 @@ npx @kitbase/ionic push
 
 ### API Key
 
-Set your Kitbase API key as an environment variable:
+The CLI will look for your API key in the following order:
+
+1. **Environment variable** - `KITBASE_API_KEY`
+2. **Config file** - `.kitbasecli` in your project root
+3. **Interactive prompt** - If running in a terminal, you'll be prompted to enter your key
+
+#### Option 1: Interactive Setup (Recommended)
+
+Simply run the CLI without any configuration:
+
+```bash
+npx @kitbase/ionic push
+```
+
+You'll be prompted to enter your API key, and it will be saved to `.kitbasecli` for future use.
+
+#### Option 2: Environment Variable
 
 ```bash
 export KITBASE_API_KEY=your_api_key_here
 ```
 
-Or create a `.env` file in your project root:
+#### Option 3: Config File
+
+Create a `.kitbasecli` file in your project root:
+
+```
+KITBASE_API_KEY=your_api_key_here
+```
+
+> ⚠️ **Important:** Add `.kitbasecli` to your `.gitignore` to keep your API key secret!
+
+#### Option 4: .env File
 
 ```env
 KITBASE_API_KEY=your_api_key_here
@@ -42,9 +68,9 @@ To use a custom API endpoint (e.g., for local development or self-hosted):
 export KITBASE_API_URL=http://localhost:3000
 ```
 
-Or in `.env`:
+Or in `.env` / `.kitbasecli`:
 
-```env
+```
 KITBASE_API_URL=http://localhost:3000
 ```
 

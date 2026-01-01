@@ -78,3 +78,12 @@ export type { BuildAndZipResult } from './build.js';
 // Upload client
 export { UploadClient, createUploadPayload } from './upload.js';
 export type { ProgressCallback, UploadProgress, UploadOptions } from './upload.js';
+
+// Config utilities
+export {
+  getApiKey,
+  readApiKeyFromConfig,
+  writeApiKeyToConfig,
+  configExists,
+  getConfigPath,
+} from './config.js';

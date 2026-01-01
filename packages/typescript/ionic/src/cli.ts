@@ -9,6 +9,7 @@ import { fileURLToPath } from 'node:url';
 import { getGitInfo, isGitRepository } from './git.js';
 import { buildAndZip, getNativeVersion, validateZipFile, cleanupTemp, isIonicProject } from './build.js';
 import { UploadClient, createUploadPayload } from './upload.js';
+import { getApiKey } from './config.js';
 import type { PushOptions } from './types.js';
 import {
   KitbaseError,
@@ -20,7 +21,7 @@ import {
   GitError,
 } from './errors.js';
 
-// Load environment variables
+// Load environment variables from .env file
 loadEnv();
 
 const __filename = fileURLToPath(import.meta.url);
@@ -110,17 +111,20 @@ async function pushCommand(options: PushOptions): Promise<void> {
   const spinner = ora();
   
   try {
-    // Check for API key
-    const apiKey = process.env.KITBASE_API_KEY;
+    console.log(chalk.bold.cyan('\n🚀 Kitbase Ionic Push\n'));
+    
+    // Get API key (from env, config file, or prompt)
+    const apiKey = await getApiKey({ interactive: true });
     if (!apiKey) {
       throw new ConfigurationError(
-        'KITBASE_API_KEY environment variable is not set.\n' +
-        'Set it in your environment or create a .env file with:\n' +
-        'KITBASE_API_KEY=your_api_key_here'
+        'API key is required.\n' +
+        'You can set it by:\n' +
+        '  1. Running this command again and entering your API key when prompted\n' +
+        '  2. Setting KITBASE_API_KEY environment variable\n' +
+        '  3. Creating a .kitbasecli file with KITBASE_API_KEY=your_key\n' +
+        '  4. Adding KITBASE_API_KEY to your .env file'
       );
     }
-    
-    console.log(chalk.bold.cyan('\n🚀 Kitbase Ionic Push\n'));
     
     // Validate project
     if (!options.file && !isIonicProject()) {
