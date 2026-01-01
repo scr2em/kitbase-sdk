@@ -1,0 +1,48 @@
+{
+    "name": "kitbase/sdk",
+    "description": "Official Kitbase SDK for PHP",
+    "version": "0.1.0",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+        "kitbase",
+        "logging",
+        "events",
+        "analytics",
+        "tracking",
+        "changelogs",
+        "feature-flags"
+    ],
+    "authors": [
+        {
+            "name": "Kitbase Team"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "guzzlehttp/guzzle": "^7.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.0",
+        "phpstan/phpstan": "^1.10"
+    },
+    "autoload": {
+        "psr-4": {
+            "Kitbase\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Kitbase\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "analyze": "phpstan analyse src --level=8"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "stable"
+}
+
