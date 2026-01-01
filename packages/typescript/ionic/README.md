@@ -34,6 +34,20 @@ Or create a `.env` file in your project root:
 KITBASE_API_KEY=your_api_key_here
 ```
 
+### Custom API URL (Optional)
+
+To use a custom API endpoint (e.g., for local development or self-hosted):
+
+```bash
+export KITBASE_API_URL=http://localhost:3000
+```
+
+Or in `.env`:
+
+```env
+KITBASE_API_URL=http://localhost:3000
+```
+
 ## Usage
 
 ### Push Command

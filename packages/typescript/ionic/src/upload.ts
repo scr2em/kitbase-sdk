@@ -5,7 +5,7 @@ import { request as httpRequest } from 'node:http';
 import type { UploadPayload, UploadResponse, KitbaseConfig } from './types.js';
 import { ApiError, AuthenticationError, ValidationError } from './errors.js';
 
-const DEFAULT_BASE_URL = 'https://api.kitbase.dev';
+const DEFAULT_BASE_URL = process.env.KITBASE_API_URL || 'https://api.kitbase.dev';
 const TIMEOUT = 300000; // 5 minutes for large file uploads
 
 /**
