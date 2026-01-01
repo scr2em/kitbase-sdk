@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import 'exceptions.dart';
 import 'types.dart';
 
-const _baseUrl = 'https://api.kitbase.io';
+const _baseUrl = 'https://api.kitbase.dev';
 const _timeout = Duration(seconds: 30);
 
 /// Kitbase client for tracking events.
