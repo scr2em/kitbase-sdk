@@ -53,6 +53,17 @@ function formatFileSize(bytes: number): string {
 }
 
 /**
+ * Create a visual progress bar
+ */
+function createProgressBar(percent: number, width = 20): string {
+  const filled = Math.round((percent / 100) * width);
+  const empty = width - filled;
+  const filledBar = chalk.cyan('█'.repeat(filled));
+  const emptyBar = chalk.gray('░'.repeat(empty));
+  return `${filledBar}${emptyBar}`;
+}
+
+/**
  * Format error message for display
  */
 function formatError(error: unknown): string {
@@ -191,7 +202,7 @@ async function pushCommand(options: PushOptions): Promise<void> {
     }
     
     // Upload the build
-    spinner.start('Uploading to Kitbase...');
+    spinner.start('Uploading to Kitbase... 0%');
     
     const client = new UploadClient({ apiKey });
     const payload = createUploadPayload(zipFilePath, gitInfo, nativeVersion);
@@ -202,12 +213,17 @@ async function pushCommand(options: PushOptions): Promise<void> {
       console.log(chalk.dim(`  Commit: ${payload.commitHash}`));
       console.log(chalk.dim(`  Branch: ${payload.branchName}`));
       console.log(chalk.dim(`  Version: ${payload.nativeVersion}`));
-      console.log(chalk.dim(`  File: ${payload.fileName} (${Math.round(payload.file.length / 1024)}KB)`));
+      console.log(chalk.dim(`  File: ${payload.fileName} (${formatFileSize(payload.file.length)})`));
       console.log();
-      spinner.start('Uploading to Kitbase...');
+      spinner.start('Uploading to Kitbase... 0%');
     }
     
-    const response = await client.upload(payload);
+    const response = await client.upload(payload, {
+      onProgress: (progress) => {
+        const bar = createProgressBar(progress.percent);
+        spinner.text = `Uploading to Kitbase... ${bar} ${progress.percent}% (${formatFileSize(progress.uploaded)}/${formatFileSize(progress.total)})`;
+      },
+    });
     
     spinner.succeed('Build uploaded successfully!');
     
