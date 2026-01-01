@@ -205,22 +205,19 @@ async function pushCommand(options: PushOptions): Promise<void> {
       spinner.succeed(`Build zipped: ${chalk.dim(zipFilePath)} ${chalk.cyan(`(${formatFileSize(zipSize)})`)}`);
     }
     
-    // Upload the build
-    spinner.start('Uploading to Kitbase... 0%');
-    
+    // Create upload payload
     const client = new UploadClient({ apiKey });
     const payload = createUploadPayload(zipFilePath, gitInfo, nativeVersion);
     
-    if (options.verbose) {
-      spinner.stop();
-      console.log(chalk.dim('\nUpload payload:'));
-      console.log(chalk.dim(`  Commit: ${payload.commitHash}`));
-      console.log(chalk.dim(`  Branch: ${payload.branchName}`));
-      console.log(chalk.dim(`  Version: ${payload.nativeVersion}`));
-      console.log(chalk.dim(`  File: ${payload.fileName} (${formatFileSize(payload.file.length)})`));
-      console.log();
-      spinner.start('Uploading to Kitbase... 0%');
-    }
+    // Log upload details
+    console.log(chalk.dim('\n  Commit:  ') + chalk.white(payload.commitHash.substring(0, 7)));
+    console.log(chalk.dim('  Branch:  ') + chalk.white(payload.branchName));
+    console.log(chalk.dim('  Version: ') + chalk.white(payload.nativeVersion));
+    console.log(chalk.dim('  File:    ') + chalk.white(`${payload.fileName} (${formatFileSize(payload.file.length)})`));
+    console.log();
+    
+    // Upload the build
+    spinner.start('Uploading to Kitbase... 0%');
     
     const response = await client.upload(payload, {
       onProgress: (progress) => {
