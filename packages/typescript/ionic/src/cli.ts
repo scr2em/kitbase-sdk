@@ -210,7 +210,7 @@ async function pushCommand(options: PushOptions): Promise<void> {
     const payload = createUploadPayload(zipFilePath, gitInfo, nativeVersion);
     
     // Log upload details
-    console.log(chalk.dim('\n  Commit:  ') + chalk.white(payload.commitHash.substring(0, 7)));
+    console.log(chalk.dim('\n  Commit:  ') + chalk.white(payload.commitHash));
     console.log(chalk.dim('  Branch:  ') + chalk.white(payload.branchName));
     console.log(chalk.dim('  Version: ') + chalk.white(payload.nativeVersion));
     console.log(chalk.dim('  File:    ') + chalk.white(`${payload.fileName} (${formatFileSize(payload.file.length)})`));
