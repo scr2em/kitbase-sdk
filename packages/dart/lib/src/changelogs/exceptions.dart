@@ -63,3 +63,4 @@ class ChangelogsTimeoutException extends KitbaseChangelogsException {
   String toString() => 'ChangelogsTimeoutException: $message';
 }
 
+

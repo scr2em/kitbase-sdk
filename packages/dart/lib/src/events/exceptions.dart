@@ -52,3 +52,4 @@ class EventsTimeoutException extends KitbaseEventsException {
   String toString() => 'EventsTimeoutException: $message';
 }
 
+
