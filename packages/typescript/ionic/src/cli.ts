@@ -40,6 +40,19 @@ function getVersion(): string {
 }
 
 /**
+ * Format file size in human readable format
+ */
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024) {
+    return `${bytes} B`;
+  }
+  if (bytes < 1024 * 1024) {
+    return `${(bytes / 1024).toFixed(1)} KB`;
+  }
+  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+}
+
+/**
  * Format error message for display
  */
 function formatError(error: unknown): string {
@@ -154,21 +167,27 @@ async function pushCommand(options: PushOptions): Promise<void> {
     
     // Build or use existing zip
     let zipFilePath: string;
+    let zipSize: number;
     
     if (options.file) {
       // Use provided zip file
       spinner.start('Validating zip file...');
       validateZipFile(options.file);
       zipFilePath = options.file;
-      spinner.succeed(`Using zip file: ${chalk.dim(zipFilePath)}`);
+      // Get file size for existing file
+      const { statSync } = await import('node:fs');
+      zipSize = statSync(options.file).size;
+      spinner.succeed(`Using zip file: ${chalk.dim(zipFilePath)} ${chalk.cyan(`(${formatFileSize(zipSize)})`)}`);
     } else {
       // Build and zip the app
       spinner.stop();
-      zipFilePath = await buildAndZip({
+      const result = await buildAndZip({
         skipBuild: options.skipBuild,
         outputDir: options.outputDir,
       });
-      spinner.succeed(`Build zipped: ${chalk.dim(zipFilePath)}`);
+      zipFilePath = result.zipPath;
+      zipSize = result.zipSize;
+      spinner.succeed(`Build zipped: ${chalk.dim(zipFilePath)} ${chalk.cyan(`(${formatFileSize(zipSize)})`)}`);
     }
     
     // Upload the build

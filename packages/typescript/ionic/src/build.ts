@@ -184,9 +184,19 @@ export async function zipDirectory(sourceDir: string, outputPath: string): Promi
 }
 
 /**
+ * Result of building and zipping
+ */
+export interface BuildAndZipResult {
+  /** Path to the zip file */
+  zipPath: string;
+  /** Size of the zip file in bytes */
+  zipSize: number;
+}
+
+/**
  * Build web app and create zip file
  */
-export async function buildAndZip(options: BuildOptions): Promise<string> {
+export async function buildAndZip(options: BuildOptions): Promise<BuildAndZipResult> {
   const cwd = process.cwd();
   let outputDir: string;
   
@@ -209,7 +219,13 @@ export async function buildAndZip(options: BuildOptions): Promise<string> {
   console.log(`\nCreating zip from ${basename(outputDir)}...`);
   await zipDirectory(outputDir, zipPath);
   
-  return zipPath;
+  // Get file size
+  const stats = statSync(zipPath);
+  
+  return {
+    zipPath,
+    zipSize: stats.size,
+  };
 }
 
 /**

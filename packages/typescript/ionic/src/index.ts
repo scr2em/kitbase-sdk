@@ -73,6 +73,7 @@ export {
   isIonicInstalled,
   isIonicProject,
 } from './build.js';
+export type { BuildAndZipResult } from './build.js';
 
 // Upload client
 export { UploadClient, createUploadPayload } from './upload.js';
