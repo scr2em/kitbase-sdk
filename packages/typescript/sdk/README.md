@@ -18,9 +18,11 @@ Import only what you need:
 
 ```typescript
 import { Kitbase } from '@kitbase/sdk/events';
-// import { Changelogs } from '@kitbase/sdk/changelogs';  // coming soon
-// import { Flags } from '@kitbase/sdk/flags';            // coming soon
+import { Changelogs } from '@kitbase/sdk/changelogs';
+// import { Flags } from '@kitbase/sdk/flags';  // coming soon
 ```
+
+---
 
 ## Events
 
@@ -48,64 +50,104 @@ await kitbase.track({
 });
 ```
 
-### API
+### `kitbase.track(options)`
 
-#### `kitbase.track(options)`
+| Option        | Type                                      | Required | Description              |
+| ------------- | ----------------------------------------- | -------- | ------------------------ |
+| `channel`     | `string`                                  | ✅       | Channel/category         |
+| `event`       | `string`                                  | ✅       | Event name               |
+| `user_id`     | `string`                                  | –        | User identifier          |
+| `icon`        | `string`                                  | –        | Emoji or icon name       |
+| `notify`      | `boolean`                                 | –        | Send notification        |
+| `description` | `string`                                  | –        | Event description        |
+| `tags`        | `Record<string, string\|number\|boolean>` | –        | Additional metadata      |
+
+---
+
+## Changelogs
+
+Fetch version changelogs for your application.
 
 ```typescript
-interface TrackOptions {
-  channel: string;              // Required: channel/category
-  event: string;                // Required: event name
-  user_id?: string;             // Optional: user identifier
-  icon?: string;                // Optional: emoji or icon name
-  notify?: boolean;             // Optional: send notification
-  description?: string;         // Optional: event description
-  tags?: Record<string, string | number | boolean>;  // Optional: metadata
-}
+import { Changelogs } from '@kitbase/sdk/changelogs';
+
+const changelogs = new Changelogs({
+  token: '<YOUR_API_KEY>',
+});
+
+const changelog = await changelogs.get('1.0.0');
+console.log(changelog.version);
+console.log(changelog.markdown);
 ```
 
-**Returns:** `Promise<TrackResponse>`
+### `changelogs.get(version)`
+
+Get a published changelog by version.
 
 ```typescript
-interface TrackResponse {
+const changelog = await changelogs.get('1.0.0');
+```
+
+**Returns:** `Promise<ChangelogResponse>`
+
+```typescript
+interface ChangelogResponse {
   id: string;
-  event: string;
-  timestamp: string;
+  version: string;
+  markdown: string;      // Changelog content in Markdown format
+  isPublished: boolean;
+  projectId: string;
+  createdAt: string;
+  updatedAt: string;
 }
 ```
+
+---
 
 ## Error Handling
 
+Each module exports typed error classes:
+
+### Events Errors
+
 ```typescript
 import {
-  Kitbase,
   KitbaseError,
   AuthenticationError,
   ApiError,
   ValidationError,
   TimeoutError,
 } from '@kitbase/sdk/events';
+```
 
+### Changelogs Errors
+
+```typescript
+import {
+  ChangelogsError,
+  AuthenticationError,
+  ApiError,
+  NotFoundError,
+  ValidationError,
+  TimeoutError,
+} from '@kitbase/sdk/changelogs';
+```
+
+### Example
+
+```typescript
 try {
-  await kitbase.track({
-    channel: 'payments',
-    event: 'New Subscription',
-  });
+  const changelog = await changelogs.get('1.0.0');
 } catch (error) {
-  if (error instanceof AuthenticationError) {
-    // Invalid API key
-  } else if (error instanceof ValidationError) {
-    // Missing required fields
-    console.error(error.field);
-  } else if (error instanceof TimeoutError) {
-    // Request timed out
-  } else if (error instanceof ApiError) {
-    // API returned an error
-    console.error(error.statusCode);
-    console.error(error.response);
+  if (error instanceof NotFoundError) {
+    console.log(`Version ${error.version} not found`);
+  } else if (error instanceof AuthenticationError) {
+    console.log('Invalid API key');
   }
 }
 ```
+
+---
 
 ## Tree Shaking
 
@@ -114,6 +156,9 @@ This package supports tree-shaking. Only the features you import will be include
 ```typescript
 // Only events code is bundled
 import { Kitbase } from '@kitbase/sdk/events';
+
+// Only changelogs code is bundled
+import { Changelogs } from '@kitbase/sdk/changelogs';
 ```
 
 ## Requirements
@@ -124,4 +169,3 @@ import { Kitbase } from '@kitbase/sdk/events';
 ## License
 
 MIT
-
