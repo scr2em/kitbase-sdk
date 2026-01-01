@@ -45,13 +45,13 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/kitbase/kitbase-sdk.git",
+    "url": "https://github.com/scr2em/kitbase-sdk.git",
     "directory": "packages/typescript/ionic"
   },
   "bugs": {
-    "url": "https://github.com/kitbase/kitbase-sdk/issues"
+    "url": "https://github.com/scr2em/kitbase-sdk/issues"
   },
-  "homepage": "https://github.com/kitbase/kitbase-sdk/tree/main/packages/typescript/ionic#readme",
+  "homepage": "https://github.com/scr2em/kitbase-sdk/tree/main/packages/typescript/ionic#readme",
   "dependencies": {
     "archiver": "^7.0.1",
     "chalk": "^5.3.0",
