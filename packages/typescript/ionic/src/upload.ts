@@ -230,6 +230,10 @@ export class UploadClient {
       if ('error' in body && typeof (body as { error: unknown }).error === 'string') {
         return (body as { error: string }).error;
       }
+      const message = (body as {error: {message: string}})?.error?.message;
+      if (message) {
+        return message;
+      }
     }
     return fallback;
   }
