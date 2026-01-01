@@ -11,7 +11,7 @@ import {
   ValidationError,
 } from './errors.js';
 
-const BASE_URL = 'https://api.kitbase.io';
+const BASE_URL = 'https://api.kitbase.dev';
 const TIMEOUT = 30000;
 const ENVIRONMENT = 'production';
 
