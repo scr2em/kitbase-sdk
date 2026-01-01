@@ -65,7 +65,7 @@ describe('Kitbase', () => {
 
       expect(result).toEqual(mockResponse);
       expect(mockFetch).toHaveBeenCalledWith(
-        'https://api.kitbase.io/v1/logs',
+        'https://api.kitbase.dev/v1/logs',
         expect.objectContaining({
           method: 'POST',
           headers: {
@@ -99,7 +99,6 @@ describe('Kitbase', () => {
 
       const body = JSON.parse(mockFetch.mock.calls[0][1].body);
       expect(body).toEqual({
-        environment: 'production',
         channel: 'payments',
         event: 'New Subscription',
         user_id: 'user-123',
@@ -155,3 +154,4 @@ describe('Kitbase', () => {
     });
   });
 });
+

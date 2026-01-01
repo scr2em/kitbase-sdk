@@ -12,7 +12,7 @@ importers:
         specifier: ^5.3.3
         version: 5.9.3
 
-  packages/typescript/events:
+  packages/typescript/sdk:
     devDependencies:
       '@types/node':
         specifier: ^20.11.0

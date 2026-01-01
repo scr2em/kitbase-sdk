@@ -1,27 +1,38 @@
-# @kitbase/events
+# @kitbase/sdk
 
-Kitbase Events SDK for TypeScript and JavaScript. Tree-shakable and fully typed.
+Official Kitbase SDK for TypeScript and JavaScript. Tree-shakable and fully typed.
 
 ## Installation
 
 ```bash
-npm install @kitbase/events
+npm install @kitbase/sdk
 # or
-pnpm add @kitbase/events
+pnpm add @kitbase/sdk
 # or
-yarn add @kitbase/events
+yarn add @kitbase/sdk
 ```
 
-## Quick Start
+## Features
+
+Import only what you need:
 
 ```typescript
-import { Kitbase } from '@kitbase/events';
+import { Kitbase } from '@kitbase/sdk/events';
+// import { Changelogs } from '@kitbase/sdk/changelogs';  // coming soon
+// import { Flags } from '@kitbase/sdk/flags';            // coming soon
+```
+
+## Events
+
+Track events and logs in your application.
+
+```typescript
+import { Kitbase } from '@kitbase/sdk/events';
 
 const kitbase = new Kitbase({
   token: '<YOUR_API_KEY>',
 });
 
-// Track an event
 await kitbase.track({
   channel: 'payments',
   event: 'New Subscription',
@@ -37,43 +48,19 @@ await kitbase.track({
 });
 ```
 
-## Configuration
+### API
 
-```typescript
-const kitbase = new Kitbase({
-  // Required: Your Kitbase API key
-  token: '<YOUR_API_KEY>',
-});
-```
-
-## API
-
-### `kitbase.track(options)`
-
-Track an event.
+#### `kitbase.track(options)`
 
 ```typescript
 interface TrackOptions {
-  // Required: The channel/category for the event
-  channel: string;
-
-  // Required: The name of the event
-  event: string;
-
-  // Optional: User identifier
-  user_id?: string;
-
-  // Optional: Icon (emoji or icon name)
-  icon?: string;
-
-  // Optional: Send a notification (default: false)
-  notify?: boolean;
-
-  // Optional: Event description
-  description?: string;
-
-  // Optional: Additional metadata tags
-  tags?: Record<string, string | number | boolean>;
+  channel: string;              // Required: channel/category
+  event: string;                // Required: event name
+  user_id?: string;             // Optional: user identifier
+  icon?: string;                // Optional: emoji or icon name
+  notify?: boolean;             // Optional: send notification
+  description?: string;         // Optional: event description
+  tags?: Record<string, string | number | boolean>;  // Optional: metadata
 }
 ```
 
@@ -89,8 +76,6 @@ interface TrackResponse {
 
 ## Error Handling
 
-The SDK exports typed error classes for precise error handling:
-
 ```typescript
 import {
   Kitbase,
@@ -99,7 +84,7 @@ import {
   ApiError,
   ValidationError,
   TimeoutError,
-} from '@kitbase/events';
+} from '@kitbase/sdk/events';
 
 try {
   await kitbase.track({
@@ -118,19 +103,17 @@ try {
     // API returned an error
     console.error(error.statusCode);
     console.error(error.response);
-  } else if (error instanceof KitbaseError) {
-    // Generic SDK error
   }
 }
 ```
 
 ## Tree Shaking
 
-This package is fully tree-shakable. Only the code you use will be included in your bundle:
+This package supports tree-shaking. Only the features you import will be included in your bundle:
 
 ```typescript
-import { Kitbase } from '@kitbase/events';
-import type { TrackOptions } from '@kitbase/events';
+// Only events code is bundled
+import { Kitbase } from '@kitbase/sdk/events';
 ```
 
 ## Requirements
@@ -141,3 +124,4 @@ import type { TrackOptions } from '@kitbase/events';
 ## License
 
 MIT
+

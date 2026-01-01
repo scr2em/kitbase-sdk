@@ -86,7 +86,6 @@ export interface TrackResponse {
  * Internal request payload sent to the API
  */
 export interface LogPayload {
-  environment: string;
   channel: string;
   event: string;
   user_id?: string;

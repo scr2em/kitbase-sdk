@@ -13,13 +13,14 @@ import {
 
 const BASE_URL = 'https://api.kitbase.dev';
 const TIMEOUT = 30000;
-const ENVIRONMENT = 'production';
 
 /**
  * Kitbase client for tracking events
  *
  * @example
  * ```typescript
+ * import { Kitbase } from '@kitbase/sdk/events';
+ *
  * const kitbase = new Kitbase({
  *   token: '<YOUR_API_KEY>',
  * });
@@ -62,7 +63,6 @@ export class Kitbase {
     this.validateTrackOptions(options);
 
     const payload: LogPayload = {
-      environment: ENVIRONMENT,
       channel: options.channel,
       event: options.event,
       ...(options.user_id && { user_id: options.user_id }),
@@ -146,3 +146,4 @@ export class Kitbase {
     return fallback;
   }
 }
+
