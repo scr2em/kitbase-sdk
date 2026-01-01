@@ -2,32 +2,33 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-import 'package:kitbase_changelogs/kitbase_changelogs.dart';
+import 'package:kitbase/changelogs.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('Changelogs', () {
+  group('KitbaseChangelogs', () {
     group('constructor', () {
-      test('throws ValidationException when token is empty', () {
+      test('throws ChangelogsValidationException when token is empty', () {
         expect(
-          () => Changelogs(token: ''),
-          throwsA(isA<ValidationException>()),
+          () => KitbaseChangelogs(token: ''),
+          throwsA(isA<ChangelogsValidationException>()),
         );
       });
 
       test('creates client with valid token', () {
-        final client = Changelogs(token: 'test-token');
-        expect(client, isA<Changelogs>());
+        final client = KitbaseChangelogs(token: 'test-token');
+        expect(client, isA<KitbaseChangelogs>());
         client.close();
       });
     });
 
     group('get', () {
-      test('throws ValidationException when version is empty', () async {
-        final client = Changelogs(token: 'test-token');
+      test('throws ChangelogsValidationException when version is empty',
+          () async {
+        final client = KitbaseChangelogs(token: 'test-token');
         expect(
           () => client.get(''),
-          throwsA(isA<ValidationException>()),
+          throwsA(isA<ChangelogsValidationException>()),
         );
         client.close();
       });
@@ -51,7 +52,8 @@ void main() {
           return http.Response(jsonEncode(mockResponse), 200);
         });
 
-        final client = Changelogs(token: 'test-token', client: mockClient);
+        final client =
+            KitbaseChangelogs(token: 'test-token', client: mockClient);
         final result = await client.get('1.0.0');
 
         expect(result.id, 'cl-123');
@@ -80,12 +82,13 @@ void main() {
           );
         });
 
-        final client = Changelogs(token: 'test-token', client: mockClient);
+        final client =
+            KitbaseChangelogs(token: 'test-token', client: mockClient);
         await client.get('1.0.0-beta.1');
         client.close();
       });
 
-      test('throws AuthenticationException on 401', () async {
+      test('throws ChangelogsAuthenticationException on 401', () async {
         final mockClient = MockClient((request) async {
           return http.Response(
             jsonEncode({'message': 'Invalid API key'}),
@@ -93,15 +96,16 @@ void main() {
           );
         });
 
-        final client = Changelogs(token: 'invalid-token', client: mockClient);
+        final client =
+            KitbaseChangelogs(token: 'invalid-token', client: mockClient);
         expect(
           () => client.get('1.0.0'),
-          throwsA(isA<AuthenticationException>()),
+          throwsA(isA<ChangelogsAuthenticationException>()),
         );
         client.close();
       });
 
-      test('throws NotFoundException on 404', () async {
+      test('throws ChangelogsNotFoundException on 404', () async {
         final mockClient = MockClient((request) async {
           return http.Response(
             jsonEncode({'message': 'Changelog not found'}),
@@ -109,15 +113,16 @@ void main() {
           );
         });
 
-        final client = Changelogs(token: 'test-token', client: mockClient);
+        final client =
+            KitbaseChangelogs(token: 'test-token', client: mockClient);
         expect(
           () => client.get('99.99.99'),
-          throwsA(isA<NotFoundException>()),
+          throwsA(isA<ChangelogsNotFoundException>()),
         );
         client.close();
       });
 
-      test('throws ApiException on other HTTP errors', () async {
+      test('throws ChangelogsApiException on other HTTP errors', () async {
         final mockClient = MockClient((request) async {
           return http.Response(
             jsonEncode({'message': 'Server error'}),
@@ -125,10 +130,11 @@ void main() {
           );
         });
 
-        final client = Changelogs(token: 'test-token', client: mockClient);
+        final client =
+            KitbaseChangelogs(token: 'test-token', client: mockClient);
         expect(
           () => client.get('1.0.0'),
-          throwsA(isA<ApiException>()),
+          throwsA(isA<ChangelogsApiException>()),
         );
         client.close();
       });

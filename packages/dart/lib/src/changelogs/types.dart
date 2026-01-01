@@ -1,9 +1,9 @@
-/// Configuration for the Changelogs client.
-class ChangelogsConfig {
+/// Configuration for the KitbaseChangelogs client.
+class KitbaseChangelogsConfig {
   /// Your Kitbase API key.
   final String token;
 
-  const ChangelogsConfig({
+  const KitbaseChangelogsConfig({
     required this.token,
   });
 }

@@ -9,30 +9,31 @@ import 'types.dart';
 const _baseUrl = 'https://api.kitbase.dev';
 const _timeout = Duration(seconds: 30);
 
-/// Changelogs client for fetching version changelogs.
+/// Kitbase Changelogs client for fetching version changelogs.
 ///
 /// ```dart
-/// final changelogs = Changelogs(token: '<YOUR_API_KEY>');
+/// final changelogs = KitbaseChangelogs(token: '<YOUR_API_KEY>');
 ///
 /// final changelog = await changelogs.get('1.0.0');
 /// print(changelog.version);
 /// print(changelog.markdown);
 /// ```
-class Changelogs {
+class KitbaseChangelogs {
   final String _token;
   final http.Client _client;
 
-  /// Creates a new Changelogs client.
+  /// Creates a new KitbaseChangelogs client.
   ///
   /// [token] is your Kitbase API key.
   /// [client] is an optional HTTP client for testing.
-  Changelogs({
+  KitbaseChangelogs({
     required String token,
     http.Client? client,
   })  : _token = token,
         _client = client ?? http.Client() {
     if (token.isEmpty) {
-      throw const ValidationException('API token is required', field: 'token');
+      throw const ChangelogsValidationException('API token is required',
+          field: 'token');
     }
   }
 
@@ -42,14 +43,15 @@ class Changelogs {
   ///
   /// Returns a [ChangelogResponse] with the changelog details.
   ///
-  /// Throws [ValidationException] when version is missing.
-  /// Throws [AuthenticationException] when the API key is invalid.
-  /// Throws [NotFoundException] when the changelog is not found.
-  /// Throws [ApiException] when the API returns an error.
-  /// Throws [TimeoutException] when the request times out.
+  /// Throws [ChangelogsValidationException] when version is missing.
+  /// Throws [ChangelogsAuthenticationException] when the API key is invalid.
+  /// Throws [ChangelogsNotFoundException] when the changelog is not found.
+  /// Throws [ChangelogsApiException] when the API returns an error.
+  /// Throws [ChangelogsTimeoutException] when the request times out.
   Future<ChangelogResponse> get(String version) async {
     if (version.isEmpty) {
-      throw const ValidationException('Version is required', field: 'version');
+      throw const ChangelogsValidationException('Version is required',
+          field: 'version');
     }
 
     return _request('/v1/changelogs/${Uri.encodeComponent(version)}');
@@ -70,19 +72,20 @@ class Changelogs {
           .timeout(_timeout);
 
       if (response.statusCode == 401) {
-        throw const AuthenticationException();
+        throw const ChangelogsAuthenticationException();
       }
 
       if (response.statusCode == 404) {
         final version = endpoint.split('/').last;
-        throw NotFoundException(Uri.decodeComponent(version));
+        throw ChangelogsNotFoundException(Uri.decodeComponent(version));
       }
 
       if (response.statusCode < 200 || response.statusCode >= 300) {
         final errorBody = _tryParseJson(response.body);
-        final message =
-            _extractErrorMessage(errorBody) ?? response.reasonPhrase ?? 'Unknown error';
-        throw ApiException(
+        final message = _extractErrorMessage(errorBody) ??
+            response.reasonPhrase ??
+            'Unknown error';
+        throw ChangelogsApiException(
           message,
           statusCode: response.statusCode,
           response: errorBody,
@@ -92,7 +95,7 @@ class Changelogs {
       final json = jsonDecode(response.body) as Map<String, dynamic>;
       return ChangelogResponse.fromJson(json);
     } on TimeoutException {
-      throw const TimeoutException();
+      throw const ChangelogsTimeoutException();
     }
   }
 
@@ -117,9 +120,6 @@ class Changelogs {
   }
 
   /// Closes the HTTP client.
-  ///
-  /// Call this when you're done using the Changelogs client
-  /// to free up resources.
   void close() {
     _client.close();
   }

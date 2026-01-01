@@ -9,12 +9,12 @@ import 'types.dart';
 const _baseUrl = 'https://api.kitbase.dev';
 const _timeout = Duration(seconds: 30);
 
-/// Kitbase client for tracking events.
+/// Kitbase Events client for tracking events.
 ///
 /// ```dart
-/// final kitbase = Kitbase(token: '<YOUR_API_KEY>');
+/// final events = KitbaseEvents(token: '<YOUR_API_KEY>');
 ///
-/// await kitbase.track(
+/// await events.track(
 ///   channel: 'payments',
 ///   event: 'New Subscription',
 ///   userId: 'user-123',
@@ -23,21 +23,22 @@ const _timeout = Duration(seconds: 30);
 ///   tags: {'plan': 'premium', 'cycle': 'monthly'},
 /// );
 /// ```
-class Kitbase {
+class KitbaseEvents {
   final String _token;
   final http.Client _client;
 
-  /// Creates a new Kitbase client.
+  /// Creates a new KitbaseEvents client.
   ///
   /// [token] is your Kitbase API key.
   /// [client] is an optional HTTP client for testing.
-  Kitbase({
+  KitbaseEvents({
     required String token,
     http.Client? client,
   })  : _token = token,
         _client = client ?? http.Client() {
     if (token.isEmpty) {
-      throw const ValidationException('API token is required', field: 'token');
+      throw const EventsValidationException('API token is required',
+          field: 'token');
     }
   }
 
@@ -53,10 +54,10 @@ class Kitbase {
   ///
   /// Returns a [TrackResponse] with the event ID and timestamp.
   ///
-  /// Throws [ValidationException] when required fields are missing.
-  /// Throws [AuthenticationException] when the API key is invalid.
-  /// Throws [ApiException] when the API returns an error.
-  /// Throws [TimeoutException] when the request times out.
+  /// Throws [EventsValidationException] when required fields are missing.
+  /// Throws [EventsAuthenticationException] when the API key is invalid.
+  /// Throws [EventsApiException] when the API returns an error.
+  /// Throws [EventsTimeoutException] when the request times out.
   Future<TrackResponse> track({
     required String channel,
     required String event,
@@ -67,10 +68,12 @@ class Kitbase {
     Map<String, dynamic>? tags,
   }) async {
     if (channel.isEmpty) {
-      throw const ValidationException('Channel is required', field: 'channel');
+      throw const EventsValidationException('Channel is required',
+          field: 'channel');
     }
     if (event.isEmpty) {
-      throw const ValidationException('Event is required', field: 'event');
+      throw const EventsValidationException('Event is required',
+          field: 'event');
     }
 
     final options = TrackOptions(
@@ -105,13 +108,15 @@ class Kitbase {
           .timeout(_timeout);
 
       if (response.statusCode == 401) {
-        throw const AuthenticationException();
+        throw const EventsAuthenticationException();
       }
 
       if (response.statusCode < 200 || response.statusCode >= 300) {
         final errorBody = _tryParseJson(response.body);
-        final message = _extractErrorMessage(errorBody) ?? response.reasonPhrase ?? 'Unknown error';
-        throw ApiException(
+        final message = _extractErrorMessage(errorBody) ??
+            response.reasonPhrase ??
+            'Unknown error';
+        throw EventsApiException(
           message,
           statusCode: response.statusCode,
           response: errorBody,
@@ -121,7 +126,7 @@ class Kitbase {
       final json = jsonDecode(response.body) as Map<String, dynamic>;
       return TrackResponse.fromJson(json);
     } on TimeoutException {
-      throw const TimeoutException();
+      throw const EventsTimeoutException();
     }
   }
 
@@ -146,12 +151,8 @@ class Kitbase {
   }
 
   /// Closes the HTTP client.
-  ///
-  /// Call this when you're done using the Kitbase client
-  /// to free up resources.
   void close() {
     _client.close();
   }
 }
-
 

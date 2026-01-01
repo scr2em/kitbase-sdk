@@ -1,9 +1,9 @@
-/// Configuration for the Kitbase client.
-class KitbaseConfig {
+/// Configuration for the KitbaseEvents client.
+class KitbaseEventsConfig {
   /// Your Kitbase API key.
   final String token;
 
-  const KitbaseConfig({
+  const KitbaseEventsConfig({
     required this.token,
   });
 }
@@ -43,7 +43,6 @@ class TrackOptions {
 
   Map<String, dynamic> toJson() {
     return {
-      'environment': 'production',
       'channel': channel,
       'event': event,
       if (userId != null) 'user_id': userId,
@@ -80,5 +79,4 @@ class TrackResponse {
     );
   }
 }
-
 

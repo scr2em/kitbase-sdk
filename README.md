@@ -10,35 +10,40 @@ Official SDKs for [Kitbase](https://kitbase.io).
 npm install @kitbase/sdk
 ```
 
-| Import                        | Description       | Status |
-| ----------------------------- | ----------------- | ------ |
-| `@kitbase/sdk/events`         | Event tracking    | ✅     |
-| `@kitbase/sdk/changelogs`     | Changelogs        | ✅     |
-| `@kitbase/sdk/flags`          | Feature flags     | 🚧     |
+| Import                    | Description    | Status |
+| ------------------------- | -------------- | ------ |
+| `@kitbase/sdk/events`     | Event tracking | ✅     |
+| `@kitbase/sdk/changelogs` | Changelogs     | ✅     |
+| `@kitbase/sdk/flags`      | Feature flags  | 🚧     |
 
 ### Dart / Flutter
 
-| Package                                              | Description       | Status |
-| ---------------------------------------------------- | ----------------- | ------ |
-| [kitbase_events](./packages/dart/events)             | Event tracking    | ✅     |
-| [kitbase_changelogs](./packages/dart/changelogs)     | Changelogs        | ✅     |
-| kitbase_flags                                        | Feature flags     | 🚧     |
+```yaml
+dependencies:
+  kitbase: ^0.1.0
+```
+
+| Import                           | Description    | Status |
+| -------------------------------- | -------------- | ------ |
+| `package:kitbase/events.dart`    | Event tracking | ✅     |
+| `package:kitbase/changelogs.dart`| Changelogs     | ✅     |
+| `package:kitbase/flags.dart`     | Feature flags  | 🚧     |
 
 ### Python (coming soon)
 
-| Package            | Description       | Status |
-| ------------------ | ----------------- | ------ |
-| kitbase-events     | Event tracking    | 🚧     |
-| kitbase-changelogs | Changelogs        | 🚧     |
-| kitbase-flags      | Feature flags     | 🚧     |
+| Package            | Description    | Status |
+| ------------------ | -------------- | ------ |
+| kitbase-events     | Event tracking | 🚧     |
+| kitbase-changelogs | Changelogs     | 🚧     |
+| kitbase-flags      | Feature flags  | 🚧     |
 
 ### PHP (coming soon)
 
-| Package            | Description       | Status |
-| ------------------ | ----------------- | ------ |
-| kitbase/events     | Event tracking    | 🚧     |
-| kitbase/changelogs | Changelogs        | 🚧     |
-| kitbase/flags      | Feature flags     | 🚧     |
+| Package            | Description    | Status |
+| ------------------ | -------------- | ------ |
+| kitbase/events     | Event tracking | 🚧     |
+| kitbase/changelogs | Changelogs     | 🚧     |
+| kitbase/flags      | Feature flags  | 🚧     |
 
 ## Quick Start
 
@@ -55,7 +60,6 @@ await kitbase.track({
   event: 'New Subscription',
   user_id: 'user-123',
   icon: '💰',
-  notify: true,
 });
 
 // Fetch changelogs
@@ -67,21 +71,20 @@ console.log(changelog.markdown);
 ### Dart / Flutter
 
 ```dart
-import 'package:kitbase_events/kitbase_events.dart';
-import 'package:kitbase_changelogs/kitbase_changelogs.dart';
+import 'package:kitbase/events.dart';
+import 'package:kitbase/changelogs.dart';
 
 // Track events
-final kitbase = Kitbase(token: '<YOUR_API_KEY>');
-await kitbase.track(
+final events = KitbaseEvents(token: '<YOUR_API_KEY>');
+await events.track(
   channel: 'payments',
   event: 'New Subscription',
   userId: 'user-123',
   icon: '💰',
-  notify: true,
 );
 
 // Fetch changelogs
-final changelogs = Changelogs(token: '<YOUR_API_KEY>');
+final changelogs = KitbaseChangelogs(token: '<YOUR_API_KEY>');
 final changelog = await changelogs.get('1.0.0');
 print(changelog.markdown);
 ```
@@ -92,15 +95,16 @@ print(changelog.markdown);
 kitbase-sdk/
 ├── packages/
 │   ├── typescript/
-│   │   └── sdk/              # @kitbase/sdk (npm)
+│   │   └── sdk/                  # @kitbase/sdk (npm)
 │   │       └── src/
-│   │           ├── events/       # @kitbase/sdk/events
-│   │           └── changelogs/   # @kitbase/sdk/changelogs
-│   ├── dart/
-│   │   ├── events/           # kitbase_events (pub.dev)
-│   │   └── changelogs/       # kitbase_changelogs (pub.dev)
-│   ├── python/               # (coming soon)
-│   └── php/                  # (coming soon)
+│   │           ├── events/           # @kitbase/sdk/events
+│   │           └── changelogs/       # @kitbase/sdk/changelogs
+│   ├── dart/                     # kitbase (pub.dev)
+│   │   └── lib/
+│   │       ├── events.dart           # package:kitbase/events.dart
+│   │       └── changelogs.dart       # package:kitbase/changelogs.dart
+│   ├── python/                   # (coming soon)
+│   └── php/                      # (coming soon)
 └── ...
 ```
 
@@ -117,13 +121,10 @@ pnpm test
 ### Dart
 
 ```bash
-cd packages/dart/events
+cd packages/dart
 dart pub get
 dart test
-
-cd packages/dart/changelogs
-dart pub get
-dart test
+dart analyze
 ```
 
 ## License
