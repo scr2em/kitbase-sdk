@@ -33,3 +33,4 @@ export function FlagsProvider({ token, children }: FlagsProviderProps) {
     <FlagsContext.Provider value={client}>{children}</FlagsContext.Provider>
   );
 }
+

@@ -8,3 +8,4 @@ export interface UseTrackOptions {
    */
   resetOnSuccess?: boolean;
 }
+

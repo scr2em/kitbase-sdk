@@ -272,3 +272,4 @@ String flagValueTypeToString(FlagValueType type) {
       return 'json';
   }
 }
+

@@ -422,3 +422,4 @@ class KitbaseFlags {
     _client.close();
   }
 }
+

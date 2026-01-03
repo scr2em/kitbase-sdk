@@ -385,3 +385,4 @@ class ClientTest extends TestCase
         $this->assertNull($flag3);
     }
 }
+

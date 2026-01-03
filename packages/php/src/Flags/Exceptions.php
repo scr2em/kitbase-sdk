@@ -139,3 +139,4 @@ class ParseException extends FlagsException
         parent::__construct($message, 0, $previous);
     }
 }
+

@@ -15,3 +15,4 @@ export function useEventsContext(): Kitbase {
 
   return context;
 }
+

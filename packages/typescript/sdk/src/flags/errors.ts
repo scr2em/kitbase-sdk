@@ -120,3 +120,4 @@ export class ParseError extends FlagsError {
     Object.setPrototypeOf(this, ParseError.prototype);
   }
 }
+

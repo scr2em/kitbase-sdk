@@ -33,3 +33,4 @@ export function EventsProvider({ token, children }: EventsProviderProps) {
     <EventsContext.Provider value={client}>{children}</EventsContext.Provider>
   );
 }
+

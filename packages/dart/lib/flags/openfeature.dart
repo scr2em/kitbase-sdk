@@ -41,3 +41,4 @@
 library kitbase.flags.openfeature;
 
 export '../src/flags/openfeature/provider.dart';
+

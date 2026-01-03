@@ -35,3 +35,4 @@ export function ChangelogsProvider({ token, children }: ChangelogsProviderProps)
     </ChangelogsContext.Provider>
   );
 }
+

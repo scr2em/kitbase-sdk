@@ -267,3 +267,4 @@ class FlagSnapshot
         return null;
     }
 }
+
