@@ -1,6 +1,21 @@
-# kitbase
+# Kitbase SDK for Dart & Flutter
 
-Official Kitbase SDK for Dart and Flutter.
+Official Kitbase SDK for Dart and Flutter applications.
+
+[![Pub Version](https://img.shields.io/pub/v/kitbase)](https://pub.dev/packages/kitbase)
+[![Dart SDK](https://img.shields.io/badge/Dart-%3E%3D3.0.0-blue)](https://dart.dev)
+
+## Table of Contents
+
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Feature Flags](#feature-flags)
+- [Events](#events)
+- [Changelogs](#changelogs)
+- [Error Handling](#error-handling)
+- [Flutter Integration](#flutter-integration)
+
+---
 
 ## Installation
 
@@ -19,25 +34,27 @@ dart pub get
 flutter pub get
 ```
 
-## Features
+---
 
-Import what you need:
+## Quick Start
 
 ```dart
 // Import everything
 import 'package:kitbase/kitbase.dart';
 
-// Or import specific features
+// Or import only what you need
+import 'package:kitbase/flags.dart';
 import 'package:kitbase/events.dart';
 import 'package:kitbase/changelogs.dart';
-import 'package:kitbase/flags.dart';
 ```
 
 ---
 
 ## Feature Flags
 
-Evaluate feature flags in your application with targeting support.
+Evaluate feature flags with targeting and percentage rollouts.
+
+### Basic Usage
 
 ```dart
 import 'package:kitbase/flags.dart';
@@ -45,10 +62,10 @@ import 'package:kitbase/flags.dart';
 final flags = KitbaseFlags(token: '<YOUR_API_KEY>');
 
 // Simple boolean check
-final isEnabled = await flags.getBooleanValue('dark-mode', false);
+final darkMode = await flags.getBooleanValue('dark-mode', false);
 
 // With targeting context
-final isPremiumFeature = await flags.getBooleanValue(
+final premiumFeature = await flags.getBooleanValue(
   'premium-feature',
   false,
   context: EvaluationContext(
@@ -57,55 +74,85 @@ final isPremiumFeature = await flags.getBooleanValue(
   ),
 );
 
-// Other value types
-final apiUrl = await flags.getStringValue('api-url', 'https://default.api');
-final maxItems = await flags.getNumberValue('max-items', 50);
-final config = await flags.getJsonValue<Map<String, dynamic>>('ui-config', {});
-
-// Get full resolution details
-final details = await flags.getBooleanDetails('feature-x', false);
-print('Value: ${details.value}');
-print('Reason: ${details.reason}');
-print('Variant: ${details.variant}');
-
-// Get all flags as a snapshot
-final snapshot = await flags.getSnapshot();
-for (final flag in snapshot.flags) {
-  print('${flag.flagKey}: ${flag.value}');
-}
-
 // Don't forget to close when done
 flags.close();
 ```
 
-### Value Methods
+### All Value Types
+
+```dart
+// Boolean
+final isEnabled = await flags.getBooleanValue('feature', false);
+
+// String
+final apiUrl = await flags.getStringValue('api-url', 'https://default.api');
+
+// Number
+final maxItems = await flags.getNumberValue('max-items', 50);
+
+// JSON
+final config = await flags.getJsonValue<Map<String, dynamic>>('ui-config', {});
+```
+
+### Resolution Details
+
+Get detailed information about flag evaluation:
+
+```dart
+final details = await flags.getBooleanDetails('feature-x', false);
+
+print(details.value);        // true
+print(details.reason);       // ResolutionReason.targetingMatch
+print(details.variant);      // "treatment-a"
+print(details.flagMetadata); // {name: "Feature X"}
+```
+
+### Flag Snapshot
+
+Fetch all flags at once:
+
+```dart
+final snapshot = await flags.getSnapshot(
+  options: EvaluateOptions(
+    context: EvaluationContext(targetingKey: 'user-123'),
+  ),
+);
+
+for (final flag in snapshot.flags) {
+  print('${flag.flagKey}: ${flag.value} (${flag.valueType})');
+}
+```
+
+### API Reference
+
+#### Value Methods
 
 | Method | Return Type | Description |
-| ------ | ----------- | ----------- |
-| `getBooleanValue(key, default, {context})` | `Future<bool>` | Get boolean flag value |
-| `getStringValue(key, default, {context})` | `Future<String>` | Get string flag value |
-| `getNumberValue(key, default, {context})` | `Future<num>` | Get number flag value |
-| `getJsonValue<T>(key, default, {context})` | `Future<T>` | Get JSON flag value |
+|--------|-------------|-------------|
+| `getBooleanValue(key, default, {context})` | `Future<bool>` | Get boolean value |
+| `getStringValue(key, default, {context})` | `Future<String>` | Get string value |
+| `getNumberValue(key, default, {context})` | `Future<num>` | Get number value |
+| `getJsonValue<T>(key, default, {context})` | `Future<T>` | Get JSON value |
 
-### Details Methods
-
-| Method | Return Type | Description |
-| ------ | ----------- | ----------- |
-| `getBooleanDetails(key, default, {context})` | `Future<ResolutionDetails<bool>>` | Get boolean with resolution details |
-| `getStringDetails(key, default, {context})` | `Future<ResolutionDetails<String>>` | Get string with resolution details |
-| `getNumberDetails(key, default, {context})` | `Future<ResolutionDetails<num>>` | Get number with resolution details |
-| `getJsonDetails<T>(key, default, {context})` | `Future<ResolutionDetails<T>>` | Get JSON with resolution details |
-
-### Other Methods
+#### Details Methods
 
 | Method | Return Type | Description |
-| ------ | ----------- | ----------- |
-| `getSnapshot({options})` | `Future<FlagSnapshot>` | Get all evaluated flags |
-| `evaluateFlag(key, {context, defaultValue})` | `Future<EvaluatedFlag>` | Evaluate a single flag |
+|--------|-------------|-------------|
+| `getBooleanDetails(key, default, {context})` | `Future<ResolutionDetails<bool>>` | Boolean with details |
+| `getStringDetails(key, default, {context})` | `Future<ResolutionDetails<String>>` | String with details |
+| `getNumberDetails(key, default, {context})` | `Future<ResolutionDetails<num>>` | Number with details |
+| `getJsonDetails<T>(key, default, {context})` | `Future<ResolutionDetails<T>>` | JSON with details |
+
+#### Other Methods
+
+| Method | Return Type | Description |
+|--------|-------------|-------------|
+| `getSnapshot({options})` | `Future<FlagSnapshot>` | Get all flags |
+| `evaluateFlag(key, {context, defaultValue})` | `Future<EvaluatedFlag>` | Evaluate single flag |
 
 ### OpenFeature Integration
 
-For OpenFeature ecosystem integration, use the provider:
+For projects using [OpenFeature](https://openfeature.dev), we provide a compatible provider:
 
 ```dart
 import 'package:openfeature_dart_server_sdk/open_feature_api.dart';
@@ -114,26 +161,23 @@ import 'package:openfeature_dart_server_sdk/hooks.dart';
 import 'package:openfeature_dart_server_sdk/evaluation_context.dart';
 import 'package:kitbase/flags/openfeature.dart';
 
-// Register the Kitbase provider
+// Register provider
 final api = OpenFeatureAPI();
 api.setProvider(KitbaseProvider(
   options: KitbaseProviderOptions(token: '<YOUR_API_KEY>'),
 ));
 
-// Create a client
+// Create client
 final client = FeatureClient(
   metadata: ClientMetadata(name: 'my-app'),
   hookManager: HookManager(),
   defaultContext: EvaluationContext(attributes: {}),
 );
 
-// Evaluate flags using the OpenFeature API
+// Evaluate flags
 final isEnabled = await client.getBooleanFlag(
   'dark-mode',
   defaultValue: false,
-  context: EvaluationContext(attributes: {
-    'targetingKey': 'user-123',
-  }),
 );
 ```
 
@@ -142,6 +186,8 @@ final isEnabled = await client.getBooleanFlag(
 ## Events
 
 Track events and logs in your application.
+
+### Basic Usage
 
 ```dart
 import 'package:kitbase/events.dart';
@@ -162,27 +208,40 @@ await events.track(
   },
 );
 
-// Don't forget to close when done
 events.close();
 ```
 
-### `events.track(...)`
+### API Reference
 
-| Parameter     | Type                   | Required | Description              |
-| ------------- | ---------------------- | -------- | ------------------------ |
-| `channel`     | `String`               | ✅       | Channel/category         |
-| `event`       | `String`               | ✅       | Event name               |
-| `userId`      | `String?`              | –        | User identifier          |
-| `icon`        | `String?`              | –        | Emoji or icon name       |
-| `notify`      | `bool?`                | –        | Send notification        |
-| `description` | `String?`              | –        | Event description        |
-| `tags`        | `Map<String, dynamic>?`| –        | Additional metadata      |
+#### `events.track(...)`
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `channel` | `String` | ✅ | Channel/category |
+| `event` | `String` | ✅ | Event name |
+| `userId` | `String?` | – | User identifier |
+| `icon` | `String?` | – | Emoji or icon name |
+| `notify` | `bool?` | – | Send notification |
+| `description` | `String?` | – | Event description |
+| `tags` | `Map<String, dynamic>?` | – | Additional metadata |
+
+#### Response
+
+```dart
+class TrackResponse {
+  final String id;        // Event ID
+  final String event;     // Event name
+  final String timestamp; // Server timestamp
+}
+```
 
 ---
 
 ## Changelogs
 
 Fetch version changelogs for your application.
+
+### Basic Usage
 
 ```dart
 import 'package:kitbase/changelogs.dart';
@@ -193,11 +252,12 @@ final changelog = await changelogs.get('1.0.0');
 print(changelog.version);   // "1.0.0"
 print(changelog.markdown);  // "## What's New\n\n- Feature X..."
 
-// Don't forget to close when done
 changelogs.close();
 ```
 
-### `changelogs.get(version)`
+### API Reference
+
+#### `changelogs.get(version)`
 
 Returns a `ChangelogResponse`:
 
@@ -205,7 +265,7 @@ Returns a `ChangelogResponse`:
 class ChangelogResponse {
   final String id;
   final String version;
-  final String markdown;      // Markdown content
+  final String markdown;    // Markdown content
   final bool isPublished;
   final String projectId;
   final String createdAt;
@@ -217,45 +277,9 @@ class ChangelogResponse {
 
 ## Error Handling
 
-### Events Errors
+All modules throw specific exceptions for different error cases.
 
-```dart
-try {
-  await events.track(channel: 'test', event: 'Test');
-} on EventsAuthenticationException {
-  // Invalid API key
-} on EventsValidationException catch (e) {
-  print(e.field);  // Which field failed
-} on EventsTimeoutException {
-  // Request timed out
-} on EventsApiException catch (e) {
-  print(e.statusCode);
-} on KitbaseEventsException catch (e) {
-  print(e.message);
-}
-```
-
-### Changelogs Errors
-
-```dart
-try {
-  await changelogs.get('1.0.0');
-} on ChangelogsAuthenticationException {
-  // Invalid API key
-} on ChangelogsNotFoundException catch (e) {
-  print('Version ${e.version} not found');
-} on ChangelogsValidationException catch (e) {
-  print(e.field);
-} on ChangelogsTimeoutException {
-  // Request timed out
-} on ChangelogsApiException catch (e) {
-  print(e.statusCode);
-} on KitbaseChangelogsException catch (e) {
-  print(e.message);
-}
-```
-
-### Flags Errors
+### Feature Flags
 
 ```dart
 try {
@@ -267,37 +291,86 @@ try {
 } on TypeMismatchException catch (e) {
   print('Expected ${e.expectedType}, got ${e.actualType}');
 } on FlagsValidationException catch (e) {
-  print(e.field);
+  print('Validation error: ${e.field}');
 } on FlagsTimeoutException {
   // Request timed out
 } on FlagsApiException catch (e) {
-  print(e.statusCode);
-} on KitbaseFlagsException catch (e) {
-  print(e.message);
+  print('API error: ${e.statusCode}');
+}
+```
+
+### Events
+
+```dart
+try {
+  await events.track(channel: 'test', event: 'Test');
+} on EventsAuthenticationException {
+  // Invalid API key
+} on EventsValidationException catch (e) {
+  print('Validation error: ${e.field}');
+} on EventsTimeoutException {
+  // Request timed out
+} on EventsApiException catch (e) {
+  print('API error: ${e.statusCode}');
+}
+```
+
+### Changelogs
+
+```dart
+try {
+  await changelogs.get('1.0.0');
+} on ChangelogsAuthenticationException {
+  // Invalid API key
+} on ChangelogsNotFoundException catch (e) {
+  print('Version ${e.version} not found');
+} on ChangelogsValidationException catch (e) {
+  print('Validation error: ${e.field}');
+} on ChangelogsTimeoutException {
+  // Request timed out
+} on ChangelogsApiException catch (e) {
+  print('API error: ${e.statusCode}');
 }
 ```
 
 ---
 
-## Flutter Usage
+## Flutter Integration
+
+Example singleton service for Flutter apps:
 
 ```dart
-// Singleton pattern
+import 'package:kitbase/kitbase.dart';
+
 class KitbaseService {
   static final KitbaseService _instance = KitbaseService._internal();
+  
+  late final KitbaseFlags _flags;
   late final KitbaseEvents _events;
   late final KitbaseChangelogs _changelogs;
-  late final KitbaseFlags _flags;
 
   factory KitbaseService() => _instance;
 
   KitbaseService._internal() {
-    _events = KitbaseEvents(token: '<YOUR_API_KEY>');
-    _changelogs = KitbaseChangelogs(token: '<YOUR_API_KEY>');
-    _flags = KitbaseFlags(token: '<YOUR_API_KEY>');
+    const token = '<YOUR_API_KEY>';
+    _flags = KitbaseFlags(token: token);
+    _events = KitbaseEvents(token: token);
+    _changelogs = KitbaseChangelogs(token: token);
   }
 
-  Future<TrackResponse> track({
+  // Feature Flags
+  Future<bool> isFeatureEnabled(String key, {String? userId}) {
+    return _flags.getBooleanValue(
+      key,
+      false,
+      context: userId != null 
+          ? EvaluationContext(targetingKey: userId) 
+          : null,
+    );
+  }
+
+  // Events
+  Future<TrackResponse> trackEvent({
     required String channel,
     required String event,
     String? userId,
@@ -315,21 +388,40 @@ class KitbaseService {
     );
   }
 
+  // Changelogs
   Future<ChangelogResponse> getChangelog(String version) {
     return _changelogs.get(version);
   }
 
-  Future<bool> isFeatureEnabled(String flagKey, {String? userId}) {
-    return _flags.getBooleanValue(
-      flagKey,
-      false,
-      context: userId != null
-          ? EvaluationContext(targetingKey: userId)
-          : null,
+  // Cleanup
+  void dispose() {
+    _flags.close();
+    _events.close();
+    _changelogs.close();
+  }
+}
+```
+
+**Usage in widgets:**
+
+```dart
+class MyWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<bool>(
+      future: KitbaseService().isFeatureEnabled('new-ui', userId: 'user-123'),
+      builder: (context, snapshot) {
+        if (snapshot.data == true) {
+          return NewUIWidget();
+        }
+        return OldUIWidget();
+      },
     );
   }
 }
 ```
+
+---
 
 ## Requirements
 
