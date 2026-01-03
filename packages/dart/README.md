@@ -30,6 +30,111 @@ import 'package:kitbase/kitbase.dart';
 // Or import specific features
 import 'package:kitbase/events.dart';
 import 'package:kitbase/changelogs.dart';
+import 'package:kitbase/flags.dart';
+```
+
+---
+
+## Feature Flags
+
+Evaluate feature flags in your application with targeting support.
+
+```dart
+import 'package:kitbase/flags.dart';
+
+final flags = KitbaseFlags(token: '<YOUR_API_KEY>');
+
+// Simple boolean check
+final isEnabled = await flags.getBooleanValue('dark-mode', false);
+
+// With targeting context
+final isPremiumFeature = await flags.getBooleanValue(
+  'premium-feature',
+  false,
+  context: EvaluationContext(
+    targetingKey: 'user-123',
+    attributes: {'plan': 'premium', 'country': 'US'},
+  ),
+);
+
+// Other value types
+final apiUrl = await flags.getStringValue('api-url', 'https://default.api');
+final maxItems = await flags.getNumberValue('max-items', 50);
+final config = await flags.getJsonValue<Map<String, dynamic>>('ui-config', {});
+
+// Get full resolution details
+final details = await flags.getBooleanDetails('feature-x', false);
+print('Value: ${details.value}');
+print('Reason: ${details.reason}');
+print('Variant: ${details.variant}');
+
+// Get all flags as a snapshot
+final snapshot = await flags.getSnapshot();
+for (final flag in snapshot.flags) {
+  print('${flag.flagKey}: ${flag.value}');
+}
+
+// Don't forget to close when done
+flags.close();
+```
+
+### Value Methods
+
+| Method | Return Type | Description |
+| ------ | ----------- | ----------- |
+| `getBooleanValue(key, default, {context})` | `Future<bool>` | Get boolean flag value |
+| `getStringValue(key, default, {context})` | `Future<String>` | Get string flag value |
+| `getNumberValue(key, default, {context})` | `Future<num>` | Get number flag value |
+| `getJsonValue<T>(key, default, {context})` | `Future<T>` | Get JSON flag value |
+
+### Details Methods
+
+| Method | Return Type | Description |
+| ------ | ----------- | ----------- |
+| `getBooleanDetails(key, default, {context})` | `Future<ResolutionDetails<bool>>` | Get boolean with resolution details |
+| `getStringDetails(key, default, {context})` | `Future<ResolutionDetails<String>>` | Get string with resolution details |
+| `getNumberDetails(key, default, {context})` | `Future<ResolutionDetails<num>>` | Get number with resolution details |
+| `getJsonDetails<T>(key, default, {context})` | `Future<ResolutionDetails<T>>` | Get JSON with resolution details |
+
+### Other Methods
+
+| Method | Return Type | Description |
+| ------ | ----------- | ----------- |
+| `getSnapshot({options})` | `Future<FlagSnapshot>` | Get all evaluated flags |
+| `evaluateFlag(key, {context, defaultValue})` | `Future<EvaluatedFlag>` | Evaluate a single flag |
+
+### OpenFeature Integration
+
+For OpenFeature ecosystem integration, use the provider:
+
+```dart
+import 'package:openfeature_dart_server_sdk/open_feature_api.dart';
+import 'package:openfeature_dart_server_sdk/client.dart';
+import 'package:openfeature_dart_server_sdk/hooks.dart';
+import 'package:openfeature_dart_server_sdk/evaluation_context.dart';
+import 'package:kitbase/flags/openfeature.dart';
+
+// Register the Kitbase provider
+final api = OpenFeatureAPI();
+api.setProvider(KitbaseProvider(
+  options: KitbaseProviderOptions(token: '<YOUR_API_KEY>'),
+));
+
+// Create a client
+final client = FeatureClient(
+  metadata: ClientMetadata(name: 'my-app'),
+  hookManager: HookManager(),
+  defaultContext: EvaluationContext(attributes: {}),
+);
+
+// Evaluate flags using the OpenFeature API
+final isEnabled = await client.getBooleanFlag(
+  'dark-mode',
+  defaultValue: false,
+  context: EvaluationContext(attributes: {
+    'targetingKey': 'user-123',
+  }),
+);
 ```
 
 ---
@@ -150,6 +255,28 @@ try {
 }
 ```
 
+### Flags Errors
+
+```dart
+try {
+  await flags.getBooleanValue('my-flag', false);
+} on FlagsAuthenticationException {
+  // Invalid API key
+} on FlagNotFoundException catch (e) {
+  print('Flag ${e.flagKey} not found');
+} on TypeMismatchException catch (e) {
+  print('Expected ${e.expectedType}, got ${e.actualType}');
+} on FlagsValidationException catch (e) {
+  print(e.field);
+} on FlagsTimeoutException {
+  // Request timed out
+} on FlagsApiException catch (e) {
+  print(e.statusCode);
+} on KitbaseFlagsException catch (e) {
+  print(e.message);
+}
+```
+
 ---
 
 ## Flutter Usage
@@ -160,12 +287,14 @@ class KitbaseService {
   static final KitbaseService _instance = KitbaseService._internal();
   late final KitbaseEvents _events;
   late final KitbaseChangelogs _changelogs;
+  late final KitbaseFlags _flags;
 
   factory KitbaseService() => _instance;
 
   KitbaseService._internal() {
     _events = KitbaseEvents(token: '<YOUR_API_KEY>');
     _changelogs = KitbaseChangelogs(token: '<YOUR_API_KEY>');
+    _flags = KitbaseFlags(token: '<YOUR_API_KEY>');
   }
 
   Future<TrackResponse> track({
@@ -189,6 +318,16 @@ class KitbaseService {
   Future<ChangelogResponse> getChangelog(String version) {
     return _changelogs.get(version);
   }
+
+  Future<bool> isFeatureEnabled(String flagKey, {String? userId}) {
+    return _flags.getBooleanValue(
+      flagKey,
+      false,
+      context: userId != null
+          ? EvaluationContext(targetingKey: userId)
+          : null,
+    );
+  }
 }
 ```
 
@@ -199,7 +338,3 @@ class KitbaseService {
 ## License
 
 MIT
-
-
-
-
