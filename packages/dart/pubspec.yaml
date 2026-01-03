@@ -1,5 +1,5 @@
 name: kitbase
-description: Official Kitbase SDK for Dart/Flutter - Events tracking and changelogs
+description: Official Kitbase SDK for Dart/Flutter - Events tracking, changelogs, and feature flags
 version: 0.1.0
 repository: https://github.com/scr2em/kitbase-sdk/tree/main/packages/dart
 homepage: https://kitbase.io
@@ -15,5 +15,3 @@ dev_dependencies:
   test: ^1.25.0
   mockito: ^5.4.0
   build_runner: ^2.4.0
-
-
