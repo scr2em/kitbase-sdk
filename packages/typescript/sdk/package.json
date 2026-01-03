@@ -33,6 +33,26 @@
         "types": "./dist/flags/index.d.cts",
         "default": "./dist/flags/index.cjs"
       }
+    },
+    "./flags/server": {
+      "import": {
+        "types": "./dist/flags/server/index.d.ts",
+        "default": "./dist/flags/server/index.js"
+      },
+      "require": {
+        "types": "./dist/flags/server/index.d.cts",
+        "default": "./dist/flags/server/index.cjs"
+      }
+    },
+    "./flags/web": {
+      "import": {
+        "types": "./dist/flags/web/index.d.ts",
+        "default": "./dist/flags/web/index.js"
+      },
+      "require": {
+        "types": "./dist/flags/web/index.d.cts",
+        "default": "./dist/flags/web/index.cjs"
+      }
     }
   },
   "files": [
@@ -55,7 +75,8 @@
     "analytics",
     "tracking",
     "changelogs",
-    "feature-flags"
+    "feature-flags",
+    "openfeature"
   ],
   "author": "",
   "license": "MIT",
@@ -69,14 +90,26 @@
   },
   "homepage": "https://github.com/scr2em/kitbase-sdk/tree/main/packages/typescript/sdk#readme",
   "devDependencies": {
+    "@openfeature/server-sdk": "^1.15.0",
+    "@openfeature/web-sdk": "^1.2.0",
     "@types/node": "^20.11.0",
     "tsup": "^8.0.1",
     "typescript": "^5.3.3",
     "vitest": "^1.2.0"
   },
+  "peerDependencies": {
+    "@openfeature/server-sdk": "^1.0.0",
+    "@openfeature/web-sdk": "^1.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@openfeature/server-sdk": {
+      "optional": true
+    },
+    "@openfeature/web-sdk": {
+      "optional": true
+    }
+  },
   "engines": {
     "node": ">=18"
   }
 }
-
-

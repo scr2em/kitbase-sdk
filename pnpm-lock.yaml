@@ -48,6 +48,12 @@ importers:
 
   packages/typescript/sdk:
     devDependencies:
+      '@openfeature/server-sdk':
+        specifier: ^1.15.0
+        version: 1.20.1(@openfeature/core@1.9.1)
+      '@openfeature/web-sdk':
+        specifier: ^1.2.0
+        version: 1.7.2(@openfeature/core@1.9.1)
       '@types/node':
         specifier: ^20.11.0
         version: 20.19.27
@@ -377,6 +383,20 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
+
+  '@openfeature/core@1.9.1':
+    resolution: {integrity: sha512-YySPtH4s/rKKnHRU0xyFGrqMU8XA+OIPNWDrlEFxE6DCVWCIrxE5YpiB94YD2jMFn6SSdA0cwQ8vLkCkl8lm8A==}
+
+  '@openfeature/server-sdk@1.20.1':
+    resolution: {integrity: sha512-jzz++kblADniuc7hONZ4DlRsoektCMDX5PPHoltn0hYWWw/Zm6sh3f7z5mGUX2XOikWKNVCtUQ3gWsdmIdHHXg==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      '@openfeature/core': ^1.9.0
+
+  '@openfeature/web-sdk@1.7.2':
+    resolution: {integrity: sha512-8QwhoxVNN2bFFkpWjbCyHCdkVjt/UTVn0o+OwcUUQoZnvPn46Oo1BxJQxUTibl/D/dAM/YQhxmg7ep7gYRxX4g==}
+    peerDependencies:
+      '@openfeature/core': ^1.9.0
 
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
@@ -1450,6 +1470,16 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
+
+  '@openfeature/core@1.9.1': {}
+
+  '@openfeature/server-sdk@1.20.1(@openfeature/core@1.9.1)':
+    dependencies:
+      '@openfeature/core': 1.9.1
+
+  '@openfeature/web-sdk@1.7.2(@openfeature/core@1.9.1)':
+    dependencies:
+      '@openfeature/core': 1.9.1
 
   '@pkgjs/parseargs@0.11.0':
     optional: true
