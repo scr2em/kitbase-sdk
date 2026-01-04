@@ -1,3 +1,5 @@
+import type { FlagConfiguration } from './config-types.js';
+
 /**
  * Configuration options for the FlagsClient
  */
@@ -6,6 +8,44 @@ export interface FlagsConfig {
    * Your Kitbase API key
    */
   token: string;
+
+  /**
+   * Enable local evaluation mode.
+   * When true, the SDK fetches flag configuration once and evaluates flags locally.
+   * When false (default), each flag evaluation makes an API call.
+   * @default false
+   */
+  enableLocalEvaluation?: boolean;
+
+  /**
+   * How often to refresh the environment configuration in seconds (local evaluation only).
+   * Set to 0 to disable automatic refresh.
+   * @default 60
+   */
+  environmentRefreshIntervalSeconds?: number;
+
+  /**
+   * Enable real-time updates via SSE streaming (local evaluation only).
+   * When true, uses Server-Sent Events instead of polling.
+   * @default false
+   */
+  enableRealtimeUpdates?: boolean;
+
+  /**
+   * Initial configuration to use before fetching from server (local evaluation only).
+   * Useful for SSR or offline-first scenarios.
+   */
+  initialConfiguration?: FlagConfiguration;
+
+  /**
+   * Callback when configuration is updated (local evaluation only).
+   */
+  onConfigurationChange?: (config: FlagConfiguration) => void;
+
+  /**
+   * Callback when an error occurs during config fetch/stream (local evaluation only).
+   */
+  onError?: (error: Error) => void;
 }
 
 /**
@@ -222,6 +262,3 @@ export type JsonValue =
   | null
   | JsonValue[]
   | { [key: string]: JsonValue };
-
-
-

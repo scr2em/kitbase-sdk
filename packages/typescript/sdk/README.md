@@ -19,7 +19,7 @@ Import only what you need:
 ```typescript
 import { Kitbase } from '@kitbase/sdk/events';
 import { Changelogs } from '@kitbase/sdk/changelogs';
-import { FlagsClient, LocalFlagsClient } from '@kitbase/sdk/flags';
+import { FlagsClient } from '@kitbase/sdk/flags';
 ```
 
 ---
@@ -153,9 +153,12 @@ try {
 
 Evaluate feature flags in your application. The SDK supports two evaluation modes:
 
-### Server-Side Evaluation (FlagsClient)
+- **Remote Evaluation** (default): Each flag evaluation makes an API call
+- **Local Evaluation**: Fetches config once and evaluates flags locally
 
-Each flag evaluation makes an API call. Best for server-side usage with low-latency requirements to the Kitbase API.
+### Remote Evaluation (Default)
+
+Each flag evaluation makes an API call. Simple to use, always up-to-date.
 
 ```typescript
 import { FlagsClient } from '@kitbase/sdk/flags';
@@ -177,24 +180,24 @@ const result = await flags.evaluateFlag('feature-x', {
 console.log(result.value, result.reason);
 ```
 
-### Local Evaluation (LocalFlagsClient)
+### Local Evaluation
 
-Fetches flag configuration once and evaluates flags locally without API calls. Best for high-throughput scenarios or when you need low-latency flag evaluation.
+Fetches flag configuration once and evaluates flags locally. Best for high-throughput scenarios with sub-millisecond evaluation.
 
 ```typescript
-import { LocalFlagsClient } from '@kitbase/sdk/flags';
+import { FlagsClient } from '@kitbase/sdk/flags';
 
-const flags = new LocalFlagsClient({
+const flags = new FlagsClient({
   token: '<YOUR_API_KEY>',
-  pollingInterval: 60000, // Poll for updates every minute
-  // streaming: true,     // Or use SSE for real-time updates
+  enableLocalEvaluation: true,
+  environmentRefreshIntervalSeconds: 60, // Refresh config every 60s
 });
 
 // Initialize (fetches configuration)
 await flags.initialize();
 
 // Evaluate flags locally (no network call)
-const isEnabled = flags.getBooleanValue('dark-mode', false, {
+const isEnabled = await flags.getBooleanValue('dark-mode', false, {
   targetingKey: 'user-123',
   plan: 'premium',
 });
@@ -210,20 +213,19 @@ flags.on((event) => {
 flags.close();
 ```
 
-### LocalFlagsClient Options
+### FlagsClient Options
 
-| Option                  | Type                                 | Default | Description                                     |
-| ----------------------- | ------------------------------------ | ------- | ----------------------------------------------- |
-| `token`                 | `string`                             | –       | Your Kitbase API key (required)                 |
-| `streaming`             | `boolean`                            | `false` | Enable SSE streaming for real-time updates      |
-| `pollingInterval`       | `number`                             | `60000` | Polling interval in ms (0 to disable)           |
-| `initialConfig`         | `FlagConfiguration`                  | –       | Initial config for SSR/offline scenarios        |
-| `onConfigurationChange` | `(config: FlagConfiguration) => void`| –       | Callback when configuration updates             |
-| `onError`               | `(error: Error) => void`             | –       | Callback for errors during config fetch/stream  |
+| Option                             | Type                                  | Default | Description                                      |
+| ---------------------------------- | ------------------------------------- | ------- | ------------------------------------------------ |
+| `token`                            | `string`                              | –       | Your Kitbase API key (required)                  |
+| `enableLocalEvaluation`            | `boolean`                             | `false` | Enable local evaluation mode                     |
+| `environmentRefreshIntervalSeconds`| `number`                              | `60`    | Config refresh interval in seconds (local only)  |
+| `enableRealtimeUpdates`            | `boolean`                             | `false` | Use SSE streaming instead of polling (local only)|
+| `initialConfiguration`             | `FlagConfiguration`                   | –       | Initial config for SSR/offline (local only)      |
+| `onConfigurationChange`            | `(config: FlagConfiguration) => void` | –       | Callback when configuration updates (local only) |
+| `onError`                          | `(error: Error) => void`              | –       | Callback for errors (local only)                 |
 
 ### Flag Value Methods
-
-Both clients support the same methods for retrieving flag values:
 
 ```typescript
 // Boolean flags

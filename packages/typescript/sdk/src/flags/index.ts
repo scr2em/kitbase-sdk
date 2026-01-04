@@ -1,9 +1,6 @@
-// Main client (server-side evaluation)
+// Main client
 export { FlagsClient } from './client.js';
-
-// Local evaluation client
-export { LocalFlagsClient } from './local-client.js';
-export type { LocalFlagsEvent, LocalFlagsListener } from './local-client.js';
+export type { FlagsClientEvent, FlagsClientListener } from './client.js';
 
 // Local evaluation engine (for advanced use cases)
 export { FlagEvaluator, evaluateFlag } from './evaluator.js';
@@ -32,7 +29,6 @@ export type {
   SegmentDefinition,
   SegmentRuleDefinition,
   SegmentOperator,
-  LocalFlagsConfig,
 } from './config-types.js';
 
 // Errors
