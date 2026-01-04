@@ -34,3 +34,4 @@ export function EventsProvider({ token, children }: EventsProviderProps) {
   );
 }
 
+

@@ -96,3 +96,4 @@ class ParseException extends KitbaseFlagsException {
   String toString() => 'ParseException: $message';
 }
 
+
