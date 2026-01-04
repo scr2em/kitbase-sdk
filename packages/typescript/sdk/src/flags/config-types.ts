@@ -196,3 +196,4 @@ export interface LocalFlagsConfig {
    */
   onError?: (error: Error) => void;
 }
+

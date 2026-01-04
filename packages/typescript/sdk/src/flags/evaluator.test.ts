@@ -654,3 +654,4 @@ describe('evaluateFlag function', () => {
     expect(result.flag.value).toBe(true);
   });
 });
+
