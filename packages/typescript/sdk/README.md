@@ -19,7 +19,7 @@ Import only what you need:
 ```typescript
 import { Kitbase } from '@kitbase/sdk/events';
 import { Changelogs } from '@kitbase/sdk/changelogs';
-// import { Flags } from '@kitbase/sdk/flags';  // coming soon
+import { FlagsClient, LocalFlagsClient } from '@kitbase/sdk/flags';
 ```
 
 ---
@@ -145,6 +145,132 @@ try {
     console.log('Invalid API key');
   }
 }
+```
+
+---
+
+## Feature Flags
+
+Evaluate feature flags in your application. The SDK supports two evaluation modes:
+
+### Server-Side Evaluation (FlagsClient)
+
+Each flag evaluation makes an API call. Best for server-side usage with low-latency requirements to the Kitbase API.
+
+```typescript
+import { FlagsClient } from '@kitbase/sdk/flags';
+
+const flags = new FlagsClient({
+  token: '<YOUR_API_KEY>',
+});
+
+// Simple boolean check
+const isEnabled = await flags.getBooleanValue('dark-mode', false, {
+  targetingKey: 'user-123',
+  plan: 'premium',
+});
+
+// Get full resolution details
+const result = await flags.evaluateFlag('feature-x', {
+  context: { targetingKey: 'user-123', country: 'US' },
+});
+console.log(result.value, result.reason);
+```
+
+### Local Evaluation (LocalFlagsClient)
+
+Fetches flag configuration once and evaluates flags locally without API calls. Best for high-throughput scenarios or when you need low-latency flag evaluation.
+
+```typescript
+import { LocalFlagsClient } from '@kitbase/sdk/flags';
+
+const flags = new LocalFlagsClient({
+  token: '<YOUR_API_KEY>',
+  pollingInterval: 60000, // Poll for updates every minute
+  // streaming: true,     // Or use SSE for real-time updates
+});
+
+// Initialize (fetches configuration)
+await flags.initialize();
+
+// Evaluate flags locally (no network call)
+const isEnabled = flags.getBooleanValue('dark-mode', false, {
+  targetingKey: 'user-123',
+  plan: 'premium',
+});
+
+// Listen for configuration changes
+flags.on((event) => {
+  if (event.type === 'configurationChanged') {
+    console.log('Flags updated:', event.config.etag);
+  }
+});
+
+// Clean up when done
+flags.close();
+```
+
+### LocalFlagsClient Options
+
+| Option                  | Type                                 | Default | Description                                     |
+| ----------------------- | ------------------------------------ | ------- | ----------------------------------------------- |
+| `token`                 | `string`                             | –       | Your Kitbase API key (required)                 |
+| `streaming`             | `boolean`                            | `false` | Enable SSE streaming for real-time updates      |
+| `pollingInterval`       | `number`                             | `60000` | Polling interval in ms (0 to disable)           |
+| `initialConfig`         | `FlagConfiguration`                  | –       | Initial config for SSR/offline scenarios        |
+| `onConfigurationChange` | `(config: FlagConfiguration) => void`| –       | Callback when configuration updates             |
+| `onError`               | `(error: Error) => void`             | –       | Callback for errors during config fetch/stream  |
+
+### Flag Value Methods
+
+Both clients support the same methods for retrieving flag values:
+
+```typescript
+// Boolean flags
+const boolValue = await flags.getBooleanValue('flag-key', defaultValue, context);
+const boolDetails = await flags.getBooleanDetails('flag-key', defaultValue, context);
+
+// String flags
+const strValue = await flags.getStringValue('flag-key', defaultValue, context);
+const strDetails = await flags.getStringDetails('flag-key', defaultValue, context);
+
+// Number flags
+const numValue = await flags.getNumberValue('flag-key', defaultValue, context);
+const numDetails = await flags.getNumberDetails('flag-key', defaultValue, context);
+
+// JSON flags
+const jsonValue = await flags.getJsonValue('flag-key', defaultValue, context);
+const jsonDetails = await flags.getJsonDetails('flag-key', defaultValue, context);
+
+// Get all flags at once
+const snapshot = await flags.getSnapshot(context);
+```
+
+### Evaluation Context
+
+The evaluation context is used for targeting and percentage rollouts:
+
+```typescript
+const context = {
+  targetingKey: 'user-123',  // Required for percentage rollouts
+  plan: 'premium',           // Custom attribute for targeting
+  country: 'US',             // Custom attribute for targeting
+  age: 25,                   // Supports any JSON-serializable value
+};
+```
+
+### Flags Errors
+
+```typescript
+import {
+  FlagsError,
+  AuthenticationError,
+  ApiError,
+  ValidationError,
+  TimeoutError,
+  FlagNotFoundError,
+  TypeMismatchError,
+} from '@kitbase/sdk/flags';
 ```
 
 ---
