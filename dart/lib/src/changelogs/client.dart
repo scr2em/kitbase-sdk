@@ -66,7 +66,7 @@ class KitbaseChangelogs {
             uri,
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': 'Bearer $_token',
+              'x-api-key': '$_token',
             },
           )
           .timeout(_timeout);
@@ -124,11 +124,3 @@ class KitbaseChangelogs {
     _client.close();
   }
 }
-
-
-
-
-
-
-
-

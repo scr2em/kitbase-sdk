@@ -63,7 +63,7 @@ describe('Kitbase', () => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: 'Bearer test-token',
+            'x-api-key': 'test-token',
           },
         }),
       );
@@ -148,11 +148,3 @@ describe('Kitbase', () => {
     });
   });
 });
-
-
-
-
-
-
-
-

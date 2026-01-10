@@ -68,7 +68,7 @@ export class Changelogs {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.token}`,
+          'x-api-key': `${this.token}`,
         },
         signal: controller.signal,
       });
@@ -123,11 +123,3 @@ export class Changelogs {
     return fallback;
   }
 }
-
-
-
-
-
-
-
-

@@ -43,7 +43,7 @@ void main() {
           expect(request.url.toString(),
               'https://api.kitbase.dev/v1/feature-flags/snapshot');
           expect(request.method, 'POST');
-          expect(request.headers['Authorization'], 'Bearer test-token');
+          expect(request.headers['x-api-key'], 'test-token');
           expect(request.headers['Content-Type'], 'application/json');
           return http.Response(jsonEncode(mockResponse), 200);
         });
@@ -400,7 +400,3 @@ void main() {
     });
   });
 }
-
-
-
-

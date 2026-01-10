@@ -77,7 +77,7 @@ class Changelogs
             $response = $this->httpClient->get($endpoint, [
                 'headers' => [
                     'Content-Type' => 'application/json',
-                    'Authorization' => 'Bearer ' . $this->token,
+                    'x-api-key' => $this->token,
                 ],
             ]);
 
@@ -138,11 +138,3 @@ class Changelogs
         return $fallback;
     }
 }
-
-
-
-
-
-
-
-

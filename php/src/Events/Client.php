@@ -141,7 +141,7 @@ class Kitbase
             $response = $this->httpClient->post($endpoint, [
                 'headers' => [
                     'Content-Type' => 'application/json',
-                    'Authorization' => 'Bearer ' . $this->token,
+                    'x-api-key' => $this->token,
                 ],
                 'json' => $body,
             ]);
@@ -196,11 +196,3 @@ class Kitbase
         return $fallback;
     }
 }
-
-
-
-
-
-
-
-

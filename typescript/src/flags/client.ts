@@ -121,7 +121,7 @@ export class FlagsClient {
     this.cacheTtl = config.cacheTtl ?? 300000; // 5 minutes default
     this.enablePersistentCache =
       config.enablePersistentCache ??
-        this.isLocalStorageAvailable()
+      this.isLocalStorageAvailable()
 
     // Initialize evaluator for local evaluation mode
     if (this.enableLocalEvaluation) {
@@ -659,7 +659,7 @@ export class FlagsClient {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.token}`,
+          'x-api-key': `${this.token}`,
         },
         body: body ? JSON.stringify(body) : undefined,
         signal: controller.signal,

@@ -179,7 +179,7 @@ export class Kitbase {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.token}`,
+          "x-api-key": `${this.token}`,
         },
         body: JSON.stringify(body),
         signal: controller.signal,

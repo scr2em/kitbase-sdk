@@ -48,7 +48,7 @@ void main() {
           expect(request.url.toString(),
               'https://api.kitbase.dev/v1/changelogs/1.0.0');
           expect(request.method, 'GET');
-          expect(request.headers['Authorization'], 'Bearer test-token');
+          expect(request.headers['x-api-key'], 'test-token');
           return http.Response(jsonEncode(mockResponse), 200);
         });
 
@@ -141,11 +141,3 @@ void main() {
     });
   });
 }
-
-
-
-
-
-
-
-

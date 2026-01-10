@@ -354,7 +354,7 @@ class KitbaseFlags {
             uri,
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': 'Bearer $_token',
+              'x-api-key': '$_token',
             },
             body: body != null ? jsonEncode(body) : null,
           )
@@ -422,7 +422,3 @@ class KitbaseFlags {
     _client.close();
   }
 }
-
-
-
-
