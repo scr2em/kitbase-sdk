@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:openfeature_dart_server_sdk/feature_provider.dart';
 
 import '../client.dart';
-import '../types.dart';
+import '../types.dart' as kitbase_types;
 
 /// Configuration options for KitbaseProvider
 class KitbaseProviderOptions {
@@ -90,11 +90,14 @@ class KitbaseProvider implements FeatureProvider {
   String get name => 'kitbase';
 
   @override
+  ProviderMetadata get metadata => ProviderMetadata(name: name);
+
+  @override
   ProviderState get state => _state;
   ProviderState _state = ProviderState.NOT_READY;
 
   @override
-  ProviderConfig get config => ProviderConfig();
+  ProviderConfig get config => const ProviderConfig();
 
   final KitbaseFlags _client;
   final bool _cacheEnabled;
@@ -197,8 +200,8 @@ class KitbaseProvider implements FeatureProvider {
   /// Prefetch all flags for a context (useful for caching).
   Future<void> prefetchFlags({Map<String, dynamic>? context}) async {
     final kitbaseContext = _toKitbaseContext(context);
-    final snapshot =
-        await _client.getSnapshot(options: EvaluateOptions(context: kitbaseContext));
+    final snapshot = await _client.getSnapshot(
+        options: kitbase_types.EvaluateOptions(context: kitbaseContext));
 
     for (final flag in snapshot.flags) {
       final cacheKey = _getCacheKey(flag.flagKey, context);
@@ -206,10 +209,12 @@ class KitbaseProvider implements FeatureProvider {
         value: flag.value,
         variant: flag.variant,
         reason: _reasonToString(flag.reason),
-        errorCode: flag.errorCode != null ? _errorCodeToString(flag.errorCode!) : null,
+        errorCode: flag.errorCode != null
+            ? _kitbaseErrorCodeToString(flag.errorCode!)
+            : null,
         errorMessage: flag.errorMessage,
         flagMetadata: flag.flagMetadata,
-        valueType: flagValueTypeToString(flag.valueType),
+        valueType: kitbase_types.flagValueTypeToString(flag.valueType),
         timestamp: DateTime.now(),
       );
     }
@@ -243,16 +248,16 @@ class KitbaseProvider implements FeatureProvider {
       );
 
       // Check for type mismatch
-      if (flagValueTypeToString(flag.valueType) != expectedType) {
+      if (kitbase_types.flagValueTypeToString(flag.valueType) != expectedType) {
         return FlagEvaluationResult<T>(
           flagKey: flagKey,
           value: defaultValue,
           evaluatedAt: DateTime.now(),
           evaluatorId: name,
           reason: 'ERROR',
-          errorCode: 'TYPE_MISMATCH',
+          errorCode: ErrorCode.TYPE_MISMATCH,
           errorMessage:
-              'Expected $expectedType, got ${flagValueTypeToString(flag.valueType)}',
+              'Expected $expectedType, got ${kitbase_types.flagValueTypeToString(flag.valueType)}',
         );
       }
 
@@ -262,7 +267,7 @@ class KitbaseProvider implements FeatureProvider {
       }
 
       // Handle disabled flags or errors
-      if (flag.errorCode == ErrorCode.flagNotFound ||
+      if (flag.errorCode == kitbase_types.ErrorCode.flagNotFound ||
           !flag.enabled ||
           flag.value == null) {
         return FlagEvaluationResult<T>(
@@ -272,7 +277,9 @@ class KitbaseProvider implements FeatureProvider {
           evaluatorId: name,
           variant: flag.variant,
           reason: _reasonToString(flag.reason),
-          errorCode: flag.errorCode != null ? _errorCodeToString(flag.errorCode!) : null,
+          errorCode: flag.errorCode != null
+              ? _kitbaseErrorCodeToOpenFeatureErrorCode(flag.errorCode!)
+              : null,
           errorMessage: flag.errorMessage,
         );
       }
@@ -284,7 +291,9 @@ class KitbaseProvider implements FeatureProvider {
         evaluatorId: name,
         variant: flag.variant,
         reason: _reasonToString(flag.reason),
-        errorCode: flag.errorCode != null ? _errorCodeToString(flag.errorCode!) : null,
+        errorCode: flag.errorCode != null
+            ? _kitbaseErrorCodeToOpenFeatureErrorCode(flag.errorCode!)
+            : null,
         errorMessage: flag.errorMessage,
       );
     } catch (error) {
@@ -294,13 +303,14 @@ class KitbaseProvider implements FeatureProvider {
         evaluatedAt: DateTime.now(),
         evaluatorId: name,
         reason: 'ERROR',
-        errorCode: 'GENERAL',
+        errorCode: ErrorCode.GENERAL,
         errorMessage: error.toString(),
       );
     }
   }
 
-  EvaluationContext? _toKitbaseContext(Map<String, dynamic>? context) {
+  kitbase_types.EvaluationContext? _toKitbaseContext(
+      Map<String, dynamic>? context) {
     if (context == null || context.isEmpty) {
       return null;
     }
@@ -309,7 +319,7 @@ class KitbaseProvider implements FeatureProvider {
     final attributes = Map<String, dynamic>.from(context)
       ..remove('targetingKey');
 
-    return EvaluationContext(
+    return kitbase_types.EvaluationContext(
       targetingKey: targetingKey,
       attributes: attributes,
     );
@@ -333,7 +343,8 @@ class KitbaseProvider implements FeatureProvider {
     }
 
     // Check if cache is expired
-    if (DateTime.now().difference(cached.timestamp).inMilliseconds > _cacheTtl) {
+    if (DateTime.now().difference(cached.timestamp).inMilliseconds >
+        _cacheTtl) {
       _cache.remove(cacheKey);
       return null;
     }
@@ -350,7 +361,9 @@ class KitbaseProvider implements FeatureProvider {
       evaluatorId: name,
       variant: cached.variant,
       reason: 'CACHED',
-      errorCode: cached.errorCode,
+      errorCode: cached.errorCode != null
+          ? _stringToOpenFeatureErrorCode(cached.errorCode!)
+          : null,
       errorMessage: cached.errorMessage,
     );
   }
@@ -358,7 +371,7 @@ class KitbaseProvider implements FeatureProvider {
   void _setCachedValue(
     String flagKey,
     Map<String, dynamic>? context,
-    EvaluatedFlag flag,
+    kitbase_types.EvaluatedFlag flag,
     String valueType,
   ) {
     final cacheKey = _getCacheKey(flagKey, context);
@@ -366,7 +379,9 @@ class KitbaseProvider implements FeatureProvider {
       value: flag.value,
       variant: flag.variant,
       reason: _reasonToString(flag.reason),
-      errorCode: flag.errorCode != null ? _errorCodeToString(flag.errorCode!) : null,
+      errorCode: flag.errorCode != null
+          ? _kitbaseErrorCodeToString(flag.errorCode!)
+          : null,
       errorMessage: flag.errorMessage,
       flagMetadata: flag.flagMetadata,
       valueType: valueType,
@@ -374,45 +389,87 @@ class KitbaseProvider implements FeatureProvider {
     );
   }
 
-  String _reasonToString(ResolutionReason reason) {
+  String _reasonToString(kitbase_types.ResolutionReason reason) {
     switch (reason) {
-      case ResolutionReason.static_:
+      case kitbase_types.ResolutionReason.static_:
         return 'STATIC';
-      case ResolutionReason.default_:
+      case kitbase_types.ResolutionReason.default_:
         return 'DEFAULT';
-      case ResolutionReason.targetingMatch:
+      case kitbase_types.ResolutionReason.targetingMatch:
         return 'TARGETING_MATCH';
-      case ResolutionReason.split:
+      case kitbase_types.ResolutionReason.split:
         return 'SPLIT';
-      case ResolutionReason.cached:
+      case kitbase_types.ResolutionReason.cached:
         return 'CACHED';
-      case ResolutionReason.disabled:
+      case kitbase_types.ResolutionReason.disabled:
         return 'DISABLED';
-      case ResolutionReason.unknown:
+      case kitbase_types.ResolutionReason.unknown:
         return 'UNKNOWN';
-      case ResolutionReason.stale:
+      case kitbase_types.ResolutionReason.stale:
         return 'STALE';
-      case ResolutionReason.error:
+      case kitbase_types.ResolutionReason.error:
         return 'ERROR';
     }
   }
 
-  String _errorCodeToString(ErrorCode code) {
+  String _kitbaseErrorCodeToString(kitbase_types.ErrorCode code) {
     switch (code) {
-      case ErrorCode.providerNotReady:
+      case kitbase_types.ErrorCode.providerNotReady:
         return 'PROVIDER_NOT_READY';
-      case ErrorCode.flagNotFound:
+      case kitbase_types.ErrorCode.flagNotFound:
         return 'FLAG_NOT_FOUND';
-      case ErrorCode.parseError:
+      case kitbase_types.ErrorCode.parseError:
         return 'PARSE_ERROR';
-      case ErrorCode.typeMismatch:
+      case kitbase_types.ErrorCode.typeMismatch:
         return 'TYPE_MISMATCH';
-      case ErrorCode.targetingKeyMissing:
+      case kitbase_types.ErrorCode.targetingKeyMissing:
         return 'TARGETING_KEY_MISSING';
-      case ErrorCode.invalidContext:
+      case kitbase_types.ErrorCode.invalidContext:
         return 'INVALID_CONTEXT';
-      case ErrorCode.general:
+      case kitbase_types.ErrorCode.general:
         return 'GENERAL';
+    }
+  }
+
+  /// Convert Kitbase ErrorCode to OpenFeature ErrorCode enum.
+  ErrorCode _kitbaseErrorCodeToOpenFeatureErrorCode(
+      kitbase_types.ErrorCode code) {
+    switch (code) {
+      case kitbase_types.ErrorCode.providerNotReady:
+        return ErrorCode.PROVIDER_NOT_READY;
+      case kitbase_types.ErrorCode.flagNotFound:
+        return ErrorCode.FLAG_NOT_FOUND;
+      case kitbase_types.ErrorCode.parseError:
+        return ErrorCode.PARSE_ERROR;
+      case kitbase_types.ErrorCode.typeMismatch:
+        return ErrorCode.TYPE_MISMATCH;
+      case kitbase_types.ErrorCode.targetingKeyMissing:
+        return ErrorCode.TARGETING_KEY_MISSING;
+      case kitbase_types.ErrorCode.invalidContext:
+        return ErrorCode.INVALID_CONTEXT;
+      case kitbase_types.ErrorCode.general:
+        return ErrorCode.GENERAL;
+    }
+  }
+
+  ErrorCode _stringToOpenFeatureErrorCode(String code) {
+    switch (code) {
+      case 'PROVIDER_NOT_READY':
+        return ErrorCode.PROVIDER_NOT_READY;
+      case 'FLAG_NOT_FOUND':
+        return ErrorCode.FLAG_NOT_FOUND;
+      case 'PARSE_ERROR':
+        return ErrorCode.PARSE_ERROR;
+      case 'TYPE_MISMATCH':
+        return ErrorCode.TYPE_MISMATCH;
+      case 'TARGETING_KEY_MISSING':
+        return ErrorCode.TARGETING_KEY_MISSING;
+      case 'INVALID_CONTEXT':
+        return ErrorCode.INVALID_CONTEXT;
+      case 'GENERAL':
+        return ErrorCode.GENERAL;
+      default:
+        return ErrorCode.GENERAL;
     }
   }
 }

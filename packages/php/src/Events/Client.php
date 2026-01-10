@@ -7,6 +7,7 @@ namespace Kitbase\Events;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
+use Ramsey\Uuid\Uuid;
 
 /**
  * Kitbase client for tracking events
@@ -21,9 +22,16 @@ use GuzzleHttp\Exception\RequestException;
  *     token: '<YOUR_API_KEY>',
  * ));
  *
+ * // Track anonymous events (anonymous_id is automatically included)
  * $response = $kitbase->track(new TrackOptions(
- *     channel: 'payments',
+ *     event: 'Page Viewed',
+ *     icon: '👀',
+ * ));
+ *
+ * // Track events for a logged-in user
+ * $response = $kitbase->track(new TrackOptions(
  *     event: 'New Subscription',
+ *     channel: 'payments',
  *     userId: 'user-123',
  *     icon: '💰',
  *     notify: true,
@@ -36,11 +44,15 @@ use GuzzleHttp\Exception\RequestException;
  */
 class Kitbase
 {
-    private const BASE_URL = 'https://api.kitbase.dev';
+    private const DEFAULT_BASE_URL = 'https://api.kitbase.dev';
     private const TIMEOUT = 30;
 
     private readonly string $token;
+    private readonly string $baseUrl;
     private readonly HttpClient $httpClient;
+    private readonly ?Storage $storage;
+    private readonly string $storageKey;
+    private ?string $anonymousId = null;
 
     public function __construct(KitbaseConfig $config, ?HttpClient $httpClient = null)
     {
@@ -49,10 +61,47 @@ class Kitbase
         }
 
         $this->token = $config->token;
+        $this->baseUrl = $config->baseUrl ?? self::DEFAULT_BASE_URL;
+        $this->storage = $config->storage ?? new MemoryStorage();
+        $this->storageKey = $config->storageKey;
         $this->httpClient = $httpClient ?? new HttpClient([
-            'base_uri' => self::BASE_URL,
+            'base_uri' => $this->baseUrl,
             'timeout' => self::TIMEOUT,
         ]);
+
+        $this->initializeAnonymousId();
+    }
+
+    /**
+     * Initialize the anonymous ID from storage or generate a new one
+     */
+    private function initializeAnonymousId(): void
+    {
+        if ($this->storage !== null) {
+            $stored = $this->storage->getItem($this->storageKey);
+            if ($stored !== null) {
+                $this->anonymousId = $stored;
+                return;
+            }
+        }
+
+        // Generate new anonymous ID (UUID v4)
+        $this->anonymousId = Uuid::uuid4()->toString();
+
+        // Persist if storage is available
+        if ($this->storage !== null && $this->anonymousId !== null) {
+            $this->storage->setItem($this->storageKey, $this->anonymousId);
+        }
+    }
+
+
+
+    /**
+     * Get the current anonymous ID
+     */
+    public function getAnonymousId(): ?string
+    {
+        return $this->anonymousId;
     }
 
     /**
@@ -69,7 +118,7 @@ class Kitbase
     {
         $this->validateTrackOptions($options);
 
-        $payload = $options->toPayload();
+        $payload = $options->toPayload($this->anonymousId);
         $response = $this->request('/v1/logs', $payload);
 
         return TrackResponse::fromArray($response);
@@ -77,9 +126,6 @@ class Kitbase
 
     private function validateTrackOptions(TrackOptions $options): void
     {
-        if (empty($options->channel)) {
-            throw new ValidationException('Channel is required', 'channel');
-        }
         if (empty($options->event)) {
             throw new ValidationException('Event is required', 'event');
         }
@@ -150,6 +196,7 @@ class Kitbase
         return $fallback;
     }
 }
+
 
 
 

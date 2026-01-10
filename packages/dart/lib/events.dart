@@ -16,13 +16,8 @@
 /// ```
 library kitbase.events;
 
-export 'src/events/client.dart';
-export 'src/events/types.dart';
-export 'src/events/exceptions.dart';
-
-
-
-
-
-
-
+export 'src/events/kitbase_events.dart';
+export 'src/events/domain/entities/track_options.dart';
+export 'src/events/domain/entities/track_response.dart';
+export 'src/events/domain/repos/events_repository.dart';
+export 'src/core/exceptions/exceptions.dart';

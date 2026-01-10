@@ -1,149 +1,162 @@
-import 'dart:convert';
-
-import 'package:http/http.dart' as http;
-import 'package:http/testing.dart';
 import 'package:kitbase/events.dart';
+import 'package:kitbase/src/core/network/kitbase_http_response.dart';
+import 'package:kitbase/src/events/data/data_sources/events_remote_data_source.dart';
+import 'package:kitbase/src/events/data/repos/events_repository_impl.dart';
 import 'package:test/test.dart';
+
+class MockEventsRemoteDataSource implements EventsRemoteDataSource {
+  KitbaseHttpResponse? response;
+  TrackOptions? capturedOptions;
+
+  @override
+  Future<KitbaseHttpResponse> track(TrackOptions options) async {
+    capturedOptions = options;
+    return response ?? const KitbaseHttpResponse(statusCode: 200);
+  }
+}
+
+class MockEventsRepository implements EventsRepository {
+  TrackResponse? response;
+  Exception? exception;
+  TrackOptions? capturedOptions;
+
+  @override
+  Future<TrackResponse> track(TrackOptions options) async {
+    capturedOptions = options;
+    if (exception != null) throw exception!;
+    return response ??
+        const TrackResponse(
+          id: 'evt-123',
+          event: 'Test Event',
+          timestamp: '2024-01-15T10:30:00Z',
+        );
+  }
+}
 
 void main() {
   group('KitbaseEvents', () {
-    group('constructor', () {
-      test('throws EventsValidationException when token is empty', () {
+    group('track validation', () {
+      test('throws KitbaseValidationException when channel is empty', () {
+        final events = KitbaseEvents();
         expect(
-          () => KitbaseEvents(token: ''),
-          throwsA(isA<EventsValidationException>()),
+          () => events.track(channel: '', event: 'Test Event'),
+          throwsA(isA<KitbaseValidationException>()),
         );
       });
 
-      test('creates client with valid token', () {
-        final client = KitbaseEvents(token: 'test-token');
-        expect(client, isA<KitbaseEvents>());
-        client.close();
+      test('throws KitbaseValidationException when event is empty', () {
+        final events = KitbaseEvents();
+        expect(
+          () => events.track(channel: 'test', event: ''),
+          throwsA(isA<KitbaseValidationException>()),
+        );
       });
     });
 
-    group('track', () {
-      test('throws EventsValidationException when channel is empty', () async {
-        final client = KitbaseEvents(token: 'test-token');
-        expect(
-          () => client.track(channel: '', event: 'Test Event'),
-          throwsA(isA<EventsValidationException>()),
-        );
-        client.close();
-      });
-
-      test('throws EventsValidationException when event is empty', () async {
-        final client = KitbaseEvents(token: 'test-token');
-        expect(
-          () => client.track(channel: 'test', event: ''),
-          throwsA(isA<EventsValidationException>()),
-        );
-        client.close();
-      });
-
+    group('track with mocked repository', () {
       test('successfully tracks an event', () async {
-        final mockResponse = {
-          'id': 'evt-123',
-          'event': 'Test Event',
-          'timestamp': '2024-01-15T10:30:00Z',
-        };
+        final mockRepo = MockEventsRepository();
+        final events = KitbaseEvents(repository: mockRepo);
 
-        final mockClient = MockClient((request) async {
-          expect(request.url.toString(), 'https://api.kitbase.dev/v1/logs');
-          expect(request.method, 'POST');
-          expect(request.headers['Authorization'], 'Bearer test-token');
-          expect(request.headers['Content-Type'], 'application/json');
-          return http.Response(jsonEncode(mockResponse), 201);
-        });
-
-        final client = KitbaseEvents(token: 'test-token', client: mockClient);
-        final result = await client.track(
+        final result = await events.track(
           channel: 'test',
           event: 'Test Event',
         );
 
         expect(result.id, 'evt-123');
         expect(result.event, 'Test Event');
-        expect(result.timestamp, '2024-01-15T10:30:00Z');
-        client.close();
+        expect(mockRepo.capturedOptions?.channel, 'test');
+        expect(mockRepo.capturedOptions?.event, 'Test Event');
       });
 
-      test('sends all optional fields', () async {
-        Map<String, dynamic>? capturedBody;
+      test('passes all optional fields to repository', () async {
+        final mockRepo = MockEventsRepository();
+        final events = KitbaseEvents(repository: mockRepo);
 
-        final mockClient = MockClient((request) async {
-          capturedBody = jsonDecode(request.body) as Map<String, dynamic>;
-          return http.Response(
-            jsonEncode({
-              'id': 'evt-123',
-              'event': 'New Subscription',
-              'timestamp': '2024-01-15T10:30:00Z',
-            }),
-            201,
-          );
-        });
-
-        final client = KitbaseEvents(token: 'test-token', client: mockClient);
-        await client.track(
+        await events.track(
           channel: 'payments',
           event: 'New Subscription',
           userId: 'user-123',
           icon: '💰',
           notify: true,
           description: 'User subscribed',
-          tags: {'plan': 'premium', 'trial': false},
+          tags: {'plan': 'premium'},
         );
 
-        expect(capturedBody, {
-          'channel': 'payments',
-          'event': 'New Subscription',
-          'user_id': 'user-123',
-          'icon': '💰',
-          'notify': true,
-          'description': 'User subscribed',
-          'tags': {'plan': 'premium', 'trial': false},
-        });
-        client.close();
-      });
-
-      test('throws EventsAuthenticationException on 401', () async {
-        final mockClient = MockClient((request) async {
-          return http.Response(
-            jsonEncode({'message': 'Invalid API key'}),
-            401,
-          );
-        });
-
-        final client = KitbaseEvents(token: 'invalid-token', client: mockClient);
-        expect(
-          () => client.track(channel: 'test', event: 'Test Event'),
-          throwsA(isA<EventsAuthenticationException>()),
-        );
-        client.close();
-      });
-
-      test('throws EventsApiException on other HTTP errors', () async {
-        final mockClient = MockClient((request) async {
-          return http.Response(
-            jsonEncode({'message': 'Invalid channel'}),
-            400,
-          );
-        });
-
-        final client = KitbaseEvents(token: 'test-token', client: mockClient);
-        expect(
-          () => client.track(channel: 'test', event: 'Test Event'),
-          throwsA(isA<EventsApiException>()),
-        );
-        client.close();
+        expect(mockRepo.capturedOptions?.channel, 'payments');
+        expect(mockRepo.capturedOptions?.event, 'New Subscription');
+        expect(mockRepo.capturedOptions?.userId, 'user-123');
+        expect(mockRepo.capturedOptions?.icon, '💰');
+        expect(mockRepo.capturedOptions?.notify, true);
+        expect(mockRepo.capturedOptions?.description, 'User subscribed');
+        expect(mockRepo.capturedOptions?.tags, {'plan': 'premium'});
       });
     });
   });
+
+  group('EventsRepositoryImpl', () {
+    test('returns TrackResponse on successful response', () async {
+      final mockDataSource = MockEventsRemoteDataSource();
+      mockDataSource.response = const KitbaseHttpResponse(
+        statusCode: 201,
+        data: {
+          'id': 'evt-456',
+          'event': 'Payment',
+          'timestamp': '2024-01-15T10:30:00Z',
+        },
+      );
+
+      final repo = EventsRepositoryImpl(remoteDataSource: mockDataSource);
+      final result = await repo.track(const TrackOptions(
+        channel: 'test',
+        event: 'Payment',
+      ));
+
+      expect(result.id, 'evt-456');
+      expect(result.event, 'Payment');
+    });
+
+    test('throws KitbaseAuthenticationException on 401', () async {
+      final mockDataSource = MockEventsRemoteDataSource();
+      mockDataSource.response = const KitbaseHttpResponse(
+        statusCode: 401,
+        data: {'message': 'Invalid API key'},
+      );
+
+      final repo = EventsRepositoryImpl(remoteDataSource: mockDataSource);
+
+      expect(
+        () => repo.track(const TrackOptions(channel: 'test', event: 'Test')),
+        throwsA(isA<KitbaseAuthenticationException>()),
+      );
+    });
+
+    test('throws KitbaseApiException on other HTTP errors', () async {
+      final mockDataSource = MockEventsRemoteDataSource();
+      mockDataSource.response = const KitbaseHttpResponse(
+        statusCode: 400,
+        data: {'message': 'Invalid channel'},
+      );
+
+      final repo = EventsRepositoryImpl(remoteDataSource: mockDataSource);
+
+      expect(
+        () => repo.track(const TrackOptions(channel: 'test', event: 'Test')),
+        throwsA(isA<KitbaseApiException>()),
+      );
+    });
+
+    test('throws KitbaseConnectionException on connection error', () async {
+      final mockDataSource = MockEventsRemoteDataSource();
+      mockDataSource.response =
+          const KitbaseHttpResponse(isConnectionError: true);
+
+      final repo = EventsRepositoryImpl(remoteDataSource: mockDataSource);
+
+      expect(
+        () => repo.track(const TrackOptions(channel: 'test', event: 'Test')),
+        throwsA(isA<KitbaseConnectionException>()),
+      );
+    });
+  });
 }
-
-
-
-
-
-
-
