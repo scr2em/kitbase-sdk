@@ -18,16 +18,6 @@ import type { FlagsConfig, EvaluationContext as KitbaseContext } from '../types.
  */
 export type KitbaseProviderOptions = FlagsConfig
 
-interface CacheEntry {
-  value: unknown;
-  variant?: string;
-  reason: string;
-  errorCode?: ErrorCode;
-  errorMessage?: string;
-  flagMetadata?: FlagMetadata;
-  valueType: string;
-  timestamp: number;
-}
 
 /**
  * Kitbase OpenFeature Provider for Web/Browser applications
@@ -156,7 +146,7 @@ export class KitbaseProvider implements Provider {
 
   /**
    * Prefetch all flags for a context
-   * FlagsClient handles caching and localStorage, we populate our sync cache from the results
+   * FlagsClient handles caching and localStorage
    */
   async prefetchFlags(context?: EvaluationContext): Promise<void> {
     try {
@@ -165,7 +155,6 @@ export class KitbaseProvider implements Provider {
       await this.client.getSnapshot({
         context: kitbaseContext,
       });
-
     } catch (error) {
       // Log error but don't throw - provider can still work with defaults
       console.warn('[Kitbase] Failed to prefetch flags:', error);
@@ -187,7 +176,7 @@ export class KitbaseProvider implements Provider {
   }
 
   /**
-   * Synchronous evaluation resolution (uses cache for web)
+   * Synchronous evaluation resolution (uses FlagsClient cache directly)
    * Web SDK uses synchronous resolution for better performance
    */
   private resolveEvaluation<T>(
@@ -196,16 +185,62 @@ export class KitbaseProvider implements Provider {
     context: EvaluationContext,
     expectedType: 'boolean' | 'string' | 'number' | 'json',
   ): ResolutionDetails<T> {
-  
-    // If not in cache and we're supposed to prefetch, return STALE with default
-    return {
-      value: defaultValue,
-      reason: 'STALE',
-      errorCode: 'FLAG_NOT_FOUND' as ErrorCode,
-      errorMessage: `Flag '${flagKey}' not found in cache. Call refresh() or wait for initialization.`,
-    };
+    // Get cached snapshot synchronously from FlagsClient
+    const kitbaseContext = this.toKitbaseContext(context);
+    const snapshot = this.client.getCachedSnapshotSync(kitbaseContext);
 
-  
+    if (!snapshot) {
+      // No cached snapshot available
+      return {
+        value: defaultValue,
+        reason: 'STALE',
+        errorCode: 'FLAG_NOT_FOUND' as ErrorCode,
+        errorMessage: `Flag '${flagKey}' not found in cache. Call refresh() or wait for initialization.`,
+      };
+    }
+
+    // Find the flag in the snapshot
+    const flag = snapshot.flags.find((f) => f.flagKey === flagKey);
+
+    if (!flag) {
+      // Flag not in snapshot
+      return {
+        value: defaultValue,
+        reason: 'STALE',
+        errorCode: 'FLAG_NOT_FOUND' as ErrorCode,
+        errorMessage: `Flag '${flagKey}' not found in snapshot.`,
+      };
+    }
+
+    // Check type match
+    if (flag.valueType !== expectedType) {
+      return {
+        value: null as T,
+        reason: 'ERROR',
+        errorCode: 'TYPE_MISMATCH' as ErrorCode,
+        errorMessage: `Expected ${expectedType}, got ${flag.valueType}`,
+      };
+    }
+
+    // Handle disabled/null values
+    if (flag.value === null || flag.value === undefined || !flag.enabled) {
+      return {
+        value: null as T,
+        variant: flag.variant,
+        reason: flag.reason as ResolutionDetails<T>['reason'],
+        errorCode: flag.errorCode as ErrorCode | undefined,
+        errorMessage: flag.errorMessage,
+        flagMetadata: flag.flagMetadata as FlagMetadata | undefined,
+      };
+    }
+
+    // Return the flag value
+    return {
+      value: flag.value as T,
+      variant: flag.variant,
+      reason: 'CACHED',
+      flagMetadata: flag.flagMetadata as FlagMetadata | undefined,
+    };
   }
 
   /**
@@ -219,5 +254,4 @@ export class KitbaseProvider implements Provider {
     }
     return context as KitbaseContext;
   }
-
 }

@@ -274,6 +274,31 @@ export class FlagsClient {
     return this.evaluator?.getConfiguration() ?? null;
   }
 
+  /**
+   * Get a cached snapshot synchronously (for synchronous providers like OpenFeature web SDK)
+   * Returns null if not cached or expired
+   */
+  getCachedSnapshotSync(context?: EvaluationContext): FlagSnapshot | null {
+    if (this.enableLocalEvaluation) {
+      // For local evaluation, we can generate snapshot synchronously
+      if (!this.evaluator?.isReady()) {
+        return null;
+      }
+      const config = this.evaluator.getConfiguration()!;
+      const flags = this.evaluator.evaluateAll(context);
+      return {
+        projectId: '',
+        environmentId: config.environmentId,
+        evaluatedAt: new Date().toISOString(),
+        flags,
+      };
+    }
+
+    // For remote evaluation, check cache
+    const cacheKey = this.getSnapshotCacheKey(context);
+    return this.getCachedValue<FlagSnapshot>(cacheKey);
+  }
+
   // ==================== Flag Evaluation Methods ====================
 
   /**
