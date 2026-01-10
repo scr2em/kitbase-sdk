@@ -1,4 +1,4 @@
 packages:
-  - 'packages/typescript'
-  - 'packages/ionic'
-  - 'packages/react'
+  - 'typescript'
+  - 'ionic'
+  - 'react'

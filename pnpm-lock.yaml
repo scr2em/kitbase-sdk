@@ -12,7 +12,7 @@ importers:
         specifier: ^5.3.3
         version: 5.9.3
 
-  packages/ionic:
+  ionic:
     dependencies:
       archiver:
         specifier: ^7.0.1
@@ -46,7 +46,7 @@ importers:
         specifier: ^1.2.0
         version: 1.6.1(@types/node@20.19.27)(jsdom@23.2.0)
 
-  packages/react:
+  react:
     dependencies:
       '@kitbase/sdk':
         specifier: workspace:*
@@ -74,7 +74,7 @@ importers:
         specifier: ^1.2.0
         version: 1.6.1(@types/node@20.19.27)(jsdom@23.2.0)
 
-  packages/typescript:
+  typescript:
     dependencies:
       uuid:
         specifier: ^13.0.0
