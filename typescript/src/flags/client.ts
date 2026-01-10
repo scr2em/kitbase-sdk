@@ -704,7 +704,7 @@ export class FlagsClient {
   // ==================== Local Evaluation Methods ====================
 
   private async fetchConfiguration(): Promise<void> {
-    const url = `${BASE_URL}/v1/feature-flags/config`;
+    const url = `${this.baseUrl}/v1/feature-flags/config`;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), TIMEOUT);
 
