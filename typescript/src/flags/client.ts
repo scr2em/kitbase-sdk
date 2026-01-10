@@ -131,10 +131,18 @@ export class FlagsClient {
       // Use initial config if provided
       if (config.initialConfiguration) {
         this.evaluator.setConfiguration(config.initialConfiguration);
+        this.initialized = true;
       } else {
         // Try to load cached configuration from localStorage
         if (this.enablePersistentCache) {
           this.loadConfigurationFromStorage();
+        }
+
+        // Auto-start initialization in the background if not already ready
+        if (!this.evaluator.isReady()) {
+          this.initPromise = this.doInitialize();
+          // Emit error event but keep the promise rejected so ensureLocalReady() can throw
+          this.initPromise.catch((err) => this.handleError(err));
         }
       }
     } else {
@@ -148,28 +156,60 @@ export class FlagsClient {
   // ==================== Initialization (Local Evaluation Only) ====================
 
   /**
-   * Initialize the client by fetching the initial configuration.
-   * When `enableLocalEvaluation` is true, this is called automatically on first evaluation.
-   * Can also be called manually to initialize early.
+   * Wait for the client to be ready (local evaluation mode only).
+   *
+   * Initialization starts automatically when the client is created.
+   * This method is optional - you can call flag evaluation methods directly
+   * and they will wait for initialization to complete.
+   *
+   * Use this method if you need to:
+   * - Catch initialization errors before evaluating flags
+   * - Ensure the client is ready before rendering UI
    *
    * @returns Promise that resolves when configuration is loaded
    * @throws {AuthenticationError} When the API key is invalid
    * @throws {ApiError} When the API returns an error
    * @throws {TimeoutError} When the request times out
+   *
+   * @example
+   * ```typescript
+   * // Option 1: Just use the client directly (recommended)
+   * const value = await flags.getBooleanValue('dark-mode', false);
+   *
+   * // Option 2: Wait for ready if you need to catch errors early
+   * try {
+   *   await flags.initialize();
+   * } catch (err) {
+   *   console.error('Failed to load flags:', err);
+   * }
+   * ```
    */
-  async initialize(): Promise<void> {
+  async waitUntilReady(): Promise<void> {
     if (!this.enableLocalEvaluation) {
       // No-op for remote evaluation mode
       return;
     }
 
-    // Prevent multiple concurrent initializations
+    // If already initialized, return immediately
+    if (this.initialized && this.evaluator?.isReady()) {
+      return;
+    }
+
+    // Wait for the initialization promise
     if (this.initPromise) {
       return this.initPromise;
     }
 
+    // Start initialization if not already started
     this.initPromise = this.doInitialize();
     return this.initPromise;
+  }
+
+  /**
+   * @deprecated Use waitUntilReady() instead. This method is kept for backwards compatibility.
+   */
+  async initialize(): Promise<void> {
+    return this.waitUntilReady();
   }
 
   private async doInitialize(): Promise<void> {
@@ -564,7 +604,7 @@ export class FlagsClient {
 
   private async ensureLocalReady(): Promise<void> {
     if (!this.evaluator?.isReady()) {
-      await this.initialize();
+      await this.waitUntilReady();
     }
   }
 
