@@ -96,6 +96,7 @@ export class FlagsClient {
   private readonly onError?: (error: Error) => void;
   private readonly cacheTtl: number;
   private readonly enablePersistentCache: boolean;
+  private readonly baseUrl: string;
 
   // Local evaluation state
   private evaluator: FlagEvaluator | null = null;
@@ -111,14 +112,14 @@ export class FlagsClient {
     if (!config.token) {
       throw new ValidationError('API token is required', 'token');
     }
-
+    this.baseUrl = config.baseUrl ?? BASE_URL;
     this.token = config.token;
     this.enableLocalEvaluation = config.enableLocalEvaluation ?? false;
     this.pollingInterval =
       (config.environmentRefreshIntervalSeconds ?? 60) * 1000;
     this.onConfigurationChange = config.onConfigurationChange;
     this.onError = config.onError;
-    this.cacheTtl = config.cacheTtl ?? 300000; // 5 minutes default
+    this.cacheTtl = config.cacheTtl ?? 60000; // 1 minutes default
     this.enablePersistentCache =
       config.enablePersistentCache ??
       this.isLocalStorageAvailable()
@@ -650,7 +651,7 @@ export class FlagsClient {
   }
 
   private async request<T>(endpoint: string, body?: unknown): Promise<T> {
-    const url = `${BASE_URL}${endpoint}`;
+    const url = `${this.baseUrl}${endpoint}`;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), TIMEOUT);
 

@@ -41,7 +41,7 @@ export interface FlagsConfig {
   onError?: (error: Error) => void;
 
   /**
-   * Cache TTL in milliseconds for remote evaluation mode (default: 300000 = 5 minutes)
+   * Cache TTL in milliseconds for remote evaluation mode (default: 60000 = 1 minute)
    * Web clients typically use longer TTL to reduce network requests
    */
   cacheTtl?: number;
@@ -52,6 +52,13 @@ export interface FlagsConfig {
    * Only works in browser environments
    */
   enablePersistentCache?: boolean;
+
+  /**
+   * Base URL for the Kitbase API, defaults to https://api.kitbase.dev, use it if you are self-hosting the Kitbase API.
+   * @default https://api.kitbase.dev
+   */
+  baseUrl?: string;
+
 }
 
 /**
