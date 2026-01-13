@@ -9,7 +9,11 @@ export type {
   Tags,
   TagValue,
   Storage,
+  OfflineConfig,
 } from './types.js';
+
+// Queue types
+export type { QueuedEvent, QueueStats } from './queue/types.js';
 
 // Errors
 export {
@@ -19,11 +23,3 @@ export {
   ValidationError,
   TimeoutError,
 } from './errors.js';
-
-
-
-
-
-
-
-

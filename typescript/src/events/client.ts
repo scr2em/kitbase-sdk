@@ -5,6 +5,7 @@ import type {
   TrackResponse,
   LogPayload,
   Storage,
+  Tags,
 } from './types.js';
 import {
   ApiError,
@@ -12,6 +13,8 @@ import {
   TimeoutError,
   ValidationError,
 } from './errors.js';
+import { EventQueue } from './queue/index.js';
+import type { QueuedEvent, QueueStats } from './queue/types.js';
 
 const DEFAULT_BASE_URL = 'https://api.kitbase.dev';
 const TIMEOUT = 30000;
@@ -55,13 +58,26 @@ function getDefaultStorage(): Storage {
  *
  * const kitbase = new Kitbase({
  *   token: '<YOUR_API_KEY>',
+ *   debug: true,
+ *   offline: { enabled: true },
  * });
+ *
+ * // Register super properties (included in all events)
+ * kitbase.register({ app_version: '2.1.0', platform: 'web' });
  *
  * // Track anonymous events (anonymous_id is automatically included)
  * await kitbase.track({
  *   channel: 'payments',
  *   event: 'Page Viewed',
  *   icon: '👀',
+ * });
+ *
+ * // Time events for duration tracking
+ * kitbase.timeEvent('Video Watched');
+ * // ... later
+ * await kitbase.track({
+ *   channel: 'engagement',
+ *   event: 'Video Watched', // $duration automatically included
  * });
  *
  * // Track events for a logged-in user (just pass user_id)
@@ -85,6 +101,19 @@ export class Kitbase {
   private readonly storageKey: string;
   private anonymousId: string | null = null;
 
+  // Super properties (memory-only, merged into all events)
+  private superProperties: Tags = {};
+
+  // Time event tracking
+  private timedEvents: Map<string, number> = new Map();
+
+  // Debug mode
+  private debugMode: boolean;
+
+  // Offline queue
+  private queue: EventQueue | null = null;
+  private offlineEnabled: boolean;
+
   constructor(config: KitbaseConfig) {
     if (!config.token) {
       throw new ValidationError('API token is required', 'token');
@@ -93,6 +122,7 @@ export class Kitbase {
     this.token = config.token;
     this.baseUrl = config.baseUrl ?? DEFAULT_BASE_URL;
     this.storageKey = config.storageKey ?? DEFAULT_STORAGE_KEY;
+    this.debugMode = config.debug ?? false;
 
     // Initialize storage (null means disabled)
     if (config.storage === null) {
@@ -103,6 +133,18 @@ export class Kitbase {
 
     // Load or generate anonymous ID
     this.initializeAnonymousId();
+
+    // Initialize offline queue if enabled
+    this.offlineEnabled = config.offline?.enabled ?? false;
+    if (this.offlineEnabled) {
+      this.queue = new EventQueue(config.offline);
+      this.queue.setDebugMode(this.debugMode, this.log.bind(this));
+      this.queue.setSendCallback(this.sendQueuedEvents.bind(this));
+      this.queue.startFlushTimer();
+      this.log('Offline queueing enabled', {
+        storageType: this.queue.getStorageType(),
+      });
+    }
   }
 
   /**
@@ -133,21 +175,324 @@ export class Kitbase {
     return this.anonymousId;
   }
 
+  // ============================================================
+  // Debug Mode
+  // ============================================================
+
+  /**
+   * Enable or disable debug mode
+   * When enabled, all SDK operations are logged to the console
+   *
+   * @param enabled - Whether to enable debug mode
+   *
+   * @example
+   * ```typescript
+   * kitbase.setDebugMode(true);
+   * // All events and operations will now be logged
+   * ```
+   */
+  setDebugMode(enabled: boolean): void {
+    this.debugMode = enabled;
+    if (this.queue) {
+      this.queue.setDebugMode(enabled, this.log.bind(this));
+    }
+    this.log(`Debug mode ${enabled ? 'enabled' : 'disabled'}`);
+  }
+
+  /**
+   * Check if debug mode is enabled
+   */
+  isDebugMode(): boolean {
+    return this.debugMode;
+  }
+
+  /**
+   * Internal logging function
+   */
+  private log(message: string, data?: unknown): void {
+    if (!this.debugMode) return;
+
+    const prefix = '[Kitbase]';
+    if (data !== undefined) {
+      console.log(prefix, message, data);
+    } else {
+      console.log(prefix, message);
+    }
+  }
+
+  // ============================================================
+  // Super Properties
+  // ============================================================
+
+  /**
+   * Register super properties that will be included with every event
+   * These properties are stored in memory only and reset on page reload
+   *
+   * @param properties - Properties to register
+   *
+   * @example
+   * ```typescript
+   * kitbase.register({
+   *   app_version: '2.1.0',
+   *   platform: 'web',
+   *   environment: 'production',
+   * });
+   * ```
+   */
+  register(properties: Tags): void {
+    this.superProperties = { ...this.superProperties, ...properties };
+    this.log('Super properties registered', properties);
+  }
+
+  /**
+   * Register super properties only if they haven't been set yet
+   * Useful for setting default values that shouldn't override existing ones
+   *
+   * @param properties - Properties to register if not already set
+   *
+   * @example
+   * ```typescript
+   * kitbase.registerOnce({ first_visit: new Date().toISOString() });
+   * ```
+   */
+  registerOnce(properties: Tags): void {
+    const newProps: Tags = {};
+    for (const [key, value] of Object.entries(properties)) {
+      if (!(key in this.superProperties)) {
+        newProps[key] = value;
+      }
+    }
+    if (Object.keys(newProps).length > 0) {
+      this.superProperties = { ...this.superProperties, ...newProps };
+      this.log('Super properties registered (once)', newProps);
+    }
+  }
+
+  /**
+   * Remove a super property
+   *
+   * @param key - The property key to remove
+   *
+   * @example
+   * ```typescript
+   * kitbase.unregister('platform');
+   * ```
+   */
+  unregister(key: string): void {
+    if (key in this.superProperties) {
+      delete this.superProperties[key];
+      this.log('Super property removed', { key });
+    }
+  }
+
+  /**
+   * Get all registered super properties
+   *
+   * @returns A copy of the current super properties
+   *
+   * @example
+   * ```typescript
+   * const props = kitbase.getSuperProperties();
+   * console.log(props); // { app_version: '2.1.0', platform: 'web' }
+   * ```
+   */
+  getSuperProperties(): Tags {
+    return { ...this.superProperties };
+  }
+
+  /**
+   * Clear all super properties
+   *
+   * @example
+   * ```typescript
+   * kitbase.clearSuperProperties();
+   * ```
+   */
+  clearSuperProperties(): void {
+    this.superProperties = {};
+    this.log('Super properties cleared');
+  }
+
+  // ============================================================
+  // Time Events (Duration Tracking)
+  // ============================================================
+
+  /**
+   * Start timing an event
+   * When the same event is tracked later, a $duration property (in seconds)
+   * will automatically be included
+   *
+   * @param eventName - The name of the event to time
+   *
+   * @example
+   * ```typescript
+   * kitbase.timeEvent('Video Watched');
+   * // ... user watches video ...
+   * await kitbase.track({
+   *   channel: 'engagement',
+   *   event: 'Video Watched',
+   *   tags: { video_id: '123' }
+   * });
+   * // Event will include $duration: 45.2 (seconds)
+   * ```
+   */
+  timeEvent(eventName: string): void {
+    this.timedEvents.set(eventName, Date.now());
+    this.log('Timer started', { event: eventName });
+  }
+
+  /**
+   * Cancel a timed event without tracking it
+   *
+   * @param eventName - The name of the event to cancel timing for
+   *
+   * @example
+   * ```typescript
+   * kitbase.timeEvent('Checkout Flow');
+   * // User abandons checkout
+   * kitbase.cancelTimeEvent('Checkout Flow');
+   * ```
+   */
+  cancelTimeEvent(eventName: string): void {
+    if (this.timedEvents.has(eventName)) {
+      this.timedEvents.delete(eventName);
+      this.log('Timer cancelled', { event: eventName });
+    }
+  }
+
+  /**
+   * Get all currently timed events
+   *
+   * @returns Array of event names that are currently being timed
+   *
+   * @example
+   * ```typescript
+   * const timedEvents = kitbase.getTimedEvents();
+   * console.log(timedEvents); // ['Video Watched', 'Checkout Flow']
+   * ```
+   */
+  getTimedEvents(): string[] {
+    return Array.from(this.timedEvents.keys());
+  }
+
+  /**
+   * Get the duration of a timed event (without stopping it)
+   *
+   * @param eventName - The name of the event
+   * @returns Duration in seconds, or null if not being timed
+   */
+  getEventDuration(eventName: string): number | null {
+    const startTime = this.timedEvents.get(eventName);
+    if (startTime === undefined) return null;
+    return (Date.now() - startTime) / 1000;
+  }
+
+  // ============================================================
+  // Offline Queue
+  // ============================================================
+
+  /**
+   * Get offline queue statistics
+   *
+   * @returns Queue statistics including size and flush status
+   *
+   * @example
+   * ```typescript
+   * const stats = await kitbase.getQueueStats();
+   * console.log(stats); // { size: 5, isFlushing: false }
+   * ```
+   */
+  async getQueueStats(): Promise<QueueStats | null> {
+    if (!this.queue) return null;
+    return this.queue.getStats();
+  }
+
+  /**
+   * Manually flush the offline queue
+   * Events are automatically flushed on interval and when coming back online,
+   * but this method can be used to trigger an immediate flush
+   *
+   * @example
+   * ```typescript
+   * await kitbase.flushQueue();
+   * ```
+   */
+  async flushQueue(): Promise<void> {
+    if (!this.queue) return;
+    await this.queue.flush();
+  }
+
+  /**
+   * Clear all events from the offline queue
+   *
+   * @example
+   * ```typescript
+   * await kitbase.clearQueue();
+   * ```
+   */
+  async clearQueue(): Promise<void> {
+    if (!this.queue) return;
+    await this.queue.clear();
+  }
+
+  /**
+   * Callback for the queue to send batched events
+   */
+  private async sendQueuedEvents(events: QueuedEvent[]): Promise<number[]> {
+    const sentIds: number[] = [];
+
+    for (const event of events) {
+      try {
+        await this.sendRequest<TrackResponse>('/v1/logs', event.payload);
+        sentIds.push(event.id!);
+      } catch (error) {
+        this.log('Failed to send queued event', { id: event.id, error });
+        // Continue with next event
+      }
+    }
+
+    return sentIds;
+  }
+
+  // ============================================================
+  // Track Event
+  // ============================================================
+
   /**
    * Track an event
+   *
+   * When offline queueing is enabled, events are always written to the local
+   * database first (write-ahead), then sent to the server. This ensures no
+   * events are lost if the browser crashes or the network fails.
    *
    * @param options - Event tracking options
    * @returns Promise resolving to the track response
    * @throws {ValidationError} When required fields are missing
-   * @throws {AuthenticationError} When the API key is invalid
-   * @throws {ApiError} When the API returns an error
-   * @throws {TimeoutError} When the request times out
+   * @throws {AuthenticationError} When the API key is invalid (only when offline disabled)
+   * @throws {ApiError} When the API returns an error (only when offline disabled)
+   * @throws {TimeoutError} When the request times out (only when offline disabled)
    */
   async track(options: TrackOptions): Promise<TrackResponse> {
     this.validateTrackOptions(options);
 
+    // Calculate duration if this event was being timed
+    let duration: number | undefined;
+    const startTime = this.timedEvents.get(options.event);
+    if (startTime !== undefined) {
+      duration = (Date.now() - startTime) / 1000;
+      this.timedEvents.delete(options.event);
+      this.log('Timer stopped', { event: options.event, duration });
+    }
+
     // Include anonymous_id unless explicitly disabled
     const includeAnonymousId = options.includeAnonymousId !== false;
+
+    // Merge super properties with event tags (event tags take precedence)
+    const mergedTags: Tags = {
+      ...this.superProperties,
+      ...(options.tags ?? {}),
+      ...(duration !== undefined ? { $duration: duration } : {}),
+    };
 
     const payload: LogPayload = {
       channel: options.channel,
@@ -157,10 +502,34 @@ export class Kitbase {
       ...(options.icon && { icon: options.icon }),
       ...(options.notify !== undefined && { notify: options.notify }),
       ...(options.description && { description: options.description }),
-      ...(options.tags && { tags: options.tags }),
+      ...(Object.keys(mergedTags).length > 0 && { tags: mergedTags }),
     };
 
-    return this.request<TrackResponse>('/v1/logs', payload);
+    this.log('Track', { event: options.event, payload });
+
+    // If offline queueing is enabled, use write-ahead pattern
+    if (this.queue) {
+      // Always write to DB first (guaranteed durability)
+      await this.queue.enqueue(payload);
+      this.log('Event persisted to queue');
+
+      // Trigger an immediate flush attempt (non-blocking)
+      this.queue.flush().catch((err) => {
+        this.log('Background flush failed', err);
+      });
+
+      // Return immediately after DB write
+      return {
+        id: `queued-${Date.now()}`,
+        event: options.event,
+        timestamp: new Date().toISOString(),
+      };
+    }
+
+    // No offline queue - send directly (original behavior)
+    const response = await this.sendRequest<TrackResponse>('/v1/logs', payload);
+    this.log('Event sent successfully', { id: response.id });
+    return response;
   }
 
   private validateTrackOptions(options: TrackOptions): void {
@@ -169,7 +538,10 @@ export class Kitbase {
     }
   }
 
-  private async request<T>(endpoint: string, body: unknown): Promise<T> {
+  /**
+   * Send a request to the API
+   */
+  private async sendRequest<T>(endpoint: string, body: unknown): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), TIMEOUT);
@@ -179,7 +551,7 @@ export class Kitbase {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          "x-api-key": `${this.token}`,
+          'x-api-key': `${this.token}`,
         },
         body: JSON.stringify(body),
         signal: controller.signal,
@@ -229,5 +601,34 @@ export class Kitbase {
       return String((body as { error: unknown }).error);
     }
     return fallback;
+  }
+
+  // ============================================================
+  // Cleanup
+  // ============================================================
+
+  /**
+   * Shutdown the client and cleanup resources
+   * Call this when you're done using the client to stop timers and close connections
+   *
+   * @example
+   * ```typescript
+   * await kitbase.shutdown();
+   * ```
+   */
+  async shutdown(): Promise<void> {
+    this.log('Shutting down');
+
+    // Flush any remaining queued events
+    if (this.queue) {
+      await this.queue.flush();
+      await this.queue.close();
+      this.queue = null;
+    }
+
+    // Clear timed events
+    this.timedEvents.clear();
+
+    this.log('Shutdown complete');
   }
 }

@@ -1,3 +1,5 @@
+import type { OfflineConfig } from './queue/types.js';
+
 /**
  * Storage interface for anonymous ID persistence
  */
@@ -6,6 +8,11 @@ export interface Storage {
   setItem(key: string, value: string): void;
   removeItem(key: string): void;
 }
+
+/**
+ * Configuration options for offline event queueing
+ */
+export type { OfflineConfig };
 
 /**
  * Configuration options for the Kitbase client
@@ -34,6 +41,19 @@ export interface KitbaseConfig {
    * @default 'kitbase_anonymous_id'
    */
   storageKey?: string;
+
+  /**
+   * Enable debug mode for console logging.
+   * @default false
+   */
+  debug?: boolean;
+
+  /**
+   * Offline queueing configuration.
+   * Events are queued locally when offline or when the API fails,
+   * and automatically sent when back online.
+   */
+  offline?: OfflineConfig;
 }
 
 /**
