@@ -77,4 +77,8 @@ export interface PushOptions {
   message?: string;
   /** Verbose output */
   verbose: boolean;
+  /** API key passed via command line */
+  apiKey?: string;
+  /** Custom base URL for the API */
+  baseUrl?: string;
 }

@@ -12,7 +12,7 @@ export class KitbaseError extends Error {
  * Error thrown when API authentication fails
  */
 export class AuthenticationError extends KitbaseError {
-  constructor(message = 'Invalid API key. Please check your KITBASE_API_KEY environment variable.') {
+  constructor(message = 'API key was rejected by the server.') {
     super(message);
     this.name = 'AuthenticationError';
   }

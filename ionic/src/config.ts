@@ -120,40 +120,59 @@ export async function promptForApiKey(): Promise<string | null> {
 }
 
 /**
- * Get API key from all sources (env, config file, or prompt)
- * Priority: 1. Environment variable, 2. Config file, 3. Interactive prompt
+ * Prompt user to save API key to config file
  */
-export async function getApiKey(options?: { interactive?: boolean }): Promise<string | null> {
-  // 1. Check environment variable first
+export async function promptToSaveApiKey(apiKey: string): Promise<void> {
+  if (!process.stdin.isTTY) {
+    return;
+  }
+
+  const save = await prompt('Save API key to .kitbasecli for future use? (Y/n): ');
+
+  if (save.toLowerCase() !== 'n') {
+    writeApiKeyToConfig(apiKey);
+    console.log('\n✅ API key saved to .kitbasecli');
+    console.log(chalk.yellow('⚠️  Remember to add .kitbasecli to .gitignore!\n'));
+  }
+}
+
+/**
+ * Get API key from all sources (env, config file, or prompt)
+ * Priority: 1. CLI argument, 2. Environment variable, 3. Config file, 4. Interactive prompt
+ */
+export async function getApiKey(options?: { interactive?: boolean; cliApiKey?: string }): Promise<string | null> {
+  // 1. Check CLI argument first
+  if (options?.cliApiKey) {
+    // If API key was provided via CLI and not already saved, offer to save it
+    const existingKey = readApiKeyFromConfig();
+    if (!existingKey || existingKey !== options.cliApiKey) {
+      await promptToSaveApiKey(options.cliApiKey);
+    }
+    return options.cliApiKey;
+  }
+
+  // 2. Check environment variable
   const envKey = process.env.KITBASE_API_KEY;
   if (envKey) {
     return envKey;
   }
-  
-  // 2. Check config file
+
+  // 3. Check config file
   const configKey = readApiKeyFromConfig();
   if (configKey) {
     return configKey;
   }
-  
-  // 3. If interactive mode is enabled, prompt user
+
+  // 4. If interactive mode is enabled, prompt user
   if (options?.interactive !== false && process.stdin.isTTY) {
     const apiKey = await promptForApiKey();
-    
+
     if (apiKey) {
-      // Ask to save
-      const save = await prompt('Save API key to .kitbasecli for future use? (Y/n): ');
-      
-      if (save.toLowerCase() !== 'n') {
-        writeApiKeyToConfig(apiKey);
-        console.log('\n✅ API key saved to .kitbasecli');
-        console.log(chalk.yellow('⚠️  Remember to add .kitbasecli to .gitignore!\n'));
-      }
-      
+      await promptToSaveApiKey(apiKey);
       return apiKey;
     }
   }
-  
+
   return null;
 }
 

@@ -70,7 +70,11 @@ function createProgressBar(percent: number, width = 20): string {
 function formatError(error: unknown): string {
   if (error instanceof AuthenticationError) {
     return `${chalk.red('Authentication Error:')} ${error.message}\n\n` +
-      chalk.dim('Make sure KITBASE_API_KEY is set in your environment or .env file.');
+      chalk.dim('This usually means:\n') +
+      chalk.dim('  • The SDK key does not exist or was deleted\n') +
+      chalk.dim('  • The SDK key is for a different environment\n') +
+      chalk.dim('  • The SDK key was copied incorrectly\n\n') +
+      chalk.dim('Create a new SDK key from the dashboard and try again.');
   }
   
   if (error instanceof ApiError) {
@@ -112,16 +116,16 @@ async function pushCommand(options: PushOptions): Promise<void> {
   
   try {
     console.log(chalk.bold.cyan('\n🚀 Kitbase Ionic Push\n'));
-    
-    // Get API key (from env, config file, or prompt)
-    const apiKey = await getApiKey({ interactive: true });
+
+    // Get API key (from CLI arg, env, config file, or prompt)
+    const apiKey = await getApiKey({ interactive: true, cliApiKey: options.apiKey });
     if (!apiKey) {
       throw new ConfigurationError(
         'API key is required.\n' +
         'You can set it by:\n' +
-        '  1. Running this command again and entering your API key when prompted\n' +
-        '  2. Setting KITBASE_API_KEY environment variable\n' +
-        '  3. Creating a .kitbasecli file with KITBASE_API_KEY=your_key\n' +
+        '  1. Using --api-key flag: kitbase-ionic push --api-key=your_key\n' +
+        '  2. Creating a .kitbasecli file with KITBASE_API_KEY=your_key\n' +
+        '  3. Setting KITBASE_API_KEY environment variable\n' +
         '  4. Adding KITBASE_API_KEY to your .env file'
       );
     }
@@ -206,7 +210,7 @@ async function pushCommand(options: PushOptions): Promise<void> {
     }
     
     // Create upload payload
-    const client = new UploadClient({ apiKey });
+    const client = new UploadClient({ apiKey, baseUrl: options.baseUrl });
     const payload = createUploadPayload(zipFilePath, gitInfo, nativeVersion);
     
     // Log upload details
@@ -269,6 +273,8 @@ function createProgram(): Command {
     .option('-o, --output-dir <path>', 'Custom web build output directory (default: www, dist, or build)')
     .option('-f, --file <path>', 'Path to existing zip file to upload')
     .option('-v, --version <version>', 'Override app version')
+    .option('-k, --api-key <key>', 'API key for authentication')
+    .option('--base-url <url>', 'Override API base URL')
     .option('--commit <hash>', 'Override git commit hash')
     .option('--branch <name>', 'Override git branch name')
     .option('--message <message>', 'Override git commit message')
@@ -283,8 +289,10 @@ function createProgram(): Command {
         branch: opts.branch,
         message: opts.message,
         verbose: opts.verbose,
+        apiKey: opts.apiKey,
+        baseUrl: opts.baseUrl,
       };
-      
+
       await pushCommand(options);
     });
   
