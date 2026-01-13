@@ -1,0 +1,26 @@
+{
+    "name": "kitbase/events",
+    "description": "Kitbase Events SDK for PHP - Track events and logs in your application",
+    "version": "0.1.0",
+    "type": "library",
+    "license": "MIT",
+    "authors": [],
+    "require": {
+        "php": "^8.1",
+        "guzzlehttp/guzzle": "^7.0",
+        "ramsey/uuid": "^4.7"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Kitbase\\Events\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Kitbase\\Events\\Tests\\": "tests/"
+        }
+    }
+}

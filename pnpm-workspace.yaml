@@ -1,4 +1,15 @@
 packages:
-  - 'typescript'
+  # Events
+  - 'customEvents/typescript'
+  - 'customEvents/react'
+
+  # Changelogs
+  - 'changelogs/typescript'
+  - 'changelogs/react'
+
+  # Feature Flags
+  - 'flags/typescript'
+  - 'flags/react'
+
+  # CLI Tools
   - 'ionic'
-  - 'react'

@@ -1,0 +1,16 @@
+name: kitbase_events
+description: Kitbase Events SDK for Dart and Flutter - Track events and logs in your application
+version: 0.1.0
+repository: https://github.com/scr2em/kitbase-sdk/tree/main/customEvents/dart
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  http: ^1.2.0
+
+dev_dependencies:
+  lints: ^4.0.0
+  test: ^1.24.0
+  mockito: ^5.4.4
+  build_runner: ^2.4.13
