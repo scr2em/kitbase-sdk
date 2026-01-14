@@ -119,7 +119,7 @@ class Kitbase
         $this->validateTrackOptions($options);
 
         $payload = $options->toPayload($this->anonymousId);
-        $response = $this->request('/v1/logs', $payload);
+        $response = $this->request('/sdk/v1/logs', $payload);
 
         return TrackResponse::fromArray($response);
     }

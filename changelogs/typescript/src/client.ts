@@ -54,7 +54,7 @@ export class Changelogs {
     }
 
     return this.request<ChangelogResponse>(
-      `/v1/changelogs/${encodeURIComponent(version)}`,
+      `/sdk/v1/changelogs/${encodeURIComponent(version)}`,
     );
   }
 

@@ -373,7 +373,7 @@ export class FlagsClient {
 
     const payload = this.buildSnapshotPayload(options?.context);
     const snapshot = await this.request<FlagSnapshot>(
-      '/v1/feature-flags/snapshot',
+      '/sdk/v1/feature-flags/snapshot',
       payload,
     );
 
@@ -420,7 +420,7 @@ export class FlagsClient {
       options?.defaultValue,
     );
     const flag = await this.request<EvaluatedFlag>(
-      '/v1/feature-flags/evaluate',
+      '/sdk/v1/feature-flags/evaluate',
       payload,
     );
 
@@ -744,7 +744,7 @@ export class FlagsClient {
   // ==================== Local Evaluation Methods ====================
 
   private async fetchConfiguration(): Promise<void> {
-    const url = `${this.baseUrl}/v1/feature-flags/config`;
+    const url = `${this.baseUrl}/sdk/v1/feature-flags/config`;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), TIMEOUT);
 

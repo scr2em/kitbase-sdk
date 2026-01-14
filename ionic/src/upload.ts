@@ -56,7 +56,7 @@ export class UploadClient {
     this.validatePayload(payload);
     
     const { body, boundary } = this.createMultipartBody(payload);
-    const url = new URL(`${this.baseUrl}/v1/builds`);
+    const url = new URL(`${this.baseUrl}/sdk/v1/builds`);
     
     return new Promise((resolve, reject) => {
       const isHttps = url.protocol === 'https:';

@@ -64,7 +64,7 @@ describe('FlagsClient', () => {
 
         expect(result).toEqual(mockResponse);
         expect(mockFetch).toHaveBeenCalledWith(
-          'https://api.kitbase.dev/v1/feature-flags/snapshot',
+          'https://api.kitbase.dev/sdk/v1/feature-flags/snapshot',
           expect.objectContaining({
             method: 'POST',
             headers: {
@@ -470,7 +470,7 @@ describe('FlagsClient', () => {
         await client.waitUntilReady();
 
         expect(mockFetch).toHaveBeenCalledWith(
-          'https://api.kitbase.dev/v1/feature-flags/config',
+          'https://api.kitbase.dev/sdk/v1/feature-flags/config',
           expect.objectContaining({
             method: 'GET',
             headers: expect.objectContaining({
@@ -590,7 +590,7 @@ describe('FlagsClient', () => {
 
         // Should have made the config request
         expect(mockFetch).toHaveBeenCalledWith(
-          'https://api.kitbase.dev/v1/feature-flags/config',
+          'https://api.kitbase.dev/sdk/v1/feature-flags/config',
           expect.any(Object),
         );
 
@@ -1892,7 +1892,7 @@ describe('FlagsClient', () => {
       await client.getSnapshot();
 
       expect(mockFetch).toHaveBeenCalledWith(
-        'https://custom.api.example.com/v1/feature-flags/snapshot',
+        'https://custom.api.example.com/sdk/v1/feature-flags/snapshot',
         expect.any(Object),
       );
     });
@@ -1920,7 +1920,7 @@ describe('FlagsClient', () => {
 
 
       expect(mockFetch).toHaveBeenCalledWith(
-        'https://custom.api.example.com/v1/feature-flags/config',
+        'https://custom.api.example.com/sdk/v1/feature-flags/config',
         expect.any(Object),
       );
 

@@ -61,7 +61,7 @@ describe('Changelogs', () => {
 
       expect(result).toEqual(mockResponse);
       expect(mockFetch).toHaveBeenCalledWith(
-        'https://api.kitbase.dev/v1/changelogs/1.0.0',
+        'https://api.kitbase.dev/sdk/v1/changelogs/1.0.0',
         expect.objectContaining({
           method: 'GET',
           headers: {
@@ -90,7 +90,7 @@ describe('Changelogs', () => {
       await client.get('1.0.0-beta.1');
 
       expect(mockFetch).toHaveBeenCalledWith(
-        'https://api.kitbase.dev/v1/changelogs/1.0.0-beta.1',
+        'https://api.kitbase.dev/sdk/v1/changelogs/1.0.0-beta.1',
         expect.any(Object),
       );
     });

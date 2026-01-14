@@ -65,7 +65,7 @@ class KitbaseFlags {
   Future<FlagSnapshot> getSnapshot({EvaluateOptions? options}) async {
     final payload = _buildSnapshotPayload(options?.context);
     final response =
-        await _request<Map<String, dynamic>>('/v1/feature-flags/snapshot', payload);
+        await _request<Map<String, dynamic>>('/sdk/v1/feature-flags/snapshot', payload);
     return FlagSnapshot.fromJson(response);
   }
 
@@ -93,7 +93,7 @@ class KitbaseFlags {
 
     final payload = _buildEvaluateFlagPayload(flagKey, context, defaultValue);
     final response =
-        await _request<Map<String, dynamic>>('/v1/feature-flags/evaluate', payload);
+        await _request<Map<String, dynamic>>('/sdk/v1/feature-flags/evaluate', payload);
     return EvaluatedFlag.fromJson(response);
   }
 

@@ -65,7 +65,7 @@ describe('Kitbase', () => {
 
       expect(result).toEqual(mockResponse);
       expect(mockFetch).toHaveBeenCalledWith(
-        'https://api.kitbase.dev/v1/logs',
+        'https://api.kitbase.dev/sdk/v1/logs',
         expect.objectContaining({
           method: 'POST',
           headers: {

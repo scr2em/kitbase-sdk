@@ -54,7 +54,7 @@ class KitbaseChangelogs {
           field: 'version');
     }
 
-    return _request('/v1/changelogs/${Uri.encodeComponent(version)}');
+    return _request('/sdk/v1/changelogs/${Uri.encodeComponent(version)}');
   }
 
   Future<ChangelogResponse> _request(String endpoint) async {

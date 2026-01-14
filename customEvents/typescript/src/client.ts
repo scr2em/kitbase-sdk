@@ -443,7 +443,7 @@ export class Kitbase {
 
     for (const event of events) {
       try {
-        await this.sendRequest<TrackResponse>('/v1/logs', event.payload);
+        await this.sendRequest<TrackResponse>('/sdk/v1/logs', event.payload);
         sentIds.push(event.id!);
       } catch (error) {
         this.log('Failed to send queued event', { id: event.id, error });
@@ -527,7 +527,7 @@ export class Kitbase {
     }
 
     // No offline queue - send directly (original behavior)
-    const response = await this.sendRequest<TrackResponse>('/v1/logs', payload);
+    const response = await this.sendRequest<TrackResponse>('/sdk/v1/logs', payload);
     this.log('Event sent successfully', { id: response.id });
     return response;
   }

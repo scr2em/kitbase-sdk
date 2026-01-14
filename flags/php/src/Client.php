@@ -68,7 +68,7 @@ class Flags
     public function getSnapshot(?EvaluationContext $context = null): FlagSnapshot
     {
         $payload = $context?->toPayload() ?? [];
-        $response = $this->request('/v1/feature-flags/snapshot', $payload);
+        $response = $this->request('/sdk/v1/feature-flags/snapshot', $payload);
 
         return FlagSnapshot::fromArray($response);
     }
@@ -103,7 +103,7 @@ class Flags
             $payload['defaultValue'] = $defaultValue;
         }
 
-        $response = $this->request('/v1/feature-flags/evaluate', $payload);
+        $response = $this->request('/sdk/v1/feature-flags/evaluate', $payload);
 
         return EvaluatedFlag::fromArray($response);
     }

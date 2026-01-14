@@ -63,7 +63,7 @@ class Changelogs
             throw new ValidationException('Version is required', 'version');
         }
 
-        $response = $this->request('/v1/changelogs/' . urlencode($version));
+        $response = $this->request('/sdk/v1/changelogs/' . urlencode($version));
 
         return ChangelogResponse::fromArray($response);
     }
