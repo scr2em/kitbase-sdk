@@ -137,7 +137,8 @@ export class Kitbase {
     }
 
     this.token = config.token;
-    this.baseUrl = config.baseUrl ?? DEFAULT_BASE_URL;
+    // Remove trailing slashes to prevent double-slash in URLs
+    this.baseUrl = (config.baseUrl ?? DEFAULT_BASE_URL).replace(/\/+$/, '');
     this.storageKey = config.storageKey ?? DEFAULT_STORAGE_KEY;
     this.debugMode = config.debug ?? false;
 
