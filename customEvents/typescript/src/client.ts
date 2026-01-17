@@ -746,7 +746,8 @@ export class Kitbase {
       event: 'session_start',
       tags: {
         __session_id: this.session.id,
-        __entry_path: this.session.entryPath ?? '',
+        __path: this.session.entryPath ?? '', // For path column in DB
+        __entry_path: this.session.entryPath ?? '', // For semantic clarity
         __referrer: this.session.entryReferrer ?? '',
         ...utmParams,
       },
