@@ -20,6 +20,12 @@ import {
 } from './errors.js';
 import { EventQueue } from './queue/index.js';
 import type { QueuedEvent, QueueStats } from './queue/types.js';
+import {
+  detectBot,
+  DEFAULT_BOT_DETECTION_CONFIG,
+  type BotDetectionConfig,
+  type BotDetectionResult,
+} from './botDetection.js';
 
 const DEFAULT_BASE_URL = 'https://api.kitbase.dev';
 const TIMEOUT = 30000;
@@ -131,6 +137,10 @@ export class Kitbase {
   private userId: string | null = null;
   private unloadListenerAdded = false;
 
+  // Bot detection
+  private botDetectionConfig: BotDetectionConfig;
+  private botDetectionResult: BotDetectionResult | null = null;
+
   constructor(config: KitbaseConfig) {
     if (!config.token) {
       throw new ValidationError('API token is required', 'token');
@@ -179,6 +189,24 @@ export class Kitbase {
       this.log('Offline queueing enabled', {
         storageType: this.queue.getStorageType(),
       });
+    }
+
+    // Initialize bot detection
+    this.botDetectionConfig = {
+      ...DEFAULT_BOT_DETECTION_CONFIG,
+      ...config.botDetection,
+    };
+
+    if (this.botDetectionConfig.enabled) {
+      this.botDetectionResult = detectBot(this.botDetectionConfig);
+      if (this.botDetectionResult.isBot) {
+        this.log('Bot detected', {
+          reason: this.botDetectionResult.reason,
+          checks: this.botDetectionResult.checks,
+        });
+      } else {
+        this.log('Bot detection enabled, no bot detected');
+      }
     }
   }
 
@@ -423,6 +451,93 @@ export class Kitbase {
   }
 
   // ============================================================
+  // Bot Detection
+  // ============================================================
+
+  /**
+   * Check if the current visitor is detected as a bot
+   *
+   * @returns true if bot detected, false otherwise
+   *
+   * @example
+   * ```typescript
+   * if (kitbase.isBot()) {
+   *   console.log('Bot detected, tracking disabled');
+   * }
+   * ```
+   */
+  isBot(): boolean {
+    if (!this.botDetectionConfig.enabled) {
+      return false;
+    }
+
+    // Re-run detection if not yet done
+    if (!this.botDetectionResult) {
+      this.botDetectionResult = detectBot(this.botDetectionConfig);
+    }
+
+    return this.botDetectionResult.isBot;
+  }
+
+  /**
+   * Get detailed bot detection result
+   *
+   * @returns Bot detection result with detailed checks, or null if detection not enabled
+   *
+   * @example
+   * ```typescript
+   * const result = kitbase.getBotDetectionResult();
+   * if (result?.isBot) {
+   *   console.log('Bot detected:', result.reason);
+   *   console.log('Checks:', result.checks);
+   * }
+   * ```
+   */
+  getBotDetectionResult(): BotDetectionResult | null {
+    if (!this.botDetectionConfig.enabled) {
+      return null;
+    }
+
+    // Re-run detection if not yet done
+    if (!this.botDetectionResult) {
+      this.botDetectionResult = detectBot(this.botDetectionConfig);
+    }
+
+    return this.botDetectionResult;
+  }
+
+  /**
+   * Force re-run bot detection
+   * Useful if you want to check again after page state changes
+   *
+   * @returns Updated bot detection result
+   *
+   * @example
+   * ```typescript
+   * const result = kitbase.redetectBot();
+   * console.log('Is bot:', result.isBot);
+   * ```
+   */
+  redetectBot(): BotDetectionResult {
+    this.botDetectionResult = detectBot(this.botDetectionConfig);
+    this.log('Bot detection re-run', {
+      isBot: this.botDetectionResult.isBot,
+      reason: this.botDetectionResult.reason,
+    });
+    return this.botDetectionResult;
+  }
+
+  /**
+   * Check if bot blocking is currently active
+   * When bot detection is enabled and a bot is detected, all events are blocked.
+   *
+   * @returns true if bots are being blocked from tracking
+   */
+  isBotBlockingActive(): boolean {
+    return this.botDetectionConfig.enabled === true && this.isBot();
+  }
+
+  // ============================================================
   // Offline Queue
   // ============================================================
 
@@ -509,6 +624,16 @@ export class Kitbase {
    */
   async track(options: TrackOptions): Promise<TrackResponse> {
     this.validateTrackOptions(options);
+
+    // Check if bot blocking is active
+    if (this.isBotBlockingActive()) {
+      this.log('Event blocked - bot detected', { event: options.event });
+      return {
+        id: `blocked-bot-${Date.now()}`,
+        event: options.event,
+        timestamp: new Date().toISOString(),
+      };
+    }
 
     // Calculate duration if this event was being timed
     let duration: number | undefined;

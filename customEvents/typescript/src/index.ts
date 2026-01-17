@@ -16,10 +16,21 @@ export type {
   PageViewOptions,
   RevenueOptions,
   IdentifyOptions,
+  // Bot detection types
+  BotDetectionConfig,
 } from './types.js';
 
 // Queue types
 export type { QueuedEvent, QueueStats } from './queue/types.js';
+
+// Bot detection utilities
+export {
+  detectBot,
+  isBot,
+  isUserAgentBot,
+  getUserAgent,
+  type BotDetectionResult,
+} from './botDetection.js';
 
 // Errors
 export {

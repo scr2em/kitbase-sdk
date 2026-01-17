@@ -1,4 +1,5 @@
 import type { OfflineConfig } from './queue/types.js';
+import type { BotDetectionConfig } from './botDetection.js';
 
 /**
  * Storage interface for anonymous ID persistence
@@ -13,6 +14,11 @@ export interface Storage {
  * Configuration options for offline event queueing
  */
 export type { OfflineConfig };
+
+/**
+ * Configuration options for bot detection
+ */
+export type { BotDetectionConfig };
 
 /**
  * Configuration options for the Kitbase client
@@ -60,6 +66,12 @@ export interface KitbaseConfig {
    * Enables session tracking, pageview tracking, and revenue tracking.
    */
   analytics?: AnalyticsConfig;
+
+  /**
+   * Bot detection configuration.
+   * When enabled, detects automated traffic and can block tracking for bots.
+   */
+  botDetection?: BotDetectionConfig;
 }
 
 /**
