@@ -700,7 +700,7 @@ export class FlagsClient {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': `${this.token}`,
+          'x-sdk-key': `${this.token}`,
         },
         body: body ? JSON.stringify(body) : undefined,
         signal: controller.signal,
@@ -750,7 +750,7 @@ export class FlagsClient {
 
     try {
       const headers: Record<string, string> = {
-        'X-API-Key': this.token,
+        'x-sdk-key': this.token,
       };
 
       // Add ETag for cache validation

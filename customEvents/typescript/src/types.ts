@@ -54,6 +54,12 @@ export interface KitbaseConfig {
    * and automatically sent when back online.
    */
   offline?: OfflineConfig;
+
+  /**
+   * Analytics tracking configuration.
+   * Enables session tracking, pageview tracking, and revenue tracking.
+   */
+  analytics?: AnalyticsConfig;
 }
 
 /**
@@ -148,6 +154,117 @@ export interface LogPayload {
   notify?: boolean;
   description?: string;
   tags?: Tags;
+}
+
+// ============================================================
+// Analytics Types
+// ============================================================
+
+/**
+ * Session data for analytics tracking
+ */
+export interface Session {
+  id: string;
+  startedAt: number;
+  lastActivityAt: number;
+  screenViewCount: number;
+  entryPath?: string;
+  entryReferrer?: string;
+}
+
+/**
+ * Configuration for analytics tracking
+ */
+export interface AnalyticsConfig {
+  /**
+   * Enable automatic pageview tracking on route changes
+   * @default false
+   */
+  autoTrackPageViews?: boolean;
+
+  /**
+   * Enable automatic session tracking
+   * @default true
+   */
+  autoTrackSessions?: boolean;
+
+  /**
+   * Session timeout in milliseconds (default: 30 minutes)
+   * @default 1800000
+   */
+  sessionTimeout?: number;
+
+  /**
+   * Storage key for session data
+   * @default 'kitbase_session'
+   */
+  sessionStorageKey?: string;
+}
+
+/**
+ * Options for tracking a pageview
+ */
+export interface PageViewOptions {
+  /**
+   * The page path (defaults to window.location.pathname)
+   */
+  path?: string;
+
+  /**
+   * The page title (defaults to document.title)
+   */
+  title?: string;
+
+  /**
+   * The referrer URL
+   */
+  referrer?: string;
+
+  /**
+   * Additional metadata tags
+   */
+  tags?: Tags;
+}
+
+/**
+ * Options for tracking revenue
+ */
+export interface RevenueOptions {
+  /**
+   * Revenue amount in cents (e.g., 1999 for $19.99)
+   */
+  amount: number;
+
+  /**
+   * Currency code (e.g., 'USD', 'EUR')
+   * @default 'USD'
+   */
+  currency?: string;
+
+  /**
+   * Optional user identifier
+   */
+  user_id?: string;
+
+  /**
+   * Additional metadata tags
+   */
+  tags?: Tags;
+}
+
+/**
+ * Options for identifying a user
+ */
+export interface IdentifyOptions {
+  /**
+   * The unique user identifier
+   */
+  userId: string;
+
+  /**
+   * User traits/properties
+   */
+  traits?: Tags;
 }
 
 

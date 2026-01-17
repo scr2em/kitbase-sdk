@@ -66,7 +66,7 @@ describe('Changelogs', () => {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            'x-api-key': 'test-token',
+            'x-sdk-key': 'test-token',
           },
         }),
       );

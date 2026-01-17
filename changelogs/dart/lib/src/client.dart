@@ -66,7 +66,7 @@ class KitbaseChangelogs {
             uri,
             headers: {
               'Content-Type': 'application/json',
-              'x-api-key': '$_token',
+              'x-sdk-key': '$_token',
             },
           )
           .timeout(_timeout);

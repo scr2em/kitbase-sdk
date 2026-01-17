@@ -6,6 +6,11 @@ import type {
   LogPayload,
   Storage,
   Tags,
+  Session,
+  AnalyticsConfig,
+  PageViewOptions,
+  RevenueOptions,
+  IdentifyOptions,
 } from './types.js';
 import {
   ApiError,
@@ -19,6 +24,9 @@ import type { QueuedEvent, QueueStats } from './queue/types.js';
 const DEFAULT_BASE_URL = 'https://api.kitbase.dev';
 const TIMEOUT = 30000;
 const DEFAULT_STORAGE_KEY = 'kitbase_anonymous_id';
+const DEFAULT_SESSION_STORAGE_KEY = 'kitbase_session';
+const DEFAULT_SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes
+const ANALYTICS_CHANNEL = '__analytics';
 
 /**
  * In-memory storage fallback for non-browser environments
@@ -114,6 +122,17 @@ export class Kitbase {
   private queue: EventQueue | null = null;
   private offlineEnabled: boolean;
 
+  // Analytics & Session tracking
+  private session: Session | null = null;
+  private sessionTimeout: number;
+  private sessionStorageKey: string;
+  private analyticsEnabled: boolean;
+  private autoTrackPageViews: boolean;
+  private userId: string | null = null;
+  private lastPagePath: string | null = null;
+  private pageViewStartTime: number | null = null;
+  private unloadListenerAdded = false;
+
   constructor(config: KitbaseConfig) {
     if (!config.token) {
       throw new ValidationError('API token is required', 'token');
@@ -133,6 +152,23 @@ export class Kitbase {
 
     // Load or generate anonymous ID
     this.initializeAnonymousId();
+
+    // Initialize analytics configuration
+    this.sessionTimeout = config.analytics?.sessionTimeout ?? DEFAULT_SESSION_TIMEOUT;
+    this.sessionStorageKey = config.analytics?.sessionStorageKey ?? DEFAULT_SESSION_STORAGE_KEY;
+    this.analyticsEnabled = config.analytics?.autoTrackSessions ?? true;
+    this.autoTrackPageViews = config.analytics?.autoTrackPageViews ?? false;
+
+    // Load existing session from storage
+    if (this.analyticsEnabled) {
+      this.loadSession();
+      this.setupUnloadListener();
+
+      // Auto-track pageviews if enabled
+      if (this.autoTrackPageViews && typeof window !== 'undefined') {
+        this.enableAutoPageViews();
+      }
+    }
 
     // Initialize offline queue if enabled
     this.offlineEnabled = config.offline?.enabled ?? false;
@@ -551,7 +587,7 @@ export class Kitbase {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': `${this.token}`,
+          'x-sdk-key': `${this.token}`,
         },
         body: JSON.stringify(body),
         signal: controller.signal,
@@ -601,6 +637,410 @@ export class Kitbase {
       return String((body as { error: unknown }).error);
     }
     return fallback;
+  }
+
+  // ============================================================
+  // Analytics & Session Management
+  // ============================================================
+
+  /**
+   * Load session from storage
+   */
+  private loadSession(): void {
+    if (!this.storage) return;
+
+    try {
+      const stored = this.storage.getItem(this.sessionStorageKey);
+      if (stored) {
+        const session = JSON.parse(stored) as Session;
+        const now = Date.now();
+
+        // Check if session is still valid (not expired)
+        if (now - session.lastActivityAt < this.sessionTimeout) {
+          this.session = session;
+          this.log('Session restored', { sessionId: session.id });
+        } else {
+          // Session expired, will create new one on next activity
+          this.storage.removeItem(this.sessionStorageKey);
+          this.log('Session expired, removed from storage');
+        }
+      }
+    } catch (error) {
+      this.log('Failed to load session from storage', error);
+    }
+  }
+
+  /**
+   * Save session to storage
+   */
+  private saveSession(): void {
+    if (!this.storage || !this.session) return;
+
+    try {
+      this.storage.setItem(this.sessionStorageKey, JSON.stringify(this.session));
+    } catch (error) {
+      this.log('Failed to save session to storage', error);
+    }
+  }
+
+  /**
+   * Get or create a session
+   */
+  private getOrCreateSession(): Session {
+    const now = Date.now();
+
+    // Check if session expired
+    if (this.session && (now - this.session.lastActivityAt) > this.sessionTimeout) {
+      this.endSession();
+      this.session = null;
+    }
+
+    // Create new session if needed
+    if (!this.session) {
+      const referrer = typeof document !== 'undefined' ? document.referrer : undefined;
+      const path = typeof window !== 'undefined' ? window.location.pathname : undefined;
+
+      this.session = {
+        id: uuidv4(),
+        startedAt: now,
+        lastActivityAt: now,
+        screenViewCount: 0,
+        entryPath: path,
+        entryReferrer: referrer,
+      };
+
+      this.log('New session created', { sessionId: this.session.id });
+      this.trackSessionStart();
+    }
+
+    // Update last activity
+    this.session.lastActivityAt = now;
+    this.saveSession();
+
+    return this.session;
+  }
+
+  /**
+   * Get the current session ID (or null if no active session)
+   */
+  getSessionId(): string | null {
+    return this.session?.id ?? null;
+  }
+
+  /**
+   * Get the current session data
+   */
+  getSession(): Session | null {
+    return this.session ? { ...this.session } : null;
+  }
+
+  /**
+   * Track session start event
+   */
+  private trackSessionStart(): void {
+    if (!this.session) return;
+
+    const utmParams = this.getUtmParams();
+
+    this.track({
+      channel: ANALYTICS_CHANNEL,
+      event: 'session_start',
+      tags: {
+        __session_id: this.session.id,
+        __entry_path: this.session.entryPath ?? '',
+        __referrer: this.session.entryReferrer ?? '',
+        ...utmParams,
+      },
+    }).catch((err) => this.log('Failed to track session_start', err));
+  }
+
+  /**
+   * End the current session and send session_end event
+   */
+  private endSession(): void {
+    if (!this.session) return;
+
+    const duration = Date.now() - this.session.startedAt;
+    const isBounce = this.session.screenViewCount <= 1;
+
+    this.track({
+      channel: ANALYTICS_CHANNEL,
+      event: 'session_end',
+      tags: {
+        __session_id: this.session.id,
+        __duration: duration,
+        __bounce: isBounce,
+        __screen_view_count: this.session.screenViewCount,
+      },
+    }).catch((err) => this.log('Failed to track session_end', err));
+
+    this.log('Session ended', {
+      sessionId: this.session.id,
+      duration,
+      screenViewCount: this.session.screenViewCount,
+      bounce: isBounce,
+    });
+
+    // Clear session from storage
+    if (this.storage) {
+      this.storage.removeItem(this.sessionStorageKey);
+    }
+  }
+
+  /**
+   * Setup listener to end session on page unload
+   */
+  private setupUnloadListener(): void {
+    if (typeof window === 'undefined' || this.unloadListenerAdded) return;
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        // Track last page view duration before ending session
+        this.trackLastPageViewDuration();
+        this.endSession();
+      }
+    };
+
+    window.addEventListener('visibilitychange', handleVisibilityChange);
+    this.unloadListenerAdded = true;
+    this.log('Unload listener added');
+  }
+
+  /**
+   * Get UTM parameters from URL
+   */
+  private getUtmParams(): Tags {
+    if (typeof window === 'undefined') return {};
+
+    const params = new URLSearchParams(window.location.search);
+    const utmParams: Tags = {};
+
+    const utmKeys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
+    for (const key of utmKeys) {
+      const value = params.get(key);
+      if (value) {
+        utmParams[`__${key}`] = value;
+      }
+    }
+
+    return utmParams;
+  }
+
+  /**
+   * Track the duration of the last page view
+   */
+  private trackLastPageViewDuration(): void {
+    if (this.lastPagePath && this.pageViewStartTime) {
+      const duration = Date.now() - this.pageViewStartTime;
+      // Send duration update for the last page view
+      this.track({
+        channel: ANALYTICS_CHANNEL,
+        event: 'screen_view_duration',
+        tags: {
+          __session_id: this.session?.id ?? '',
+          __path: this.lastPagePath,
+          __duration: duration,
+        },
+      }).catch((err) => this.log('Failed to track screen_view_duration', err));
+    }
+  }
+
+  /**
+   * Track a page view
+   *
+   * @param options - Page view options
+   * @returns Promise resolving to the track response
+   *
+   * @example
+   * ```typescript
+   * // Track current page
+   * await kitbase.trackPageView();
+   *
+   * // Track with custom path
+   * await kitbase.trackPageView({ path: '/products/123', title: 'Product Details' });
+   * ```
+   */
+  async trackPageView(options: PageViewOptions = {}): Promise<TrackResponse> {
+    const session = this.getOrCreateSession();
+    session.screenViewCount++;
+    this.saveSession();
+
+    // Track duration of previous page
+    this.trackLastPageViewDuration();
+
+    const path = options.path ?? (typeof window !== 'undefined' ? window.location.pathname : '');
+    const title = options.title ?? (typeof document !== 'undefined' ? document.title : '');
+    const referrer = options.referrer ?? (typeof document !== 'undefined' ? document.referrer : '');
+
+    // Update tracking for duration calculation
+    this.lastPagePath = path;
+    this.pageViewStartTime = Date.now();
+
+    return this.track({
+      channel: ANALYTICS_CHANNEL,
+      event: 'screen_view',
+      tags: {
+        __session_id: session.id,
+        __path: path,
+        __title: title,
+        __referrer: referrer,
+        ...this.getUtmParams(),
+        ...(options.tags ?? {}),
+      },
+    });
+  }
+
+  /**
+   * Enable automatic page view tracking
+   * Intercepts browser history changes (pushState, replaceState, popstate)
+   *
+   * @example
+   * ```typescript
+   * kitbase.enableAutoPageViews();
+   * // Now all route changes will automatically be tracked
+   * ```
+   */
+  enableAutoPageViews(): void {
+    if (typeof window === 'undefined') {
+      this.log('Auto page views not available in non-browser environment');
+      return;
+    }
+
+    // Track initial page view
+    this.trackPageView().catch((err) => this.log('Failed to track initial page view', err));
+
+    // Intercept pushState
+    const originalPushState = history.pushState.bind(history);
+    history.pushState = (...args) => {
+      originalPushState(...args);
+      this.trackPageView().catch((err) => this.log('Failed to track page view (pushState)', err));
+    };
+
+    // Intercept replaceState
+    const originalReplaceState = history.replaceState.bind(history);
+    history.replaceState = (...args) => {
+      originalReplaceState(...args);
+      // Don't track replaceState as it's usually not a navigation
+    };
+
+    // Listen to popstate (browser back/forward)
+    window.addEventListener('popstate', () => {
+      this.trackPageView().catch((err) => this.log('Failed to track page view (popstate)', err));
+    });
+
+    this.log('Auto page view tracking enabled');
+  }
+
+  /**
+   * Track a revenue event
+   *
+   * @param options - Revenue options
+   * @returns Promise resolving to the track response
+   *
+   * @example
+   * ```typescript
+   * // Track a $19.99 purchase
+   * await kitbase.trackRevenue({
+   *   amount: 1999,
+   *   currency: 'USD',
+   *   tags: { product_id: 'prod_123', plan: 'premium' },
+   * });
+   * ```
+   */
+  async trackRevenue(options: RevenueOptions): Promise<TrackResponse> {
+    const session = this.getOrCreateSession();
+
+    return this.track({
+      channel: ANALYTICS_CHANNEL,
+      event: 'revenue',
+      user_id: options.user_id ?? this.userId ?? undefined,
+      tags: {
+        __session_id: session.id,
+        __revenue: options.amount,
+        __currency: options.currency ?? 'USD',
+        ...(options.tags ?? {}),
+      },
+    });
+  }
+
+  /**
+   * Identify a user
+   * Links the current anonymous ID to a user ID for future events
+   *
+   * @param options - Identify options
+   *
+   * @example
+   * ```typescript
+   * kitbase.identify({
+   *   userId: 'user_123',
+   *   traits: { email: 'user@example.com', plan: 'premium' },
+   * });
+   * ```
+   */
+  identify(options: IdentifyOptions): void {
+    this.userId = options.userId;
+
+    // Register user traits as super properties
+    if (options.traits) {
+      this.register({
+        __user_id: options.userId,
+        ...options.traits,
+      });
+    } else {
+      this.register({ __user_id: options.userId });
+    }
+
+    // Track identify event
+    this.track({
+      channel: ANALYTICS_CHANNEL,
+      event: 'identify',
+      user_id: options.userId,
+      tags: {
+        __session_id: this.session?.id ?? '',
+        __anonymous_id: this.anonymousId ?? '',
+        ...(options.traits ?? {}),
+      },
+    }).catch((err) => this.log('Failed to track identify', err));
+
+    this.log('User identified', { userId: options.userId });
+  }
+
+  /**
+   * Get the current user ID (set via identify)
+   */
+  getUserId(): string | null {
+    return this.userId;
+  }
+
+  /**
+   * Reset the user identity and session
+   * Call this when a user logs out
+   *
+   * @example
+   * ```typescript
+   * kitbase.reset();
+   * ```
+   */
+  reset(): void {
+    // End current session
+    if (this.session) {
+      this.endSession();
+      this.session = null;
+    }
+
+    // Clear user ID
+    this.userId = null;
+
+    // Generate new anonymous ID
+    this.anonymousId = uuidv4();
+    if (this.storage) {
+      this.storage.setItem(this.storageKey, this.anonymousId);
+    }
+
+    // Clear super properties
+    this.clearSuperProperties();
+
+    this.log('User reset complete');
   }
 
   // ============================================================

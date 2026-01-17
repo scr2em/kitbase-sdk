@@ -314,7 +314,7 @@ class Flags
             $response = $this->httpClient->post($endpoint, [
                 'headers' => [
                     'Content-Type' => 'application/json',
-                    'x-api-key' => $this->token,
+                    'x-sdk-key' => $this->token,
                 ],
                 'json' => $body ?: new \stdClass(), // Send empty object if no body
             ]);

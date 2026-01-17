@@ -68,7 +68,7 @@ export class Changelogs {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': `${this.token}`,
+          'x-sdk-key': `${this.token}`,
         },
         signal: controller.signal,
       });

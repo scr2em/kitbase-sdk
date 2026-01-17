@@ -69,7 +69,7 @@ describe('FlagsClient', () => {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              'x-api-key': 'test-token',
+              'x-sdk-key': 'test-token',
             },
           }),
         );
@@ -474,7 +474,7 @@ describe('FlagsClient', () => {
           expect.objectContaining({
             method: 'GET',
             headers: expect.objectContaining({
-              'X-API-Key': 'test-token',
+              'x-sdk-key': 'test-token',
             }),
           }),
         );

@@ -70,7 +70,7 @@ describe('Kitbase', () => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'x-api-key': 'test-token',
+            'x-sdk-key': 'test-token',
           },
         }),
       );
@@ -399,7 +399,7 @@ describe('Kitbase', () => {
     });
 
     it('should log when debug mode is enabled', async () => {
-      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => { });
 
       mockFetch.mockResolvedValueOnce({
         ok: true,
@@ -419,7 +419,7 @@ describe('Kitbase', () => {
     });
 
     it('should not log when debug mode is disabled', async () => {
-      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => { });
 
       mockFetch.mockResolvedValueOnce({
         ok: true,

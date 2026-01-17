@@ -10,6 +10,12 @@ export type {
   TagValue,
   Storage,
   OfflineConfig,
+  // Analytics types
+  Session,
+  AnalyticsConfig,
+  PageViewOptions,
+  RevenueOptions,
+  IdentifyOptions,
 } from './types.js';
 
 // Queue types

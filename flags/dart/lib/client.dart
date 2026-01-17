@@ -354,7 +354,7 @@ class KitbaseFlags {
             uri,
             headers: {
               'Content-Type': 'application/json',
-              'x-api-key': '$_token',
+              'x-sdk-key': '$_token',
             },
             body: body != null ? jsonEncode(body) : null,
           )

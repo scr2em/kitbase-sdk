@@ -77,7 +77,7 @@ class Changelogs
             $response = $this->httpClient->get($endpoint, [
                 'headers' => [
                     'Content-Type' => 'application/json',
-                    'x-api-key' => $this->token,
+                    'x-sdk-key' => $this->token,
                 ],
             ]);
 

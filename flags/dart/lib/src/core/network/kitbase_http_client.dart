@@ -100,7 +100,7 @@ class KitbaseHttpClient {
     };
 
     if (headers.addAuthorizationHeader) {
-      result['x-api-key'] = '$_token';
+      result['x-sdk-key'] = '$_token';
     }
 
     if (headers.customHeaders != null) {

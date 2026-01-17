@@ -141,7 +141,7 @@ class Kitbase
             $response = $this->httpClient->post($endpoint, [
                 'headers' => [
                     'Content-Type' => 'application/json',
-                    'x-api-key' => $this->token,
+                    'x-sdk-key' => $this->token,
                 ],
                 'json' => $body,
             ]);

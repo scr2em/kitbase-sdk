@@ -44,7 +44,7 @@ export class UploadClient {
     if (!config.apiKey) {
       throw new ValidationError('API key is required', 'apiKey');
     }
-    
+
     this.apiKey = config.apiKey;
     this.baseUrl = config.baseUrl || DEFAULT_BASE_URL;
   }
@@ -54,14 +54,14 @@ export class UploadClient {
    */
   async upload(payload: UploadPayload, options?: UploadOptions): Promise<UploadResponse> {
     this.validatePayload(payload);
-    
+
     const { body, boundary } = this.createMultipartBody(payload);
     const url = new URL(`${this.baseUrl}/sdk/v1/builds`);
-    
+
     return new Promise((resolve, reject) => {
       const isHttps = url.protocol === 'https:';
       const requestFn = isHttps ? httpsRequest : httpRequest;
-      
+
       const req = requestFn({
         hostname: url.hostname,
         port: url.port || (isHttps ? 443 : 80),
@@ -70,25 +70,25 @@ export class UploadClient {
         headers: {
           'Content-Type': `multipart/form-data; boundary=${boundary}`,
           'Content-Length': body.length,
-          'X-API-Key': this.apiKey,
+          'x-sdk-key': this.apiKey,
         },
         timeout: TIMEOUT,
       }, (res) => {
         let responseData = '';
-        
+
         res.on('data', (chunk) => {
           responseData += chunk;
         });
-        
+
         res.on('end', () => {
           try {
             const statusCode = res.statusCode || 0;
-            
+
             if (statusCode === 401 || statusCode === 403) {
               reject(new AuthenticationError());
               return;
             }
-            
+
             if (statusCode >= 400) {
               let errorBody: unknown;
               try {
@@ -100,7 +100,7 @@ export class UploadClient {
               reject(new ApiError(message, statusCode, errorBody));
               return;
             }
-            
+
             const result = JSON.parse(responseData) as UploadResponse;
             resolve(result);
           } catch (error) {
@@ -108,35 +108,35 @@ export class UploadClient {
           }
         });
       });
-      
+
       req.on('error', (error) => {
         reject(new ApiError(`Upload failed: ${error.message}`, 0));
       });
-      
+
       req.on('timeout', () => {
         req.destroy();
         reject(new ApiError('Upload timed out. Please try again.', 408));
       });
-      
+
       // Track upload progress
       if (options?.onProgress) {
         const total = body.length;
         let uploaded = 0;
         const chunkSize = 64 * 1024; // 64KB chunks
-        
+
         const writeChunk = (offset: number) => {
           const end = Math.min(offset + chunkSize, total);
           const chunk = body.slice(offset, end);
-          
+
           const canContinue = req.write(chunk);
           uploaded = end;
-          
+
           options.onProgress!({
             uploaded,
             total,
             percent: Math.round((uploaded / total) * 100),
           });
-          
+
           if (uploaded < total) {
             if (canContinue) {
               // Use setImmediate to avoid blocking
@@ -149,7 +149,7 @@ export class UploadClient {
             req.end();
           }
         };
-        
+
         // Start writing chunks
         writeChunk(0);
       } else {
@@ -184,18 +184,18 @@ export class UploadClient {
   private createMultipartBody(payload: UploadPayload): { body: Buffer; boundary: string } {
     const boundary = `----KitbaseBoundary${Date.now()}${Math.random().toString(36).slice(2)}`;
     const parts: Buffer[] = [];
-    
+
     // Add text fields
     const textFields: Record<string, string> = {
       commitHash: payload.commitHash,
       branchName: payload.branchName,
       nativeVersion: payload.nativeVersion,
     };
-    
+
     if (payload.commitMessage) {
       textFields.commitMessage = payload.commitMessage;
     }
-    
+
     for (const [name, value] of Object.entries(textFields)) {
       parts.push(Buffer.from(
         `--${boundary}\r\n` +
@@ -203,7 +203,7 @@ export class UploadClient {
         `${value}\r\n`
       ));
     }
-    
+
     // Add file
     parts.push(Buffer.from(
       `--${boundary}\r\n` +
@@ -212,7 +212,7 @@ export class UploadClient {
     ));
     parts.push(payload.file);
     parts.push(Buffer.from(`\r\n--${boundary}--\r\n`));
-    
+
     return {
       body: Buffer.concat(parts),
       boundary,
@@ -230,7 +230,7 @@ export class UploadClient {
       if ('error' in body && typeof (body as { error: unknown }).error === 'string') {
         return (body as { error: string }).error;
       }
-      const message = (body as {error: {message: string}})?.error?.message;
+      const message = (body as { error: { message: string } })?.error?.message;
       if (message) {
         return message;
       }
@@ -249,7 +249,7 @@ export function createUploadPayload(
 ): UploadPayload {
   const file = readFileSync(filePath);
   const fileName = basename(filePath);
-  
+
   return {
     commitHash: gitInfo.commitHash,
     branchName: gitInfo.branchName,
