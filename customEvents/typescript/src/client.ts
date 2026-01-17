@@ -129,8 +129,6 @@ export class Kitbase {
   private analyticsEnabled: boolean;
   private autoTrackPageViews: boolean;
   private userId: string | null = null;
-  private lastPagePath: string | null = null;
-  private pageViewStartTime: number | null = null;
   private unloadListenerAdded = false;
 
   constructor(config: KitbaseConfig) {
@@ -533,6 +531,7 @@ export class Kitbase {
     const payload: LogPayload = {
       channel: options.channel,
       event: options.event,
+      timestamp: Date.now(),
       ...(options.user_id && { user_id: options.user_id }),
       ...(includeAnonymousId && this.anonymousId && { anonymous_id: this.anonymousId }),
       ...(options.icon && { icon: options.icon }),
@@ -755,55 +754,42 @@ export class Kitbase {
   }
 
   /**
-   * End the current session and send session_end event
+   * End the current session (clears local state only - server calculates metrics)
    */
   private endSession(): void {
     if (!this.session) return;
 
-    const duration = Date.now() - this.session.startedAt;
-    const isBounce = this.session.screenViewCount <= 1;
+    this.log('Session ended', { sessionId: this.session.id });
 
-    this.track({
-      channel: ANALYTICS_CHANNEL,
-      event: 'session_end',
-      tags: {
-        __session_id: this.session.id,
-        __duration: duration,
-        __bounce: isBounce,
-        __screen_view_count: this.session.screenViewCount,
-      },
-    }).catch((err) => this.log('Failed to track session_end', err));
-
-    this.log('Session ended', {
-      sessionId: this.session.id,
-      duration,
-      screenViewCount: this.session.screenViewCount,
-      bounce: isBounce,
-    });
-
-    // Clear session from storage
+    // Clear session from storage (no event sent - server calculates metrics)
     if (this.storage) {
       this.storage.removeItem(this.sessionStorageKey);
     }
+    this.session = null;
   }
 
   /**
-   * Setup listener to end session on page unload
+   * Setup listeners for session lifecycle management
    */
   private setupUnloadListener(): void {
     if (typeof window === 'undefined' || this.unloadListenerAdded) return;
 
-    const handleVisibilityChange = () => {
+    // On visibility change: save session state
+    document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'hidden') {
-        // Track last page view duration before ending session
-        this.trackLastPageViewDuration();
-        this.endSession();
+        this.saveSession();
+        this.log('Page hidden, session state saved');
       }
-    };
+    });
 
-    window.addEventListener('visibilitychange', handleVisibilityChange);
+    // On page unload: end session (clears local state only)
+    window.addEventListener('pagehide', () => {
+      this.endSession();
+      this.log('Page unloading, session ended locally');
+    });
+
     this.unloadListenerAdded = true;
-    this.log('Unload listener added');
+    this.log('Session lifecycle listeners added');
   }
 
   /**
@@ -827,25 +813,6 @@ export class Kitbase {
   }
 
   /**
-   * Track the duration of the last page view
-   */
-  private trackLastPageViewDuration(): void {
-    if (this.lastPagePath && this.pageViewStartTime) {
-      const duration = Date.now() - this.pageViewStartTime;
-      // Send duration update for the last page view
-      this.track({
-        channel: ANALYTICS_CHANNEL,
-        event: 'screen_view_duration',
-        tags: {
-          __session_id: this.session?.id ?? '',
-          __path: this.lastPagePath,
-          __duration: duration,
-        },
-      }).catch((err) => this.log('Failed to track screen_view_duration', err));
-    }
-  }
-
-  /**
    * Track a page view
    *
    * @param options - Page view options
@@ -865,16 +832,9 @@ export class Kitbase {
     session.screenViewCount++;
     this.saveSession();
 
-    // Track duration of previous page
-    this.trackLastPageViewDuration();
-
     const path = options.path ?? (typeof window !== 'undefined' ? window.location.pathname : '');
     const title = options.title ?? (typeof document !== 'undefined' ? document.title : '');
     const referrer = options.referrer ?? (typeof document !== 'undefined' ? document.referrer : '');
-
-    // Update tracking for duration calculation
-    this.lastPagePath = path;
-    this.pageViewStartTime = Date.now();
 
     return this.track({
       channel: ANALYTICS_CHANNEL,

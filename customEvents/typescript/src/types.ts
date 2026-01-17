@@ -154,6 +154,11 @@ export interface LogPayload {
   notify?: boolean;
   description?: string;
   tags?: Tags;
+  /**
+   * Client-side timestamp (ms since epoch) when the event occurred.
+   * Used for accurate session duration calculation, especially in offline mode.
+   */
+  timestamp?: number;
 }
 
 // ============================================================
