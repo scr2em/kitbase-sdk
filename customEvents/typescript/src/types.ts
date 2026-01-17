@@ -206,6 +206,13 @@ export interface AnalyticsConfig {
   autoTrackSessions?: boolean;
 
   /**
+   * Enable automatic outbound link click tracking
+   * Tracks when users click links to external domains
+   * @default true
+   */
+  autoTrackOutboundLinks?: boolean;
+
+  /**
    * Session timeout in milliseconds (default: 30 minutes)
    * @default 1800000
    */

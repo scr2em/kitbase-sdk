@@ -134,8 +134,10 @@ export class Kitbase {
   private sessionStorageKey: string;
   private analyticsEnabled: boolean;
   private autoTrackPageViews: boolean;
+  private autoTrackOutboundLinks: boolean;
   private userId: string | null = null;
   private unloadListenerAdded = false;
+  private clickListenerAdded = false;
 
   // Bot detection
   private botDetectionConfig: BotDetectionConfig;
@@ -167,6 +169,7 @@ export class Kitbase {
     this.sessionStorageKey = config.analytics?.sessionStorageKey ?? DEFAULT_SESSION_STORAGE_KEY;
     this.analyticsEnabled = config.analytics?.autoTrackSessions ?? true;
     this.autoTrackPageViews = config.analytics?.autoTrackPageViews ?? false;
+    this.autoTrackOutboundLinks = config.analytics?.autoTrackOutboundLinks ?? true;
 
     // Load existing session from storage
     if (this.analyticsEnabled) {
@@ -177,6 +180,11 @@ export class Kitbase {
       if (this.autoTrackPageViews && typeof window !== 'undefined') {
         this.enableAutoPageViews();
       }
+    }
+
+    // Setup outbound link tracking if enabled
+    if (this.autoTrackOutboundLinks && typeof window !== 'undefined') {
+      this.setupOutboundLinkTracking();
     }
 
     // Initialize offline queue if enabled
@@ -917,6 +925,118 @@ export class Kitbase {
 
     this.unloadListenerAdded = true;
     this.log('Session lifecycle listeners added');
+  }
+
+  /**
+   * Setup outbound link click tracking
+   */
+  private setupOutboundLinkTracking(): void {
+    if (typeof window === 'undefined' || this.clickListenerAdded) return;
+
+    const handleClick = (event: MouseEvent) => {
+      const link = (event.target as Element)?.closest?.('a');
+      if (link) {
+        this.handleLinkClick(link as HTMLAnchorElement);
+      }
+    };
+
+    const handleKeydown = (event: KeyboardEvent) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        const link = (event.target as Element)?.closest?.('a');
+        if (link) {
+          this.handleLinkClick(link as HTMLAnchorElement);
+        }
+      }
+    };
+
+    document.addEventListener('click', handleClick);
+    document.addEventListener('keydown', handleKeydown);
+
+    this.clickListenerAdded = true;
+    this.log('Outbound link tracking enabled');
+  }
+
+  /**
+   * Handle link click for outbound tracking
+   */
+  private handleLinkClick(link: HTMLAnchorElement): void {
+    if (!link.href) return;
+
+    try {
+      const linkUrl = new URL(link.href);
+
+      // Only track http/https links
+      if (linkUrl.protocol !== 'http:' && linkUrl.protocol !== 'https:') {
+        return;
+      }
+
+      const currentHost = window.location.hostname;
+      const linkHost = linkUrl.hostname;
+
+      // Skip if same host
+      if (linkHost === currentHost) {
+        return;
+      }
+
+      // Skip if same root domain (e.g., blog.example.com -> example.com)
+      if (this.isSameRootDomain(currentHost, linkHost)) {
+        return;
+      }
+
+      // Track as outbound link
+      this.trackOutboundLink({
+        url: link.href,
+        text: link.textContent?.trim() || '',
+      }).catch((err) => this.log('Failed to track outbound link', err));
+    } catch {
+      // Invalid URL, skip
+    }
+  }
+
+  /**
+   * Get root domain from hostname (e.g., blog.example.com -> example.com)
+   */
+  private getRootDomain(hostname: string): string {
+    const parts = hostname.replace(/^www\./, '').split('.');
+    if (parts.length >= 2) {
+      return parts.slice(-2).join('.');
+    }
+    return hostname;
+  }
+
+  /**
+   * Check if two hostnames share the same root domain
+   */
+  private isSameRootDomain(host1: string, host2: string): boolean {
+    return this.getRootDomain(host1) === this.getRootDomain(host2);
+  }
+
+  /**
+   * Track an outbound link click
+   *
+   * @param options - Outbound link options
+   * @returns Promise resolving to the track response
+   *
+   * @example
+   * ```typescript
+   * await kitbase.trackOutboundLink({
+   *   url: 'https://example.com',
+   *   text: 'Visit Example',
+   * });
+   * ```
+   */
+  async trackOutboundLink(options: { url: string; text?: string }): Promise<TrackResponse> {
+    const session = this.getOrCreateSession();
+
+    return this.track({
+      channel: ANALYTICS_CHANNEL,
+      event: 'outbound_link',
+      tags: {
+        __session_id: session.id,
+        __url: options.url,
+        __text: options.text || '',
+      },
+    });
   }
 
   /**
