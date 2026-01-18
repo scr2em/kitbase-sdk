@@ -11,6 +11,7 @@ import type {
   PageViewOptions,
   RevenueOptions,
   IdentifyOptions,
+  PrivacyConfig,
 } from './types.js';
 import {
   ApiError,
@@ -31,6 +32,7 @@ const DEFAULT_BASE_URL = 'https://api.kitbase.dev';
 const TIMEOUT = 30000;
 const DEFAULT_STORAGE_KEY = 'kitbase_anonymous_id';
 const DEFAULT_SESSION_STORAGE_KEY = 'kitbase_session';
+const DEFAULT_OPT_OUT_STORAGE_KEY = 'kitbase_opt_out';
 const DEFAULT_SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes
 const ANALYTICS_CHANNEL = '__analytics';
 
@@ -143,6 +145,11 @@ export class Kitbase {
   private botDetectionConfig: BotDetectionConfig;
   private botDetectionResult: BotDetectionResult | null = null;
 
+  // Privacy & Consent
+  private optedOut: boolean = false;
+  private optOutStorageKey: string;
+  private clearQueueOnOptOut: boolean;
+
   constructor(config: KitbaseConfig) {
     if (!config.token) {
       throw new ValidationError('API token is required', 'token');
@@ -216,6 +223,11 @@ export class Kitbase {
         this.log('Bot detection enabled, no bot detected');
       }
     }
+
+    // Initialize privacy/consent settings
+    this.optOutStorageKey = config.privacy?.optOutStorageKey ?? DEFAULT_OPT_OUT_STORAGE_KEY;
+    this.clearQueueOnOptOut = config.privacy?.clearQueueOnOptOut ?? true;
+    this.initializeOptOutState(config.privacy?.optOutByDefault ?? false);
   }
 
   /**
@@ -546,6 +558,121 @@ export class Kitbase {
   }
 
   // ============================================================
+  // Privacy & Consent Management
+  // ============================================================
+
+  /**
+   * Initialize opt-out state from storage or default
+   */
+  private initializeOptOutState(optOutByDefault: boolean): void {
+    if (this.storage) {
+      const stored = this.storage.getItem(this.optOutStorageKey);
+      if (stored !== null) {
+        this.optedOut = stored === 'true';
+        this.log('Opt-out state loaded from storage', { optedOut: this.optedOut });
+        return;
+      }
+    }
+
+    // Use default if no stored value
+    this.optedOut = optOutByDefault;
+    if (optOutByDefault) {
+      this.log('Tracking opted out by default');
+    }
+  }
+
+  /**
+   * Opt out of tracking
+   * When opted out, all tracking calls will be silently ignored.
+   * The opt-out state is persisted to storage and survives page reloads.
+   *
+   * @example
+   * ```typescript
+   * // User clicks "Reject" on cookie consent banner
+   * kitbase.optOut();
+   * ```
+   */
+  async optOut(): Promise<void> {
+    this.optedOut = true;
+
+    // Persist to storage
+    if (this.storage) {
+      this.storage.setItem(this.optOutStorageKey, 'true');
+    }
+
+    // Clear queued events if configured to do so
+    if (this.clearQueueOnOptOut && this.queue) {
+      await this.queue.clear();
+      this.log('Offline queue cleared due to opt-out');
+    }
+
+    // End current session
+    if (this.session) {
+      if (this.storage) {
+        this.storage.removeItem(this.sessionStorageKey);
+      }
+      this.session = null;
+    }
+
+    this.log('User opted out of tracking');
+  }
+
+  /**
+   * Opt back in to tracking
+   * Re-enables tracking after a previous opt-out.
+   * The opt-in state is persisted to storage.
+   *
+   * @example
+   * ```typescript
+   * // User clicks "Accept" on cookie consent banner
+   * kitbase.optIn();
+   * ```
+   */
+  optIn(): void {
+    this.optedOut = false;
+
+    // Persist to storage
+    if (this.storage) {
+      this.storage.setItem(this.optOutStorageKey, 'false');
+    }
+
+    this.log('User opted in to tracking');
+  }
+
+  /**
+   * Check if tracking is currently opted out
+   *
+   * @returns true if the user has opted out of tracking
+   *
+   * @example
+   * ```typescript
+   * if (kitbase.isOptedOut()) {
+   *   console.log('Tracking is disabled');
+   * }
+   * ```
+   */
+  isOptedOut(): boolean {
+    return this.optedOut;
+  }
+
+  /**
+   * Check if tracking has user consent (not opted out)
+   * Convenience method - inverse of isOptedOut()
+   *
+   * @returns true if the user has consented to tracking
+   *
+   * @example
+   * ```typescript
+   * if (kitbase.hasConsent()) {
+   *   // Show personalized content
+   * }
+   * ```
+   */
+  hasConsent(): boolean {
+    return !this.optedOut;
+  }
+
+  // ============================================================
   // Offline Queue
   // ============================================================
 
@@ -624,23 +751,25 @@ export class Kitbase {
    * events are lost if the browser crashes or the network fails.
    *
    * @param options - Event tracking options
-   * @returns Promise resolving to the track response
+   * @returns Promise resolving to the track response, or void if tracking is blocked
    * @throws {ValidationError} When required fields are missing
    * @throws {AuthenticationError} When the API key is invalid (only when offline disabled)
    * @throws {ApiError} When the API returns an error (only when offline disabled)
    * @throws {TimeoutError} When the request times out (only when offline disabled)
    */
-  async track(options: TrackOptions): Promise<TrackResponse> {
+  async track(options: TrackOptions): Promise<TrackResponse | void> {
     this.validateTrackOptions(options);
+
+    // Check if user has opted out of tracking
+    if (this.optedOut) {
+      this.log('Event skipped - user opted out', { event: options.event });
+      return;
+    }
 
     // Check if bot blocking is active
     if (this.isBotBlockingActive()) {
-      this.log('Event blocked - bot detected', { event: options.event });
-      return {
-        id: `blocked-bot-${Date.now()}`,
-        event: options.event,
-        timestamp: new Date().toISOString(),
-      };
+      this.log('Event skipped - bot detected', { event: options.event });
+      return;
     }
 
     // Calculate duration if this event was being timed
@@ -1025,7 +1154,7 @@ export class Kitbase {
    * });
    * ```
    */
-  async trackOutboundLink(options: { url: string; text?: string }): Promise<TrackResponse> {
+  async trackOutboundLink(options: { url: string; text?: string }): Promise<TrackResponse | void> {
     const session = this.getOrCreateSession();
 
     return this.track({
@@ -1074,7 +1203,7 @@ export class Kitbase {
    * await kitbase.trackPageView({ path: '/products/123', title: 'Product Details' });
    * ```
    */
-  async trackPageView(options: PageViewOptions = {}): Promise<TrackResponse> {
+  async trackPageView(options: PageViewOptions = {}): Promise<TrackResponse | void> {
     const session = this.getOrCreateSession();
     session.screenViewCount++;
     this.saveSession();
@@ -1154,7 +1283,7 @@ export class Kitbase {
    * });
    * ```
    */
-  async trackRevenue(options: RevenueOptions): Promise<TrackResponse> {
+  async trackRevenue(options: RevenueOptions): Promise<TrackResponse | void> {
     const session = this.getOrCreateSession();
 
     return this.track({

@@ -18,6 +18,8 @@ export type {
   IdentifyOptions,
   // Bot detection types
   BotDetectionConfig,
+  // Privacy types
+  PrivacyConfig,
 } from './types.js';
 
 // Queue types
