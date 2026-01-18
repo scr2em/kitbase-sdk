@@ -1301,19 +1301,27 @@ export class Kitbase {
 
   /**
    * Identify a user
-   * Links the current anonymous ID to a user ID for future events
+   * Links the current anonymous ID to a user ID on the server.
+   * Call this when a user signs up or logs in.
    *
    * @param options - Identify options
+   * @returns Promise that resolves when the identity is linked
    *
    * @example
    * ```typescript
-   * kitbase.identify({
+   * await kitbase.identify({
    *   userId: 'user_123',
    *   traits: { email: 'user@example.com', plan: 'premium' },
    * });
    * ```
    */
-  identify(options: IdentifyOptions): void {
+  async identify(options: IdentifyOptions): Promise<void> {
+    // Check if user has opted out of tracking
+    if (this.optedOut) {
+      this.log('Identify skipped - user opted out', { userId: options.userId });
+      return;
+    }
+
     this.userId = options.userId;
 
     // Register user traits as super properties
@@ -1326,17 +1334,34 @@ export class Kitbase {
       this.register({ __user_id: options.userId });
     }
 
-    // Track identify event
-    this.track({
-      channel: ANALYTICS_CHANNEL,
-      event: 'identify',
-      user_id: options.userId,
-      tags: {
-        __session_id: this.session?.id ?? '',
-        __anonymous_id: this.anonymousId ?? '',
-        ...(options.traits ?? {}),
-      },
-    }).catch((err) => this.log('Failed to track identify', err));
+    // Call the identify endpoint to link anonymous_id -> user_id
+    if (this.anonymousId) {
+      try {
+        const response = await fetch(`${this.baseUrl}/sdk/v1/identify`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-sdk-key': this.token,
+          },
+          body: JSON.stringify({
+            anonymous_id: this.anonymousId,
+            user_id: options.userId,
+            traits: options.traits,
+          }),
+        });
+
+        if (!response.ok) {
+          this.log('Identify API call failed', { status: response.status });
+        } else {
+          this.log('Identity linked on server', {
+            anonymousId: this.anonymousId,
+            userId: options.userId,
+          });
+        }
+      } catch (err) {
+        this.log('Failed to call identify endpoint', err);
+      }
+    }
 
     this.log('User identified', { userId: options.userId });
   }
