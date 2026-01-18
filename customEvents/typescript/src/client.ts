@@ -475,7 +475,7 @@ export class Kitbase {
    * ```
    */
   isBot(): boolean {
-    if (!this.botDetectionConfig.enabled) {
+    if (!this.botDetectionConfig?.enabled) {
       return false;
     }
 
@@ -542,7 +542,7 @@ export class Kitbase {
    * @returns true if bots are being blocked from tracking
    */
   isBotBlockingActive(): boolean {
-    return this.botDetectionConfig.enabled === true && this.isBot();
+    return this.botDetectionConfig?.enabled === true && this.isBot();
   }
 
   // ============================================================
