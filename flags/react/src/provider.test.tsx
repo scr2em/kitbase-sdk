@@ -4,7 +4,7 @@ import React from 'react';
 import { FlagsProvider } from './provider';
 import { useFlagsContext } from './context';
 
-vi.mock('@kitbase/sdk/flags', () => ({
+vi.mock('@kitbase/flags', () => ({
   FlagsClient: vi.fn().mockImplementation((config) => ({
     config,
     getBooleanValue: vi.fn(),
@@ -20,7 +20,7 @@ describe('FlagsProvider', () => {
 
   it('should render children', () => {
     render(
-      <FlagsProvider config={{ token: 'test-token' }}>
+      <FlagsProvider config={{ sdkKey: 'test-token' }}>
         <div data-testid="child">Child Component</div>
       </FlagsProvider>
     );
@@ -36,7 +36,7 @@ describe('FlagsProvider', () => {
     };
 
     render(
-      <FlagsProvider config={{ token: 'test-token' }}>
+      <FlagsProvider config={{ sdkKey: 'test-token' }}>
         <TestComponent />
       </FlagsProvider>
     );
@@ -45,16 +45,16 @@ describe('FlagsProvider', () => {
   });
 
   it('should create FlagsClient with provided config', async () => {
-    const { FlagsClient } = await import('@kitbase/sdk/flags');
+    const { FlagsClient } = await import('@kitbase/flags');
 
     render(
-      <FlagsProvider config={{ token: 'my-api-token', enableLocalEvaluation: true }}>
+      <FlagsProvider config={{ sdkKey: 'my-api-token', enableLocalEvaluation: true }}>
         <div>Child</div>
       </FlagsProvider>
     );
 
     expect(FlagsClient).toHaveBeenCalledWith({
-      token: 'my-api-token',
+      sdkKey: 'my-api-token',
       enableLocalEvaluation: true,
     });
   });
@@ -66,7 +66,7 @@ describe('FlagsProvider', () => {
     };
 
     const { rerender } = render(
-      <FlagsProvider config={{ token: 'test-token' }}>
+      <FlagsProvider config={{ sdkKey: 'test-token' }}>
         <TestComponent />
       </FlagsProvider>
     );
@@ -74,7 +74,7 @@ describe('FlagsProvider', () => {
     const firstRender = screen.getByTestId('client').textContent;
 
     rerender(
-      <FlagsProvider config={{ token: 'test-token' }}>
+      <FlagsProvider config={{ sdkKey: 'test-token' }}>
         <TestComponent />
       </FlagsProvider>
     );

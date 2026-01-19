@@ -21,15 +21,15 @@ describe('FlagsClient', () => {
   });
 
   describe('constructor', () => {
-    it('should throw ValidationError when token is missing', () => {
-      expect(() => new FlagsClient({ token: '' })).toThrow(ValidationError);
-      expect(() => new FlagsClient({ token: '' })).toThrow(
-        'API token is required',
+    it('should throw ValidationError when sdkKey is missing', () => {
+      expect(() => new FlagsClient({ sdkKey: '' })).toThrow(ValidationError);
+      expect(() => new FlagsClient({ sdkKey: '' })).toThrow(
+        'SDK key is required',
       );
     });
 
     it('should create client with valid config', () => {
-      const client = new FlagsClient({ token: 'test-token' });
+      const client = new FlagsClient({ sdkKey: 'test-token' });
       expect(client).toBeInstanceOf(FlagsClient);
     });
   });
@@ -59,7 +59,7 @@ describe('FlagsClient', () => {
           json: async () => mockResponse,
         });
 
-        const client = new FlagsClient({ token: 'test-token' });
+        const client = new FlagsClient({ sdkKey: 'test-token' });
         const result = await client.getSnapshot();
 
         expect(result).toEqual(mockResponse);
@@ -86,7 +86,7 @@ describe('FlagsClient', () => {
           }),
         });
 
-        const client = new FlagsClient({ token: 'test-token' });
+        const client = new FlagsClient({ sdkKey: 'test-token' });
         await client.getSnapshot({
           context: {
             targetingKey: 'user-123',
@@ -108,7 +108,7 @@ describe('FlagsClient', () => {
 
     describe('evaluateFlag', () => {
       it('should throw ValidationError when flagKey is missing', async () => {
-        const client = new FlagsClient({ token: 'test-token' });
+        const client = new FlagsClient({ sdkKey: 'test-token' });
         await expect(client.evaluateFlag('')).rejects.toThrow(ValidationError);
         await expect(client.evaluateFlag('')).rejects.toThrow(
           'Flag key is required',
@@ -130,7 +130,7 @@ describe('FlagsClient', () => {
           json: async () => mockResponse,
         });
 
-        const client = new FlagsClient({ token: 'test-token' });
+        const client = new FlagsClient({ sdkKey: 'test-token' });
         const result = await client.evaluateFlag('dark-mode');
 
         expect(result).toEqual(mockResponse);
@@ -150,7 +150,7 @@ describe('FlagsClient', () => {
           }),
         });
 
-        const client = new FlagsClient({ token: 'test-token' });
+        const client = new FlagsClient({ sdkKey: 'test-token' });
         await client.evaluateFlag('feature-x', {
           context: { targetingKey: 'user-123', plan: 'premium' },
           defaultValue: false,
@@ -179,8 +179,8 @@ describe('FlagsClient', () => {
           }),
         });
 
-        const client = new FlagsClient({ token: 'test-token' });
-        const result = await client.getBooleanValue('dark-mode', false);
+        const client = new FlagsClient({ sdkKey: 'test-token' });
+        const result = await client.getBooleanValue('dark-mode');
 
         expect(result).toBe(true);
       });
@@ -197,8 +197,11 @@ describe('FlagsClient', () => {
           }),
         });
 
-        const client = new FlagsClient({ token: 'test-token' });
-        const result = await client.getBooleanValue('dark-mode', true);
+        const client = new FlagsClient({
+          sdkKey: 'test-token',
+          defaultValues: { 'dark-mode': true },
+        });
+        const result = await client.getBooleanValue('dark-mode');
 
         expect(result).toBe(true);
       });
@@ -215,8 +218,8 @@ describe('FlagsClient', () => {
           }),
         });
 
-        const client = new FlagsClient({ token: 'test-token' });
-        await expect(client.getBooleanValue('api-url', false)).rejects.toThrow(
+        const client = new FlagsClient({ sdkKey: 'test-token' });
+        await expect(client.getBooleanValue('api-url')).rejects.toThrow(
           TypeMismatchError,
         );
       });
@@ -235,8 +238,8 @@ describe('FlagsClient', () => {
           }),
         });
 
-        const client = new FlagsClient({ token: 'test-token' });
-        const result = await client.getStringValue('api-url', 'default');
+        const client = new FlagsClient({ sdkKey: 'test-token' });
+        const result = await client.getStringValue('api-url');
 
         expect(result).toBe('https://api.example.com');
       });
@@ -255,8 +258,8 @@ describe('FlagsClient', () => {
           }),
         });
 
-        const client = new FlagsClient({ token: 'test-token' });
-        const result = await client.getNumberValue('max-items', 50);
+        const client = new FlagsClient({ sdkKey: 'test-token' });
+        const result = await client.getNumberValue('max-items');
 
         expect(result).toBe(100);
       });
@@ -276,8 +279,8 @@ describe('FlagsClient', () => {
           }),
         });
 
-        const client = new FlagsClient({ token: 'test-token' });
-        const result = await client.getJsonValue('ui-config', {});
+        const client = new FlagsClient({ sdkKey: 'test-token' });
+        const result = await client.getJsonValue('ui-config');
 
         expect(result).toEqual(jsonValue);
       });
@@ -298,8 +301,8 @@ describe('FlagsClient', () => {
           }),
         });
 
-        const client = new FlagsClient({ token: 'test-token' });
-        const result = await client.getBooleanDetails('feature-x', false, {
+        const client = new FlagsClient({ sdkKey: 'test-token' });
+        const result = await client.getBooleanDetails('feature-x', {
           targetingKey: 'user-123',
         });
 
@@ -327,8 +330,11 @@ describe('FlagsClient', () => {
           }),
         });
 
-        const client = new FlagsClient({ token: 'test-token' });
-        const result = await client.getBooleanDetails('unknown-flag', true);
+        const client = new FlagsClient({
+          sdkKey: 'test-token',
+          defaultValues: { 'unknown-flag': true },
+        });
+        const result = await client.getBooleanDetails('unknown-flag');
 
         expect(result.value).toBe(true);
         expect(result.reason).toBe('ERROR');
@@ -345,7 +351,7 @@ describe('FlagsClient', () => {
           json: async () => ({ message: 'Invalid API key' }),
         });
 
-        const client = new FlagsClient({ token: 'invalid-token' });
+        const client = new FlagsClient({ sdkKey: 'invalid-token' });
         await expect(client.getSnapshot()).rejects.toThrow(AuthenticationError);
       });
 
@@ -357,7 +363,7 @@ describe('FlagsClient', () => {
           json: async () => ({ message: 'Invalid request' }),
         });
 
-        const client = new FlagsClient({ token: 'test-token' });
+        const client = new FlagsClient({ sdkKey: 'test-token' });
         await expect(client.getSnapshot()).rejects.toThrow(ApiError);
       });
 
@@ -371,7 +377,7 @@ describe('FlagsClient', () => {
             }),
         );
 
-        const client = new FlagsClient({ token: 'test-token' });
+        const client = new FlagsClient({ sdkKey: 'test-token' });
         await expect(client.getSnapshot()).rejects.toThrow(TimeoutError);
       });
     });
@@ -463,7 +469,7 @@ describe('FlagsClient', () => {
         });
 
         const client = new FlagsClient({
-          token: 'test-token',
+          sdkKey: 'test-token',
           enableLocalEvaluation: true,
           environmentRefreshIntervalSeconds: 0,
         });
@@ -492,7 +498,7 @@ describe('FlagsClient', () => {
         });
 
         const client = new FlagsClient({
-          token: 'test-token',
+          sdkKey: 'test-token',
           enableLocalEvaluation: true,
           environmentRefreshIntervalSeconds: 0,
         });
@@ -517,7 +523,7 @@ describe('FlagsClient', () => {
         });
 
         const client = new FlagsClient({
-          token: 'invalid-token',
+          sdkKey: 'invalid-token',
           enableLocalEvaluation: true,
           environmentRefreshIntervalSeconds: 0,
         });
@@ -527,7 +533,7 @@ describe('FlagsClient', () => {
       });
 
       it('should be no-op for remote evaluation mode', async () => {
-        const client = new FlagsClient({ token: 'test-token' });
+        const client = new FlagsClient({ sdkKey: 'test-token' });
         // Should not throw
         expect(mockFetch).not.toHaveBeenCalled();
       });
@@ -535,13 +541,13 @@ describe('FlagsClient', () => {
 
     describe('isReady', () => {
       it('should return true for remote evaluation mode', () => {
-        const client = new FlagsClient({ token: 'test-token' });
+        const client = new FlagsClient({ sdkKey: 'test-token' });
         expect(client.isReady()).toBe(true);
       });
 
       it('should return false before initialization for local mode', () => {
         const client = new FlagsClient({
-          token: 'test-token',
+          sdkKey: 'test-token',
           enableLocalEvaluation: true,
         });
         expect(client.isReady()).toBe(false);
@@ -557,7 +563,7 @@ describe('FlagsClient', () => {
         });
 
         const client = new FlagsClient({
-          token: 'test-token',
+          sdkKey: 'test-token',
           enableLocalEvaluation: true,
           environmentRefreshIntervalSeconds: 0,
         });
@@ -579,7 +585,7 @@ describe('FlagsClient', () => {
         });
 
         const client = new FlagsClient({
-          token: 'test-token',
+          sdkKey: 'test-token',
           enableLocalEvaluation: true,
         });
 
@@ -606,7 +612,7 @@ describe('FlagsClient', () => {
         });
 
         const client = new FlagsClient({
-          token: 'test-token',
+          sdkKey: 'test-token',
           enableLocalEvaluation: true,
           environmentRefreshIntervalSeconds: 0,
         });
@@ -634,7 +640,7 @@ describe('FlagsClient', () => {
         });
 
         const client = new FlagsClient({
-          token: 'test-token',
+          sdkKey: 'test-token',
           enableLocalEvaluation: true,
           environmentRefreshIntervalSeconds: 0,
         });
@@ -659,13 +665,13 @@ describe('FlagsClient', () => {
         });
 
         const client = new FlagsClient({
-          token: 'test-token',
+          sdkKey: 'test-token',
           enableLocalEvaluation: true,
           environmentRefreshIntervalSeconds: 0,
         });
 
 
-        const result = await client.getBooleanValue('dark-mode', false);
+        const result = await client.getBooleanValue('dark-mode');
         expect(result).toBe(true);
 
         client.close();
@@ -680,13 +686,14 @@ describe('FlagsClient', () => {
         });
 
         const client = new FlagsClient({
-          token: 'test-token',
+          sdkKey: 'test-token',
           enableLocalEvaluation: true,
           environmentRefreshIntervalSeconds: 0,
+          defaultValues: { 'disabled-flag': true },
         });
 
 
-        const result = await client.getBooleanValue('disabled-flag', true);
+        const result = await client.getBooleanValue('disabled-flag');
         expect(result).toBe(true);
 
         client.close();
@@ -701,14 +708,14 @@ describe('FlagsClient', () => {
         });
 
         const client = new FlagsClient({
-          token: 'test-token',
+          sdkKey: 'test-token',
           enableLocalEvaluation: true,
           environmentRefreshIntervalSeconds: 0,
         });
 
 
         await expect(
-          client.getBooleanValue('api-url', false),
+          client.getBooleanValue('api-url'),
         ).rejects.toThrow(TypeMismatchError);
 
         client.close();
@@ -725,16 +732,16 @@ describe('FlagsClient', () => {
         });
 
         const client = new FlagsClient({
-          token: 'test-token',
+          sdkKey: 'test-token',
           enableLocalEvaluation: true,
           environmentRefreshIntervalSeconds: 0,
+          defaultValues: { 'premium-feature': false },
         });
 
 
         // Premium user should get true
         const premiumResult = await client.getBooleanValue(
           'premium-feature',
-          false,
           {
             targetingKey: 'user-1',
             plan: 'premium',
@@ -745,7 +752,6 @@ describe('FlagsClient', () => {
         // Free user should get default (false)
         const freeResult = await client.getBooleanValue(
           'premium-feature',
-          false,
           {
             targetingKey: 'user-2',
             plan: 'free',
@@ -767,7 +773,7 @@ describe('FlagsClient', () => {
         });
 
         const client = new FlagsClient({
-          token: 'test-token',
+          sdkKey: 'test-token',
           enableLocalEvaluation: true,
           environmentRefreshIntervalSeconds: 0,
         });
@@ -800,7 +806,7 @@ describe('FlagsClient', () => {
         });
 
         const client = new FlagsClient({
-          token: 'test-token',
+          sdkKey: 'test-token',
           enableLocalEvaluation: true,
           environmentRefreshIntervalSeconds: 5,
         });
@@ -827,7 +833,7 @@ describe('FlagsClient', () => {
         });
 
         const client = new FlagsClient({
-          token: 'test-token',
+          sdkKey: 'test-token',
           enableLocalEvaluation: true,
           environmentRefreshIntervalSeconds: 5,
         });
@@ -863,7 +869,7 @@ describe('FlagsClient', () => {
           });
 
         const client = new FlagsClient({
-          token: 'test-token',
+          sdkKey: 'test-token',
           enableLocalEvaluation: true,
           environmentRefreshIntervalSeconds: 5,
         });
@@ -900,7 +906,7 @@ describe('FlagsClient', () => {
 
         const listener = vi.fn();
         const client = new FlagsClient({
-          token: 'test-token',
+          sdkKey: 'test-token',
           enableLocalEvaluation: true,
           environmentRefreshIntervalSeconds: 5,
         });
@@ -943,7 +949,7 @@ describe('FlagsClient', () => {
 
         const onConfigurationChange = vi.fn();
         const client = new FlagsClient({
-          token: 'test-token',
+          sdkKey: 'test-token',
           enableLocalEvaluation: true,
           environmentRefreshIntervalSeconds: 5,
           onConfigurationChange,
@@ -1008,21 +1014,21 @@ describe('FlagsClient', () => {
           });
 
         const client = new FlagsClient({
-          token: 'test-token',
+          sdkKey: 'test-token',
           enableLocalEvaluation: true,
           environmentRefreshIntervalSeconds: 5,
         });
 
 
         // First evaluation: should be true
-        const value1 = await client.getBooleanValue('dark-mode', false);
+        const value1 = await client.getBooleanValue('dark-mode');
         expect(value1).toBe(true);
 
         // Advance timer to trigger polling - backend returns new config
         await vi.advanceTimersByTimeAsync(5000);
 
         // Second evaluation: should now be false (updated value)
-        const value2 = await client.getBooleanValue('dark-mode', false);
+        const value2 = await client.getBooleanValue('dark-mode');
         expect(value2).toBe(false);
 
         client.close();
@@ -1091,14 +1097,15 @@ describe('FlagsClient', () => {
           });
 
         const client = new FlagsClient({
-          token: 'test-token',
+          sdkKey: 'test-token',
           enableLocalEvaluation: true,
           environmentRefreshIntervalSeconds: 5,
+          defaultValues: { 'premium-feature': false },
         });
 
 
         // Free user initially gets false
-        const value1 = await client.getBooleanValue('premium-feature', false, {
+        const value1 = await client.getBooleanValue('premium-feature', {
           targetingKey: 'user-1',
           plan: 'free',
         });
@@ -1108,11 +1115,516 @@ describe('FlagsClient', () => {
         await vi.advanceTimersByTimeAsync(5000);
 
         // Same free user now gets true (feature enabled for everyone)
-        const value2 = await client.getBooleanValue('premium-feature', false, {
+        const value2 = await client.getBooleanValue('premium-feature', {
           targetingKey: 'user-1',
           plan: 'free',
         });
         expect(value2).toBe(true);
+
+        client.close();
+      });
+    });
+
+    describe('onFlagChange', () => {
+      it('should notify listeners when flag values change', async () => {
+        const mockConfig1: FlagConfiguration = {
+          environmentId: 'env-123',
+          schemaVersion: '1.0',
+          generatedAt: new Date().toISOString(),
+          etag: '"v1"',
+          flags: [
+            {
+              key: 'dark-mode',
+              valueType: 'boolean',
+              defaultEnabled: true,
+              defaultValue: false,
+              rules: [],
+            },
+            {
+              key: 'max-items',
+              valueType: 'number',
+              defaultEnabled: true,
+              defaultValue: 10,
+              rules: [],
+            },
+          ],
+          segments: [],
+        };
+
+        const mockConfig2: FlagConfiguration = {
+          environmentId: 'env-123',
+          schemaVersion: '1.0',
+          generatedAt: new Date().toISOString(),
+          etag: '"v2"',
+          flags: [
+            {
+              key: 'dark-mode',
+              valueType: 'boolean',
+              defaultEnabled: true,
+              defaultValue: true, // Changed from false to true
+              rules: [],
+            },
+            {
+              key: 'max-items',
+              valueType: 'number',
+              defaultEnabled: true,
+              defaultValue: 10, // Same value
+              rules: [],
+            },
+          ],
+          segments: [],
+        };
+
+        mockFetch
+          .mockResolvedValueOnce({
+            ok: true,
+            status: 200,
+            json: async () => mockConfig1,
+          })
+          .mockResolvedValueOnce({
+            ok: true,
+            status: 200,
+            json: async () => mockConfig2,
+          });
+
+        const flagChangeListener = vi.fn();
+        const client = new FlagsClient({
+          sdkKey: 'test-token',
+          enableLocalEvaluation: true,
+          environmentRefreshIntervalSeconds: 5,
+        });
+
+        client.onFlagChange(flagChangeListener);
+        await client.waitUntilReady();
+
+        // Should not be called on initial load
+        expect(flagChangeListener).not.toHaveBeenCalled();
+
+        // Trigger polling
+        await vi.advanceTimersByTimeAsync(5000);
+
+        // Should be called with only the changed flag
+        expect(flagChangeListener).toHaveBeenCalledTimes(1);
+        expect(flagChangeListener).toHaveBeenCalledWith({
+          'dark-mode': true,
+        });
+
+        client.close();
+      });
+
+      it('should notify listeners when multiple flags change', async () => {
+        const mockConfig1: FlagConfiguration = {
+          environmentId: 'env-123',
+          schemaVersion: '1.0',
+          generatedAt: new Date().toISOString(),
+          etag: '"v1"',
+          flags: [
+            {
+              key: 'dark-mode',
+              valueType: 'boolean',
+              defaultEnabled: true,
+              defaultValue: false,
+              rules: [],
+            },
+            {
+              key: 'max-items',
+              valueType: 'number',
+              defaultEnabled: true,
+              defaultValue: 10,
+              rules: [],
+            },
+            {
+              key: 'api-url',
+              valueType: 'string',
+              defaultEnabled: true,
+              defaultValue: 'https://old.api.com',
+              rules: [],
+            },
+          ],
+          segments: [],
+        };
+
+        const mockConfig2: FlagConfiguration = {
+          environmentId: 'env-123',
+          schemaVersion: '1.0',
+          generatedAt: new Date().toISOString(),
+          etag: '"v2"',
+          flags: [
+            {
+              key: 'dark-mode',
+              valueType: 'boolean',
+              defaultEnabled: true,
+              defaultValue: true, // Changed
+              rules: [],
+            },
+            {
+              key: 'max-items',
+              valueType: 'number',
+              defaultEnabled: true,
+              defaultValue: 50, // Changed
+              rules: [],
+            },
+            {
+              key: 'api-url',
+              valueType: 'string',
+              defaultEnabled: true,
+              defaultValue: 'https://old.api.com', // Same
+              rules: [],
+            },
+          ],
+          segments: [],
+        };
+
+        mockFetch
+          .mockResolvedValueOnce({
+            ok: true,
+            status: 200,
+            json: async () => mockConfig1,
+          })
+          .mockResolvedValueOnce({
+            ok: true,
+            status: 200,
+            json: async () => mockConfig2,
+          });
+
+        const flagChangeListener = vi.fn();
+        const client = new FlagsClient({
+          sdkKey: 'test-token',
+          enableLocalEvaluation: true,
+          environmentRefreshIntervalSeconds: 5,
+        });
+
+        client.onFlagChange(flagChangeListener);
+        await client.waitUntilReady();
+
+        await vi.advanceTimersByTimeAsync(5000);
+
+        expect(flagChangeListener).toHaveBeenCalledWith({
+          'dark-mode': true,
+          'max-items': 50,
+        });
+
+        client.close();
+      });
+
+      it('should support multiple listeners', async () => {
+        const mockConfig1: FlagConfiguration = {
+          environmentId: 'env-123',
+          schemaVersion: '1.0',
+          generatedAt: new Date().toISOString(),
+          etag: '"v1"',
+          flags: [
+            {
+              key: 'feature-flag',
+              valueType: 'boolean',
+              defaultEnabled: true,
+              defaultValue: false,
+              rules: [],
+            },
+          ],
+          segments: [],
+        };
+
+        const mockConfig2: FlagConfiguration = {
+          ...mockConfig1,
+          etag: '"v2"',
+          flags: [
+            {
+              key: 'feature-flag',
+              valueType: 'boolean',
+              defaultEnabled: true,
+              defaultValue: true,
+              rules: [],
+            },
+          ],
+        };
+
+        mockFetch
+          .mockResolvedValueOnce({
+            ok: true,
+            status: 200,
+            json: async () => mockConfig1,
+          })
+          .mockResolvedValueOnce({
+            ok: true,
+            status: 200,
+            json: async () => mockConfig2,
+          });
+
+        const listener1 = vi.fn();
+        const listener2 = vi.fn();
+        const client = new FlagsClient({
+          sdkKey: 'test-token',
+          enableLocalEvaluation: true,
+          environmentRefreshIntervalSeconds: 5,
+        });
+
+        client.onFlagChange(listener1);
+        client.onFlagChange(listener2);
+        await client.waitUntilReady();
+
+        await vi.advanceTimersByTimeAsync(5000);
+
+        expect(listener1).toHaveBeenCalledWith({ 'feature-flag': true });
+        expect(listener2).toHaveBeenCalledWith({ 'feature-flag': true });
+
+        client.close();
+      });
+
+      it('should allow unsubscribing', async () => {
+        const mockConfig1: FlagConfiguration = {
+          environmentId: 'env-123',
+          schemaVersion: '1.0',
+          generatedAt: new Date().toISOString(),
+          etag: '"v1"',
+          flags: [
+            {
+              key: 'feature-flag',
+              valueType: 'boolean',
+              defaultEnabled: true,
+              defaultValue: false,
+              rules: [],
+            },
+          ],
+          segments: [],
+        };
+
+        const mockConfig2: FlagConfiguration = {
+          ...mockConfig1,
+          etag: '"v2"',
+          flags: [
+            {
+              key: 'feature-flag',
+              valueType: 'boolean',
+              defaultEnabled: true,
+              defaultValue: true,
+              rules: [],
+            },
+          ],
+        };
+
+        const mockConfig3: FlagConfiguration = {
+          ...mockConfig1,
+          etag: '"v3"',
+          flags: [
+            {
+              key: 'feature-flag',
+              valueType: 'boolean',
+              defaultEnabled: true,
+              defaultValue: false,
+              rules: [],
+            },
+          ],
+        };
+
+        mockFetch
+          .mockResolvedValueOnce({
+            ok: true,
+            status: 200,
+            json: async () => mockConfig1,
+          })
+          .mockResolvedValueOnce({
+            ok: true,
+            status: 200,
+            json: async () => mockConfig2,
+          })
+          .mockResolvedValueOnce({
+            ok: true,
+            status: 200,
+            json: async () => mockConfig3,
+          });
+
+        const listener = vi.fn();
+        const client = new FlagsClient({
+          sdkKey: 'test-token',
+          enableLocalEvaluation: true,
+          environmentRefreshIntervalSeconds: 5,
+        });
+
+        const { unsubscribe } = client.onFlagChange(listener);
+        await client.waitUntilReady();
+
+        // First change - listener should be called
+        await vi.advanceTimersByTimeAsync(5000);
+        expect(listener).toHaveBeenCalledTimes(1);
+
+        // Unsubscribe
+        unsubscribe();
+
+        // Second change - listener should NOT be called
+        await vi.advanceTimersByTimeAsync(5000);
+        expect(listener).toHaveBeenCalledTimes(1);
+
+        client.close();
+      });
+
+      it('should not notify when no flags change', async () => {
+        const mockConfig1: FlagConfiguration = {
+          environmentId: 'env-123',
+          schemaVersion: '1.0',
+          generatedAt: new Date().toISOString(),
+          etag: '"v1"',
+          flags: [
+            {
+              key: 'dark-mode',
+              valueType: 'boolean',
+              defaultEnabled: true,
+              defaultValue: true,
+              rules: [],
+            },
+          ],
+          segments: [],
+        };
+
+        // Same config, different etag (simulating metadata change but same values)
+        const mockConfig2: FlagConfiguration = {
+          ...mockConfig1,
+          etag: '"v2"',
+          generatedAt: new Date().toISOString(),
+        };
+
+        mockFetch
+          .mockResolvedValueOnce({
+            ok: true,
+            status: 200,
+            json: async () => mockConfig1,
+          })
+          .mockResolvedValueOnce({
+            ok: true,
+            status: 200,
+            json: async () => mockConfig2,
+          });
+
+        const listener = vi.fn();
+        const client = new FlagsClient({
+          sdkKey: 'test-token',
+          enableLocalEvaluation: true,
+          environmentRefreshIntervalSeconds: 5,
+        });
+
+        client.onFlagChange(listener);
+        await client.waitUntilReady();
+
+        await vi.advanceTimersByTimeAsync(5000);
+
+        // Should NOT be called since flag values didn't change
+        expect(listener).not.toHaveBeenCalled();
+
+        client.close();
+      });
+
+      it('should clear flag change listeners on close', async () => {
+        const mockConfig1: FlagConfiguration = {
+          environmentId: 'env-123',
+          schemaVersion: '1.0',
+          generatedAt: new Date().toISOString(),
+          etag: '"v1"',
+          flags: [
+            {
+              key: 'feature-flag',
+              valueType: 'boolean',
+              defaultEnabled: true,
+              defaultValue: false,
+              rules: [],
+            },
+          ],
+          segments: [],
+        };
+
+        mockFetch.mockResolvedValue({
+          ok: true,
+          status: 200,
+          json: async () => mockConfig1,
+        });
+
+        const listener = vi.fn();
+        const client = new FlagsClient({
+          sdkKey: 'test-token',
+          enableLocalEvaluation: true,
+          environmentRefreshIntervalSeconds: 5,
+        });
+
+        client.onFlagChange(listener);
+        await client.waitUntilReady();
+
+        client.close();
+
+        // After close, listeners should be cleared
+        // This is just a sanity check - the polling is also stopped
+        expect(listener).not.toHaveBeenCalled();
+      });
+
+      it('should notify when a flag is removed', async () => {
+        const mockConfig1: FlagConfiguration = {
+          environmentId: 'env-123',
+          schemaVersion: '1.0',
+          generatedAt: new Date().toISOString(),
+          etag: '"v1"',
+          flags: [
+            {
+              key: 'dark-mode',
+              valueType: 'boolean',
+              defaultEnabled: true,
+              defaultValue: true,
+              rules: [],
+            },
+            {
+              key: 'feature-to-remove',
+              valueType: 'boolean',
+              defaultEnabled: true,
+              defaultValue: true,
+              rules: [],
+            },
+          ],
+          segments: [],
+        };
+
+        // Config without 'feature-to-remove'
+        const mockConfig2: FlagConfiguration = {
+          environmentId: 'env-123',
+          schemaVersion: '1.0',
+          generatedAt: new Date().toISOString(),
+          etag: '"v2"',
+          flags: [
+            {
+              key: 'dark-mode',
+              valueType: 'boolean',
+              defaultEnabled: true,
+              defaultValue: true, // Same value
+              rules: [],
+            },
+          ],
+          segments: [],
+        };
+
+        mockFetch
+          .mockResolvedValueOnce({
+            ok: true,
+            status: 200,
+            json: async () => mockConfig1,
+          })
+          .mockResolvedValueOnce({
+            ok: true,
+            status: 200,
+            json: async () => mockConfig2,
+          });
+
+        const listener = vi.fn();
+        const client = new FlagsClient({
+          sdkKey: 'test-token',
+          enableLocalEvaluation: true,
+          environmentRefreshIntervalSeconds: 5,
+        });
+
+        client.onFlagChange(listener);
+        await client.waitUntilReady();
+
+        await vi.advanceTimersByTimeAsync(5000);
+
+        // Should be notified about removed flag with undefined value
+        expect(listener).toHaveBeenCalledWith({
+          'feature-to-remove': undefined,
+        });
 
         client.close();
       });
@@ -1128,7 +1640,7 @@ describe('FlagsClient', () => {
         });
 
         const client = new FlagsClient({
-          token: 'test-token',
+          sdkKey: 'test-token',
           enableLocalEvaluation: true,
           environmentRefreshIntervalSeconds: 5,
         });
@@ -1154,7 +1666,7 @@ describe('FlagsClient', () => {
         });
 
         const client = new FlagsClient({
-          token: 'test-token',
+          sdkKey: 'test-token',
           enableLocalEvaluation: true,
           environmentRefreshIntervalSeconds: 0,
         });
@@ -1182,7 +1694,7 @@ describe('FlagsClient', () => {
         });
 
         const client = new FlagsClient({
-          token: 'test-token',
+          sdkKey: 'test-token',
           enableLocalEvaluation: true,
           environmentRefreshIntervalSeconds: 0,
         });
@@ -1195,7 +1707,7 @@ describe('FlagsClient', () => {
       });
 
       it('should return empty for remote evaluation mode', () => {
-        const client = new FlagsClient({ token: 'test-token' });
+        const client = new FlagsClient({ sdkKey: 'test-token' });
         expect(client.getFlagKeys()).toEqual([]);
         expect(client.hasFlag('any-flag')).toBe(false);
       });
@@ -1218,7 +1730,7 @@ describe('FlagsClient', () => {
           });
 
         const client = new FlagsClient({
-          token: 'test-token',
+          sdkKey: 'test-token',
           enableLocalEvaluation: true,
           environmentRefreshIntervalSeconds: 0,
         });
@@ -1234,7 +1746,7 @@ describe('FlagsClient', () => {
       });
 
       it('should be no-op for remote evaluation mode', async () => {
-        const client = new FlagsClient({ token: 'test-token' });
+        const client = new FlagsClient({ sdkKey: 'test-token' });
         await client.refresh();
         expect(mockFetch).not.toHaveBeenCalled();
       });
@@ -1242,7 +1754,7 @@ describe('FlagsClient', () => {
 
     describe('getConfiguration', () => {
       it('should return null for remote evaluation mode', () => {
-        const client = new FlagsClient({ token: 'test-token' });
+        const client = new FlagsClient({ sdkKey: 'test-token' });
         expect(client.getConfiguration()).toBeNull();
       });
 
@@ -1255,7 +1767,7 @@ describe('FlagsClient', () => {
         });
 
         const client = new FlagsClient({
-          token: 'test-token',
+          sdkKey: 'test-token',
           enableLocalEvaluation: true,
           environmentRefreshIntervalSeconds: 0,
         });
@@ -1273,14 +1785,14 @@ describe('FlagsClient', () => {
         const mockConfig = createMockConfig();
 
         const client = new FlagsClient({
-          token: 'test-token',
+          sdkKey: 'test-token',
           enableLocalEvaluation: true,
           initialConfiguration: mockConfig,
           environmentRefreshIntervalSeconds: 0,
         });
 
         // Should be ready immediately without fetch
-        const result = await client.getBooleanValue('dark-mode', false);
+        const result = await client.getBooleanValue('dark-mode');
         expect(result).toBe(true);
 
         // Should not have made any fetch calls for evaluation
@@ -1304,7 +1816,7 @@ describe('FlagsClient', () => {
           .mockRejectedValueOnce(new Error('Network error'));
 
         const client = new FlagsClient({
-          token: 'test-token',
+          sdkKey: 'test-token',
           enableLocalEvaluation: true,
           environmentRefreshIntervalSeconds: 5,
           onError,
@@ -1333,7 +1845,7 @@ describe('FlagsClient', () => {
           .mockRejectedValueOnce(new Error('Network error'));
 
         const client = new FlagsClient({
-          token: 'test-token',
+          sdkKey: 'test-token',
           enableLocalEvaluation: true,
           environmentRefreshIntervalSeconds: 5,
         });
@@ -1362,7 +1874,7 @@ describe('FlagsClient', () => {
         });
 
         const client = new FlagsClient({
-          token: 'test-token',
+          sdkKey: 'test-token',
           enableLocalEvaluation: true,
           environmentRefreshIntervalSeconds: 0,
         });
@@ -1387,7 +1899,7 @@ describe('FlagsClient', () => {
         });
 
         const client = new FlagsClient({
-          token: 'test-token',
+          sdkKey: 'test-token',
           enableLocalEvaluation: true,
           environmentRefreshIntervalSeconds: 0,
         });
@@ -1416,7 +1928,7 @@ describe('FlagsClient', () => {
         });
 
         const client = new FlagsClient({
-          token: 'test-token',
+          sdkKey: 'test-token',
           enableLocalEvaluation: true,
           environmentRefreshIntervalSeconds: 0,
         });
@@ -1457,7 +1969,7 @@ describe('FlagsClient', () => {
         });
 
         const client = new FlagsClient({
-          token: 'test-token',
+          sdkKey: 'test-token',
           enableLocalEvaluation: true,
           environmentRefreshIntervalSeconds: 0,
         });
@@ -1506,7 +2018,7 @@ describe('FlagsClient', () => {
         });
 
         const client = new FlagsClient({
-          token: 'test-token',
+          sdkKey: 'test-token',
           cacheTtl: 60000,
         });
 
@@ -1536,7 +2048,7 @@ describe('FlagsClient', () => {
         });
 
         const client = new FlagsClient({
-          token: 'test-token',
+          sdkKey: 'test-token',
           cacheTtl: 60000,
         });
 
@@ -1576,7 +2088,7 @@ describe('FlagsClient', () => {
           });
 
         const client = new FlagsClient({
-          token: 'test-token',
+          sdkKey: 'test-token',
           cacheTtl: 60000,
         });
 
@@ -1616,7 +2128,7 @@ describe('FlagsClient', () => {
         });
 
         const client = new FlagsClient({
-          token: 'test-token',
+          sdkKey: 'test-token',
           cacheTtl: 1000, // 1 second TTL
         });
 
@@ -1649,7 +2161,7 @@ describe('FlagsClient', () => {
         });
 
         const client = new FlagsClient({
-          token: 'test-token',
+          sdkKey: 'test-token',
           cacheTtl: 60000,
         });
 
@@ -1681,7 +2193,7 @@ describe('FlagsClient', () => {
         });
 
         const client = new FlagsClient({
-          token: 'test-token',
+          sdkKey: 'test-token',
           cacheTtl: 60000,
         });
 
@@ -1710,7 +2222,7 @@ describe('FlagsClient', () => {
         });
 
         const client = new FlagsClient({
-          token: 'test-token',
+          sdkKey: 'test-token',
           cacheTtl: 1000,
         });
 
@@ -1743,7 +2255,7 @@ describe('FlagsClient', () => {
           }),
         });
 
-        const client = new FlagsClient({ token: 'test-token' });
+        const client = new FlagsClient({ sdkKey: 'test-token' });
         const result = await client.getStringDetails('api-url', 'default');
 
         expect(result).toEqual({
@@ -1768,7 +2280,7 @@ describe('FlagsClient', () => {
           }),
         });
 
-        const client = new FlagsClient({ token: 'test-token' });
+        const client = new FlagsClient({ sdkKey: 'test-token' });
         await expect(
           client.getStringDetails('dark-mode', 'default'),
         ).rejects.toThrow(TypeMismatchError);
@@ -1790,7 +2302,7 @@ describe('FlagsClient', () => {
           }),
         });
 
-        const client = new FlagsClient({ token: 'test-token' });
+        const client = new FlagsClient({ sdkKey: 'test-token' });
         const result = await client.getNumberDetails('max-items', 10);
 
         expect(result).toEqual({
@@ -1815,7 +2327,7 @@ describe('FlagsClient', () => {
           }),
         });
 
-        const client = new FlagsClient({ token: 'test-token' });
+        const client = new FlagsClient({ sdkKey: 'test-token' });
         await expect(
           client.getNumberDetails('dark-mode', 0),
         ).rejects.toThrow(TypeMismatchError);
@@ -1838,7 +2350,7 @@ describe('FlagsClient', () => {
           }),
         });
 
-        const client = new FlagsClient({ token: 'test-token' });
+        const client = new FlagsClient({ sdkKey: 'test-token' });
         const result = await client.getJsonDetails('ui-config', {});
 
         expect(result).toEqual({
@@ -1863,7 +2375,7 @@ describe('FlagsClient', () => {
           }),
         });
 
-        const client = new FlagsClient({ token: 'test-token' });
+        const client = new FlagsClient({ sdkKey: 'test-token' });
         await expect(
           client.getJsonDetails('dark-mode', {}),
         ).rejects.toThrow(TypeMismatchError);
@@ -1886,7 +2398,7 @@ describe('FlagsClient', () => {
       });
 
       const client = new FlagsClient({
-        token: 'test-token',
+        sdkKey: 'test-token',
         baseUrl: 'https://custom.api.example.com',
       });
       await client.getSnapshot();
@@ -1912,7 +2424,7 @@ describe('FlagsClient', () => {
       });
 
       const client = new FlagsClient({
-        token: 'test-token',
+        sdkKey: 'test-token',
         baseUrl: 'https://custom.api.example.com',
         enableLocalEvaluation: true,
         environmentRefreshIntervalSeconds: 0,
@@ -1941,7 +2453,7 @@ describe('FlagsClient', () => {
         json: async () => ({ flagKey: 'unknown-flag' }),
       });
 
-      const client = new FlagsClient({ token: 'test-token' });
+      const client = new FlagsClient({ sdkKey: 'test-token' });
       await expect(client.evaluateFlag('unknown-flag')).rejects.toThrow(
         FlagNotFoundError,
       );
@@ -1955,7 +2467,7 @@ describe('FlagsClient', () => {
         json: async () => ({ message: 'Resource not found' }),
       });
 
-      const client = new FlagsClient({ token: 'test-token' });
+      const client = new FlagsClient({ sdkKey: 'test-token' });
       await expect(client.evaluateFlag('some-flag')).rejects.toThrow(ApiError);
     });
 
@@ -1969,7 +2481,7 @@ describe('FlagsClient', () => {
         },
       });
 
-      const client = new FlagsClient({ token: 'test-token' });
+      const client = new FlagsClient({ sdkKey: 'test-token' });
       await expect(client.getSnapshot()).rejects.toThrow(ApiError);
     });
 
@@ -1981,7 +2493,7 @@ describe('FlagsClient', () => {
         json: async () => ({ error: 'Custom error message' }),
       });
 
-      const client = new FlagsClient({ token: 'test-token' });
+      const client = new FlagsClient({ sdkKey: 'test-token' });
       try {
         await client.getSnapshot();
       } catch (error) {
@@ -2020,7 +2532,7 @@ describe('FlagsClient', () => {
 
     it('should return null when not ready', () => {
       const client = new FlagsClient({
-        token: 'test-token',
+        sdkKey: 'test-token',
         enableLocalEvaluation: true,
       });
 
@@ -2038,7 +2550,7 @@ describe('FlagsClient', () => {
       });
 
       const client = new FlagsClient({
-        token: 'test-token',
+        sdkKey: 'test-token',
         enableLocalEvaluation: true,
         environmentRefreshIntervalSeconds: 0,
       });
@@ -2092,7 +2604,7 @@ describe('FlagsClient', () => {
       });
 
       const client = new FlagsClient({
-        token: 'test-token',
+        sdkKey: 'test-token',
         enableLocalEvaluation: true,
         environmentRefreshIntervalSeconds: 0,
       });
@@ -2114,6 +2626,173 @@ describe('FlagsClient', () => {
       expect(freeSnapshot?.flags[0].value).toBeNull();
 
       client.close();
+    });
+  });
+
+  // ==================== Global Default Values ====================
+
+  describe('Global Default Values', () => {
+    describe('when flag is disabled', () => {
+      it('should use global default when method default is undefined', async () => {
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({
+            flagKey: 'dark-mode',
+            enabled: false,
+            valueType: 'boolean',
+            value: null,
+            reason: 'DISABLED',
+          }),
+        });
+
+        const client = new FlagsClient({
+          sdkKey: 'test-token',
+          defaultValues: {
+            'dark-mode': true,
+          },
+        });
+
+        const result = await client.getBooleanValue(
+          'dark-mode',
+        );
+        expect(result).toBe(true);
+      });
+
+    });
+
+    describe('when flag is not found', () => {
+      it('should use global default when method default is undefined', async () => {
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({
+            flagKey: 'unknown-flag',
+            enabled: false,
+            valueType: 'string',
+            value: null,
+            reason: 'ERROR',
+            errorCode: 'FLAG_NOT_FOUND',
+            errorMessage: "Flag 'unknown-flag' not found",
+          }),
+        });
+
+        const client = new FlagsClient({
+          sdkKey: 'test-token',
+          defaultValues: {
+            'unknown-flag': 'global-default-value',
+          },
+        });
+
+        const result = await client.getStringValue(
+          'unknown-flag',
+        );
+        expect(result).toBe('global-default-value');
+      });
+
+    });
+
+    describe('with different value types', () => {
+      it('should work with number defaults', async () => {
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({
+            flagKey: 'max-items',
+            enabled: false,
+            valueType: 'number',
+            value: null,
+            reason: 'DISABLED',
+          }),
+        });
+
+        const client = new FlagsClient({
+          sdkKey: 'test-token',
+          defaultValues: {
+            'max-items': 100,
+          },
+        });
+
+        const result = await client.getNumberValue(
+          'max-items',
+        );
+        expect(result).toBe(100);
+      });
+
+      it('should work with JSON defaults', async () => {
+        const defaultConfig = { theme: 'dark', fontSize: 14 };
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({
+            flagKey: 'ui-config',
+            enabled: false,
+            valueType: 'json',
+            value: null,
+            reason: 'DISABLED',
+          }),
+        });
+
+        const client = new FlagsClient({
+          sdkKey: 'test-token',
+          defaultValues: {
+            'ui-config': defaultConfig,
+          },
+        });
+
+        const result = await client.getJsonValue(
+          'ui-config',
+          undefined as unknown as typeof defaultConfig,
+        );
+        expect(result).toEqual(defaultConfig);
+      });
+    });
+
+    describe('with local evaluation mode', () => {
+      const createMockConfig = () => ({
+        environmentId: 'env-123',
+        schemaVersion: '1.0',
+        generatedAt: new Date().toISOString(),
+        etag: '"abc123"',
+        flags: [
+          {
+            key: 'disabled-flag',
+            valueType: 'boolean',
+            defaultEnabled: false,
+            defaultValue: false,
+            rules: [],
+          },
+        ],
+        segments: [],
+      });
+
+      beforeEach(() => {
+        vi.useFakeTimers();
+      });
+
+      afterEach(() => {
+        vi.useRealTimers();
+      });
+
+      it('should use global default for disabled flags in local mode', async () => {
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          status: 200,
+          json: async () => createMockConfig(),
+        });
+
+        const client = new FlagsClient({
+          sdkKey: 'test-token',
+          enableLocalEvaluation: true,
+          environmentRefreshIntervalSeconds: 0,
+          defaultValues: {
+            'disabled-flag': true,
+          },
+        });
+
+        const result = await client.getBooleanValue(
+          'disabled-flag',
+        );
+        expect(result).toBe(true);
+
+        client.close();
+      });
     });
   });
 });

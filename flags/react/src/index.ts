@@ -11,7 +11,6 @@ export {
   useStringFlag,
   useNumberFlag,
   useJsonFlag,
-  useFlagDetails,
 } from './use-flag.js';
 
 export { useFlagSnapshot } from './use-snapshot.js';
@@ -28,4 +27,4 @@ export type {
   JsonValue,
   ResolutionReason,
   ErrorCode,
-} from '@kitbase/sdk/flags';
+} from '@kitbase/flags';

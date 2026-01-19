@@ -1,4 +1,4 @@
-import type { EvaluationContext } from '@kitbase/sdk/flags';
+import type { EvaluationContext } from '@kitbase/flags';
 
 /**
  * Options for the flag hooks
@@ -40,7 +40,3 @@ export interface UseFlagResult<T> {
    */
   refetch: () => Promise<void>;
 }
-
-
-
-

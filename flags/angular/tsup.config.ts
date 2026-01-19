@@ -9,6 +9,6 @@ export default defineConfig({
   sourcemap: true,
   clean: true,
   target: 'es2022',
-  external: ['react', '@kitbase/flags'],
+  external: ['@angular/core', 'rxjs', '@kitbase/flags'],
   splitting: false,
 });

@@ -3,7 +3,7 @@ import type {
   EvaluationContext,
   ResolutionDetails,
   JsonValue,
-} from '@kitbase/sdk/flags';
+} from '@kitbase/flags';
 import { useFlagsContext } from './context.js';
 import type { UseFlagOptions, UseFlagResult } from './types.js';
 
@@ -23,14 +23,13 @@ function contextEqual(
  * Hook to get a boolean feature flag value
  *
  * @param flagKey - The key of the feature flag
- * @param defaultValue - Default value to return while loading or on error
  * @param options - Options for evaluation context and behavior
  * @returns The flag value and state
  *
  * @example
  * ```tsx
  * function MyComponent() {
- *   const { data: isDarkMode, isLoading } = useBooleanFlag('dark-mode', false, {
+ *   const { data: isDarkMode, isLoading } = useBooleanFlag('dark-mode', {
  *     context: { targetingKey: userId, plan: 'premium' }
  *   });
  *
@@ -41,29 +40,22 @@ function contextEqual(
  */
 export function useBooleanFlag(
   flagKey: string,
-  defaultValue: boolean,
   options?: UseFlagOptions,
 ): UseFlagResult<boolean> {
-  return useTypedFlag(
-    flagKey,
-    defaultValue,
-    'boolean',
-    options,
-  );
+  return useTypedFlag(flagKey, 'boolean', options);
 }
 
 /**
  * Hook to get a string feature flag value
  *
  * @param flagKey - The key of the feature flag
- * @param defaultValue - Default value to return while loading or on error
  * @param options - Options for evaluation context and behavior
  * @returns The flag value and state
  *
  * @example
  * ```tsx
  * function MyComponent() {
- *   const { data: variant } = useStringFlag('checkout-variant', 'control', {
+ *   const { data: variant } = useStringFlag('checkout-variant', {
  *     context: { targetingKey: userId }
  *   });
  *
@@ -73,24 +65,22 @@ export function useBooleanFlag(
  */
 export function useStringFlag(
   flagKey: string,
-  defaultValue: string,
   options?: UseFlagOptions,
 ): UseFlagResult<string> {
-  return useTypedFlag(flagKey, defaultValue, 'string', options);
+  return useTypedFlag(flagKey, 'string', options);
 }
 
 /**
  * Hook to get a number feature flag value
  *
  * @param flagKey - The key of the feature flag
- * @param defaultValue - Default value to return while loading or on error
  * @param options - Options for evaluation context and behavior
  * @returns The flag value and state
  *
  * @example
  * ```tsx
  * function MyComponent() {
- *   const { data: maxItems } = useNumberFlag('max-cart-items', 10, {
+ *   const { data: maxItems } = useNumberFlag('max-cart-items', {
  *     context: { targetingKey: userId }
  *   });
  *
@@ -100,17 +90,15 @@ export function useStringFlag(
  */
 export function useNumberFlag(
   flagKey: string,
-  defaultValue: number,
   options?: UseFlagOptions,
 ): UseFlagResult<number> {
-  return useTypedFlag(flagKey, defaultValue, 'number', options);
+  return useTypedFlag(flagKey, 'number', options);
 }
 
 /**
  * Hook to get a JSON feature flag value
  *
  * @param flagKey - The key of the feature flag
- * @param defaultValue - Default value to return while loading or on error
  * @param options - Options for evaluation context and behavior
  * @returns The flag value and state
  *
@@ -125,7 +113,6 @@ export function useNumberFlag(
  * function MyComponent() {
  *   const { data: config } = useJsonFlag<FeatureConfig>(
  *     'feature-config',
- *     { enabled: false, theme: 'light', maxItems: 5 },
  *     { context: { targetingKey: userId } }
  *   );
  *
@@ -135,24 +122,22 @@ export function useNumberFlag(
  */
 export function useJsonFlag<T extends JsonValue = JsonValue>(
   flagKey: string,
-  defaultValue: T,
   options?: UseFlagOptions,
 ): UseFlagResult<T> {
-  return useTypedFlag(flagKey, defaultValue, 'json', options);
+  return useTypedFlag(flagKey, 'json', options);
 }
 
 /**
- * Hook to get full resolution details for a feature flag
+ * Hook to get full resolution details for a boolean feature flag
  *
  * @param flagKey - The key of the feature flag
- * @param defaultValue - Default value to return while loading or on error
  * @param options - Options for evaluation context and behavior
  * @returns The full resolution details and state
  *
  * @example
  * ```tsx
  * function MyComponent() {
- *   const { data: details } = useFlagDetails('feature-x', false, {
+ *   const { data: details } = useBooleanFlagDetails('feature-x', {
  *     context: { targetingKey: userId }
  *   });
  *
@@ -161,9 +146,77 @@ export function useJsonFlag<T extends JsonValue = JsonValue>(
  * }
  * ```
  */
-export function useFlagDetails<T extends boolean | string | number | JsonValue>(
+export function useBooleanFlagDetails(
   flagKey: string,
-  defaultValue: T,
+  options?: UseFlagOptions,
+): UseFlagResult<ResolutionDetails<boolean>> {
+  return useFlagDetailsInternal(
+    flagKey,
+    (flags, key, ctx) => flags.getBooleanDetails(key, ctx),
+    options,
+  );
+}
+
+/**
+ * Hook to get full resolution details for a string feature flag
+ *
+ * @param flagKey - The key of the feature flag
+ * @param options - Options for evaluation context and behavior
+ * @returns The full resolution details and state
+ */
+export function useStringFlagDetails(
+  flagKey: string,
+  options?: UseFlagOptions,
+): UseFlagResult<ResolutionDetails<string>> {
+  return useFlagDetailsInternal(
+    flagKey,
+    (flags, key, ctx) => flags.getStringDetails(key, ctx),
+    options,
+  );
+}
+
+/**
+ * Hook to get full resolution details for a number feature flag
+ *
+ * @param flagKey - The key of the feature flag
+ * @param options - Options for evaluation context and behavior
+ * @returns The full resolution details and state
+ */
+export function useNumberFlagDetails(
+  flagKey: string,
+  options?: UseFlagOptions,
+): UseFlagResult<ResolutionDetails<number>> {
+  return useFlagDetailsInternal(
+    flagKey,
+    (flags, key, ctx) => flags.getNumberDetails(key, ctx),
+    options,
+  );
+}
+
+/**
+ * Hook to get full resolution details for a JSON feature flag
+ *
+ * @param flagKey - The key of the feature flag
+ * @param options - Options for evaluation context and behavior
+ * @returns The full resolution details and state
+ */
+export function useJsonFlagDetails<T extends JsonValue = JsonValue>(
+  flagKey: string,
+  options?: UseFlagOptions,
+): UseFlagResult<ResolutionDetails<T>> {
+  return useFlagDetailsInternal(
+    flagKey,
+    (flags, key, ctx) => flags.getJsonDetails(key, ctx) as Promise<ResolutionDetails<T>>,
+    options,
+  );
+}
+
+/**
+ * Internal hook for flag details
+ */
+function useFlagDetailsInternal<T>(
+  flagKey: string,
+  fetcher: (flags: ReturnType<typeof useFlagsContext>, key: string, context?: EvaluationContext) => Promise<ResolutionDetails<T>>,
   options?: UseFlagOptions,
 ): UseFlagResult<ResolutionDetails<T>> {
   const flags = useFlagsContext();
@@ -172,6 +225,8 @@ export function useFlagDetails<T extends boolean | string | number | JsonValue>(
   const [error, setError] = useState<Error | null>(null);
 
   const contextRef = useRef(options?.context);
+  const fetcherRef = useRef(fetcher);
+  fetcherRef.current = fetcher;
   const refetchOnContextChange = options?.refetchOnContextChange ?? true;
 
   const fetchFlag = useCallback(async () => {
@@ -179,42 +234,14 @@ export function useFlagDetails<T extends boolean | string | number | JsonValue>(
     setError(null);
 
     try {
-      const type = typeof defaultValue;
-      let result: ResolutionDetails<T>;
-
-      if (type === 'boolean') {
-        result = (await flags.getBooleanDetails(
-          flagKey,
-          defaultValue as boolean,
-          options?.context,
-        )) as ResolutionDetails<T>;
-      } else if (type === 'string') {
-        result = (await flags.getStringDetails(
-          flagKey,
-          defaultValue as string,
-          options?.context,
-        )) as ResolutionDetails<T>;
-      } else if (type === 'number') {
-        result = (await flags.getNumberDetails(
-          flagKey,
-          defaultValue as number,
-          options?.context,
-        )) as ResolutionDetails<T>;
-      } else {
-        result = (await flags.getJsonDetails(
-          flagKey,
-          defaultValue as JsonValue,
-          options?.context,
-        )) as ResolutionDetails<T>;
-      }
-
+      const result = await fetcherRef.current(flags, flagKey, options?.context);
       setData(result);
     } catch (err) {
       setError(err instanceof Error ? err : new Error(String(err)));
     } finally {
       setIsLoading(false);
     }
-  }, [flags, flagKey, defaultValue, options?.context]);
+  }, [flags, flagKey, options?.context]);
 
   useEffect(() => {
     // Check if context changed
@@ -227,10 +254,6 @@ export function useFlagDetails<T extends boolean | string | number | JsonValue>(
     }
   }, [options?.context, refetchOnContextChange, fetchFlag]);
 
-  useEffect(() => {
-    fetchFlag();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [flagKey]);
 
   useEffect(() => {
     // If client is already ready, fetch immediately
@@ -238,15 +261,25 @@ export function useFlagDetails<T extends boolean | string | number | JsonValue>(
       fetchFlag();
     }
 
-    // Listen for configuration changes (when polling updates config) and ready event (initial load)
-    const unsubscribe = flags.on((event) => {
-      if (event.type === 'configurationChanged' || event.type === 'ready') {
+    // Listen for ready event (initial load)
+    const unsubscribeReady = flags.on((event) => {
+      if (event.type === 'ready') {
         fetchFlag();
       }
     });
 
-    return unsubscribe;
-  }, [flags, fetchFlag]);
+    // Listen for flag changes - only refetch when this specific flag changes
+    const { unsubscribe: unsubscribeFlagChange } = flags.onFlagChange((changedFlags) => {
+      if (flagKey in changedFlags) {
+        fetchFlag();
+      }
+    });
+
+    return () => {
+      unsubscribeReady();
+      unsubscribeFlagChange();
+    };
+  }, [flags, flagKey, fetchFlag]);
 
   return {
     data,
@@ -261,7 +294,6 @@ export function useFlagDetails<T extends boolean | string | number | JsonValue>(
  */
 function useTypedFlag<T extends boolean | string | number | JsonValue>(
   flagKey: string,
-  defaultValue: T,
   type: 'boolean' | 'string' | 'number' | 'json',
   options?: UseFlagOptions,
 ): UseFlagResult<T> {
@@ -284,28 +316,24 @@ function useTypedFlag<T extends boolean | string | number | JsonValue>(
         case 'boolean':
           value = (await flags.getBooleanValue(
             flagKey,
-            defaultValue as boolean,
             options?.context,
           )) as T;
           break;
         case 'string':
           value = (await flags.getStringValue(
             flagKey,
-            defaultValue as string,
             options?.context,
           )) as T;
           break;
         case 'number':
           value = (await flags.getNumberValue(
             flagKey,
-            defaultValue as number,
             options?.context,
           )) as T;
           break;
         case 'json':
           value = (await flags.getJsonValue(
             flagKey,
-            defaultValue as JsonValue,
             options?.context,
           )) as T;
           break;
@@ -314,11 +342,10 @@ function useTypedFlag<T extends boolean | string | number | JsonValue>(
       setData(value);
     } catch (err) {
       setError(err instanceof Error ? err : new Error(String(err)));
-      setData(defaultValue);
     } finally {
       setIsLoading(false);
     }
-  }, [flags, flagKey, defaultValue, type, options?.context]);
+  }, [flags, flagKey, type, options?.context]);
 
   useEffect(() => {
     // Check if context changed
@@ -342,15 +369,25 @@ function useTypedFlag<T extends boolean | string | number | JsonValue>(
       fetchFlag();
     }
 
-    // Listen for configuration changes (when polling updates config) and ready event (initial load)
-    const unsubscribe = flags.on((event) => {
-      if (event.type === 'configurationChanged' || event.type === 'ready') {
+    // Listen for ready event (initial load)
+    const unsubscribeReady = flags.on((event) => {
+      if (event.type === 'ready') {
         fetchFlag();
       }
     });
 
-    return unsubscribe;
-  }, [flags, fetchFlag]);
+    // Listen for flag changes - only refetch when this specific flag changes
+    const { unsubscribe: unsubscribeFlagChange } = flags.onFlagChange((changedFlags) => {
+      if (flagKey in changedFlags) {
+        fetchFlag();
+      }
+    });
+
+    return () => {
+      unsubscribeReady();
+      unsubscribeFlagChange();
+    };
+  }, [flags, flagKey, fetchFlag]);
 
   return {
     data,

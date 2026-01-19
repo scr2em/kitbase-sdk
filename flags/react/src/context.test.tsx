@@ -2,14 +2,14 @@ import { describe, it, expect, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import React from 'react';
 import { FlagsContext, useFlagsContext } from './context';
-import type { FlagsClient } from '@kitbase/sdk/flags';
+import type { FlagsClient } from '@kitbase/flags';
 
 describe('FlagsContext', () => {
   it('should throw error when used outside provider', () => {
     expect(() => {
       renderHook(() => useFlagsContext());
     }).toThrow(
-      'useFlagsContext must be used within a FlagsProvider. Wrap your component with <FlagsProvider token="your-token">'
+      'useFlagsContext must be used within a FlagsProvider. Wrap your component with <FlagsProvider config={{ sdkKey: "your-sdk-key" }}>'
     );
   });
 

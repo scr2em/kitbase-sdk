@@ -1,0 +1,41 @@
+{
+  "name": "@kitbase/flags-angular",
+  "version": "0.1.0",
+  "description": "Kitbase Feature Flags Angular SDK - Angular services and signals",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
+      "require": { "types": "./dist/index.d.cts", "default": "./dist/index.cjs" }
+    }
+  },
+  "files": ["dist"],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "pnpm build"
+  },
+  "keywords": ["kitbase", "flags", "feature-flags", "angular", "signals"],
+  "license": "MIT",
+  "repository": { "type": "git", "url": "https://github.com/scr2em/kitbase-sdk.git", "directory": "flags/angular" },
+  "peerDependencies": {
+    "@angular/core": ">=18.0.0",
+    "rxjs": ">=7.0.0"
+  },
+  "dependencies": {
+    "@kitbase/flags": "workspace:*"
+  },
+  "devDependencies": {
+    "@angular/core": "^18.0.0",
+    "rxjs": "^7.8.1",
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.3",
+    "vitest": "^1.2.0"
+  },
+  "engines": { "node": ">=18" }
+}

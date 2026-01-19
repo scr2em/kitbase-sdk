@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import type { EvaluationContext, FlagSnapshot } from '@kitbase/sdk/flags';
+import type { EvaluationContext, FlagSnapshot } from '@kitbase/flags';
 import { useFlagsContext } from './context.js';
 import type { UseFlagOptions, UseFlagResult } from './types.js';
 

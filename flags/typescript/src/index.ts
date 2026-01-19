@@ -19,6 +19,9 @@ export type {
   EvaluateOptions,
   EvaluateFlagOptions,
   JsonValue,
+  ChangedFlags,
+  FlagChangeCallback,
+  FlagChangeSubscription,
 } from './types.js';
 
 // Configuration types (for local evaluation)

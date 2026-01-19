@@ -18,6 +18,9 @@ import type {
   SnapshotPayload,
   EvaluateFlagPayload,
   JsonValue,
+  FlagChangeCallback,
+  FlagChangeSubscription,
+  ChangedFlags,
 } from './types.js';
 import { FlagEvaluator } from './evaluator.js';
 import {
@@ -54,33 +57,42 @@ export type FlagsClientListener = (event: FlagsClientEvent) => void;
  *
  * @example Remote evaluation (default)
  * ```typescript
- * import { FlagsClient } from '@kitbase/sdk/flags';
+ * import { FlagsClient } from '@kitbase/flags';
  *
  * const flags = new FlagsClient({
- *   token: '<YOUR_API_KEY>',
+ *   sdkKey: '<YOUR_SDK_KEY>',
+ *   defaultValues: {
+ *     'dark-mode': false,
+ *   },
  * });
  *
- * // Each call makes an API request
- * const isEnabled = await flags.getBooleanValue('dark-mode', false, {
+ * // Each call makes an API request - defaultValue is optional when using global defaults
+ * const isEnabled = await flags.getBooleanValue('dark-mode');
+ *
+ * // Or with context
+ * const isEnabled2 = await flags.getBooleanValue('dark-mode', undefined, {
  *   targetingKey: 'user-123',
  * });
+ *
+ * // Or override the default for this call
+ * const isEnabled3 = await flags.getBooleanValue('dark-mode', true);
  * ```
  *
  * @example Local evaluation
  * ```typescript
- * import { FlagsClient } from '@kitbase/sdk/flags';
+ * import { FlagsClient } from '@kitbase/flags';
  *
  * const flags = new FlagsClient({
- *   token: '<YOUR_API_KEY>',
+ *   sdkKey: '<YOUR_SDK_KEY>',
  *   enableLocalEvaluation: true,
  *   environmentRefreshIntervalSeconds: 60,
+ *   defaultValues: {
+ *     'dark-mode': false,
+ *   },
  * });
  *
  * // Evaluates locally (no network call)
- * const isEnabled = await flags.getBooleanValue('dark-mode', false, {
- *   targetingKey: 'user-123',
- * });
- *
+ * const isEnabled = await flags.getBooleanValue('dark-mode');
  * ```
  */
 interface CacheEntry {
@@ -89,7 +101,7 @@ interface CacheEntry {
 }
 
 export class FlagsClient {
-  private readonly token: string;
+  private readonly sdkKey: string;
   private readonly enableLocalEvaluation: boolean;
   private readonly pollingInterval: number;
   private readonly onConfigurationChange?: (config: FlagConfiguration) => void;
@@ -97,6 +109,7 @@ export class FlagsClient {
   private readonly cacheTtl: number;
   private readonly enablePersistentCache: boolean;
   private readonly baseUrl: string;
+  private readonly defaultValues: Record<string, unknown>;
 
   // Local evaluation state
   private evaluator: FlagEvaluator | null = null;
@@ -108,12 +121,15 @@ export class FlagsClient {
   // Remote evaluation cache (only used when enableLocalEvaluation is false)
   private cache: Map<string, CacheEntry> = new Map();
 
+  // Flag change listeners
+  private flagChangeListeners: Set<FlagChangeCallback> = new Set();
+
   constructor(config: FlagsConfig) {
-    if (!config.token) {
-      throw new ValidationError('API token is required', 'token');
+    if (!config.sdkKey) {
+      throw new ValidationError('SDK key is required', 'sdkKey');
     }
     this.baseUrl = config.baseUrl ?? BASE_URL;
-    this.token = config.token;
+    this.sdkKey = config.sdkKey;
     this.enableLocalEvaluation = config.enableLocalEvaluation ?? false;
     this.pollingInterval =
       (config.environmentRefreshIntervalSeconds ?? 60) * 1000;
@@ -122,7 +138,8 @@ export class FlagsClient {
     this.cacheTtl = config.cacheTtl ?? 60000; // 1 minutes default
     this.enablePersistentCache =
       config.enablePersistentCache ??
-      this.isLocalStorageAvailable()
+      this.isLocalStorageAvailable();
+    this.defaultValues = config.defaultValues ?? {}
 
     // Initialize evaluator for local evaluation mode
     if (this.enableLocalEvaluation) {
@@ -273,6 +290,36 @@ export class FlagsClient {
     this.listeners.delete(listener);
   }
 
+  /**
+   * Subscribe to flag value changes.
+   * The callback will be called whenever any flag value changes,
+   * with a map of the changed flag keys to their new values.
+   *
+   * @param callback - Function to call when flags change
+   * @returns Subscription with unsubscribe method
+   *
+   * @example
+   * ```typescript
+   * const { unsubscribe } = client.onFlagChange((changedFlags) => {
+   *   console.log('Flags changed:', changedFlags);
+   *   // changedFlags = { 'dark-mode': true, 'max-items': 50 }
+   *
+   *   if ('dark-mode' in changedFlags) {
+   *     updateTheme(changedFlags['dark-mode']);
+   *   }
+   * });
+   *
+   * // Later, to stop listening:
+   * unsubscribe();
+   * ```
+   */
+  onFlagChange(callback: FlagChangeCallback): FlagChangeSubscription {
+    this.flagChangeListeners.add(callback);
+    return {
+      unsubscribe: () => this.flagChangeListeners.delete(callback),
+    };
+  }
+
   private emit(event: FlagsClientEvent): void {
     for (const listener of this.listeners) {
       try {
@@ -294,6 +341,7 @@ export class FlagsClient {
     }
 
     this.listeners.clear();
+    this.flagChangeListeners.clear();
   }
 
   /**
@@ -434,156 +482,101 @@ export class FlagsClient {
    * Get a boolean flag value
    *
    * @param flagKey - The key of the flag to evaluate
-   * @param defaultValue - Default value if flag cannot be evaluated
+   * @param defaultValue - Optional default value (falls back to global defaultValues if not provided)
    * @param context - Optional evaluation context
    * @returns Promise resolving to the boolean value
    * @throws {TypeMismatchError} When the flag is not a boolean type
    */
   async getBooleanValue(
     flagKey: string,
-    defaultValue: boolean,
     context?: EvaluationContext,
   ): Promise<boolean> {
-    const result = await this.getBooleanDetails(flagKey, defaultValue, context);
+    const result = await this.getBooleanDetails(flagKey, context);
     return result.value;
   }
 
-  /**
-   * Get a boolean flag value with full resolution details
-   *
-   * @param flagKey - The key of the flag to evaluate
-   * @param defaultValue - Default value if flag cannot be evaluated
-   * @param context - Optional evaluation context
-   * @returns Promise resolving to resolution details with boolean value
-   */
-  async getBooleanDetails(
+  private async getBooleanDetails(
     flagKey: string,
-    defaultValue: boolean,
     context?: EvaluationContext,
   ): Promise<ResolutionDetails<boolean>> {
-    const flag = await this.evaluateFlag(flagKey, {
-      context,
-      defaultValue,
-    });
+    const flag = await this.evaluateFlag(flagKey, { context });
 
-    return this.toResolutionDetails(flag, defaultValue, 'boolean');
+    return this.toResolutionDetails(flag, 'boolean');
   }
 
   /**
    * Get a string flag value
    *
    * @param flagKey - The key of the flag to evaluate
-   * @param defaultValue - Default value if flag cannot be evaluated
    * @param context - Optional evaluation context
    * @returns Promise resolving to the string value
    * @throws {TypeMismatchError} When the flag is not a string type
    */
   async getStringValue(
     flagKey: string,
-    defaultValue: string,
     context?: EvaluationContext,
   ): Promise<string> {
-    const result = await this.getStringDetails(flagKey, defaultValue, context);
+    const result = await this.getStringDetails(flagKey, context);
     return result.value;
   }
 
-  /**
-   * Get a string flag value with full resolution details
-   *
-   * @param flagKey - The key of the flag to evaluate
-   * @param defaultValue - Default value if flag cannot be evaluated
-   * @param context - Optional evaluation context
-   * @returns Promise resolving to resolution details with string value
-   */
-  async getStringDetails(
+  private async getStringDetails(
     flagKey: string,
-    defaultValue: string,
     context?: EvaluationContext,
   ): Promise<ResolutionDetails<string>> {
-    const flag = await this.evaluateFlag(flagKey, {
-      context,
-      defaultValue,
-    });
+    const flag = await this.evaluateFlag(flagKey, { context });
 
-    return this.toResolutionDetails(flag, defaultValue, 'string');
+    return this.toResolutionDetails(flag, 'string');
   }
 
   /**
    * Get a number flag value
    *
    * @param flagKey - The key of the flag to evaluate
-   * @param defaultValue - Default value if flag cannot be evaluated
    * @param context - Optional evaluation context
    * @returns Promise resolving to the number value
    * @throws {TypeMismatchError} When the flag is not a number type
    */
   async getNumberValue(
     flagKey: string,
-    defaultValue: number,
     context?: EvaluationContext,
   ): Promise<number> {
-    const result = await this.getNumberDetails(flagKey, defaultValue, context);
+    const result = await this.getNumberDetails(flagKey, context);
     return result.value;
   }
 
-  /**
-   * Get a number flag value with full resolution details
-   *
-   * @param flagKey - The key of the flag to evaluate
-   * @param defaultValue - Default value if flag cannot be evaluated
-   * @param context - Optional evaluation context
-   * @returns Promise resolving to resolution details with number value
-   */
-  async getNumberDetails(
+  private async getNumberDetails(
     flagKey: string,
-    defaultValue: number,
     context?: EvaluationContext,
   ): Promise<ResolutionDetails<number>> {
-    const flag = await this.evaluateFlag(flagKey, {
-      context,
-      defaultValue,
-    });
+    const flag = await this.evaluateFlag(flagKey, { context });
 
-    return this.toResolutionDetails(flag, defaultValue, 'number');
+    return this.toResolutionDetails(flag, 'number');
   }
 
   /**
    * Get a JSON object flag value
    *
    * @param flagKey - The key of the flag to evaluate
-   * @param defaultValue - Default value if flag cannot be evaluated
    * @param context - Optional evaluation context
    * @returns Promise resolving to the JSON value
    * @throws {TypeMismatchError} When the flag is not a json type
    */
   async getJsonValue<T extends JsonValue = JsonValue>(
     flagKey: string,
-    defaultValue: T,
     context?: EvaluationContext,
   ): Promise<T> {
-    const result = await this.getJsonDetails(flagKey, defaultValue, context);
+    const result = await this.getJsonDetails<T>(flagKey, context);
     return result.value;
   }
 
-  /**
-   * Get a JSON object flag value with full resolution details
-   *
-   * @param flagKey - The key of the flag to evaluate
-   * @param defaultValue - Default value if flag cannot be evaluated
-   * @param context - Optional evaluation context
-   * @returns Promise resolving to resolution details with JSON value
-   */
-  async getJsonDetails<T extends JsonValue = JsonValue>(
+  private async getJsonDetails<T extends JsonValue = JsonValue>(
     flagKey: string,
-    defaultValue: T,
     context?: EvaluationContext,
   ): Promise<ResolutionDetails<T>> {
-    const flag = await this.evaluateFlag(flagKey, {
-      context,
-      defaultValue,
-    });
+    const flag = await this.evaluateFlag(flagKey, { context });
 
-    return this.toResolutionDetails(flag, defaultValue, 'json');
+    return this.toResolutionDetails(flag, 'json') as ResolutionDetails<T>;
   }
 
   /**
@@ -611,15 +604,32 @@ export class FlagsClient {
   /**
    * Convert API response to typed resolution details
    */
-  private toResolutionDetails<T>(
+  private toResolutionDetails(
     flag: EvaluatedFlag,
-    defaultValue: T,
+    expectedType: 'boolean',
+  ): ResolutionDetails<boolean>;
+  private toResolutionDetails(
+    flag: EvaluatedFlag,
+    expectedType: 'string',
+  ): ResolutionDetails<string>;
+  private toResolutionDetails(
+    flag: EvaluatedFlag,
+    expectedType: 'number',
+  ): ResolutionDetails<number>;
+  private toResolutionDetails(
+    flag: EvaluatedFlag,
+    expectedType: 'json',
+  ): ResolutionDetails<JsonValue>;
+  private toResolutionDetails(
+    flag: EvaluatedFlag,
     expectedType: 'boolean' | 'string' | 'number' | 'json',
-  ): ResolutionDetails<T> {
+  ): ResolutionDetails<boolean | string | number | JsonValue> {
+    const effectiveDefault = this.defaultValues[flag.flagKey];
+
     // Check for errors from the API
     if (flag.errorCode === 'FLAG_NOT_FOUND') {
       return {
-        value: defaultValue,
+        value: effectiveDefault as boolean | string | number | JsonValue,
         reason: 'ERROR',
         errorCode: 'FLAG_NOT_FOUND',
         errorMessage: flag.errorMessage,
@@ -635,7 +645,7 @@ export class FlagsClient {
     // Handle disabled flags
     if (!flag.enabled || flag.value === null || flag.value === undefined) {
       return {
-        value: defaultValue,
+        value: effectiveDefault as boolean | string | number | JsonValue,
         variant: flag.variant,
         reason: flag.reason,
         errorCode: flag.errorCode,
@@ -645,7 +655,7 @@ export class FlagsClient {
     }
 
     return {
-      value: flag.value as T,
+      value: flag.value as boolean | string | number | JsonValue,
       variant: flag.variant,
       reason: flag.reason,
       errorCode: flag.errorCode,
@@ -700,7 +710,7 @@ export class FlagsClient {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-sdk-key': `${this.token}`,
+          'x-sdk-key': `${this.sdkKey}`,
         },
         body: body ? JSON.stringify(body) : undefined,
         signal: controller.signal,
@@ -750,7 +760,7 @@ export class FlagsClient {
 
     try {
       const headers: Record<string, string> = {
-        'x-sdk-key': this.token,
+        'x-sdk-key': this.sdkKey,
       };
 
       // Add ETag for cache validation
@@ -801,6 +811,14 @@ export class FlagsClient {
 
   private updateConfiguration(config: FlagConfiguration): void {
     const previousConfig = this.evaluator?.getConfiguration();
+
+    // Capture old flag values before updating
+    let oldFlagValues: Map<string, unknown> | null = null;
+    if (previousConfig && this.flagChangeListeners.size > 0) {
+      const oldFlags = this.evaluator!.evaluateAll();
+      oldFlagValues = new Map(oldFlags.map((f) => [f.flagKey, f.value]));
+    }
+
     this.evaluator!.setConfiguration(config);
 
     // Save configuration to localStorage for local evaluation mode
@@ -812,6 +830,41 @@ export class FlagsClient {
     if (previousConfig && previousConfig.etag !== config.etag) {
       this.emit({ type: 'configurationChanged', config });
       this.onConfigurationChange?.(config);
+
+      // Detect and emit flag changes
+      if (oldFlagValues && this.flagChangeListeners.size > 0) {
+        const newFlags = this.evaluator!.evaluateAll();
+        const changedFlags: ChangedFlags = {};
+
+        for (const newFlag of newFlags) {
+          const oldValue = oldFlagValues.get(newFlag.flagKey);
+          if (oldValue !== newFlag.value) {
+            changedFlags[newFlag.flagKey] = newFlag.value;
+          }
+        }
+
+        // Check for removed flags (flags that existed before but not now)
+        for (const [flagKey] of oldFlagValues) {
+          if (!newFlags.some((f) => f.flagKey === flagKey)) {
+            changedFlags[flagKey] = undefined;
+          }
+        }
+
+        // Notify flag change listeners if there are changes
+        if (Object.keys(changedFlags).length > 0) {
+          this.emitFlagChanges(changedFlags);
+        }
+      }
+    }
+  }
+
+  private emitFlagChanges(changedFlags: ChangedFlags): void {
+    for (const listener of this.flagChangeListeners) {
+      try {
+        listener(changedFlags);
+      } catch {
+        // Ignore listener errors
+      }
     }
   }
 
@@ -934,7 +987,7 @@ export class FlagsClient {
    */
   private getStorageKey(): string {
     // Use a hash of the token to create a unique key per API key
-    const tokenHash = this.simpleHash(this.token);
+    const tokenHash = this.simpleHash(this.sdkKey);
     return `kitbase:flags:cache:${tokenHash}`;
   }
 
@@ -1044,7 +1097,7 @@ export class FlagsClient {
    * Get the localStorage key for configuration
    */
   private getConfigurationStorageKey(): string {
-    const tokenHash = this.simpleHash(this.token);
+    const tokenHash = this.simpleHash(this.sdkKey);
     return `kitbase:flags:config:${tokenHash}`;
   }
 

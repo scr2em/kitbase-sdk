@@ -17,9 +17,9 @@ import type { EvaluationContext as KitbaseContext } from '../types.js';
  */
 export interface KitbaseProviderOptions {
   /**
-   * Your Kitbase API key
+   * Your Kitbase SDK key
    */
-  token: string;
+  sdkKey: string;
 
   /**
    * Enable flag caching (default: true)
@@ -52,11 +52,11 @@ interface CacheEntry {
  * @example
  * ```typescript
  * import { OpenFeature } from '@openfeature/server-sdk';
- * import { KitbaseProvider } from '@kitbase/sdk/flags/server';
+ * import { KitbaseProvider } from '@kitbase/flags/server';
  *
  * // Register the provider
  * await OpenFeature.setProviderAndWait(new KitbaseProvider({
- *   token: 'YOUR_API_KEY'
+ *   sdkKey: 'YOUR_SDK_KEY'
  * }));
  *
  * // Get a client and evaluate flags
@@ -81,7 +81,7 @@ export class KitbaseProvider implements Provider {
   private cache: Map<string, CacheEntry> = new Map();
 
   constructor(options: KitbaseProviderOptions) {
-    this.client = new FlagsClient({ token: options.token });
+    this.client = new FlagsClient({ sdkKey: options.sdkKey });
     this.cacheEnabled = options.cache ?? true;
     this.cacheTtl = options.cacheTtl ?? 60000;
     this.status = 'NOT_READY' as ProviderStatus;

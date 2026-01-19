@@ -33,11 +33,11 @@ export type KitbaseProviderOptions = FlagsConfig
  * @example
  * ```typescript
  * import { OpenFeature } from '@openfeature/web-sdk';
- * import { KitbaseProvider } from '@kitbase/sdk/flags/web';
+ * import { KitbaseProvider } from '@kitbase/flags/web';
  *
  * // Register the provider with initial context
  * await OpenFeature.setProviderAndWait(new KitbaseProvider({
- *   token: 'YOUR_API_KEY',
+ *   sdkKey: 'YOUR_SDK_KEY',
  *   prefetchOnInit: true
  * }), {
  *   targetingKey: 'user-123',

@@ -3,7 +3,7 @@ import { renderHook, waitFor, act } from '@testing-library/react';
 import React from 'react';
 import { FlagsContext } from './context';
 import { useFlagSnapshot } from './use-snapshot';
-import type { FlagsClient, FlagSnapshot } from '@kitbase/sdk/flags';
+import type { FlagsClient, FlagSnapshot } from '@kitbase/flags';
 
 const mockSnapshot: FlagSnapshot = {
   projectId: 'project-123',
@@ -24,7 +24,7 @@ const mockSnapshot: FlagSnapshot = {
 const createMockClient = (overrides: Partial<FlagsClient> = {}) => ({
   getSnapshot: vi.fn().mockResolvedValue(mockSnapshot),
   isReady: vi.fn().mockReturnValue(true),
-  on: vi.fn().mockReturnValue(() => {}),
+  on: vi.fn().mockReturnValue(() => { }),
   ...overrides,
 } as unknown as FlagsClient);
 
@@ -169,11 +169,11 @@ describe('useFlagSnapshot', () => {
   });
 
   it('should refetch on configurationChanged event', async () => {
-    let eventCallback: (event: { type: string }) => void = () => {};
+    let eventCallback: (event: { type: string }) => void = () => { };
     mockClient = createMockClient({
       on: vi.fn().mockImplementation((cb) => {
         eventCallback = cb;
-        return () => {};
+        return () => { };
       }),
     });
 
@@ -198,12 +198,12 @@ describe('useFlagSnapshot', () => {
   });
 
   it('should refetch on ready event', async () => {
-    let eventCallback: (event: { type: string }) => void = () => {};
+    let eventCallback: (event: { type: string }) => void = () => { };
     mockClient = createMockClient({
       isReady: vi.fn().mockReturnValue(false),
       on: vi.fn().mockImplementation((cb) => {
         eventCallback = cb;
-        return () => {};
+        return () => { };
       }),
     });
 
@@ -244,11 +244,11 @@ describe('useFlagSnapshot', () => {
   });
 
   it('should ignore other event types', async () => {
-    let eventCallback: (event: { type: string }) => void = () => {};
+    let eventCallback: (event: { type: string }) => void = () => { };
     mockClient = createMockClient({
       on: vi.fn().mockImplementation((cb) => {
         eventCallback = cb;
-        return () => {};
+        return () => { };
       }),
     });
 

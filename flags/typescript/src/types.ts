@@ -5,9 +5,9 @@ import type { FlagConfiguration } from './config-types.js';
  */
 export interface FlagsConfig {
   /**
-   * Your Kitbase API key
+   * Your Kitbase SDK key (required)
    */
-  token: string;
+  sdkKey: string;
 
   /**
    * Enable local evaluation mode.
@@ -59,6 +59,28 @@ export interface FlagsConfig {
    */
   baseUrl?: string;
 
+  /**
+   * Global default values for flags.
+   * Used as fallback when:
+   * - Flag is disabled from backend
+   * - Backend returns an error
+   * - Flag is not found
+   *
+   * Priority: method default > global default > null
+   *
+   * @example
+   * ```typescript
+   * const client = new FlagsClient({
+   *   sdkKey: 'YOUR_SDK_KEY',
+   *   defaultValues: {
+   *     'dark-mode': false,
+   *     'api-url': 'https://api.default.com',
+   *     'max-items': 10,
+   *   }
+   * });
+   * ```
+   */
+  defaultValues?: Record<string, unknown>;
 }
 
 /**
@@ -275,3 +297,23 @@ export type JsonValue =
   | null
   | JsonValue[]
   | { [key: string]: JsonValue };
+
+/**
+ * Map of flag keys to their new values when flags change
+ */
+export type ChangedFlags = Record<string, unknown>;
+
+/**
+ * Callback for flag change events
+ */
+export type FlagChangeCallback = (changedFlags: ChangedFlags) => void;
+
+/**
+ * Subscription handle for flag change listeners
+ */
+export interface FlagChangeSubscription {
+  /**
+   * Unsubscribe from flag change events
+   */
+  unsubscribe: () => void;
+}

@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
-import type { FlagsClient } from '@kitbase/sdk/flags';
+import type { FlagsClient } from '@kitbase/flags';
 
 export const FlagsContext = createContext<FlagsClient | null>(null);
 
@@ -9,13 +9,9 @@ export function useFlagsContext(): FlagsClient {
   if (!context) {
     throw new Error(
       'useFlagsContext must be used within a FlagsProvider. ' +
-        'Wrap your component with <FlagsProvider token="your-token">',
+      'Wrap your component with <FlagsProvider config={{ sdkKey: "your-sdk-key" }}>',
     );
   }
 
   return context;
 }
-
-
-
-
