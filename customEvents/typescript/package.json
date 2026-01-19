@@ -1,7 +1,7 @@
 {
   "name": "@ktibase/analytics",
   "version": "0.1.5",
-  "description": "Kitbase Events SDK for TypeScript and JavaScript",
+  "description": "Ktibase Analytics SDK for TypeScript and JavaScript",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",

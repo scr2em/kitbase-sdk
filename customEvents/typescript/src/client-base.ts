@@ -69,7 +69,7 @@ function getDefaultStorage(): Storage {
  *
  * @example
  * ```typescript
- * import { Kitbase } from '@kitbase/sdk/events/lite';
+ * import { Kitbase } from '@ktibase/analytics/lite';
  *
  * const kitbase = new Kitbase({
  *   token: '<YOUR_API_KEY>',

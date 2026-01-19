@@ -35,7 +35,7 @@
  *
  * @example NPM import
  * ```typescript
- * import { Kitbase } from '@kitbase/events/lite';
+ * import { Kitbase } from '@ktibase/analytics/lite';
  * const kitbase = new Kitbase({ token: 'your-api-key' });
  * ```
  *

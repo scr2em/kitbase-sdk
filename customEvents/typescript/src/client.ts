@@ -15,7 +15,7 @@ import type { QueuedEvent, QueueStats } from './queue/types.js';
  *
  * @example
  * ```typescript
- * import { Kitbase } from '@kitbase/sdk/events';
+ * import { Kitbase } from '@ktibase/analytics';
  *
  * const kitbase = new Kitbase({
  *   token: '<YOUR_API_KEY>',
