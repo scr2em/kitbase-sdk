@@ -8,11 +8,13 @@ This monorepo is organized by **feature**, with each feature available in multip
 
 ```
 kitbase-sdk/
-├── customEvents/          # Event tracking
-│   ├── typescript/        # @kitbase/events (npm)
-│   ├── react/             # @kitbase/events-react (npm)
-│   ├── dart/              # kitbase_events (pub.dev)
-│   └── php/               # kitbase/events (packagist)
+├── customEvents/          # Analytics & Event tracking
+│   ├── typescript/        # @kitbase/analytics (npm)
+│   │   ├── packages/core      # @kitbase/analytics
+│   │   ├── packages/react     # @kitbase/analytics-react
+│   │   └── packages/angular   # @kitbase/analytics-angular
+│   ├── dart/              # kitbase_analytics (pub.dev)
+│   └── php/               # kitbase/analytics (packagist)
 │
 ├── changelogs/            # Changelog management
 │   ├── typescript/        # @kitbase/changelogs (npm)
@@ -31,16 +33,17 @@ kitbase-sdk/
 
 ## Packages
 
-### Custom Events
+### Analytics (Custom Events)
 
-Track events and logs in your application.
+Track events and analytics in your application.
 
-| Platform   | Package               | Install                          |
-|------------|----------------------|----------------------------------|
-| TypeScript | `@kitbase/events`     | `npm install @kitbase/events`    |
-| React      | `@kitbase/events-react` | `npm install @kitbase/events-react` |
-| Dart       | `kitbase_events`      | `dart pub add kitbase_events`    |
-| PHP        | `kitbase/events`      | `composer require kitbase/events`|
+| Platform   | Package                    | Install                               |
+|------------|----------------------------|---------------------------------------|
+| TypeScript | `@kitbase/analytics`       | `npm install @kitbase/analytics`      |
+| React      | `@kitbase/analytics-react` | `npm install @kitbase/analytics-react`|
+| Angular    | `@kitbase/analytics-angular`| `npm install @kitbase/analytics-angular`|
+| Dart       | `kitbase_analytics`        | `dart pub add kitbase_analytics`      |
+| PHP        | `kitbase/analytics`        | `composer require kitbase/analytics`  |
 
 ### Changelogs
 
@@ -69,19 +72,19 @@ Evaluate feature flags with OpenFeature support.
 ### TypeScript
 
 ```typescript
-import { Kitbase } from '@kitbase/events';
+import { KitbaseAnalytics } from '@kitbase/analytics';
 
-const kitbase = new Kitbase({
+const analytics = new KitbaseAnalytics({
   token: '<YOUR_API_KEY>',
   debug: true,
   offline: { enabled: true },
 });
 
 // Register super properties (included in all events)
-kitbase.register({ app_version: '2.1.0', platform: 'web' });
+analytics.register({ app_version: '2.1.0', platform: 'web' });
 
 // Track events
-await kitbase.track({
+await analytics.track({
   channel: 'payments',
   event: 'New Subscription',
   user_id: 'user-123',
@@ -93,18 +96,18 @@ await kitbase.track({
 ### React
 
 ```tsx
-import { EventsProvider, useTrack } from '@kitbase/events-react';
+import { KitbaseAnalyticsProvider, useTrack } from '@kitbase/analytics-react';
 
 function App() {
   return (
-    <EventsProvider token="<YOUR_API_KEY>">
+    <KitbaseAnalyticsProvider config={{ token: '<YOUR_API_KEY>' }}>
       <MyComponent />
-    </EventsProvider>
+    </KitbaseAnalyticsProvider>
   );
 }
 
 function MyComponent() {
-  const { track } = useTrack();
+  const track = useTrack();
 
   return (
     <button onClick={() => track({ channel: 'ui', event: 'Button Clicked' })}>
@@ -114,14 +117,39 @@ function MyComponent() {
 }
 ```
 
+### Angular
+
+```typescript
+// app.config.ts
+import { provideKitbaseAnalytics } from '@kitbase/analytics-angular';
+
+export const appConfig = {
+  providers: [
+    provideKitbaseAnalytics({ token: '<YOUR_API_KEY>' }),
+  ],
+};
+
+// component.ts
+import { KitbaseAnalyticsService } from '@kitbase/analytics-angular';
+
+@Component({ ... })
+export class MyComponent {
+  constructor(private analytics: KitbaseAnalyticsService) {}
+
+  onClick() {
+    this.analytics.track({ channel: 'ui', event: 'Button Clicked' });
+  }
+}
+```
+
 ### Dart / Flutter
 
 ```dart
-import 'package:kitbase_events/events.dart';
+import 'package:kitbase_analytics/analytics.dart';
 
-final events = KitbaseEvents(token: '<YOUR_API_KEY>');
+final analytics = KitbaseAnalytics(token: '<YOUR_API_KEY>');
 
-await events.track(
+await analytics.track(
   channel: 'payments',
   event: 'New Subscription',
   userId: 'user-123',
@@ -132,15 +160,15 @@ await events.track(
 ### PHP
 
 ```php
-use Kitbase\Events\Kitbase;
-use Kitbase\Events\KitbaseConfig;
-use Kitbase\Events\TrackOptions;
+use Kitbase\Analytics\KitbaseAnalytics;
+use Kitbase\Analytics\KitbaseConfig;
+use Kitbase\Analytics\TrackOptions;
 
-$kitbase = new Kitbase(new KitbaseConfig(
+$analytics = new KitbaseAnalytics(new KitbaseConfig(
     token: '<YOUR_API_KEY>',
 ));
 
-$kitbase->track(new TrackOptions(
+$analytics->track(new TrackOptions(
     event: 'New Subscription',
     channel: 'payments',
     userId: 'user-123',
@@ -150,12 +178,13 @@ $kitbase->track(new TrackOptions(
 
 ## Development
 
-### TypeScript/React packages
+### TypeScript/React/Angular packages
 
 ```bash
+cd customEvents/typescript
 pnpm install
-pnpm --filter @kitbase/events build
-pnpm --filter @kitbase/events test
+pnpm build
+pnpm test
 ```
 
 ### Dart packages
