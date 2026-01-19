@@ -9,6 +9,8 @@ export type { LocalEvaluationResult } from './evaluator.js';
 // Types
 export type {
   FlagsConfig,
+  RemoteEvaluationCacheConfig,
+  LocalEvaluationConfig,
   FlagValueType,
   ResolutionReason,
   ErrorCode,

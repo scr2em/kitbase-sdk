@@ -102,14 +102,21 @@ interface CacheEntry {
 
 export class FlagsClient {
   private readonly sdkKey: string;
-  private readonly enableLocalEvaluation: boolean;
-  private readonly pollingInterval: number;
-  private readonly onConfigurationChange?: (config: FlagConfiguration) => void;
-  private readonly onError?: (error: Error) => void;
-  private readonly cacheTtl: number;
-  private readonly enablePersistentCache: boolean;
   private readonly baseUrl: string;
   private readonly defaultValues: Record<string, unknown>;
+
+  // Local evaluation settings
+  private readonly enableLocalEvaluation: boolean;
+  private readonly pollingInterval: number;
+  private readonly initialConfiguration?: FlagConfiguration;
+
+  // Cache settings
+  private readonly cacheTtl: number;
+  private readonly enablePersistentCache: boolean;
+
+  // Callbacks
+  private readonly onConfigurationChange?: (config: FlagConfiguration) => void;
+  private readonly onError?: (error: Error) => void;
 
   // Local evaluation state
   private evaluator: FlagEvaluator | null = null;
@@ -121,6 +128,9 @@ export class FlagsClient {
   // Remote evaluation cache (only used when enableLocalEvaluation is false)
   private cache: Map<string, CacheEntry> = new Map();
 
+  // Pending flag evaluation promises for deduplication
+  private pendingEvaluations: Map<string, Promise<EvaluatedFlag>> = new Map();
+
   // Flag change listeners
   private flagChangeListeners: Set<FlagChangeCallback> = new Set();
 
@@ -128,26 +138,36 @@ export class FlagsClient {
     if (!config.sdkKey) {
       throw new ValidationError('SDK key is required', 'sdkKey');
     }
-    this.baseUrl = config.baseUrl ?? BASE_URL;
+
+    // Required
     this.sdkKey = config.sdkKey;
-    this.enableLocalEvaluation = config.enableLocalEvaluation ?? false;
-    this.pollingInterval =
-      (config.environmentRefreshIntervalSeconds ?? 60) * 1000;
+
+    // API configuration
+    this.baseUrl = config.baseUrl ?? BASE_URL;
+
+    // Local evaluation settings
+    this.enableLocalEvaluation = config.localEvaluation?.enabled ?? false;
+    this.pollingInterval = (config.localEvaluation?.refreshIntervalSeconds ?? 60) * 1000;
+    this.initialConfiguration = config.localEvaluation?.initialConfiguration;
+
+    // Cache settings (remote evaluation only)
+    this.cacheTtl = config.remoteEvaluationCache?.ttl ?? 60000; // 1 minute default
+    this.enablePersistentCache = config.remoteEvaluationCache?.persistent ?? this.isLocalStorageAvailable();
+
+    // Callbacks
     this.onConfigurationChange = config.onConfigurationChange;
     this.onError = config.onError;
-    this.cacheTtl = config.cacheTtl ?? 60000; // 1 minutes default
-    this.enablePersistentCache =
-      config.enablePersistentCache ??
-      this.isLocalStorageAvailable();
-    this.defaultValues = config.defaultValues ?? {}
+
+    // Defaults
+    this.defaultValues = config.defaultValues ?? {};
 
     // Initialize evaluator for local evaluation mode
     if (this.enableLocalEvaluation) {
       this.evaluator = new FlagEvaluator();
 
       // Use initial config if provided
-      if (config.initialConfiguration) {
-        this.evaluator.setConfiguration(config.initialConfiguration);
+      if (this.initialConfiguration) {
+        this.evaluator.setConfiguration(this.initialConfiguration);
         this.initialized = true;
       } else {
         // Try to load cached configuration from localStorage
@@ -462,6 +482,28 @@ export class FlagsClient {
       return cached;
     }
 
+    // Check for pending evaluation (deduplication)
+    const pendingPromise = this.pendingEvaluations.get(cacheKey);
+    if (pendingPromise) {
+      return pendingPromise;
+    }
+
+    // Create and track the evaluation promise
+    const evaluationPromise = this.doEvaluateFlag(flagKey, cacheKey, options);
+    this.pendingEvaluations.set(cacheKey, evaluationPromise);
+
+    try {
+      return await evaluationPromise;
+    } finally {
+      this.pendingEvaluations.delete(cacheKey);
+    }
+  }
+
+  private async doEvaluateFlag(
+    flagKey: string,
+    cacheKey: string,
+    options?: EvaluateFlagOptions,
+  ): Promise<EvaluatedFlag> {
     const payload = this.buildEvaluateFlagPayload(
       flagKey,
       options?.context,

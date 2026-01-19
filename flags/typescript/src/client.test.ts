@@ -286,62 +286,6 @@ describe('FlagsClient', () => {
       });
     });
 
-    describe('getBooleanDetails', () => {
-      it('should return full resolution details', async () => {
-        mockFetch.mockResolvedValueOnce({
-          ok: true,
-          json: async () => ({
-            flagKey: 'feature-x',
-            enabled: true,
-            valueType: 'boolean',
-            value: true,
-            variant: 'segment-abc123',
-            reason: 'TARGETING_MATCH',
-            flagMetadata: { name: 'Feature X' },
-          }),
-        });
-
-        const client = new FlagsClient({ sdkKey: 'test-token' });
-        const result = await client.getBooleanDetails('feature-x', {
-          targetingKey: 'user-123',
-        });
-
-        expect(result).toEqual({
-          value: true,
-          variant: 'segment-abc123',
-          reason: 'TARGETING_MATCH',
-          errorCode: undefined,
-          errorMessage: undefined,
-          flagMetadata: { name: 'Feature X' },
-        });
-      });
-
-      it('should return default value with error details for FLAG_NOT_FOUND', async () => {
-        mockFetch.mockResolvedValueOnce({
-          ok: true,
-          json: async () => ({
-            flagKey: 'unknown-flag',
-            enabled: false,
-            valueType: 'boolean',
-            value: false,
-            reason: 'ERROR',
-            errorCode: 'FLAG_NOT_FOUND',
-            errorMessage: "Flag 'unknown-flag' not found",
-          }),
-        });
-
-        const client = new FlagsClient({
-          sdkKey: 'test-token',
-          defaultValues: { 'unknown-flag': true },
-        });
-        const result = await client.getBooleanDetails('unknown-flag');
-
-        expect(result.value).toBe(true);
-        expect(result.reason).toBe('ERROR');
-        expect(result.errorCode).toBe('FLAG_NOT_FOUND');
-      });
-    });
-
     describe('error handling', () => {
       it('should throw AuthenticationError on 401', async () => {
         mockFetch.mockResolvedValueOnce({
@@ -470,8 +414,7 @@ describe('FlagsClient', () => {
 
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          enableLocalEvaluation: true,
-          environmentRefreshIntervalSeconds: 0,
+          localEvaluation: { enabled: true, refreshIntervalSeconds: 0 },
         });
         await client.waitUntilReady();
 
@@ -499,8 +442,7 @@ describe('FlagsClient', () => {
 
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          enableLocalEvaluation: true,
-          environmentRefreshIntervalSeconds: 0,
+          localEvaluation: { enabled: true, refreshIntervalSeconds: 0 },
         });
         const listener = vi.fn();
         client.on(listener);
@@ -524,8 +466,7 @@ describe('FlagsClient', () => {
 
         const client = new FlagsClient({
           sdkKey: 'invalid-token',
-          enableLocalEvaluation: true,
-          environmentRefreshIntervalSeconds: 0,
+          localEvaluation: { enabled: true, refreshIntervalSeconds: 0 },
         });
         await expect(client.initialize()).rejects.toThrow(AuthenticationError);
 
@@ -548,7 +489,7 @@ describe('FlagsClient', () => {
       it('should return false before initialization for local mode', () => {
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          enableLocalEvaluation: true,
+          localEvaluation: { enabled: true },
         });
         expect(client.isReady()).toBe(false);
         client.close();
@@ -564,8 +505,7 @@ describe('FlagsClient', () => {
 
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          enableLocalEvaluation: true,
-          environmentRefreshIntervalSeconds: 0,
+          localEvaluation: { enabled: true, refreshIntervalSeconds: 0 },
         });
         await client.waitUntilReady();
 
@@ -586,7 +526,7 @@ describe('FlagsClient', () => {
 
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          enableLocalEvaluation: true,
+          localEvaluation: { enabled: true },
         });
 
         // First evaluation should auto-initialize
@@ -613,8 +553,7 @@ describe('FlagsClient', () => {
 
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          enableLocalEvaluation: true,
-          environmentRefreshIntervalSeconds: 0,
+          localEvaluation: { enabled: true, refreshIntervalSeconds: 0 },
         });
 
 
@@ -641,8 +580,7 @@ describe('FlagsClient', () => {
 
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          enableLocalEvaluation: true,
-          environmentRefreshIntervalSeconds: 0,
+          localEvaluation: { enabled: true, refreshIntervalSeconds: 0 },
         });
 
 
@@ -666,8 +604,7 @@ describe('FlagsClient', () => {
 
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          enableLocalEvaluation: true,
-          environmentRefreshIntervalSeconds: 0,
+          localEvaluation: { enabled: true, refreshIntervalSeconds: 0 },
         });
 
 
@@ -687,8 +624,7 @@ describe('FlagsClient', () => {
 
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          enableLocalEvaluation: true,
-          environmentRefreshIntervalSeconds: 0,
+          localEvaluation: { enabled: true, refreshIntervalSeconds: 0 },
           defaultValues: { 'disabled-flag': true },
         });
 
@@ -709,8 +645,7 @@ describe('FlagsClient', () => {
 
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          enableLocalEvaluation: true,
-          environmentRefreshIntervalSeconds: 0,
+          localEvaluation: { enabled: true, refreshIntervalSeconds: 0 },
         });
 
 
@@ -733,8 +668,7 @@ describe('FlagsClient', () => {
 
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          enableLocalEvaluation: true,
-          environmentRefreshIntervalSeconds: 0,
+          localEvaluation: { enabled: true, refreshIntervalSeconds: 0 },
           defaultValues: { 'premium-feature': false },
         });
 
@@ -774,8 +708,7 @@ describe('FlagsClient', () => {
 
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          enableLocalEvaluation: true,
-          environmentRefreshIntervalSeconds: 0,
+          localEvaluation: { enabled: true, refreshIntervalSeconds: 0 },
         });
 
 
@@ -807,8 +740,7 @@ describe('FlagsClient', () => {
 
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          enableLocalEvaluation: true,
-          environmentRefreshIntervalSeconds: 5,
+          localEvaluation: { enabled: true, refreshIntervalSeconds: 5 },
         });
 
 
@@ -834,8 +766,7 @@ describe('FlagsClient', () => {
 
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          enableLocalEvaluation: true,
-          environmentRefreshIntervalSeconds: 5,
+          localEvaluation: { enabled: true, refreshIntervalSeconds: 5 },
         });
 
 
@@ -870,8 +801,7 @@ describe('FlagsClient', () => {
 
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          enableLocalEvaluation: true,
-          environmentRefreshIntervalSeconds: 5,
+          localEvaluation: { enabled: true, refreshIntervalSeconds: 5 },
         });
         await client.waitUntilReady();
 
@@ -907,8 +837,7 @@ describe('FlagsClient', () => {
         const listener = vi.fn();
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          enableLocalEvaluation: true,
-          environmentRefreshIntervalSeconds: 5,
+          localEvaluation: { enabled: true, refreshIntervalSeconds: 5 },
         });
         client.on(listener);
         await client.waitUntilReady();
@@ -950,8 +879,7 @@ describe('FlagsClient', () => {
         const onConfigurationChange = vi.fn();
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          enableLocalEvaluation: true,
-          environmentRefreshIntervalSeconds: 5,
+          localEvaluation: { enabled: true, refreshIntervalSeconds: 5 },
           onConfigurationChange,
         });
         await client.waitUntilReady();
@@ -1015,8 +943,7 @@ describe('FlagsClient', () => {
 
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          enableLocalEvaluation: true,
-          environmentRefreshIntervalSeconds: 5,
+          localEvaluation: { enabled: true, refreshIntervalSeconds: 5 },
         });
 
 
@@ -1098,8 +1025,7 @@ describe('FlagsClient', () => {
 
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          enableLocalEvaluation: true,
-          environmentRefreshIntervalSeconds: 5,
+          localEvaluation: { enabled: true, refreshIntervalSeconds: 5 },
           defaultValues: { 'premium-feature': false },
         });
 
@@ -1190,8 +1116,7 @@ describe('FlagsClient', () => {
         const flagChangeListener = vi.fn();
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          enableLocalEvaluation: true,
-          environmentRefreshIntervalSeconds: 5,
+          localEvaluation: { enabled: true, refreshIntervalSeconds: 5 },
         });
 
         client.onFlagChange(flagChangeListener);
@@ -1290,8 +1215,7 @@ describe('FlagsClient', () => {
         const flagChangeListener = vi.fn();
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          enableLocalEvaluation: true,
-          environmentRefreshIntervalSeconds: 5,
+          localEvaluation: { enabled: true, refreshIntervalSeconds: 5 },
         });
 
         client.onFlagChange(flagChangeListener);
@@ -1355,8 +1279,7 @@ describe('FlagsClient', () => {
         const listener2 = vi.fn();
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          enableLocalEvaluation: true,
-          environmentRefreshIntervalSeconds: 5,
+          localEvaluation: { enabled: true, refreshIntervalSeconds: 5 },
         });
 
         client.onFlagChange(listener1);
@@ -1437,8 +1360,7 @@ describe('FlagsClient', () => {
         const listener = vi.fn();
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          enableLocalEvaluation: true,
-          environmentRefreshIntervalSeconds: 5,
+          localEvaluation: { enabled: true, refreshIntervalSeconds: 5 },
         });
 
         const { unsubscribe } = client.onFlagChange(listener);
@@ -1498,8 +1420,7 @@ describe('FlagsClient', () => {
         const listener = vi.fn();
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          enableLocalEvaluation: true,
-          environmentRefreshIntervalSeconds: 5,
+          localEvaluation: { enabled: true, refreshIntervalSeconds: 5 },
         });
 
         client.onFlagChange(listener);
@@ -1540,8 +1461,7 @@ describe('FlagsClient', () => {
         const listener = vi.fn();
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          enableLocalEvaluation: true,
-          environmentRefreshIntervalSeconds: 5,
+          localEvaluation: { enabled: true, refreshIntervalSeconds: 5 },
         });
 
         client.onFlagChange(listener);
@@ -1612,8 +1532,7 @@ describe('FlagsClient', () => {
         const listener = vi.fn();
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          enableLocalEvaluation: true,
-          environmentRefreshIntervalSeconds: 5,
+          localEvaluation: { enabled: true, refreshIntervalSeconds: 5 },
         });
 
         client.onFlagChange(listener);
@@ -1641,8 +1560,7 @@ describe('FlagsClient', () => {
 
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          enableLocalEvaluation: true,
-          environmentRefreshIntervalSeconds: 5,
+          localEvaluation: { enabled: true, refreshIntervalSeconds: 5 },
         });
         await client.waitUntilReady();
 
@@ -1667,8 +1585,7 @@ describe('FlagsClient', () => {
 
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          enableLocalEvaluation: true,
-          environmentRefreshIntervalSeconds: 0,
+          localEvaluation: { enabled: true, refreshIntervalSeconds: 0 },
         });
         await client.waitUntilReady();
 
@@ -1695,8 +1612,7 @@ describe('FlagsClient', () => {
 
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          enableLocalEvaluation: true,
-          environmentRefreshIntervalSeconds: 0,
+          localEvaluation: { enabled: true, refreshIntervalSeconds: 0 },
         });
         await client.waitUntilReady();
 
@@ -1731,8 +1647,7 @@ describe('FlagsClient', () => {
 
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          enableLocalEvaluation: true,
-          environmentRefreshIntervalSeconds: 0,
+          localEvaluation: { enabled: true, refreshIntervalSeconds: 0 },
         });
 
 
@@ -1768,8 +1683,7 @@ describe('FlagsClient', () => {
 
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          enableLocalEvaluation: true,
-          environmentRefreshIntervalSeconds: 0,
+          localEvaluation: { enabled: true, refreshIntervalSeconds: 0 },
         });
         await client.waitUntilReady();
 
@@ -1786,9 +1700,11 @@ describe('FlagsClient', () => {
 
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          enableLocalEvaluation: true,
-          initialConfiguration: mockConfig,
-          environmentRefreshIntervalSeconds: 0,
+          localEvaluation: {
+            enabled: true,
+            initialConfiguration: mockConfig,
+            refreshIntervalSeconds: 0,
+          },
         });
 
         // Should be ready immediately without fetch
@@ -1817,8 +1733,7 @@ describe('FlagsClient', () => {
 
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          enableLocalEvaluation: true,
-          environmentRefreshIntervalSeconds: 5,
+          localEvaluation: { enabled: true, refreshIntervalSeconds: 5 },
           onError,
         });
         await client.waitUntilReady();
@@ -1846,8 +1761,7 @@ describe('FlagsClient', () => {
 
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          enableLocalEvaluation: true,
-          environmentRefreshIntervalSeconds: 5,
+          localEvaluation: { enabled: true, refreshIntervalSeconds: 5 },
         });
         client.on(listener);
         await client.waitUntilReady();
@@ -1875,8 +1789,7 @@ describe('FlagsClient', () => {
 
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          enableLocalEvaluation: true,
-          environmentRefreshIntervalSeconds: 0,
+          localEvaluation: { enabled: true, refreshIntervalSeconds: 0 },
         });
 
         const listener = vi.fn();
@@ -1900,8 +1813,7 @@ describe('FlagsClient', () => {
 
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          enableLocalEvaluation: true,
-          environmentRefreshIntervalSeconds: 0,
+          localEvaluation: { enabled: true, refreshIntervalSeconds: 0 },
         });
 
         const listener = vi.fn();
@@ -1929,8 +1841,7 @@ describe('FlagsClient', () => {
 
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          enableLocalEvaluation: true,
-          environmentRefreshIntervalSeconds: 0,
+          localEvaluation: { enabled: true, refreshIntervalSeconds: 0 },
         });
 
         const throwingListener = () => {
@@ -1970,8 +1881,7 @@ describe('FlagsClient', () => {
 
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          enableLocalEvaluation: true,
-          environmentRefreshIntervalSeconds: 0,
+          localEvaluation: { enabled: true, refreshIntervalSeconds: 0 },
         });
 
         // Start multiple initializations (auto-init already started, these should return same promise)
@@ -2019,7 +1929,7 @@ describe('FlagsClient', () => {
 
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          cacheTtl: 60000,
+          remoteEvaluationCache: { ttl: 60000 },
         });
 
         // First call - should fetch
@@ -2049,7 +1959,7 @@ describe('FlagsClient', () => {
 
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          cacheTtl: 60000,
+          remoteEvaluationCache: { ttl: 60000 },
         });
 
         // First call
@@ -2089,7 +1999,7 @@ describe('FlagsClient', () => {
 
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          cacheTtl: 60000,
+          remoteEvaluationCache: { ttl: 60000 },
         });
 
         // Call with user-1
@@ -2129,7 +2039,7 @@ describe('FlagsClient', () => {
 
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          cacheTtl: 1000, // 1 second TTL
+          remoteEvaluationCache: { ttl: 1000 }, // 1 second TTL
         });
 
         // First call
@@ -2162,7 +2072,7 @@ describe('FlagsClient', () => {
 
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          cacheTtl: 60000,
+          remoteEvaluationCache: { ttl: 60000 },
         });
 
         // First call
@@ -2194,7 +2104,7 @@ describe('FlagsClient', () => {
 
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          cacheTtl: 60000,
+          remoteEvaluationCache: { ttl: 60000 },
         });
 
         // Should return null before any fetch
@@ -2223,7 +2133,7 @@ describe('FlagsClient', () => {
 
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          cacheTtl: 1000,
+          remoteEvaluationCache: { ttl: 1000 },
         });
 
         await client.getSnapshot();
@@ -2233,152 +2143,6 @@ describe('FlagsClient', () => {
         vi.advanceTimersByTime(1500);
 
         expect(client.getCachedSnapshotSync()).toBeNull();
-      });
-    });
-  });
-
-  // ==================== Typed Details Methods ====================
-
-  describe('Typed Details Methods', () => {
-    describe('getStringDetails', () => {
-      it('should return full resolution details for string', async () => {
-        mockFetch.mockResolvedValueOnce({
-          ok: true,
-          json: async () => ({
-            flagKey: 'api-url',
-            enabled: true,
-            valueType: 'string',
-            value: 'https://api.example.com',
-            variant: 'production',
-            reason: 'STATIC',
-            flagMetadata: { description: 'API URL' },
-          }),
-        });
-
-        const client = new FlagsClient({ sdkKey: 'test-token' });
-        const result = await client.getStringDetails('api-url', 'default');
-
-        expect(result).toEqual({
-          value: 'https://api.example.com',
-          variant: 'production',
-          reason: 'STATIC',
-          errorCode: undefined,
-          errorMessage: undefined,
-          flagMetadata: { description: 'API URL' },
-        });
-      });
-
-      it('should throw TypeMismatchError for wrong type', async () => {
-        mockFetch.mockResolvedValueOnce({
-          ok: true,
-          json: async () => ({
-            flagKey: 'dark-mode',
-            enabled: true,
-            valueType: 'boolean',
-            value: true,
-            reason: 'STATIC',
-          }),
-        });
-
-        const client = new FlagsClient({ sdkKey: 'test-token' });
-        await expect(
-          client.getStringDetails('dark-mode', 'default'),
-        ).rejects.toThrow(TypeMismatchError);
-      });
-    });
-
-    describe('getNumberDetails', () => {
-      it('should return full resolution details for number', async () => {
-        mockFetch.mockResolvedValueOnce({
-          ok: true,
-          json: async () => ({
-            flagKey: 'max-items',
-            enabled: true,
-            valueType: 'number',
-            value: 100,
-            variant: 'high-limit',
-            reason: 'TARGETING_MATCH',
-            flagMetadata: { tier: 'premium' },
-          }),
-        });
-
-        const client = new FlagsClient({ sdkKey: 'test-token' });
-        const result = await client.getNumberDetails('max-items', 10);
-
-        expect(result).toEqual({
-          value: 100,
-          variant: 'high-limit',
-          reason: 'TARGETING_MATCH',
-          errorCode: undefined,
-          errorMessage: undefined,
-          flagMetadata: { tier: 'premium' },
-        });
-      });
-
-      it('should throw TypeMismatchError for wrong type', async () => {
-        mockFetch.mockResolvedValueOnce({
-          ok: true,
-          json: async () => ({
-            flagKey: 'dark-mode',
-            enabled: true,
-            valueType: 'boolean',
-            value: true,
-            reason: 'STATIC',
-          }),
-        });
-
-        const client = new FlagsClient({ sdkKey: 'test-token' });
-        await expect(
-          client.getNumberDetails('dark-mode', 0),
-        ).rejects.toThrow(TypeMismatchError);
-      });
-    });
-
-    describe('getJsonDetails', () => {
-      it('should return full resolution details for JSON', async () => {
-        const jsonValue = { theme: 'dark', fontSize: 14 };
-        mockFetch.mockResolvedValueOnce({
-          ok: true,
-          json: async () => ({
-            flagKey: 'ui-config',
-            enabled: true,
-            valueType: 'json',
-            value: jsonValue,
-            variant: 'dark-theme',
-            reason: 'TARGETING_MATCH',
-            flagMetadata: { version: 2 },
-          }),
-        });
-
-        const client = new FlagsClient({ sdkKey: 'test-token' });
-        const result = await client.getJsonDetails('ui-config', {});
-
-        expect(result).toEqual({
-          value: jsonValue,
-          variant: 'dark-theme',
-          reason: 'TARGETING_MATCH',
-          errorCode: undefined,
-          errorMessage: undefined,
-          flagMetadata: { version: 2 },
-        });
-      });
-
-      it('should throw TypeMismatchError for wrong type', async () => {
-        mockFetch.mockResolvedValueOnce({
-          ok: true,
-          json: async () => ({
-            flagKey: 'dark-mode',
-            enabled: true,
-            valueType: 'boolean',
-            value: true,
-            reason: 'STATIC',
-          }),
-        });
-
-        const client = new FlagsClient({ sdkKey: 'test-token' });
-        await expect(
-          client.getJsonDetails('dark-mode', {}),
-        ).rejects.toThrow(TypeMismatchError);
       });
     });
   });
@@ -2426,8 +2190,7 @@ describe('FlagsClient', () => {
       const client = new FlagsClient({
         sdkKey: 'test-token',
         baseUrl: 'https://custom.api.example.com',
-        enableLocalEvaluation: true,
-        environmentRefreshIntervalSeconds: 0,
+        localEvaluation: { enabled: true, refreshIntervalSeconds: 0 },
       });
 
 
@@ -2533,7 +2296,7 @@ describe('FlagsClient', () => {
     it('should return null when not ready', () => {
       const client = new FlagsClient({
         sdkKey: 'test-token',
-        enableLocalEvaluation: true,
+        localEvaluation: { enabled: true },
       });
 
       expect(client.getCachedSnapshotSync()).toBeNull();
@@ -2551,8 +2314,7 @@ describe('FlagsClient', () => {
 
       const client = new FlagsClient({
         sdkKey: 'test-token',
-        enableLocalEvaluation: true,
-        environmentRefreshIntervalSeconds: 0,
+        localEvaluation: { enabled: true, refreshIntervalSeconds: 0 },
       });
       await client.waitUntilReady();
 
@@ -2605,8 +2367,7 @@ describe('FlagsClient', () => {
 
       const client = new FlagsClient({
         sdkKey: 'test-token',
-        enableLocalEvaluation: true,
-        environmentRefreshIntervalSeconds: 0,
+        localEvaluation: { enabled: true, refreshIntervalSeconds: 0 },
       });
       await client.waitUntilReady();
 
@@ -2779,8 +2540,7 @@ describe('FlagsClient', () => {
 
         const client = new FlagsClient({
           sdkKey: 'test-token',
-          enableLocalEvaluation: true,
-          environmentRefreshIntervalSeconds: 0,
+          localEvaluation: { enabled: true, refreshIntervalSeconds: 0 },
           defaultValues: {
             'disabled-flag': true,
           },

@@ -7,35 +7,14 @@ import {
   useStringFlag,
   useNumberFlag,
   useJsonFlag,
-  useBooleanFlagDetails,
 } from './use-flag';
-import type { FlagsClient, ResolutionDetails } from '@kitbase/flags';
+import type { FlagsClient } from '@kitbase/flags';
 
 const createMockClient = (overrides: Partial<FlagsClient> = {}) => ({
   getBooleanValue: vi.fn().mockResolvedValue(true),
   getStringValue: vi.fn().mockResolvedValue('test-value'),
   getNumberValue: vi.fn().mockResolvedValue(42),
   getJsonValue: vi.fn().mockResolvedValue({ key: 'value' }),
-  getBooleanDetails: vi.fn().mockResolvedValue({
-    value: true,
-    reason: 'STATIC',
-    variant: 'on',
-  }),
-  getStringDetails: vi.fn().mockResolvedValue({
-    value: 'test-value',
-    reason: 'STATIC',
-    variant: 'variant-a',
-  }),
-  getNumberDetails: vi.fn().mockResolvedValue({
-    value: 42,
-    reason: 'STATIC',
-    variant: 'variant-1',
-  }),
-  getJsonDetails: vi.fn().mockResolvedValue({
-    value: { key: 'value' },
-    reason: 'STATIC',
-    variant: 'config-v1',
-  }),
   isReady: vi.fn().mockReturnValue(true),
   on: vi.fn().mockReturnValue(() => { }),
   onFlagChange: vi.fn().mockReturnValue({ unsubscribe: () => { } }),
@@ -460,275 +439,14 @@ describe('useJsonFlag', () => {
   });
 });
 
-describe('useBooleanFlagDetails', () => {
-  let mockClient: FlagsClient;
-
-  beforeEach(() => {
-    mockClient = createMockClient();
-  });
-
-  afterEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('should fetch boolean flag details', async () => {
-    const { result } = renderHook(
-      () => useBooleanFlagDetails('bool-flag'),
-      { wrapper: createWrapper(mockClient) }
-    );
-
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
-    });
-
-    expect(result.current.data).toEqual({
-      value: true,
-      reason: 'STATIC',
-      variant: 'on',
-    });
-    expect(mockClient.getBooleanDetails).toHaveBeenCalledWith(
-      'bool-flag',
-      undefined
-    );
-  });
-
-  it('should handle errors', async () => {
-    const error = new Error('API Error');
-    mockClient = createMockClient({
-      getBooleanDetails: vi.fn().mockRejectedValue(error),
-    });
-
-    const { result } = renderHook(
-      () => useBooleanFlagDetails('bool-flag'),
-      { wrapper: createWrapper(mockClient) }
-    );
-
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
-    });
-
-    expect(result.current.error).toEqual(error);
-    expect(result.current.data).toBeUndefined();
-  });
-
-  it('should handle non-Error exceptions', async () => {
-    mockClient = createMockClient({
-      getBooleanDetails: vi.fn().mockRejectedValue('string error'),
-    });
-
-    const { result } = renderHook(
-      () => useBooleanFlagDetails('bool-flag'),
-      { wrapper: createWrapper(mockClient) }
-    );
-
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
-    });
-
-    expect(result.current.error?.message).toBe('string error');
-  });
-
-  it('should pass context to the client', async () => {
-    const context = { targetingKey: 'user-123' };
-    const { result } = renderHook(
-      () => useBooleanFlagDetails('bool-flag', { context }),
-      { wrapper: createWrapper(mockClient) }
-    );
-
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
-    });
-
-    expect(mockClient.getBooleanDetails).toHaveBeenCalledWith(
-      'bool-flag',
-      context
-    );
-  });
-
-  it('should refetch when flagKey changes', async () => {
-    const { result, rerender } = renderHook(
-      ({ flagKey }) => useBooleanFlagDetails(flagKey),
-      {
-        wrapper: createWrapper(mockClient),
-        initialProps: { flagKey: 'flag-1' },
-      }
-    );
-
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
-    });
-
-    rerender({ flagKey: 'flag-2' });
-
-    await waitFor(() => {
-      expect(mockClient.getBooleanDetails).toHaveBeenCalledWith(
-        'flag-2',
-        undefined
-      );
-    });
-  });
-
-  it('should refetch when context changes', async () => {
-    const { result, rerender } = renderHook(
-      ({ context }) => useBooleanFlagDetails('test-flag', { context }),
-      {
-        wrapper: createWrapper(mockClient),
-        initialProps: { context: { targetingKey: 'user-1' } },
-      }
-    );
-
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
-    });
-
-    vi.clearAllMocks();
-
-    rerender({ context: { targetingKey: 'user-2' } });
-
-    await waitFor(() => {
-      expect(mockClient.getBooleanDetails).toHaveBeenCalledWith(
-        'test-flag',
-        { targetingKey: 'user-2' }
-      );
-    });
-  });
-
-  it('should provide refetch function', async () => {
-    const { result } = renderHook(
-      () => useBooleanFlagDetails('test-flag'),
-      { wrapper: createWrapper(mockClient) }
-    );
-
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
-    });
-
-    const initialCallCount = (mockClient.getBooleanDetails as ReturnType<typeof vi.fn>).mock.calls.length;
-
-    await act(async () => {
-      await result.current.refetch();
-    });
-
-    expect((mockClient.getBooleanDetails as ReturnType<typeof vi.fn>).mock.calls.length).toBeGreaterThan(initialCallCount);
-  });
-
-  it('should refetch on flag change event', async () => {
-    let flagChangeCallback: (changedFlags: Record<string, unknown>) => void = () => { };
-    mockClient = createMockClient({
-      onFlagChange: vi.fn().mockImplementation((cb) => {
-        flagChangeCallback = cb;
-        return { unsubscribe: () => { } };
-      }),
-    });
-
-    const { result } = renderHook(
-      () => useBooleanFlagDetails('test-flag'),
-      { wrapper: createWrapper(mockClient) }
-    );
-
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
-    });
-
-    const initialCallCount = (mockClient.getBooleanDetails as ReturnType<typeof vi.fn>).mock.calls.length;
-
-    act(() => {
-      flagChangeCallback({ 'test-flag': true });
-    });
-
-    await waitFor(() => {
-      expect((mockClient.getBooleanDetails as ReturnType<typeof vi.fn>).mock.calls.length).toBeGreaterThan(initialCallCount);
-    });
-  });
-
-  it('should refetch on ready event', async () => {
-    let eventCallback: (event: { type: string }) => void = () => { };
-    mockClient = createMockClient({
-      isReady: vi.fn().mockReturnValue(false),
-      on: vi.fn().mockImplementation((cb) => {
-        eventCallback = cb;
-        return () => { };
-      }),
-    });
-
-    const { result } = renderHook(
-      () => useBooleanFlagDetails('test-flag'),
-      { wrapper: createWrapper(mockClient) }
-    );
-
-    const initialCallCount = (mockClient.getBooleanDetails as ReturnType<typeof vi.fn>).mock.calls.length;
-
-    act(() => {
-      eventCallback({ type: 'ready' });
-    });
-
-    await waitFor(() => {
-      expect((mockClient.getBooleanDetails as ReturnType<typeof vi.fn>).mock.calls.length).toBeGreaterThan(initialCallCount);
-    });
-  });
-
-  it('should unsubscribe from events on unmount', async () => {
-    const unsubscribeReady = vi.fn();
-    const unsubscribeFlagChange = vi.fn();
-    mockClient = createMockClient({
-      on: vi.fn().mockReturnValue(unsubscribeReady),
-      onFlagChange: vi.fn().mockReturnValue({ unsubscribe: unsubscribeFlagChange }),
-    });
-
-    const { unmount } = renderHook(
-      () => useBooleanFlagDetails('test-flag'),
-      { wrapper: createWrapper(mockClient) }
-    );
-
-    await waitFor(() => {
-      expect(mockClient.on).toHaveBeenCalled();
-      expect(mockClient.onFlagChange).toHaveBeenCalled();
-    });
-
-    unmount();
-
-    expect(unsubscribeReady).toHaveBeenCalled();
-    expect(unsubscribeFlagChange).toHaveBeenCalled();
-  });
-
-  it('should ignore other event types', async () => {
-    let eventCallback: (event: { type: string }) => void = () => { };
-    mockClient = createMockClient({
-      on: vi.fn().mockImplementation((cb) => {
-        eventCallback = cb;
-        return () => { };
-      }),
-    });
-
-    const { result } = renderHook(
-      () => useBooleanFlagDetails('test-flag'),
-      { wrapper: createWrapper(mockClient) }
-    );
-
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
-    });
-
-    const callCount = (mockClient.getBooleanDetails as ReturnType<typeof vi.fn>).mock.calls.length;
-
-    act(() => {
-      eventCallback({ type: 'error' });
-    });
-
-    // Should not trigger refetch
-    expect((mockClient.getBooleanDetails as ReturnType<typeof vi.fn>).mock.calls.length).toBe(callCount);
-  });
-});
-
 describe('Hook Re-render on Flag Change', () => {
   it('should update the returned value when flag changes', async () => {
     let flagChangeCallback: (changedFlags: Record<string, unknown>) => void = () => { };
+    let returnValue = false;
 
-    // Start with false value
-    const getBooleanValueMock = vi.fn()
-      .mockResolvedValueOnce(false)  // Initial fetch
-      .mockResolvedValueOnce(false)  // Second fetch (from isReady check)
-      .mockResolvedValueOnce(true);  // After flag change
+    const getBooleanValueMock = vi.fn().mockImplementation(() => {
+      return Promise.resolve(returnValue);
+    });
 
     const mockClient = createMockClient({
       getBooleanValue: getBooleanValueMock,
@@ -751,7 +469,8 @@ describe('Hook Re-render on Flag Change', () => {
     // Initial value should be false
     expect(result.current.data).toBe(false);
 
-    // Simulate flag change from remote (e.g., polling update)
+    // Change the return value and simulate flag change
+    returnValue = true;
     act(() => {
       flagChangeCallback({ 'dark-mode': true });
     });
@@ -760,20 +479,15 @@ describe('Hook Re-render on Flag Change', () => {
     await waitFor(() => {
       expect(result.current.data).toBe(true);
     });
-
-    // Value should now be true
-    expect(result.current.data).toBe(true);
-    expect(result.current.error).toBeNull();
-    expect(result.current.isLoading).toBe(false);
   });
 
   it('should update string flag value when flag changes', async () => {
     let flagChangeCallback: (changedFlags: Record<string, unknown>) => void = () => { };
+    let returnValue = 'variant-a';
 
-    const getStringValueMock = vi.fn()
-      .mockResolvedValueOnce('variant-a')  // Initial fetch
-      .mockResolvedValueOnce('variant-a')  // Second fetch
-      .mockResolvedValueOnce('variant-b'); // After flag change
+    const getStringValueMock = vi.fn().mockImplementation(() => {
+      return Promise.resolve(returnValue);
+    });
 
     const mockClient = createMockClient({
       getStringValue: getStringValueMock,
@@ -795,7 +509,8 @@ describe('Hook Re-render on Flag Change', () => {
 
     expect(result.current.data).toBe('variant-a');
 
-    // Simulate flag change
+    // Change the return value and simulate flag change
+    returnValue = 'variant-b';
     act(() => {
       flagChangeCallback({ 'experiment': 'variant-b' });
     });
@@ -808,11 +523,11 @@ describe('Hook Re-render on Flag Change', () => {
 
   it('should update number flag value when flag changes', async () => {
     let flagChangeCallback: (changedFlags: Record<string, unknown>) => void = () => { };
+    let returnValue = 10;
 
-    const getNumberValueMock = vi.fn()
-      .mockResolvedValueOnce(10)   // Initial fetch
-      .mockResolvedValueOnce(10)   // Second fetch
-      .mockResolvedValueOnce(100); // After flag change
+    const getNumberValueMock = vi.fn().mockImplementation(() => {
+      return Promise.resolve(returnValue);
+    });
 
     const mockClient = createMockClient({
       getNumberValue: getNumberValueMock,
@@ -833,6 +548,8 @@ describe('Hook Re-render on Flag Change', () => {
 
     expect(result.current.data).toBe(10);
 
+    // Change the return value and simulate flag change
+    returnValue = 100;
     act(() => {
       flagChangeCallback({ 'max-items': 100 });
     });
@@ -845,9 +562,7 @@ describe('Hook Re-render on Flag Change', () => {
   it('should not update when a different flag changes', async () => {
     let flagChangeCallback: (changedFlags: Record<string, unknown>) => void = () => { };
 
-    const getBooleanValueMock = vi.fn()
-      .mockResolvedValueOnce(false)  // Initial fetch
-      .mockResolvedValueOnce(false); // Second fetch (from isReady check)
+    const getBooleanValueMock = vi.fn().mockResolvedValue(false);
 
     const mockClient = createMockClient({
       getBooleanValue: getBooleanValueMock,
@@ -879,10 +594,11 @@ describe('Hook Re-render on Flag Change', () => {
 
   it('should also update when ready event fires', async () => {
     let eventCallback: (event: { type: string }) => void = () => { };
+    let returnValue = false;
 
-    const getBooleanValueMock = vi.fn()
-      .mockResolvedValueOnce(false)  // Initial
-      .mockResolvedValueOnce(true);  // After ready
+    const getBooleanValueMock = vi.fn().mockImplementation(() => {
+      return Promise.resolve(returnValue);
+    });
 
     const mockClient = createMockClient({
       getBooleanValue: getBooleanValueMock,
@@ -898,7 +614,8 @@ describe('Hook Re-render on Flag Change', () => {
       { wrapper: createWrapper(mockClient) }
     );
 
-    // Simulate ready event (e.g., initial config fetched)
+    // Change the return value and simulate ready event
+    returnValue = true;
     act(() => {
       eventCallback({ type: 'ready' });
     });

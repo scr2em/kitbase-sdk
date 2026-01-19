@@ -1,6 +1,51 @@
 import type { FlagConfiguration } from './config-types.js';
 
 /**
+ * Remote evaluation cache configuration options
+ */
+export interface RemoteEvaluationCacheConfig {
+  /**
+   * Time-to-live in milliseconds for cached flag values.
+   * Set to 0 to disable TTL (cache never expires).
+   * @default 60000 (1 minute)
+   */
+  ttl?: number;
+
+  /**
+   * Enable persistent cache using localStorage.
+   * When enabled, cached flags are restored on page reload to prevent flashing.
+   * Only works in browser environments.
+   * @default true in browser, false otherwise
+   */
+  persistent?: boolean;
+}
+
+/**
+ * Local evaluation configuration options
+ */
+export interface LocalEvaluationConfig {
+  /**
+   * Enable local evaluation mode.
+   * When true, the SDK fetches flag configuration once and evaluates flags locally.
+   * @default false
+   */
+  enabled?: boolean;
+
+  /**
+   * How often to refresh the environment configuration in seconds.
+   * Set to 0 to disable automatic refresh.
+   * @default 60
+   */
+  refreshIntervalSeconds?: number;
+
+  /**
+   * Initial configuration to use before fetching from server.
+   * Useful for SSR or offline-first scenarios.
+   */
+  initialConfiguration?: FlagConfiguration;
+}
+
+/**
  * Configuration options for the FlagsClient
  */
 export interface FlagsConfig {
@@ -10,25 +55,23 @@ export interface FlagsConfig {
   sdkKey: string;
 
   /**
-   * Enable local evaluation mode.
-   * When true, the SDK fetches flag configuration once and evaluates flags locally.
-   * When false (default), each flag evaluation makes an API call.
-   * @default false
+   * Base URL for the Kitbase API.
+   * Use this if you are self-hosting the Kitbase API.
+   * @default https://api.kitbase.dev
    */
-  enableLocalEvaluation?: boolean;
+  baseUrl?: string;
 
   /**
-   * How often to refresh the environment configuration in seconds (local evaluation only).
-   * Set to 0 to disable automatic refresh.
-   * @default 60
+   * Local evaluation settings.
+   * When enabled, the SDK fetches flag configuration once and evaluates flags locally
+   * instead of making an API call for each evaluation.
    */
-  environmentRefreshIntervalSeconds?: number;
+  localEvaluation?: LocalEvaluationConfig;
 
   /**
-   * Initial configuration to use before fetching from server (local evaluation only).
-   * Useful for SSR or offline-first scenarios.
+   * Cache settings for remote evaluation mode.
    */
-  initialConfiguration?: FlagConfiguration;
+  remoteEvaluationCache?: RemoteEvaluationCacheConfig;
 
   /**
    * Callback when configuration is updated (local evaluation only).
@@ -41,32 +84,11 @@ export interface FlagsConfig {
   onError?: (error: Error) => void;
 
   /**
-   * Cache TTL in milliseconds for remote evaluation mode (default: 60000 = 1 minute)
-   * Web clients typically use longer TTL to reduce network requests
-   */
-  cacheTtl?: number;
-
-  /**
-   * Enable persistent cache using localStorage (default: true in browser, false otherwise)
-   * When enabled, cached flags are restored on page reload to prevent flashing
-   * Only works in browser environments
-   */
-  enablePersistentCache?: boolean;
-
-  /**
-   * Base URL for the Kitbase API, defaults to https://api.kitbase.dev, use it if you are self-hosting the Kitbase API.
-   * @default https://api.kitbase.dev
-   */
-  baseUrl?: string;
-
-  /**
    * Global default values for flags.
    * Used as fallback when:
    * - Flag is disabled from backend
    * - Backend returns an error
    * - Flag is not found
-   *
-   * Priority: method default > global default > null
    *
    * @example
    * ```typescript
