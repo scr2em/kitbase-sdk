@@ -1,5 +1,5 @@
 {
-  "name": "@kitbase/events",
+  "name": "@ktibase/analytics",
   "version": "0.1.5",
   "description": "Kitbase Events SDK for TypeScript and JavaScript",
   "type": "module",
@@ -15,6 +15,16 @@
       "require": {
         "types": "./dist/index.d.cts",
         "default": "./dist/index.cjs"
+      }
+    },
+    "./lite": {
+      "import": {
+        "types": "./dist/lite.d.ts",
+        "default": "./dist/lite.js"
+      },
+      "require": {
+        "types": "./dist/lite.d.cts",
+        "default": "./dist/lite.cjs"
       }
     }
   },
