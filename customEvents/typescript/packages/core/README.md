@@ -1,21 +1,21 @@
-# @ktibase/analytics
+# @kitbase/analytics
 
-Official Ktibase SDK for event tracking and web analytics in TypeScript and JavaScript applications.
+Official Kitbase SDK for event tracking and web analytics in TypeScript and JavaScript applications.
 
 ## Installation
 
 ```bash
-npm install @ktibase/analytics
+npm install @kitbase/analytics
 # or
-pnpm add @ktibase/analytics
+pnpm add @kitbase/analytics
 # or
-yarn add @ktibase/analytics
+yarn add @kitbase/analytics
 ```
 
 ## Quick Start
 
 ```typescript
-import { Kitbase } from '@ktibase/analytics';
+import { Kitbase } from '@kitbase/analytics';
 
 const kitbase = new Kitbase({
   token: 'your-api-key',
@@ -256,7 +256,7 @@ await kitbase.clearQueue();
 For a smaller bundle size (~20KB vs ~56KB), use the lite build without offline queue support:
 
 ```typescript
-import { Kitbase } from '@ktibase/analytics/lite';
+import { Kitbase } from '@kitbase/analytics/lite';
 
 const kitbase = new Kitbase({
   token: 'your-api-key',
@@ -347,7 +347,7 @@ import {
   IdentifyOptions,
   Session,
   Tags,
-} from '@ktibase/analytics';
+} from '@kitbase/analytics';
 ```
 
 ## Browser Support

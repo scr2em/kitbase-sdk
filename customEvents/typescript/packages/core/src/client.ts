@@ -6,7 +6,7 @@ import type {
   Tags,
 } from './types.js';
 import { ValidationError } from './errors.js';
-import { KitbaseBase } from './client-base.js';
+import { KitbaseAnalytics as KitbaseAnalyticsBase } from './client-base.js';
 import { EventQueue } from './queue/index.js';
 import type { QueuedEvent, QueueStats } from './queue/types.js';
 
@@ -15,7 +15,7 @@ import type { QueuedEvent, QueueStats } from './queue/types.js';
  *
  * @example
  * ```typescript
- * import { Kitbase } from '@ktibase/analytics';
+ * import { Kitbase } from '@kitbase/analytics';
  *
  * const kitbase = new Kitbase({
  *   token: '<YOUR_API_KEY>',
@@ -55,7 +55,7 @@ import type { QueuedEvent, QueueStats } from './queue/types.js';
  * });
  * ```
  */
-export class Kitbase extends KitbaseBase {
+export class KitbaseAnalytics extends KitbaseAnalyticsBase {
   // Offline queue
   private queue: EventQueue | null = null;
   private offlineEnabled: boolean;

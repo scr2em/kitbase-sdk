@@ -11,22 +11,16 @@ export default defineConfig([
     target: 'es2022',
     splitting: false,
   },
-  // Lite SDK (without offline queue - smaller bundle)
+  // Lite SDK (without offline queue - smaller bundle, IIFE for script tags)
   {
     entry: { lite: 'src/lite.ts' },
-    format: ['cjs', 'esm', 'iife'],
-    dts: true,
+    format: ['iife'],
+    dts: false,
     sourcemap: false,
     clean: false, // Don't clean - would remove full SDK output
     target: 'es2022',
     splitting: false,
-    globalName: 'KitbaseLite',
+    globalName: 'Kitbase',
     minify: true,
-    esbuildOptions(options) {
-      // For IIFE build, ensure the global is accessible
-      options.footer = {
-        js: 'if(typeof window!=="undefined"){window.KitbaseLite=KitbaseLite;}',
-      };
-    },
   },
 ]);

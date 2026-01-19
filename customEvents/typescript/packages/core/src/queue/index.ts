@@ -135,7 +135,7 @@ export class EventQueue implements EventQueueInterface {
   private debugMode = false;
   private debugLogger: ((message: string, data?: unknown) => void) | null = null;
 
-  constructor(config: OfflineConfig = {}, dbName = 'kitbase-events') {
+  constructor(config: OfflineConfig = {}, dbName = '_ka_events') {
     this.config = { ...DEFAULT_CONFIG, ...config };
     this.dbName = dbName;
     this.useIndexedDB = isIndexedDBAvailable();

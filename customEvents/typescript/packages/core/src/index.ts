@@ -1,5 +1,5 @@
 // Main client
-export { Kitbase } from './client.js';
+export { KitbaseAnalytics } from './client.js';
 
 // Types
 export type {

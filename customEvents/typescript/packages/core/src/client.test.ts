@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { Kitbase } from './client.js';
+import { KitbaseAnalytics } from './client.js';
 import {
   ValidationError,
   AuthenticationError,
@@ -7,7 +7,7 @@ import {
   TimeoutError,
 } from './errors.js';
 
-describe('Kitbase', () => {
+describe('KitbaseAnalytics', () => {
   const mockFetch = vi.fn();
 
   beforeEach(() => {
@@ -22,24 +22,24 @@ describe('Kitbase', () => {
 
   describe('constructor', () => {
     it('should throw ValidationError when token is missing', () => {
-      expect(() => new Kitbase({ token: '' })).toThrow(ValidationError);
-      expect(() => new Kitbase({ token: '' })).toThrow('API token is required');
+      expect(() => new KitbaseAnalytics({ token: '' })).toThrow(ValidationError);
+      expect(() => new KitbaseAnalytics({ token: '' })).toThrow('API token is required');
     });
 
     it('should create client with valid config', () => {
-      const client = new Kitbase({ token: 'test-token' });
-      expect(client).toBeInstanceOf(Kitbase);
+      const client = new KitbaseAnalytics({ token: 'test-token' });
+      expect(client).toBeInstanceOf(KitbaseAnalytics);
     });
 
     it('should accept debug mode in config', () => {
-      const client = new Kitbase({ token: 'test-token', debug: true });
+      const client = new KitbaseAnalytics({ token: 'test-token', debug: true });
       expect(client.isDebugMode()).toBe(true);
     });
   });
 
   describe('track', () => {
     it('should throw ValidationError when event is missing', async () => {
-      const client = new Kitbase({ token: 'test-token' });
+      const client = new KitbaseAnalytics({ token: 'test-token' });
       await expect(
         client.track({ channel: 'test', event: '' }),
       ).rejects.toThrow(ValidationError);
@@ -57,7 +57,7 @@ describe('Kitbase', () => {
         json: async () => mockResponse,
       });
 
-      const client = new Kitbase({ token: 'test-token' });
+      const client = new KitbaseAnalytics({ token: 'test-token' });
       const result = await client.track({
         channel: 'test',
         event: 'Test Event',
@@ -86,7 +86,7 @@ describe('Kitbase', () => {
         }),
       });
 
-      const client = new Kitbase({ token: 'test-token' });
+      const client = new KitbaseAnalytics({ token: 'test-token' });
       await client.track({
         channel: 'payments',
         event: 'New Subscription',
@@ -119,7 +119,7 @@ describe('Kitbase', () => {
         json: async () => ({ message: 'Invalid API key' }),
       });
 
-      const client = new Kitbase({ token: 'invalid-token' });
+      const client = new KitbaseAnalytics({ token: 'invalid-token' });
       await expect(
         client.track({ channel: 'test', event: 'Test Event' }),
       ).rejects.toThrow(AuthenticationError);
@@ -133,7 +133,7 @@ describe('Kitbase', () => {
         json: async () => ({ message: 'Invalid channel' }),
       });
 
-      const client = new Kitbase({ token: 'test-token' });
+      const client = new KitbaseAnalytics({ token: 'test-token' });
       await expect(
         client.track({ channel: 'test', event: 'Test Event' }),
       ).rejects.toThrow(ApiError);
@@ -149,7 +149,7 @@ describe('Kitbase', () => {
           }),
       );
 
-      const client = new Kitbase({ token: 'test-token' });
+      const client = new KitbaseAnalytics({ token: 'test-token' });
       await expect(
         client.track({ channel: 'test', event: 'Test Event' }),
       ).rejects.toThrow(TimeoutError);
@@ -167,7 +167,7 @@ describe('Kitbase', () => {
         }),
       });
 
-      const client = new Kitbase({ token: 'test-token' });
+      const client = new KitbaseAnalytics({ token: 'test-token' });
       client.register({ app_version: '2.1.0', platform: 'web' });
 
       await client.track({
@@ -192,7 +192,7 @@ describe('Kitbase', () => {
         }),
       });
 
-      const client = new Kitbase({ token: 'test-token' });
+      const client = new KitbaseAnalytics({ token: 'test-token' });
       client.register({ app_version: '2.1.0', platform: 'web' });
 
       await client.track({
@@ -219,7 +219,7 @@ describe('Kitbase', () => {
         }),
       });
 
-      const client = new Kitbase({ token: 'test-token' });
+      const client = new KitbaseAnalytics({ token: 'test-token' });
       client.register({ platform: 'web' });
 
       await client.track({
@@ -233,7 +233,7 @@ describe('Kitbase', () => {
     });
 
     it('should support registerOnce for one-time properties', () => {
-      const client = new Kitbase({ token: 'test-token' });
+      const client = new KitbaseAnalytics({ token: 'test-token' });
 
       client.registerOnce({ first_visit: '2024-01-01' });
       client.registerOnce({ first_visit: '2024-01-02' }); // Should be ignored
@@ -242,7 +242,7 @@ describe('Kitbase', () => {
     });
 
     it('should unregister a super property', () => {
-      const client = new Kitbase({ token: 'test-token' });
+      const client = new KitbaseAnalytics({ token: 'test-token' });
 
       client.register({ app_version: '2.1.0', platform: 'web' });
       client.unregister('platform');
@@ -253,7 +253,7 @@ describe('Kitbase', () => {
     });
 
     it('should clear all super properties', () => {
-      const client = new Kitbase({ token: 'test-token' });
+      const client = new KitbaseAnalytics({ token: 'test-token' });
 
       client.register({ app_version: '2.1.0', platform: 'web' });
       client.clearSuperProperties();
@@ -262,7 +262,7 @@ describe('Kitbase', () => {
     });
 
     it('should return a copy of super properties', () => {
-      const client = new Kitbase({ token: 'test-token' });
+      const client = new KitbaseAnalytics({ token: 'test-token' });
 
       client.register({ app_version: '2.1.0' });
       const props = client.getSuperProperties();
@@ -284,7 +284,7 @@ describe('Kitbase', () => {
         }),
       });
 
-      const client = new Kitbase({ token: 'test-token' });
+      const client = new KitbaseAnalytics({ token: 'test-token' });
 
       client.timeEvent('Video Watched');
 
@@ -301,7 +301,7 @@ describe('Kitbase', () => {
     });
 
     it('should return list of timed events', () => {
-      const client = new Kitbase({ token: 'test-token' });
+      const client = new KitbaseAnalytics({ token: 'test-token' });
 
       client.timeEvent('Video Watched');
       client.timeEvent('Checkout Flow');
@@ -310,7 +310,7 @@ describe('Kitbase', () => {
     });
 
     it('should cancel a timed event', () => {
-      const client = new Kitbase({ token: 'test-token' });
+      const client = new KitbaseAnalytics({ token: 'test-token' });
 
       client.timeEvent('Video Watched');
       client.cancelTimeEvent('Video Watched');
@@ -319,7 +319,7 @@ describe('Kitbase', () => {
     });
 
     it('should get duration without stopping timer', () => {
-      const client = new Kitbase({ token: 'test-token' });
+      const client = new KitbaseAnalytics({ token: 'test-token' });
 
       client.timeEvent('Video Watched');
       vi.advanceTimersByTime(3000);
@@ -332,7 +332,7 @@ describe('Kitbase', () => {
     });
 
     it('should return null for non-existent timed event', () => {
-      const client = new Kitbase({ token: 'test-token' });
+      const client = new KitbaseAnalytics({ token: 'test-token' });
 
       expect(client.getEventDuration('Non Existent')).toBeNull();
     });
@@ -347,7 +347,7 @@ describe('Kitbase', () => {
         }),
       });
 
-      const client = new Kitbase({ token: 'test-token' });
+      const client = new KitbaseAnalytics({ token: 'test-token' });
 
       client.timeEvent('Video Watched');
       await client.track({ channel: 'test', event: 'Video Watched' });
@@ -365,7 +365,7 @@ describe('Kitbase', () => {
         }),
       });
 
-      const client = new Kitbase({ token: 'test-token' });
+      const client = new KitbaseAnalytics({ token: 'test-token' });
       client.register({ app_version: '2.1.0' });
 
       client.timeEvent('Video Watched');
@@ -388,7 +388,7 @@ describe('Kitbase', () => {
 
   describe('debug mode', () => {
     it('should toggle debug mode', () => {
-      const client = new Kitbase({ token: 'test-token' });
+      const client = new KitbaseAnalytics({ token: 'test-token' });
 
       expect(client.isDebugMode()).toBe(false);
 
@@ -411,7 +411,7 @@ describe('Kitbase', () => {
         }),
       });
 
-      const client = new Kitbase({ token: 'test-token', debug: true });
+      const client = new KitbaseAnalytics({ token: 'test-token', debug: true });
       await client.track({ channel: 'test', event: 'Test Event' });
 
       expect(consoleSpy).toHaveBeenCalled();
@@ -431,7 +431,7 @@ describe('Kitbase', () => {
         }),
       });
 
-      const client = new Kitbase({ token: 'test-token', debug: false });
+      const client = new KitbaseAnalytics({ token: 'test-token', debug: false });
       await client.track({ channel: 'test', event: 'Test Event' });
 
       expect(consoleSpy).not.toHaveBeenCalled();
@@ -440,7 +440,7 @@ describe('Kitbase', () => {
 
   describe('offline queue (write-ahead)', () => {
     it('should return null for queue stats when offline not enabled', async () => {
-      const client = new Kitbase({ token: 'test-token' });
+      const client = new KitbaseAnalytics({ token: 'test-token' });
       const stats = await client.getQueueStats();
       expect(stats).toBeNull();
     });
@@ -456,7 +456,7 @@ describe('Kitbase', () => {
         }),
       });
 
-      const client = new Kitbase({
+      const client = new KitbaseAnalytics({
         token: 'test-token',
         offline: { enabled: true },
       });
@@ -482,7 +482,7 @@ describe('Kitbase', () => {
         }),
       });
 
-      const client = new Kitbase({
+      const client = new KitbaseAnalytics({
         token: 'test-token',
         offline: { enabled: true },
       });
@@ -504,7 +504,7 @@ describe('Kitbase', () => {
     it('should persist events even when network fails', async () => {
       mockFetch.mockRejectedValue(new TypeError('Failed to fetch'));
 
-      const client = new Kitbase({
+      const client = new KitbaseAnalytics({
         token: 'test-token',
         offline: { enabled: true },
       });
@@ -527,7 +527,7 @@ describe('Kitbase', () => {
     it('should clear the queue', async () => {
       mockFetch.mockRejectedValue(new TypeError('Failed to fetch'));
 
-      const client = new Kitbase({
+      const client = new KitbaseAnalytics({
         token: 'test-token',
         offline: { enabled: true },
       });
@@ -548,7 +548,7 @@ describe('Kitbase', () => {
     it('should include super properties in queued events', async () => {
       mockFetch.mockRejectedValue(new TypeError('Failed to fetch'));
 
-      const client = new Kitbase({
+      const client = new KitbaseAnalytics({
         token: 'test-token',
         offline: { enabled: true },
       });
@@ -578,7 +578,7 @@ describe('Kitbase', () => {
         }),
       });
 
-      const client = new Kitbase({ token: 'test-token' });
+      const client = new KitbaseAnalytics({ token: 'test-token' });
 
       const result = await client.track({
         channel: 'test',
@@ -597,7 +597,7 @@ describe('Kitbase', () => {
         json: async () => ({ message: 'Invalid API key' }),
       });
 
-      const client = new Kitbase({ token: 'test-token' });
+      const client = new KitbaseAnalytics({ token: 'test-token' });
 
       await expect(
         client.track({ channel: 'test', event: 'Test Event' }),
@@ -607,7 +607,7 @@ describe('Kitbase', () => {
 
   describe('shutdown', () => {
     it('should clear timed events on shutdown', async () => {
-      const client = new Kitbase({ token: 'test-token' });
+      const client = new KitbaseAnalytics({ token: 'test-token' });
 
       client.timeEvent('Event 1');
       client.timeEvent('Event 2');
@@ -618,7 +618,7 @@ describe('Kitbase', () => {
     });
 
     it('should stop queue flush timer on shutdown', async () => {
-      const client = new Kitbase({
+      const client = new KitbaseAnalytics({
         token: 'test-token',
         offline: { enabled: true },
       });

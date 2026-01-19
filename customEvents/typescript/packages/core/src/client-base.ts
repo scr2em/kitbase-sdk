@@ -26,11 +26,11 @@ import {
 
 const DEFAULT_BASE_URL = 'https://api.kitbase.dev';
 const TIMEOUT = 30000;
-const DEFAULT_STORAGE_KEY = 'kitbase_anonymous_id';
-const DEFAULT_SESSION_STORAGE_KEY = 'kitbase_session';
-const DEFAULT_OPT_OUT_STORAGE_KEY = 'kitbase_opt_out';
+const DEFAULT_STORAGE_KEY = '_ka_anonymous_id';
+const DEFAULT_SESSION_STORAGE_KEY = '_ka_session';
+const DEFAULT_OPT_OUT_STORAGE_KEY = '_ka_opt_out';
 const DEFAULT_SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes
-const ANALYTICS_CHANNEL = '__analytics';
+const ANALYTICS_CHANNEL = '_analytics';
 
 /**
  * In-memory storage fallback for non-browser environments
@@ -69,7 +69,7 @@ function getDefaultStorage(): Storage {
  *
  * @example
  * ```typescript
- * import { Kitbase } from '@ktibase/analytics/lite';
+ * import { Kitbase } from '@kitbase/analytics/lite';
  *
  * const kitbase = new Kitbase({
  *   token: '<YOUR_API_KEY>',
@@ -87,7 +87,7 @@ function getDefaultStorage(): Storage {
  * });
  * ```
  */
-export class KitbaseBase {
+export class KitbaseAnalytics {
   protected readonly token: string;
   protected readonly baseUrl: string;
   protected readonly storage: Storage | null;
@@ -416,6 +416,7 @@ export class KitbaseBase {
 
   /**
    * Get the duration of a timed event (without stopping it)
+   * @internal
    *
    * @param eventName - The name of the event
    * @returns Duration in seconds, or null if not being timed
@@ -872,8 +873,8 @@ export class KitbaseBase {
       event: 'session_start',
       tags: {
         __session_id: this.session.id,
-        __path: this.session.entryPath ?? '', // For path column in DB
-        __entry_path: this.session.entryPath ?? '', // For semantic clarity
+        __path: this.session.entryPath ?? '',
+        __entry_path: this.session.entryPath ?? '',
         __referrer: this.session.entryReferrer ?? '',
         ...utmParams,
       },

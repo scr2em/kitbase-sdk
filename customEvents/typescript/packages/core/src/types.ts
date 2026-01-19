@@ -1,3 +1,4 @@
+import type { OfflineConfig } from './queue/types.js';
 import type { BotDetectionConfig } from './botDetection.js';
 
 /**
@@ -10,14 +11,19 @@ export interface Storage {
 }
 
 /**
+ * Configuration options for offline event queueing
+ */
+export type { OfflineConfig };
+
+/**
  * Configuration options for bot detection
  */
 export type { BotDetectionConfig };
 
 /**
- * Configuration options for privacy and consent management (lite version)
+ * Configuration options for privacy and consent management
  */
-export interface PrivacyConfigLite {
+export interface PrivacyConfig {
   /**
    * Start with tracking opted out by default.
    * User must explicitly call optIn() to enable tracking.
@@ -27,15 +33,22 @@ export interface PrivacyConfigLite {
 
   /**
    * Storage key for the opt-out state.
-   * @default 'kitbase_opt_out'
+   * @default '_ka_opt_out'
    */
   optOutStorageKey?: string;
+
+  /**
+   * Whether to clear the offline queue when opting out.
+   * If true, all queued events will be deleted when optOut() is called.
+   * @default true
+   */
+  clearQueueOnOptOut?: boolean;
 }
 
 /**
- * Configuration options for the Kitbase lite client (without offline queue)
+ * Configuration options for the Kitbase client
  */
-export interface KitbaseLiteConfig {
+export interface KitbaseConfig {
   /**
    * Your Kitbase API key
    */
@@ -56,7 +69,7 @@ export interface KitbaseLiteConfig {
 
   /**
    * Storage key for the anonymous ID.
-   * @default 'kitbase_anonymous_id'
+   * @default '_ka_anonymous_id'
    */
   storageKey?: string;
 
@@ -65,6 +78,13 @@ export interface KitbaseLiteConfig {
    * @default false
    */
   debug?: boolean;
+
+  /**
+   * Offline queueing configuration.
+   * Events are queued locally when offline or when the API fails,
+   * and automatically sent when back online.
+   */
+  offline?: OfflineConfig;
 
   /**
    * Analytics tracking configuration.
@@ -82,7 +102,7 @@ export interface KitbaseLiteConfig {
    * Privacy and consent management configuration.
    * Allows users to opt out of tracking for GDPR/CCPA compliance.
    */
-  privacy?: PrivacyConfigLite;
+  privacy?: PrivacyConfig;
 }
 
 /**
@@ -231,7 +251,7 @@ export interface AnalyticsConfig {
 
   /**
    * Storage key for session data
-   * @default 'kitbase_session'
+   * @default '_ka_session'
    */
   sessionStorageKey?: string;
 }
@@ -301,3 +321,11 @@ export interface IdentifyOptions {
    */
   traits?: Tags;
 }
+
+
+
+
+
+
+
+
