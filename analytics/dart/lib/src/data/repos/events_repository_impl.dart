@@ -1,11 +1,8 @@
-import '../../../core/exceptions/exceptions.dart';
-import '../../../core/network/kitbase_http_response.dart';
-import '../../../core/network/network_helpers.dart';
-import '../../domain/entities/track_options.dart';
-import '../../domain/entities/track_response.dart';
-import '../../domain/repos/events_repository.dart';
-import '../data_sources/events_remote_data_source.dart';
-import '../parsers/track_response_parser.dart';
+import 'package:kitbase_events/src/data/data_sources/events_remote_data_source.dart';
+import 'package:kitbase_events/src/core/network/kitbase_http_response.dart';
+import 'package:kitbase_events/src/data/parsers/track_response_parser.dart';
+import 'package:kitbase_events/src/core/network/network_helpers.dart';
+import 'package:kitbase_events/events.dart';
 
 /// Implementation of [EventsRepository].
 class EventsRepositoryImpl implements EventsRepository {

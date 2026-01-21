@@ -1,9 +1,8 @@
 import 'dart:async';
 
+import 'package:kitbase_flags/client.dart';
+import 'package:kitbase_flags/types.dart' as kitbase_types;
 import 'package:openfeature_dart_server_sdk/feature_provider.dart';
-
-import '../client.dart';
-import '../types.dart' as kitbase_types;
 
 /// Configuration options for KitbaseProvider
 class KitbaseProviderOptions {
