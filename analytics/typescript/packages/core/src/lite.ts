@@ -27,7 +27,7 @@
  *     analytics: { autoTrackPageViews: true }
  *   };
  * </script>
- * <script src="https://cdn.example.com/kitbase-lite.min.js"></script>
+ * <script src="https://kitbase.dev/script.js"></script>
  * <script>
  *   window.kitbase.track({ channel: 'web', event: 'Page Loaded' });
  * </script>

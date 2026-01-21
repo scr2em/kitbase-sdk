@@ -30,7 +30,7 @@ const DEFAULT_STORAGE_KEY = '_ka_anonymous_id';
 const DEFAULT_SESSION_STORAGE_KEY = '_ka_session';
 const DEFAULT_OPT_OUT_STORAGE_KEY = '_ka_opt_out';
 const DEFAULT_SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes
-const ANALYTICS_CHANNEL = '_analytics';
+const ANALYTICS_CHANNEL = '__analytics';
 
 /**
  * In-memory storage fallback for non-browser environments

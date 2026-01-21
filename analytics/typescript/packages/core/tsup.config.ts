@@ -14,6 +14,7 @@ export default defineConfig([
   // Lite SDK (without offline queue - smaller bundle, IIFE for script tags)
   {
     entry: { lite: 'src/lite.ts' },
+    platform: 'browser',
     format: ['iife'],
     dts: false,
     sourcemap: false,
