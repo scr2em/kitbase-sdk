@@ -147,7 +147,7 @@ export class KitbaseAnalytics {
     this.sessionTimeout = config.analytics?.sessionTimeout ?? DEFAULT_SESSION_TIMEOUT;
     this.sessionStorageKey = config.analytics?.sessionStorageKey ?? DEFAULT_SESSION_STORAGE_KEY;
     this.analyticsEnabled = config.analytics?.autoTrackSessions ?? true;
-    this.autoTrackPageViews = config.analytics?.autoTrackPageViews ?? false;
+    this.autoTrackPageViews = config.analytics?.autoTrackPageViews ?? true;
     this.autoTrackOutboundLinks = config.analytics?.autoTrackOutboundLinks ?? true;
 
     // Load existing session from storage
