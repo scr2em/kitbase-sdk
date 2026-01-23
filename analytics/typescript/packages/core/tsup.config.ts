@@ -13,7 +13,7 @@ export default defineConfig([
   },
   // Lite SDK (without offline queue - smaller bundle, IIFE for script tags)
   {
-    entry: { lite: 'src/lite.ts' },
+    entry: { lite: 'src/lite.ts', },
     platform: 'browser',
     format: ['iife'],
     dts: false,
@@ -23,5 +23,6 @@ export default defineConfig([
     splitting: false,
     globalName: 'Kitbase',
     minify: true,
+    outExtension: () => ({ js: '.js' }),
   },
 ]);
