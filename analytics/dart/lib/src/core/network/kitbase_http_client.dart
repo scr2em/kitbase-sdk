@@ -1,12 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:http/http.dart' as http;
-
-import '../constants.dart';
-import '../exceptions/exceptions.dart';
-import 'kitbase_http_response.dart';
-import 'network_error_detector.dart';
+import 'package:kitbase_analytics/src/core/constants.dart';
+import 'package:kitbase_analytics/src/core/exceptions/exceptions.dart';
+import 'package:kitbase_analytics/src/core/network/kitbase_http_response.dart';
+import 'package:kitbase_analytics/src/core/network/network_error_detector.dart';
+import 'package:kitbase_analytics/src/core/utils/kitbase_logger.dart';
 
 /// Singleton HTTP client for Kitbase SDK.
 ///
@@ -64,11 +63,21 @@ class KitbaseHttpClient {
     _ensureInitialized();
 
     final uri = _buildUri(path, queryParameters);
+    final requestHeaders = _buildHeaders(headers);
+    final requestBody = data != null ? jsonEncode(data) : null;
+
+    _logCurl(
+      method: 'POST',
+      uri: uri,
+      headers: requestHeaders,
+      body: requestBody,
+    );
+
     return _executeRequest(
       () => _client!.post(
         uri,
-        headers: _buildHeaders(headers),
-        body: data != null ? jsonEncode(data) : null,
+        headers: requestHeaders,
+        body: requestBody,
       ),
     );
   }
@@ -115,24 +124,81 @@ class KitbaseHttpClient {
   ) async {
     try {
       final response = await request().timeout(KitbaseConstants.timeout);
+
+      // Map status codes to exceptions
+      if (response.statusCode == 401 || response.statusCode == 403) {
+        throw KitbaseAuthenticationException(
+          'Authentication failed: ${response.statusCode}',
+        );
+      }
+
+      if (response.statusCode >= 400 && response.statusCode < 500) {
+        final parsedBody = _tryParseJson(response.body);
+        String message = response.body;
+        if (parsedBody is Map && parsedBody['message'] != null) {
+          message = parsedBody['message'].toString();
+        }
+
+        throw KitbaseApiException(
+          'API error: $message',
+          statusCode: response.statusCode,
+          response: parsedBody,
+        );
+      }
+
+      if (response.statusCode >= 500) {
+        throw KitbaseApiException(
+          'Server error',
+          statusCode: response.statusCode,
+          response: _tryParseJson(response.body),
+        );
+      }
+
       return KitbaseHttpResponse(
         data: _tryParseJson(response.body),
         statusCode: response.statusCode,
       );
+    } on TimeoutException {
+      throw const KitbaseTimeoutException();
     } catch (e) {
+      if (e is KitbaseException) rethrow;
+
       if (NetworkErrorDetector.isConnectionError(e)) {
-        return const KitbaseHttpResponse(isConnectionError: true);
+        throw const KitbaseConnectionException();
       }
       rethrow;
     }
   }
 
-  dynamic _tryParseJson(String body) {
+  Object? _tryParseJson(String body) {
     if (body.isEmpty) return null;
     try {
       return jsonDecode(body);
     } catch (_) {
       return body;
     }
+  }
+
+  void _logCurl({
+    required String method,
+    required Uri uri,
+    required Map<String, String> headers,
+    String? body,
+  }) {
+    final buffer = StringBuffer();
+    buffer.write('curl -X $method \'$uri\'');
+    headers.forEach((key, value) {
+      buffer.write(' -H \'$key: $value\'');
+    });
+    if (body != null) {
+      buffer.write(' -d \'$body\'');
+    }
+    KitbaseLogger.info(
+      '----------------------------------------------------------------',
+    );
+    KitbaseLogger.info(buffer.toString());
+    KitbaseLogger.info(
+      '----------------------------------------------------------------',
+    );
   }
 }
