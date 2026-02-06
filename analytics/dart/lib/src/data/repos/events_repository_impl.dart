@@ -1,8 +1,8 @@
-import 'package:kitbase_events/src/data/data_sources/events_remote_data_source.dart';
-import 'package:kitbase_events/src/core/network/kitbase_http_response.dart';
-import 'package:kitbase_events/src/data/parsers/track_response_parser.dart';
-import 'package:kitbase_events/src/core/network/network_helpers.dart';
-import 'package:kitbase_events/events.dart';
+import 'package:kitbase_analytics/src/data/data_sources/events_remote_data_source.dart';
+import 'package:kitbase_analytics/src/core/network/kitbase_http_response.dart';
+import 'package:kitbase_analytics/src/data/parsers/track_response_parser.dart';
+import 'package:kitbase_analytics/src/core/network/network_helpers.dart';
+import 'package:kitbase_analytics/events.dart';
 
 /// Implementation of [EventsRepository].
 class EventsRepositoryImpl implements EventsRepository {

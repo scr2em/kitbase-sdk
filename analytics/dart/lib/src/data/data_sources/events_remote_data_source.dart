@@ -1,8 +1,8 @@
-import 'package:kitbase_events/src/data/parsers/track_options_parser.dart';
-import 'package:kitbase_events/src/core/network/kitbase_http_response.dart';
-import 'package:kitbase_events/src/core/network/kitbase_http_client.dart';
-import 'package:kitbase_events/src/data/constants.dart';
-import 'package:kitbase_events/events.dart';
+import 'package:kitbase_analytics/src/data/parsers/track_options_parser.dart';
+import 'package:kitbase_analytics/src/core/network/kitbase_http_response.dart';
+import 'package:kitbase_analytics/src/core/network/kitbase_http_client.dart';
+import 'package:kitbase_analytics/src/data/constants.dart';
+import 'package:kitbase_analytics/events.dart';
 
 /// Remote data source for events API.
 abstract class EventsRemoteDataSource {

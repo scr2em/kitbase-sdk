@@ -20,11 +20,11 @@ import 'domain/repos/events_repository.dart';
 ///   tags: {'plan': 'premium', 'cycle': 'monthly'},
 /// );
 /// ```
-class KitbaseEvents {
+class KitbaseAnalytics {
   final EventsRepository _repository;
 
-  /// Creates a new KitbaseEvents instance.
-  KitbaseEvents({EventsRepository? repository})
+  /// Creates a new KitbaseAnalytics instance.
+  KitbaseAnalytics({EventsRepository? repository})
       : _repository = repository ??
             const EventsRepositoryImpl(
               remoteDataSource: EventsRemoteDataSourceImpl(),

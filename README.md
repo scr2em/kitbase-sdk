@@ -2,35 +2,6 @@
 
 Official SDKs for [Kitbase](https://kitbase.io).
 
-## Repository Structure
-
-This monorepo is organized by **feature**, with each feature available in multiple languages/platforms:
-
-```
-kitbase-sdk/
-├── customEvents/          # Analytics & Event tracking
-│   ├── typescript/        # @kitbase/analytics (npm)
-│   │   ├── packages/core      # @kitbase/analytics
-│   │   ├── packages/react     # @kitbase/analytics-react
-│   │   └── packages/angular   # @kitbase/analytics-angular
-│   ├── dart/              # kitbase_analytics (pub.dev)
-│   └── php/               # kitbase/analytics (packagist)
-│
-├── changelogs/            # Changelog management
-│   ├── typescript/        # @kitbase/changelogs (npm)
-│   ├── react/             # @kitbase/changelogs-react (npm)
-│   ├── dart/              # kitbase_changelogs (pub.dev)
-│   └── php/               # kitbase/changelogs (packagist)
-│
-├── flags/                 # Feature flags
-│   ├── typescript/        # @kitbase/flags (npm)
-│   ├── react/             # @kitbase/flags-react (npm)
-│   ├── dart/              # kitbase_flags (pub.dev)
-│   └── php/               # kitbase/flags (packagist)
-│
-└── ionic/                 # CLI tool for Ionic/Capacitor apps
-```
-
 ## Packages
 
 ### Analytics (Custom Events)
@@ -44,17 +15,6 @@ Track events and analytics in your application.
 | Angular    | `@kitbase/analytics-angular`| `npm install @kitbase/analytics-angular`|
 | Dart       | `kitbase_analytics`        | `dart pub add kitbase_analytics`      |
 | PHP        | `kitbase/analytics`        | `composer require kitbase/analytics`  |
-
-### Changelogs
-
-Fetch and display product changelogs.
-
-| Platform   | Package                  | Install                             |
-|------------|--------------------------|-------------------------------------|
-| TypeScript | `@kitbase/changelogs`    | `npm install @kitbase/changelogs`   |
-| React      | `@kitbase/changelogs-react` | `npm install @kitbase/changelogs-react` |
-| Dart       | `kitbase_changelogs`     | `dart pub add kitbase_changelogs`   |
-| PHP        | `kitbase/changelogs`     | `composer require kitbase/changelogs`|
 
 ### Feature Flags
 
@@ -145,7 +105,7 @@ export class MyComponent {
 ### Dart / Flutter
 
 ```dart
-import 'package:kitbase_analytics/analytics.dart';
+import 'package:kitbase_analytics/events.dart';
 
 final analytics = KitbaseAnalytics(token: '<YOUR_API_KEY>');
 
