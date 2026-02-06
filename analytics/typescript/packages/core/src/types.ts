@@ -2,15 +2,6 @@ import type { OfflineConfig } from './queue/types.js';
 import type { BotDetectionConfig } from './botDetection.js';
 
 /**
- * Storage interface for anonymous ID persistence
- */
-export interface Storage {
-  getItem(key: string): string | null;
-  setItem(key: string, value: string): void;
-  removeItem(key: string): void;
-}
-
-/**
  * Configuration options for offline event queueing
  */
 export type { OfflineConfig };
@@ -61,19 +52,6 @@ export interface KitbaseConfig {
   baseUrl?: string;
 
   /**
-   * Custom storage for anonymous ID persistence.
-   * Defaults to localStorage in browser, in-memory storage otherwise.
-   * Set to null to disable anonymous ID persistence (will generate new ID each session).
-   */
-  storage?: Storage | null;
-
-  /**
-   * Storage key for the anonymous ID.
-   * @default '_ka_anonymous_id'
-   */
-  storageKey?: string;
-
-  /**
    * Enable debug mode for console logging.
    * @default false
    */
@@ -88,7 +66,7 @@ export interface KitbaseConfig {
 
   /**
    * Analytics tracking configuration.
-   * Enables session tracking, pageview tracking, and revenue tracking.
+   * Enables pageview tracking and revenue tracking.
    */
   analytics?: AnalyticsConfig;
 
@@ -158,11 +136,6 @@ export interface TrackOptions {
    */
   tags?: Tags;
 
-  /**
-   * Whether to include the anonymous ID in this event.
-   * @default true
-   */
-  includeAnonymousId?: boolean;
 }
 
 /**
@@ -192,33 +165,20 @@ export interface LogPayload {
   channel: string;
   event: string;
   user_id?: string;
-  anonymous_id?: string;
   icon?: string;
   notify?: boolean;
   description?: string;
   tags?: Tags;
   /**
    * Client-side timestamp (ms since epoch) when the event occurred.
-   * Used for accurate session duration calculation, especially in offline mode.
+   * Added by the offline queue for accurate timing of queued events.
    */
-  timestamp?: number;
+  client_timestamp?: number;
 }
 
 // ============================================================
 // Analytics Types
 // ============================================================
-
-/**
- * Session data for analytics tracking
- */
-export interface Session {
-  id: string;
-  startedAt: number;
-  lastActivityAt: number;
-  screenViewCount: number;
-  entryPath?: string;
-  entryReferrer?: string;
-}
 
 /**
  * Configuration for analytics tracking
@@ -231,29 +191,11 @@ export interface AnalyticsConfig {
   autoTrackPageViews?: boolean;
 
   /**
-   * Enable automatic session tracking
-   * @default true
-   */
-  autoTrackSessions?: boolean;
-
-  /**
    * Enable automatic outbound link click tracking
    * Tracks when users click links to external domains
    * @default true
    */
   autoTrackOutboundLinks?: boolean;
-
-  /**
-   * Session timeout in milliseconds (default: 30 minutes)
-   * @default 1800000
-   */
-  sessionTimeout?: number;
-
-  /**
-   * Storage key for session data
-   * @default '_ka_session'
-   */
-  sessionStorageKey?: string;
 }
 
 /**

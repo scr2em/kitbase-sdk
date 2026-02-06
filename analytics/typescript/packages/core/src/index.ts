@@ -8,10 +8,8 @@ export type {
   TrackResponse,
   Tags,
   TagValue,
-  Storage,
   OfflineConfig,
   // Analytics types
-  Session,
   AnalyticsConfig,
   PageViewOptions,
   RevenueOptions,

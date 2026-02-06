@@ -263,19 +263,49 @@ const kitbase = new Kitbase({
 });
 ```
 
-### Script Tag (Auto-initialization)
+## CDN Usage
+
+For quick integration without a build step, use the hosted script with `window.KITBASE_CONFIG`:
+
+```html
+<script>
+  window.KITBASE_CONFIG = {
+    token: 'your-api-key',
+  };
+</script>`
+<script defer src="https://kitbase.dev/script.js"></script>
+```
+
+The script auto-initializes and exposes `window.kitbase` for tracking events.
+
+### Configuration Options
 
 ```html
 <script>
   window.KITBASE_CONFIG = {
     token: 'your-api-key',
     debug: true,
-    analytics: { autoTrackPageViews: true }
+    analytics: {
+      autoTrackPageViews: true,
+      autoTrackSessions: true,
+      sessionTimeout: 1800000, // 30 minutes in ms
+    },
   };
 </script>
-<script src="https://cdn.example.com/lite.global.js"></script>
+<script defer src="https://kitbase.dev/script.js"></script>
+```
+
+### Tracking Events
+
+Once loaded, use the global `window.kitbase` instance:
+
+```html
 <script>
-  window.kitbase.track({ channel: 'web', event: 'Page Loaded' });
+  window.kitbase.track({
+    channel: 'web',
+    event: 'Button Clicked',
+    tags: { button_id: 'signup' },
+  });
 </script>
 ```
 

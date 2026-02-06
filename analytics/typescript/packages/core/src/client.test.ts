@@ -101,9 +101,7 @@ describe('KitbaseAnalytics', () => {
       expect(body).toEqual({
         channel: 'payments',
         event: 'New Subscription',
-        timestamp: expect.any(Number),
         user_id: 'user-123',
-        anonymous_id: expect.any(String),
         icon: '💰',
         notify: true,
         description: 'User subscribed',

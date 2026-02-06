@@ -54,7 +54,6 @@ import {
   type RevenueOptions,
   type IdentifyOptions,
   type Tags,
-  type Session,
 } from '@kitbase/analytics';
 
 // Re-export types from core
@@ -66,7 +65,6 @@ export type {
   RevenueOptions,
   IdentifyOptions,
   Tags,
-  Session,
 };
 
 /**
@@ -166,14 +164,7 @@ export class KitbaseAnalyticsService implements OnDestroy {
   }
 
   /**
-   * Get the anonymous ID
-   */
-  getAnonymousId(): string | null {
-    return this.kitbase.getAnonymousId();
-  }
-
-  /**
-   * Reset user identity and session
+   * Reset user identity
    */
   reset(): void {
     this.kitbase.reset();
@@ -248,24 +239,6 @@ export class KitbaseAnalyticsService implements OnDestroy {
    */
   getEventDuration(eventName: string): number | null {
     return this.kitbase.getEventDuration(eventName);
-  }
-
-  // ============================================================
-  // Session Management
-  // ============================================================
-
-  /**
-   * Get current session ID
-   */
-  getSessionId(): string | null {
-    return this.kitbase.getSessionId();
-  }
-
-  /**
-   * Get current session data
-   */
-  getSession(): Session | null {
-    return this.kitbase.getSession();
   }
 
   // ============================================================

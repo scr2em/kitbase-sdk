@@ -10,7 +10,6 @@
  * - User identification (identify, reset)
  * - Super properties (register, registerOnce, unregister)
  * - Time events (timeEvent, cancelTimeEvent)
- * - Session management
  * - Bot detection
  * - Privacy/consent management (optOut, optIn)
  *
@@ -27,7 +26,7 @@
  *     analytics: { autoTrackPageViews: true }
  *   };
  * </script>
- * <script src="https://cdn.example.com/kitbase-lite.min.js"></script>
+ * <script src="https://kitbase.dev/script.js"></script>
  * <script>
  *   window.kitbase.track({ channel: 'web', event: 'Page Loaded' });
  * </script>
@@ -53,8 +52,6 @@ export type {
   TrackResponse,
   Tags,
   TagValue,
-  Storage,
-  Session,
   AnalyticsConfig,
   PageViewOptions,
   RevenueOptions,

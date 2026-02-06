@@ -1,117 +1,119 @@
-# Kitbase Analytics SDK for Dart & Flutter
+# kitbase_analytics
 
-A robust, offline-first analytics SDK with plug-and-play support for Mobile and Web.
-
-## Features
-
-- **Offline Support**: Events are queued locally (via Sembast) when offline and synced when online.
-- **Web Support**: Uses native IndexedDB (Zero configuration - no WASM assets or server headers required).
-- **Auto-Retry**: Automatically retries failed logs with exponential backoff.
-- **Session Tracking**: Automatic session management.
-- **User Identity**: Identify users and set super properties.
-- **Thread Safe**: Handles concurrent writes and logic safely.
+Kitbase Analytics SDK for Dart and Flutter. Track events and logs in your application with a simple, type-safe API.
 
 ## Installation
 
-Add to your `pubspec.yaml`:
+Add `kitbase_analytics` to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
   kitbase_analytics: ^0.1.0
 ```
 
-## Usage
+Then run:
 
-### 1. Initialization
+```sh
+dart pub get
+```
 
-Initialize the SDK once at the start of your application:
+## Quick Start
 
 ```dart
-import 'package:kitbase_analytics/kitbase_analytics.dart';
+import 'package:kitbase_analytics/events.dart';
 
-void main() async {
-  // Initialize the singleton
-  KitbaseAnalytics.init(KitbaseConfig(
-    token: 'YOUR_API_TOKEN',
-    baseUrl: 'https://api.kitbase.dev', // Optional, defaults to production
-    debug: true, // Enable debug logging
-  ));
-  
-  runApp(MyApp());
+final events = KitbaseAnalytics();
+
+final response = await events.track(
+  channel: 'payments',
+  event: 'New Subscription',
+  userId: 'user-123',
+  icon: '💰',
+  notify: true,
+  tags: {'plan': 'premium', 'cycle': 'monthly'},
+);
+
+print(response.id);        // unique event ID
+print(response.event);     // "New Subscription"
+print(response.timestamp); // ISO 8601 timestamp
+```
+
+## API Reference
+
+### `KitbaseAnalytics`
+
+Create an instance to start tracking events. The SDK communicates with the Kitbase API at `https://api.kitbase.dev`.
+
+### `track()`
+
+Send an event to Kitbase.
+
+| Parameter     | Type                    | Required | Description                        |
+|---------------|-------------------------|----------|------------------------------------|
+| `channel`     | `String`                | Yes      | Category for the event             |
+| `event`       | `String`                | Yes      | Name of the event                  |
+| `userId`      | `String?`               | No       | User identifier                    |
+| `icon`        | `String?`               | No       | Emoji or icon name                 |
+| `notify`      | `bool?`                 | No       | Whether to send a notification     |
+| `description` | `String?`               | No       | Event description                  |
+| `tags`        | `Map<String, dynamic>?` | No       | Key-value metadata for the event   |
+
+### Response
+
+`track()` returns a `Future<TrackResponse>` with the following fields:
+
+| Field       | Type     | Description              |
+|-------------|----------|--------------------------|
+| `id`        | `String` | Unique event identifier  |
+| `event`     | `String` | Name of the tracked event|
+| `timestamp` | `String` | ISO 8601 timestamp       |
+
+## Error Handling
+
+The SDK throws typed exceptions so you can handle each failure case precisely.
+
+```dart
+import 'package:kitbase_analytics/events.dart';
+
+final events = KitbaseAnalytics();
+
+try {
+  await events.track(
+    channel: 'payments',
+    event: 'New Subscription',
+  );
+} on KitbaseValidationException catch (e) {
+  // A required field is missing or invalid
+  print('Validation error on field: ${e.field}');
+} on KitbaseAuthenticationException {
+  // The API key is invalid or missing
+  print('Authentication failed');
+} on KitbaseApiException catch (e) {
+  // The API returned a non-success status code
+  print('API error ${e.statusCode}: ${e.response}');
+} on KitbaseTimeoutException {
+  // The request timed out
+  print('Request timed out');
+} on KitbaseConnectionException {
+  // A network error occurred
+  print('Connection failed');
 }
 ```
 
-### 2. Tracking Events
+### Exception Types
 
-Use the static methods or singleton instance to track events anywhere:
+| Exception                        | Description                          | Properties              |
+|----------------------------------|--------------------------------------|-------------------------|
+| `KitbaseValidationException`     | Required field missing or invalid    | `field`                 |
+| `KitbaseAuthenticationException` | Invalid or missing API key           | --                      |
+| `KitbaseApiException`            | API returned an error response       | `statusCode`, `response`|
+| `KitbaseConnectionException`     | Network connectivity error           | --                      |
+| `KitbaseTimeoutException`        | Request exceeded the time limit      | --                      |
 
-```dart
-// Simple event tracking
-await KitbaseAnalytics.track(TrackOptions(
-  channel: 'marketing',
-  event: 'Sign Up Clicked',
-));
+## Requirements
 
-// Event with properties (tags)
-await KitbaseAnalytics.track(TrackOptions(
-  channel: 'ecommerce',
-  event: 'Item Purchased',
-  tags: {
-    'item_id': 'prod_123',
-    'price': 29.99,
-    'currency': 'USD',
-  },
-));
-```
+- Dart SDK `>=3.0.0 <4.0.0`
 
-### 3. User Identification
+## Documentation
 
-Identify users to link events to specific user profiles:
-
-```dart
-// Identify a user
-KitbaseAnalytics.identify(IdentifyOptions(
-  userId: 'user_5678',
-  traits: {
-    'plan': 'premium',
-    'role': 'admin',
-  },
-));
-```
-
-### 4. Reset User Identity
-
-To clear the current user identity (e.g., on logout):
-
-```dart
-KitbaseAnalytics.unidentify();
-```
-
-### 5. Super Properties
-
-Register properties that are effectively "global" and sent with every event:
-
-```dart
-// Register properties included with all future events
-KitbaseAnalytics.registerSuperPropertie({
-  'app_version': '1.0.0',
-  'environment': 'production',
-});
-```
-
-### 6. Privacy & Consent
-
-Handle user opt-outs for privacy compliance (GDPR/CCPA):
-
-```dart
-// unexpected user opt-out
-await KitbaseAnalytics.optOut();
-
-// Check status
-if (KitbaseAnalytics.isOptedOut()) {
-  // ...
-}
-
-// User opt-in
-await KitbaseAnalytics.optIn();
-```
+For full documentation, visit [docs.kitbase.dev](https://docs.kitbase.dev).
