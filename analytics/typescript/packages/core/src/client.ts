@@ -26,7 +26,7 @@ import type { QueuedEvent, QueueStats } from './queue/types.js';
  * // Register super properties (included in all events)
  * kitbase.register({ app_version: '2.1.0', platform: 'web' });
  *
- * // Track anonymous events (anonymous_id is automatically included)
+ * // Track events
  * await kitbase.track({
  *   channel: 'payments',
  *   event: 'Page Viewed',
@@ -237,9 +237,6 @@ export class KitbaseAnalytics extends KitbaseAnalyticsBase {
       this.log('Timer stopped', { event: options.event, duration });
     }
 
-    // Include anonymous_id unless explicitly disabled
-    const includeAnonymousId = options.includeAnonymousId !== false;
-
     // Merge super properties with event tags (event tags take precedence)
     const mergedTags: Tags = {
       ...this.superProperties,
@@ -250,9 +247,7 @@ export class KitbaseAnalytics extends KitbaseAnalyticsBase {
     const payload: LogPayload = {
       channel: options.channel,
       event: options.event,
-      timestamp: Date.now(),
       ...(options.user_id && { user_id: options.user_id }),
-      ...(includeAnonymousId && this.anonymousId && { anonymous_id: this.anonymousId }),
       ...(options.icon && { icon: options.icon }),
       ...(options.notify !== undefined && { notify: options.notify }),
       ...(options.description && { description: options.description }),
@@ -263,8 +258,14 @@ export class KitbaseAnalytics extends KitbaseAnalyticsBase {
 
     // If offline queueing is enabled, use write-ahead pattern
     if (this.queue) {
+      // Add client_timestamp for accurate timing of queued events
+      const queuedPayload: LogPayload = {
+        ...payload,
+        client_timestamp: Date.now(),
+      };
+
       // Always write to DB first (guaranteed durability)
-      await this.queue.enqueue(payload);
+      await this.queue.enqueue(queuedPayload);
       this.log('Event persisted to queue');
 
       // Trigger an immediate flush attempt (non-blocking)

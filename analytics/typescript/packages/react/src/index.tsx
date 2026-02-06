@@ -394,24 +394,6 @@ export function useSuperProperties(
 }
 
 /**
- * Hook to get the current anonymous ID.
- *
- * @returns The anonymous ID or null
- *
- * @example
- * ```tsx
- * function DebugPanel() {
- *   const anonymousId = useAnonymousId();
- *   return <div>Anonymous ID: {anonymousId}</div>;
- * }
- * ```
- */
-export function useAnonymousId(): string | null {
-  const kitbase = useKitbaseAnalytics();
-  return kitbase.getAnonymousId();
-}
-
-/**
  * Hook to get the current user ID (set via identify).
  *
  * @returns The user ID or null
@@ -431,7 +413,7 @@ export function useUserId(): string | null {
 }
 
 /**
- * Hook to reset the user identity and session.
+ * Hook to reset the user identity.
  *
  * @returns A function to reset the user
  *

@@ -10,7 +10,6 @@
  * - User identification (identify, reset)
  * - Super properties (register, registerOnce, unregister)
  * - Time events (timeEvent, cancelTimeEvent)
- * - Session management
  * - Bot detection
  * - Privacy/consent management (optOut, optIn)
  *
@@ -53,8 +52,6 @@ export type {
   TrackResponse,
   Tags,
   TagValue,
-  Storage,
-  Session,
   AnalyticsConfig,
   PageViewOptions,
   RevenueOptions,

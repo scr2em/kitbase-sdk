@@ -1,11 +1,8 @@
-import { v4 as uuidv4 } from 'uuid';
 import type {
   TrackOptions,
   TrackResponse,
   LogPayload,
-  Storage,
   Tags,
-  Session,
   PageViewOptions,
   RevenueOptions,
   IdentifyOptions,
@@ -26,39 +23,25 @@ import {
 
 const DEFAULT_BASE_URL = 'https://api.kitbase.dev';
 const TIMEOUT = 30000;
-const DEFAULT_STORAGE_KEY = '_ka_anonymous_id';
-const DEFAULT_SESSION_STORAGE_KEY = '_ka_session';
 const DEFAULT_OPT_OUT_STORAGE_KEY = '_ka_opt_out';
-const DEFAULT_SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes
 const ANALYTICS_CHANNEL = '__analytics';
 
 /**
- * In-memory storage fallback for non-browser environments
+ * Simple storage interface used internally for opt-out persistence
  */
-class MemoryStorage implements Storage {
-  private data: Map<string, string> = new Map();
-
-  getItem(key: string): string | null {
-    return this.data.get(key) ?? null;
-  }
-
-  setItem(key: string, value: string): void {
-    this.data.set(key, value);
-  }
-
-  removeItem(key: string): void {
-    this.data.delete(key);
-  }
+interface SimpleStorage {
+  getItem(key: string): string | null;
+  setItem(key: string, value: string): void;
 }
 
 /**
- * Get the default storage (localStorage in browser, memory otherwise)
+ * Get the default storage (localStorage in browser, or null)
  */
-function getDefaultStorage(): Storage {
+function getDefaultStorage(): SimpleStorage | null {
   if (typeof window !== 'undefined' && window.localStorage) {
     return window.localStorage;
   }
-  return new MemoryStorage();
+  return null;
 }
 
 /**
@@ -79,7 +62,7 @@ function getDefaultStorage(): Storage {
  * // Register super properties (included in all events)
  * kitbase.register({ app_version: '2.1.0', platform: 'web' });
  *
- * // Track anonymous events (anonymous_id is automatically included)
+ * // Track events
  * await kitbase.track({
  *   channel: 'payments',
  *   event: 'Page Viewed',
@@ -90,9 +73,6 @@ function getDefaultStorage(): Storage {
 export class KitbaseAnalytics {
   protected readonly token: string;
   protected readonly baseUrl: string;
-  protected readonly storage: Storage | null;
-  protected readonly storageKey: string;
-  protected anonymousId: string | null = null;
 
   // Super properties (memory-only, merged into all events)
   protected superProperties: Tags = {};
@@ -103,15 +83,10 @@ export class KitbaseAnalytics {
   // Debug mode
   protected debugMode: boolean;
 
-  // Analytics & Session tracking
-  protected session: Session | null = null;
-  protected sessionTimeout: number;
-  protected sessionStorageKey: string;
-  protected analyticsEnabled: boolean;
+  // Analytics tracking
   protected autoTrackPageViews: boolean;
   protected autoTrackOutboundLinks: boolean;
   protected userId: string | null = null;
-  protected unloadListenerAdded = false;
   protected clickListenerAdded = false;
 
   // Bot detection
@@ -121,6 +96,7 @@ export class KitbaseAnalytics {
   // Privacy & Consent
   protected optedOut: boolean = false;
   protected optOutStorageKey: string;
+  private optOutStorage: SimpleStorage | null;
 
   constructor(config: KitbaseLiteConfig) {
     if (!config.token) {
@@ -130,35 +106,15 @@ export class KitbaseAnalytics {
     this.token = config.token;
     // Remove trailing slashes to prevent double-slash in URLs
     this.baseUrl = (config.baseUrl ?? DEFAULT_BASE_URL).replace(/\/+$/, '');
-    this.storageKey = config.storageKey ?? DEFAULT_STORAGE_KEY;
     this.debugMode = config.debug ?? false;
 
-    // Initialize storage (null means disabled)
-    if (config.storage === null) {
-      this.storage = null;
-    } else {
-      this.storage = config.storage ?? getDefaultStorage();
-    }
-
-    // Load or generate anonymous ID
-    this.initializeAnonymousId();
-
     // Initialize analytics configuration
-    this.sessionTimeout = config.analytics?.sessionTimeout ?? DEFAULT_SESSION_TIMEOUT;
-    this.sessionStorageKey = config.analytics?.sessionStorageKey ?? DEFAULT_SESSION_STORAGE_KEY;
-    this.analyticsEnabled = config.analytics?.autoTrackSessions ?? true;
     this.autoTrackPageViews = config.analytics?.autoTrackPageViews ?? true;
     this.autoTrackOutboundLinks = config.analytics?.autoTrackOutboundLinks ?? true;
 
-    // Load existing session from storage
-    if (this.analyticsEnabled) {
-      this.loadSession();
-      this.setupUnloadListener();
-
-      // Auto-track pageviews if enabled
-      if (this.autoTrackPageViews && typeof window !== 'undefined') {
-        this.enableAutoPageViews();
-      }
+    // Auto-track pageviews if enabled
+    if (this.autoTrackPageViews && typeof window !== 'undefined') {
+      this.enableAutoPageViews();
     }
 
     // Setup outbound link tracking if enabled
@@ -186,35 +142,8 @@ export class KitbaseAnalytics {
 
     // Initialize privacy/consent settings
     this.optOutStorageKey = config.privacy?.optOutStorageKey ?? DEFAULT_OPT_OUT_STORAGE_KEY;
+    this.optOutStorage = getDefaultStorage();
     this.initializeOptOutState(config.privacy?.optOutByDefault ?? false);
-  }
-
-  /**
-   * Initialize the anonymous ID from storage or generate a new one
-   */
-  protected initializeAnonymousId(): void {
-    if (this.storage) {
-      const stored = this.storage.getItem(this.storageKey);
-      if (stored) {
-        this.anonymousId = stored;
-        return;
-      }
-    }
-
-    // Generate new anonymous ID
-    this.anonymousId = uuidv4();
-
-    // Persist if storage is available
-    if (this.storage && this.anonymousId) {
-      this.storage.setItem(this.storageKey, this.anonymousId);
-    }
-  }
-
-  /**
-   * Get the current anonymous ID
-   */
-  getAnonymousId(): string | null {
-    return this.anonymousId;
   }
 
   // ============================================================
@@ -522,8 +451,8 @@ export class KitbaseAnalytics {
    * Initialize opt-out state from storage or default
    */
   protected initializeOptOutState(optOutByDefault: boolean): void {
-    if (this.storage) {
-      const stored = this.storage.getItem(this.optOutStorageKey);
+    if (this.optOutStorage) {
+      const stored = this.optOutStorage.getItem(this.optOutStorageKey);
       if (stored !== null) {
         this.optedOut = stored === 'true';
         this.log('Opt-out state loaded from storage', { optedOut: this.optedOut });
@@ -553,16 +482,8 @@ export class KitbaseAnalytics {
     this.optedOut = true;
 
     // Persist to storage
-    if (this.storage) {
-      this.storage.setItem(this.optOutStorageKey, 'true');
-    }
-
-    // End current session
-    if (this.session) {
-      if (this.storage) {
-        this.storage.removeItem(this.sessionStorageKey);
-      }
-      this.session = null;
+    if (this.optOutStorage) {
+      this.optOutStorage.setItem(this.optOutStorageKey, 'true');
     }
 
     this.log('User opted out of tracking');
@@ -583,8 +504,8 @@ export class KitbaseAnalytics {
     this.optedOut = false;
 
     // Persist to storage
-    if (this.storage) {
-      this.storage.setItem(this.optOutStorageKey, 'false');
+    if (this.optOutStorage) {
+      this.optOutStorage.setItem(this.optOutStorageKey, 'false');
     }
 
     this.log('User opted in to tracking');
@@ -664,9 +585,6 @@ export class KitbaseAnalytics {
       this.log('Timer stopped', { event: options.event, duration });
     }
 
-    // Include anonymous_id unless explicitly disabled
-    const includeAnonymousId = options.includeAnonymousId !== false;
-
     // Merge super properties with event tags (event tags take precedence)
     const mergedTags: Tags = {
       ...this.superProperties,
@@ -677,9 +595,7 @@ export class KitbaseAnalytics {
     const payload: LogPayload = {
       channel: options.channel,
       event: options.event,
-      timestamp: Date.now(),
       ...(options.user_id && { user_id: options.user_id }),
-      ...(includeAnonymousId && this.anonymousId && { anonymous_id: this.anonymousId }),
       ...(options.icon && { icon: options.icon }),
       ...(options.notify !== undefined && { notify: options.notify }),
       ...(options.description && { description: options.description }),
@@ -766,159 +682,8 @@ export class KitbaseAnalytics {
   }
 
   // ============================================================
-  // Analytics & Session Management
+  // Analytics
   // ============================================================
-
-  /**
-   * Load session from storage
-   */
-  protected loadSession(): void {
-    if (!this.storage) return;
-
-    try {
-      const stored = this.storage.getItem(this.sessionStorageKey);
-      if (stored) {
-        const session = JSON.parse(stored) as Session;
-        const now = Date.now();
-
-        // Check if session is still valid (not expired)
-        if (now - session.lastActivityAt < this.sessionTimeout) {
-          this.session = session;
-          this.log('Session restored', { sessionId: session.id });
-        } else {
-          // Session expired, will create new one on next activity
-          this.storage.removeItem(this.sessionStorageKey);
-          this.log('Session expired, removed from storage');
-        }
-      }
-    } catch (error) {
-      this.log('Failed to load session from storage', error);
-    }
-  }
-
-  /**
-   * Save session to storage
-   */
-  protected saveSession(): void {
-    if (!this.storage || !this.session) return;
-
-    try {
-      this.storage.setItem(this.sessionStorageKey, JSON.stringify(this.session));
-    } catch (error) {
-      this.log('Failed to save session to storage', error);
-    }
-  }
-
-  /**
-   * Get or create a session
-   */
-  protected getOrCreateSession(): Session {
-    const now = Date.now();
-
-    // Check if session expired
-    if (this.session && (now - this.session.lastActivityAt) > this.sessionTimeout) {
-      this.endSession();
-      this.session = null;
-    }
-
-    // Create new session if needed
-    if (!this.session) {
-      const referrer = typeof document !== 'undefined' ? document.referrer : undefined;
-      const path = typeof window !== 'undefined' ? window.location.pathname : undefined;
-
-      this.session = {
-        id: uuidv4(),
-        startedAt: now,
-        lastActivityAt: now,
-        screenViewCount: 0,
-        entryPath: path,
-        entryReferrer: referrer,
-      };
-
-      this.log('New session created', { sessionId: this.session.id });
-      this.trackSessionStart();
-    }
-
-    // Update last activity
-    this.session.lastActivityAt = now;
-    this.saveSession();
-
-    return this.session;
-  }
-
-  /**
-   * Get the current session ID (or null if no active session)
-   */
-  getSessionId(): string | null {
-    return this.session?.id ?? null;
-  }
-
-  /**
-   * Get the current session data
-   */
-  getSession(): Session | null {
-    return this.session ? { ...this.session } : null;
-  }
-
-  /**
-   * Track session start event
-   */
-  protected trackSessionStart(): void {
-    if (!this.session) return;
-
-    const utmParams = this.getUtmParams();
-
-    this.track({
-      channel: ANALYTICS_CHANNEL,
-      event: 'session_start',
-      tags: {
-        __session_id: this.session.id,
-        __path: this.session.entryPath ?? '',
-        __entry_path: this.session.entryPath ?? '',
-        __referrer: this.session.entryReferrer ?? '',
-        ...utmParams,
-      },
-    }).catch((err) => this.log('Failed to track session_start', err));
-  }
-
-  /**
-   * End the current session (clears local state only - server calculates metrics)
-   */
-  protected endSession(): void {
-    if (!this.session) return;
-
-    this.log('Session ended', { sessionId: this.session.id });
-
-    // Clear session from storage (no event sent - server calculates metrics)
-    if (this.storage) {
-      this.storage.removeItem(this.sessionStorageKey);
-    }
-    this.session = null;
-  }
-
-  /**
-   * Setup listeners for session lifecycle management
-   */
-  protected setupUnloadListener(): void {
-    if (typeof window === 'undefined' || this.unloadListenerAdded) return;
-
-    // On visibility change: save session state
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'hidden') {
-        this.saveSession();
-        this.log('Page hidden, session state saved');
-      }
-    });
-
-    // On page unload: end session (clears local state only)
-    window.addEventListener('pagehide', () => {
-      this.endSession();
-      this.log('Page unloading, session ended locally');
-    });
-
-    this.unloadListenerAdded = true;
-    this.log('Session lifecycle listeners added');
-  }
 
   /**
    * Setup outbound link click tracking
@@ -1019,13 +784,10 @@ export class KitbaseAnalytics {
    * ```
    */
   async trackOutboundLink(options: { url: string; text?: string }): Promise<TrackResponse | void> {
-    const session = this.getOrCreateSession();
-
     return this.track({
       channel: ANALYTICS_CHANNEL,
       event: 'outbound_link',
       tags: {
-        __session_id: session.id,
         __url: options.url,
         __text: options.text || '',
       },
@@ -1068,10 +830,6 @@ export class KitbaseAnalytics {
    * ```
    */
   async trackPageView(options: PageViewOptions = {}): Promise<TrackResponse | void> {
-    const session = this.getOrCreateSession();
-    session.screenViewCount++;
-    this.saveSession();
-
     const path = options.path ?? (typeof window !== 'undefined' ? window.location.pathname : '');
     const title = options.title ?? (typeof document !== 'undefined' ? document.title : '');
     const referrer = options.referrer ?? (typeof document !== 'undefined' ? document.referrer : '');
@@ -1080,7 +838,6 @@ export class KitbaseAnalytics {
       channel: ANALYTICS_CHANNEL,
       event: 'screen_view',
       tags: {
-        __session_id: session.id,
         __path: path,
         __title: title,
         __referrer: referrer,
@@ -1148,14 +905,11 @@ export class KitbaseAnalytics {
    * ```
    */
   async trackRevenue(options: RevenueOptions): Promise<TrackResponse | void> {
-    const session = this.getOrCreateSession();
-
     return this.track({
       channel: ANALYTICS_CHANNEL,
       event: 'revenue',
       user_id: options.user_id ?? this.userId ?? undefined,
       tags: {
-        __session_id: session.id,
         __revenue: options.amount,
         __currency: options.currency ?? 'USD',
         ...(options.tags ?? {}),
@@ -1165,11 +919,11 @@ export class KitbaseAnalytics {
 
   /**
    * Identify a user
-   * Links the current anonymous ID to a user ID on the server.
+   * Sets the user identity on the server.
    * Call this when a user signs up or logs in.
    *
    * @param options - Identify options
-   * @returns Promise that resolves when the identity is linked
+   * @returns Promise that resolves when the identity is set
    *
    * @example
    * ```typescript
@@ -1198,33 +952,29 @@ export class KitbaseAnalytics {
       this.register({ __user_id: options.userId });
     }
 
-    // Call the identify endpoint to link anonymous_id -> user_id
-    if (this.anonymousId) {
-      try {
-        const response = await fetch(`${this.baseUrl}/sdk/v1/identify`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-sdk-key': this.token,
-          },
-          body: JSON.stringify({
-            anonymous_id: this.anonymousId,
-            user_id: options.userId,
-            traits: options.traits,
-          }),
-        });
+    // Call the identify endpoint
+    try {
+      const response = await fetch(`${this.baseUrl}/sdk/v1/identify`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-sdk-key': this.token,
+        },
+        body: JSON.stringify({
+          user_id: options.userId,
+          traits: options.traits,
+        }),
+      });
 
-        if (!response.ok) {
-          this.log('Identify API call failed', { status: response.status });
-        } else {
-          this.log('Identity linked on server', {
-            anonymousId: this.anonymousId,
-            userId: options.userId,
-          });
-        }
-      } catch (err) {
-        this.log('Failed to call identify endpoint', err);
+      if (!response.ok) {
+        this.log('Identify API call failed', { status: response.status });
+      } else {
+        this.log('Identity set on server', {
+          userId: options.userId,
+        });
       }
+    } catch (err) {
+      this.log('Failed to call identify endpoint', err);
     }
 
     this.log('User identified', { userId: options.userId });
@@ -1238,7 +988,7 @@ export class KitbaseAnalytics {
   }
 
   /**
-   * Reset the user identity and session
+   * Reset the user identity
    * Call this when a user logs out
    *
    * @example
@@ -1247,20 +997,8 @@ export class KitbaseAnalytics {
    * ```
    */
   reset(): void {
-    // End current session
-    if (this.session) {
-      this.endSession();
-      this.session = null;
-    }
-
     // Clear user ID
     this.userId = null;
-
-    // Generate new anonymous ID
-    this.anonymousId = uuidv4();
-    if (this.storage) {
-      this.storage.setItem(this.storageKey, this.anonymousId);
-    }
 
     // Clear super properties
     this.clearSuperProperties();
