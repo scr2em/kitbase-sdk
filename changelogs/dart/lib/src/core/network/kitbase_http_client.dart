@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:kitbase_analytics/src/core/utils/kitbase_logger.dart';
 
 import '../constants.dart';
 import '../exceptions/exceptions.dart';
@@ -64,11 +65,21 @@ class KitbaseHttpClient {
     _ensureInitialized();
 
     final uri = _buildUri(path, queryParameters);
+    final requestHeaders = _buildHeaders(headers);
+    final requestBody = data != null ? jsonEncode(data) : null;
+
+    _logCurl(
+      method: 'POST',
+      uri: uri,
+      headers: requestHeaders,
+      body: requestBody,
+    );
+
     return _executeRequest(
       () => _client!.post(
         uri,
-        headers: _buildHeaders(headers),
-        body: data != null ? jsonEncode(data) : null,
+        headers: requestHeaders,
+        body: requestBody,
       ),
     );
   }
@@ -134,5 +145,27 @@ class KitbaseHttpClient {
     } catch (_) {
       return body;
     }
+  }
+
+  void _logCurl({
+    required String method,
+    required Uri uri,
+    required Map<String, String> headers,
+    String? body,
+  }) {
+    final buffer = StringBuffer();
+    buffer.write('curl -X $method \'${uri}\'');
+    headers.forEach((key, value) {
+      buffer.write(' -H \'$key: $value\'');
+    });
+    if (body != null) {
+      buffer.write(' -d \'$body\'');
+    }
+    KitbaseLogger.info(
+      '----------------------------------------------------------------',
+    );
+    KitbaseLogger.info(buffer.toString());
+    KitbaseLogger.info(
+        '----------------------------------------------------------------');
   }
 }
