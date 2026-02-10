@@ -852,7 +852,9 @@ export class KitbaseAnalytics {
       const text = (element.textContent || '').trim().slice(0, 100);
       const href = (element as HTMLAnchorElement).href || '';
 
-      this.trackClick({ __tag: tag, __id: id, __class: className, __text: text, __href: href }).catch(
+      const path = window.location.pathname;
+
+      this.trackClick({ __tag: tag, __id: id, __class: className, __text: text, __href: href, __path: path }).catch(
         (err) => this.log('Failed to track click', err),
       );
     });
