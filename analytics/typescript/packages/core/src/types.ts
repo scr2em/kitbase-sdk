@@ -196,6 +196,18 @@ export interface AnalyticsConfig {
    * @default true
    */
   autoTrackOutboundLinks?: boolean;
+
+  /**
+   * Track clicks on interactive elements (buttons, links, inputs)
+   * @default true
+   */
+  autoTrackClicks?: boolean;
+
+  /**
+   * Track max scroll depth per page (sent on navigation)
+   * @default true
+   */
+  autoTrackScrollDepth?: boolean;
 }
 
 /**

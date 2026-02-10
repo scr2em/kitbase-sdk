@@ -63,7 +63,7 @@ provideKitbase({
   token: 'your-api-key',
   debug: true,
   analytics: {
-    autoTrackSessions: true,
+    autoTrackPageViews: true,
   },
 })
 ```
@@ -85,8 +85,7 @@ provideKitbase({
 |--------|-------------|
 | `identify(options)` | Identify a user |
 | `getUserId()` | Get the identified user ID |
-| `getAnonymousId()` | Get the anonymous ID |
-| `reset()` | Reset user identity and session |
+| `reset()` | Reset user identity |
 
 #### Super Properties
 
@@ -106,13 +105,6 @@ provideKitbase({
 | `cancelTimeEvent(eventName)` | Cancel timing an event |
 | `getTimedEvents()` | Get all timed events |
 | `getEventDuration(eventName)` | Get duration of a timed event |
-
-#### Session
-
-| Method | Description |
-|--------|-------------|
-| `getSessionId()` | Get current session ID |
-| `getSession()` | Get current session data |
 
 #### Privacy & Consent
 

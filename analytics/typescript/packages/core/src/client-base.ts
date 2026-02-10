@@ -86,8 +86,18 @@ export class KitbaseAnalytics {
   // Analytics tracking
   protected autoTrackPageViews: boolean;
   protected autoTrackOutboundLinks: boolean;
+  protected autoTrackClicks: boolean;
+  protected autoTrackScrollDepth: boolean;
   protected userId: string | null = null;
   protected clickListenerAdded = false;
+  protected clickTrackingListenerAdded = false;
+
+  // Scroll depth tracking
+  protected scrollTrackingActive = false;
+  protected maxScrollDepth = 0;
+  private scrollListener: (() => void) | null = null;
+  private beforeUnloadListener: (() => void) | null = null;
+  private scrollRafScheduled = false;
 
   // Bot detection
   protected botDetectionConfig: BotDetectionConfig;
@@ -111,6 +121,8 @@ export class KitbaseAnalytics {
     // Initialize analytics configuration
     this.autoTrackPageViews = config.analytics?.autoTrackPageViews ?? true;
     this.autoTrackOutboundLinks = config.analytics?.autoTrackOutboundLinks ?? true;
+    this.autoTrackClicks = config.analytics?.autoTrackClicks ?? true;
+    this.autoTrackScrollDepth = config.analytics?.autoTrackScrollDepth ?? true;
 
     // Auto-track pageviews if enabled
     if (this.autoTrackPageViews && typeof window !== 'undefined') {
@@ -120,6 +132,16 @@ export class KitbaseAnalytics {
     // Setup outbound link tracking if enabled
     if (this.autoTrackOutboundLinks && typeof window !== 'undefined') {
       this.setupOutboundLinkTracking();
+    }
+
+    // Setup click tracking if enabled
+    if (this.autoTrackClicks && typeof window !== 'undefined') {
+      this.setupClickTracking();
+    }
+
+    // Setup scroll depth tracking if enabled
+    if (this.autoTrackScrollDepth && typeof window !== 'undefined') {
+      this.setupScrollDepthTracking();
     }
 
     // Initialize bot detection
@@ -795,6 +817,135 @@ export class KitbaseAnalytics {
   }
 
   /**
+   * Setup click tracking on interactive elements via event delegation
+   */
+  protected setupClickTracking(): void {
+    if (typeof window === 'undefined' || this.clickTrackingListenerAdded) return;
+
+    document.addEventListener('click', (event: MouseEvent) => {
+      const target = event.target as Element | null;
+      if (!target?.closest) return;
+
+      const element = target.closest('a, button, input, select, textarea, [role="button"]');
+      if (!element) return;
+
+      // Skip outbound links — already handled by outbound link tracking
+      if (this.autoTrackOutboundLinks && element.tagName === 'A') {
+        const link = element as HTMLAnchorElement;
+        try {
+          const linkUrl = new URL(link.href);
+          if (
+            (linkUrl.protocol === 'http:' || linkUrl.protocol === 'https:') &&
+            linkUrl.hostname !== window.location.hostname &&
+            !this.isSameRootDomain(window.location.hostname, linkUrl.hostname)
+          ) {
+            return;
+          }
+        } catch {
+          // Invalid URL, continue with click tracking
+        }
+      }
+
+      const tag = element.tagName.toLowerCase();
+      const id = element.id || '';
+      const className = element.className && typeof element.className === 'string' ? element.className : '';
+      const text = (element.textContent || '').trim().slice(0, 100);
+      const href = (element as HTMLAnchorElement).href || '';
+
+      this.trackClick({ __tag: tag, __id: id, __class: className, __text: text, __href: href }).catch(
+        (err) => this.log('Failed to track click', err),
+      );
+    });
+
+    this.clickTrackingListenerAdded = true;
+    this.log('Click tracking enabled');
+  }
+
+  /**
+   * Track a click on an interactive element
+   */
+  async trackClick(tags: Tags): Promise<TrackResponse | void> {
+    return this.track({
+      channel: ANALYTICS_CHANNEL,
+      event: 'click',
+      tags,
+    });
+  }
+
+  /**
+   * Setup scroll depth tracking
+   */
+  protected setupScrollDepthTracking(): void {
+    if (typeof window === 'undefined' || this.scrollTrackingActive) return;
+
+    this.scrollListener = () => {
+      if (this.scrollRafScheduled) return;
+      this.scrollRafScheduled = true;
+      requestAnimationFrame(() => {
+        this.scrollRafScheduled = false;
+        const scrollTop = window.scrollY || document.documentElement.scrollTop;
+        const viewportHeight = window.innerHeight;
+        const documentHeight = Math.max(
+          document.body.scrollHeight,
+          document.documentElement.scrollHeight,
+        );
+        if (documentHeight <= 0) return;
+        const depth = Math.min(100, Math.round(((scrollTop + viewportHeight) / documentHeight) * 100));
+        if (depth > this.maxScrollDepth) {
+          this.maxScrollDepth = depth;
+        }
+      });
+    };
+
+    this.beforeUnloadListener = () => {
+      this.flushScrollDepth();
+    };
+
+    window.addEventListener('scroll', this.scrollListener, { passive: true });
+    window.addEventListener('beforeunload', this.beforeUnloadListener);
+
+    // Also fire on SPA navigation (pushState / popstate)
+    const originalPushState = history.pushState;
+    const self = this;
+    history.pushState = function (...args) {
+      self.flushScrollDepth();
+      return originalPushState.apply(this, args);
+    };
+
+    window.addEventListener('popstate', () => {
+      this.flushScrollDepth();
+    });
+
+    this.scrollTrackingActive = true;
+    this.log('Scroll depth tracking enabled');
+  }
+
+  /**
+   * Flush scroll depth and reset for next page
+   */
+  protected flushScrollDepth(): void {
+    if (this.maxScrollDepth > 0) {
+      const path = typeof window !== 'undefined' ? window.location.pathname : '';
+      this.trackScrollDepth(this.maxScrollDepth, path);
+      this.maxScrollDepth = 0;
+    }
+  }
+
+  /**
+   * Track scroll depth
+   */
+  protected trackScrollDepth(depth: number, path: string): void {
+    this.track({
+      channel: ANALYTICS_CHANNEL,
+      event: 'scroll_depth',
+      tags: {
+        __depth: depth,
+        __path: path,
+      },
+    }).catch((err) => this.log('Failed to track scroll depth', err));
+  }
+
+  /**
    * Get UTM parameters from URL
    */
   protected getUtmParams(): Tags {
@@ -1024,6 +1175,20 @@ export class KitbaseAnalytics {
 
     // Clear timed events
     this.timedEvents.clear();
+
+    // Cleanup scroll depth tracking
+    if (this.scrollTrackingActive) {
+      this.flushScrollDepth();
+      if (this.scrollListener) {
+        window.removeEventListener('scroll', this.scrollListener);
+        this.scrollListener = null;
+      }
+      if (this.beforeUnloadListener) {
+        window.removeEventListener('beforeunload', this.beforeUnloadListener);
+        this.beforeUnloadListener = null;
+      }
+      this.scrollTrackingActive = false;
+    }
 
     this.log('Shutdown complete');
   }

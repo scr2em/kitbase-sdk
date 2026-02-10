@@ -35,8 +35,8 @@ await kitbase.track({
 ## Features
 
 - **Event Tracking** - Track custom events with metadata
-- **Web Analytics** - Automatic session tracking, pageviews, and bounce rate
-- **User Identification** - Link anonymous users to authenticated users
+- **Web Analytics** - Automatic pageview tracking and outbound link tracking
+- **User Identification** - Identify users and attach traits
 - **Offline Support** - Queue events locally when offline, sync when back online
 - **Super Properties** - Set properties that are included with every event
 - **Duration Tracking** - Measure how long actions take
@@ -63,9 +63,8 @@ const kitbase = new Kitbase({
 
   // Optional: Analytics configuration
   analytics: {
-    autoTrackSessions: true,    // Track sessions automatically (default: true)
-    autoTrackPageViews: false,  // Track pageviews on route changes
-    sessionTimeout: 1800000,    // 30 minutes in ms
+    autoTrackPageViews: false,       // Track pageviews on route changes
+    autoTrackOutboundLinks: true,    // Track outbound link clicks (default: true)
   },
 });
 ```
@@ -120,12 +119,6 @@ await kitbase.track({
 
 ## Web Analytics
 
-### Automatic Session Tracking
-
-Sessions are tracked automatically by default. A new session starts when:
-- User visits for the first time
-- User returns after 30 minutes of inactivity
-
 ### Track Page Views
 
 ```typescript
@@ -162,8 +155,6 @@ await kitbase.trackRevenue({
 ## User Identification
 
 ### Identify a User
-
-Link anonymous activity to a known user:
 
 ```typescript
 kitbase.identify({
@@ -205,25 +196,6 @@ kitbase.unregister('platform');
 
 // Clear all
 kitbase.clearSuperProperties();
-```
-
-## Anonymous ID
-
-Every user gets a persistent anonymous ID:
-
-```typescript
-const anonymousId = kitbase.getAnonymousId();
-```
-
-## Session Management
-
-```typescript
-// Get current session ID
-const sessionId = kitbase.getSessionId();
-
-// Get full session data
-const session = kitbase.getSession();
-// { id, startedAt, lastActivityAt, screenViewCount, entryPath, entryReferrer }
 ```
 
 ## Offline Support
@@ -287,8 +259,6 @@ The script auto-initializes and exposes `window.kitbase` for tracking events.
     debug: true,
     analytics: {
       autoTrackPageViews: true,
-      autoTrackSessions: true,
-      sessionTimeout: 1800000, // 30 minutes in ms
     },
   };
 </script>
@@ -344,16 +314,13 @@ await kitbase.shutdown();
 | `trackPageView(options?)` | Track a page view |
 | `trackRevenue(options)` | Track a revenue event |
 | `identify(options)` | Identify the current user |
-| `reset()` | Reset user identity and session |
+| `reset()` | Reset user identity |
 | `register(props)` | Set super properties |
 | `registerOnce(props)` | Set super properties if not already set |
 | `unregister(key)` | Remove a super property |
 | `clearSuperProperties()` | Clear all super properties |
 | `timeEvent(name)` | Start timing an event |
 | `cancelTimeEvent(name)` | Cancel timing an event |
-| `getAnonymousId()` | Get the anonymous ID |
-| `getSessionId()` | Get current session ID |
-| `getSession()` | Get current session data |
 | `getUserId()` | Get identified user ID |
 | `enableAutoPageViews()` | Enable automatic pageview tracking |
 | `setDebugMode(enabled)` | Enable/disable debug logging |
@@ -375,7 +342,6 @@ import {
   PageViewOptions,
   RevenueOptions,
   IdentifyOptions,
-  Session,
   Tags,
 } from '@kitbase/analytics';
 ```

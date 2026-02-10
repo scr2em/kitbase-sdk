@@ -68,7 +68,6 @@ Wrap your app with this provider to initialize Kitbase.
 | `useRevenue()` | Track revenue events |
 | `useTimeEvent(eventName)` | Track event duration |
 | `useSuperProperties(props, deps?)` | Register super properties |
-| `useAnonymousId()` | Get the anonymous ID |
 | `useUserId()` | Get the identified user ID |
 | `useReset()` | Reset user identity |
 | `useOptedOut()` | Check if tracking is opted out |
