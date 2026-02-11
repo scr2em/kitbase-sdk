@@ -108,6 +108,11 @@ export class KitbaseAnalytics {
   protected optOutStorageKey: string;
   private optOutStorage: SimpleStorage | null;
 
+  // Client-side session tracking
+  private clientSessionId: string | null = null;
+  private lastActivityAt: number = 0;
+  private static readonly SESSION_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
+
   constructor(config: KitbaseLiteConfig) {
     if (!config.token) {
       throw new ValidationError('API token is required', 'token');
@@ -567,6 +572,54 @@ export class KitbaseAnalytics {
   }
 
   // ============================================================
+  // Client Session Tracking
+  // ============================================================
+
+  /**
+   * Get or create a client-side session ID.
+   * Rotates the session after 30 minutes of inactivity.
+   * @internal
+   */
+  protected getClientSessionId(): string {
+    const now = Date.now();
+    if (
+      !this.clientSessionId ||
+      (this.lastActivityAt > 0 && now - this.lastActivityAt > KitbaseAnalytics.SESSION_TIMEOUT_MS)
+    ) {
+      this.clientSessionId = KitbaseAnalytics.generateUUID();
+      this.log('New client session started', { sessionId: this.clientSessionId });
+    }
+    this.lastActivityAt = now;
+    return this.clientSessionId;
+  }
+
+  /**
+   * Generate a UUID v4, with fallback for environments where
+   * crypto.randomUUID() is not available (older WebViews, Ionic).
+   */
+  private static generateUUID(): string {
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+      return crypto.randomUUID();
+    }
+    // Fallback using crypto.getRandomValues (wider browser/WebView support)
+    if (typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function') {
+      const bytes = new Uint8Array(16);
+      crypto.getRandomValues(bytes);
+      // Set version 4 and variant bits
+      bytes[6] = (bytes[6]! & 0x0f) | 0x40;
+      bytes[8] = (bytes[8]! & 0x3f) | 0x80;
+      const hex = Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+      return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+    }
+    // Last resort fallback (Math.random - not cryptographically secure but functional)
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+      const r = (Math.random() * 16) | 0;
+      const v = c === 'x' ? r : (r & 0x3) | 0x8;
+      return v.toString(16);
+    });
+  }
+
+  // ============================================================
   // Track Event
   // ============================================================
 
@@ -617,6 +670,8 @@ export class KitbaseAnalytics {
     const payload: LogPayload = {
       channel: options.channel,
       event: options.event,
+      client_timestamp: Date.now(),
+      client_session_id: this.getClientSessionId(),
       ...(options.user_id && { user_id: options.user_id }),
       ...(options.icon && { icon: options.icon }),
       ...(options.notify !== undefined && { notify: options.notify }),
@@ -1152,6 +1207,10 @@ export class KitbaseAnalytics {
   reset(): void {
     // Clear user ID
     this.userId = null;
+
+    // Clear client session
+    this.clientSessionId = null;
+    this.lastActivityAt = 0;
 
     // Clear super properties
     this.clearSuperProperties();

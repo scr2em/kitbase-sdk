@@ -171,9 +171,14 @@ export interface LogPayload {
   tags?: Tags;
   /**
    * Client-side timestamp (ms since epoch) when the event occurred.
-   * Added by the offline queue for accurate timing of queued events.
+   * Always set by the SDK for both online and offline events.
    */
-  client_timestamp?: number;
+  client_timestamp: number;
+  /**
+   * Client-generated session UUID, rotated after 30min of inactivity.
+   * Used by the server for offline session reconstruction.
+   */
+  client_session_id: string;
 }
 
 // ============================================================

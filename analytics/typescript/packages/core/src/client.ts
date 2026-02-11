@@ -177,22 +177,19 @@ export class KitbaseAnalytics extends KitbaseAnalyticsBase {
   }
 
   /**
-   * Callback for the queue to send batched events
+   * Callback for the queue to send batched events via the batch endpoint.
+   * Sends all events in a single HTTP request instead of individual POSTs.
    */
   private async sendQueuedEvents(events: QueuedEvent[]): Promise<number[]> {
-    const sentIds: number[] = [];
-
-    for (const event of events) {
-      try {
-        await this.sendRequest<TrackResponse>('/sdk/v1/logs', event.payload);
-        sentIds.push(event.id!);
-      } catch (error) {
-        this.log('Failed to send queued event', { id: event.id, error });
-        // Continue with next event
-      }
+    try {
+      await this.sendRequest('/sdk/v1/logs/batch', {
+        events: events.map((e) => e.payload),
+      });
+      return events.map((e) => e.id!);
+    } catch (error) {
+      this.log('Batch send failed', { count: events.length, error });
+      return [];
     }
-
-    return sentIds;
   }
 
   // ============================================================
@@ -247,6 +244,8 @@ export class KitbaseAnalytics extends KitbaseAnalyticsBase {
     const payload: LogPayload = {
       channel: options.channel,
       event: options.event,
+      client_timestamp: Date.now(),
+      client_session_id: this.getClientSessionId(),
       ...(options.user_id && { user_id: options.user_id }),
       ...(options.icon && { icon: options.icon }),
       ...(options.notify !== undefined && { notify: options.notify }),
@@ -258,14 +257,8 @@ export class KitbaseAnalytics extends KitbaseAnalyticsBase {
 
     // If offline queueing is enabled, use write-ahead pattern
     if (this.queue) {
-      // Add client_timestamp for accurate timing of queued events
-      const queuedPayload: LogPayload = {
-        ...payload,
-        client_timestamp: Date.now(),
-      };
-
       // Always write to DB first (guaranteed durability)
-      await this.queue.enqueue(queuedPayload);
+      await this.queue.enqueue(payload);
       this.log('Event persisted to queue');
 
       // Trigger an immediate flush attempt (non-blocking)
