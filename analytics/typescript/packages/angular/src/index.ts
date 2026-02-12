@@ -1,26 +1,27 @@
 /**
  * Angular integration for Kitbase Analytics SDK
  *
- * Provides an Angular service and optional module for easy integration
- * with Angular applications.
+ * Provides an Angular service for easy integration with Angular applications.
+ * No Angular decorators are used — the service is provided via a factory function,
+ * making it compatible with AOT compilation without requiring ng-packagr.
  *
  * @example
  * ```typescript
- * // app.config.ts (standalone)
+ * // main.ts or app.config.ts (standalone)
  * import { provideKitbaseAnalytics } from '@kitbase/analytics-angular';
  *
- * export const appConfig = {
+ * bootstrapApplication(AppComponent, {
  *   providers: [
  *     provideKitbaseAnalytics({ token: 'your-api-key' }),
  *   ],
- * };
+ * });
  *
  * // component.ts
  * import { KitbaseAnalyticsService } from '@kitbase/analytics-angular';
  *
  * @Component({ ... })
  * export class MyComponent {
- *   constructor(private kitbase: KitbaseAnalyticsService) {}
+ *   private kitbase = inject(KitbaseAnalyticsService);
  *
  *   onClick() {
  *     this.kitbase.track({ channel: 'ui', event: 'Button Clicked' });
@@ -32,18 +33,10 @@
  */
 
 import {
-  Injectable,
   InjectionToken,
-  Inject,
-  OnDestroy,
-  Directive,
-  Input,
-  ElementRef,
   Provider,
   makeEnvironmentProviders,
   EnvironmentProviders,
-  inject,
-  DestroyRef,
 } from '@angular/core';
 import {
   KitbaseAnalytics,
@@ -76,10 +69,18 @@ export type {
 /**
  * Injection token for the KitbaseAnalytics configuration
  */
-export const KITBASE_CONFIG = new InjectionToken<KitbaseConfig>('KITBASE_CONFIG');
+const KITBASE_CONFIG = new InjectionToken<KitbaseConfig>('KITBASE_CONFIG');
 
 /**
- * KitbaseAnalytics Analytics service for Angular applications.
+ * Injection token for the KitbaseAnalyticsService instance.
+ * Use this with `inject(KitbaseAnalyticsService)` in your components.
+ */
+export const KitbaseAnalyticsService = new InjectionToken<KitbaseAnalyticsServiceImpl>(
+  'KitbaseAnalyticsService',
+);
+
+/**
+ * KitbaseAnalytics service for Angular applications.
  *
  * @example
  * ```typescript
@@ -88,7 +89,7 @@ export const KITBASE_CONFIG = new InjectionToken<KitbaseConfig>('KITBASE_CONFIG'
  *   template: '<button (click)="onClick()">Click me</button>',
  * })
  * export class ButtonComponent {
- *   constructor(private kitbase: KitbaseAnalyticsService) {}
+ *   private kitbase = inject(KitbaseAnalyticsService);
  *
  *   onClick() {
  *     this.kitbase.track({
@@ -100,16 +101,11 @@ export const KITBASE_CONFIG = new InjectionToken<KitbaseConfig>('KITBASE_CONFIG'
  * }
  * ```
  */
-@Injectable({ providedIn: 'root' })
-export class KitbaseAnalyticsService implements OnDestroy {
+export class KitbaseAnalyticsServiceImpl {
   private kitbase: KitbaseAnalytics;
 
-  constructor(@Inject(KITBASE_CONFIG) config: KitbaseConfig) {
+  constructor(config: KitbaseConfig) {
     this.kitbase = new KitbaseAnalytics(config);
-  }
-
-  ngOnDestroy(): void {
-    this.kitbase.shutdown();
   }
 
   /**
@@ -117,6 +113,13 @@ export class KitbaseAnalyticsService implements OnDestroy {
    */
   getInstance(): KitbaseAnalytics {
     return this.kitbase;
+  }
+
+  /**
+   * Shutdown the client and cleanup resources
+   */
+  shutdown(): void {
+    this.kitbase.shutdown();
   }
 
   // ============================================================
@@ -303,56 +306,6 @@ export class KitbaseAnalyticsService implements OnDestroy {
   isDebugMode(): boolean {
     return this.kitbase.isDebugMode();
   }
-
-}
-
-// ============================================================
-// Click Tracking Directive
-// ============================================================
-
-/**
- * Directive to track clicks on elements.
- *
- * @example
- * ```html
- * <button kitbaseTrack="Button Clicked" [kitbaseTrackChannel]="'ui'" [kitbaseTrackTags]="{ button_id: 'cta' }">
- *   Click me
- * </button>
- * ```
- */
-@Directive({
-  selector: '[kitbaseTrack]',
-  standalone: true,
-})
-export class KitbaseTrackDirective {
-  /** The event name to track */
-  @Input('kitbaseTrack') event!: string;
-
-  /** The channel for the event (defaults to 'ui') */
-  @Input() kitbaseTrackChannel: string = 'ui';
-
-  /** Additional tags to include with the event */
-  @Input() kitbaseTrackTags?: Tags;
-
-  private kitbase = inject(KitbaseAnalyticsService);
-  private el = inject(ElementRef);
-  private destroyRef = inject(DestroyRef);
-
-  constructor() {
-    const handler = () => {
-      if (!this.event) return;
-      this.kitbase.track({
-        channel: this.kitbaseTrackChannel,
-        event: this.event,
-        tags: this.kitbaseTrackTags,
-      });
-    };
-
-    this.el.nativeElement.addEventListener('click', handler);
-    this.destroyRef.onDestroy(() => {
-      this.el.nativeElement.removeEventListener('click', handler);
-    });
-  }
 }
 
 // ============================================================
@@ -368,25 +321,24 @@ export class KitbaseTrackDirective {
  *
  * @example
  * ```typescript
- * // app.config.ts
- * import { ApplicationConfig } from '@angular/core';
+ * // main.ts
  * import { provideKitbaseAnalytics } from '@kitbase/analytics-angular';
  *
- * export const appConfig: ApplicationConfig = {
+ * bootstrapApplication(AppComponent, {
  *   providers: [
  *     provideKitbaseAnalytics({
  *       token: 'your-api-key',
  *       debug: true,
  *     }),
  *   ],
- * };
+ * });
  * ```
  *
  * @example
  * ```typescript
  * // With offline mode — events are queued locally in IndexedDB
  * // and automatically sent when back online.
- * export const appConfig: ApplicationConfig = {
+ * bootstrapApplication(AppComponent, {
  *   providers: [
  *     provideKitbaseAnalytics({
  *       token: 'your-api-key',
@@ -399,7 +351,7 @@ export class KitbaseTrackDirective {
  *       },
  *     }),
  *   ],
- * };
+ * });
  * ```
  */
 export function provideKitbaseAnalytics(config: KitbaseConfig): EnvironmentProviders {
@@ -408,7 +360,10 @@ export function provideKitbaseAnalytics(config: KitbaseConfig): EnvironmentProvi
       provide: KITBASE_CONFIG,
       useValue: config,
     },
-    KitbaseAnalyticsService,
+    {
+      provide: KitbaseAnalyticsService,
+      useFactory: () => new KitbaseAnalyticsServiceImpl(config),
+    },
   ];
 
   return makeEnvironmentProviders(providers);
