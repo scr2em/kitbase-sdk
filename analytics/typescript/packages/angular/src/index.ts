@@ -35,16 +35,16 @@ import {
   Injectable,
   InjectionToken,
   Inject,
-  Optional,
   OnDestroy,
+  Directive,
+  Input,
+  ElementRef,
   Provider,
   makeEnvironmentProviders,
   EnvironmentProviders,
   inject,
   DestroyRef,
 } from '@angular/core';
-import { Router, NavigationEnd } from '@angular/router';
-import { filter } from 'rxjs/operators';
 import {
   KitbaseAnalytics,
   type KitbaseConfig,
@@ -54,6 +54,9 @@ import {
   type RevenueOptions,
   type IdentifyOptions,
   type Tags,
+  type TagValue,
+  type AnalyticsConfig,
+  type PrivacyConfig,
 } from '@kitbase/analytics';
 
 // Re-export types from core
@@ -65,6 +68,9 @@ export type {
   RevenueOptions,
   IdentifyOptions,
   Tags,
+  TagValue,
+  AnalyticsConfig,
+  PrivacyConfig,
 };
 
 /**
@@ -143,6 +149,13 @@ export class KitbaseAnalyticsService implements OnDestroy {
    */
   trackOutboundLink(options: { url: string; text?: string }): Promise<TrackResponse | void> {
     return this.kitbase.trackOutboundLink(options);
+  }
+
+  /**
+   * Track a click on an interactive element
+   */
+  trackClick(tags: Tags): Promise<TrackResponse | void> {
+    return this.kitbase.trackClick(tags);
   }
 
   // ============================================================
@@ -291,18 +304,54 @@ export class KitbaseAnalyticsService implements OnDestroy {
     return this.kitbase.isDebugMode();
   }
 
-  /**
-   * Check if current visitor is a bot
-   */
-  isBot(): boolean {
-    return this.kitbase.isBot();
-  }
+}
 
-  /**
-   * Enable automatic page view tracking
-   */
-  enableAutoPageViews(): void {
-    this.kitbase.enableAutoPageViews();
+// ============================================================
+// Click Tracking Directive
+// ============================================================
+
+/**
+ * Directive to track clicks on elements.
+ *
+ * @example
+ * ```html
+ * <button kitbaseTrack="Button Clicked" [kitbaseTrackChannel]="'ui'" [kitbaseTrackTags]="{ button_id: 'cta' }">
+ *   Click me
+ * </button>
+ * ```
+ */
+@Directive({
+  selector: '[kitbaseTrack]',
+  standalone: true,
+})
+export class KitbaseTrackDirective {
+  /** The event name to track */
+  @Input('kitbaseTrack') event!: string;
+
+  /** The channel for the event (defaults to 'ui') */
+  @Input() kitbaseTrackChannel: string = 'ui';
+
+  /** Additional tags to include with the event */
+  @Input() kitbaseTrackTags?: Tags;
+
+  private kitbase = inject(KitbaseAnalyticsService);
+  private el = inject(ElementRef);
+  private destroyRef = inject(DestroyRef);
+
+  constructor() {
+    const handler = () => {
+      if (!this.event) return;
+      this.kitbase.track({
+        channel: this.kitbaseTrackChannel,
+        event: this.event,
+        tags: this.kitbaseTrackTags,
+      });
+    };
+
+    this.el.nativeElement.addEventListener('click', handler);
+    this.destroyRef.onDestroy(() => {
+      this.el.nativeElement.removeEventListener('click', handler);
+    });
   }
 }
 
@@ -311,18 +360,11 @@ export class KitbaseAnalyticsService implements OnDestroy {
 // ============================================================
 
 /**
- * Configuration options for the KitbaseAnalytics provider
- */
-export interface KitbaseAnalyticsProviderOptions extends KitbaseConfig {
-  /**
-   * Enable automatic page view tracking on route changes
-   * @default false
-   */
-  trackRouteChanges?: boolean;
-}
-
-/**
  * Provide KitbaseAnalytics analytics for standalone Angular applications.
+ *
+ * Page views, clicks, outbound links, and scroll depth are tracked automatically
+ * by the core SDK (it intercepts history.pushState/popstate), so no additional
+ * Angular Router integration is needed.
  *
  * @example
  * ```typescript
@@ -335,80 +377,39 @@ export interface KitbaseAnalyticsProviderOptions extends KitbaseConfig {
  *     provideKitbaseAnalytics({
  *       token: 'your-api-key',
  *       debug: true,
- *       trackRouteChanges: true,
+ *     }),
+ *   ],
+ * };
+ * ```
+ *
+ * @example
+ * ```typescript
+ * // With offline mode — events are queued locally in IndexedDB
+ * // and automatically sent when back online.
+ * export const appConfig: ApplicationConfig = {
+ *   providers: [
+ *     provideKitbaseAnalytics({
+ *       token: 'your-api-key',
+ *       offline: {
+ *         enabled: true,
+ *         maxQueueSize: 1000,    // max events to store (default: 1000)
+ *         flushInterval: 30000,  // flush every 30s (default: 30000)
+ *         flushBatchSize: 50,    // events per batch (default: 50)
+ *         maxRetries: 3,         // retry attempts (default: 3)
+ *       },
  *     }),
  *   ],
  * };
  * ```
  */
-export function provideKitbaseAnalytics(options: KitbaseAnalyticsProviderOptions): EnvironmentProviders {
+export function provideKitbaseAnalytics(config: KitbaseConfig): EnvironmentProviders {
   const providers: Provider[] = [
     {
       provide: KITBASE_CONFIG,
-      useValue: options,
+      useValue: config,
     },
     KitbaseAnalyticsService,
   ];
 
   return makeEnvironmentProviders(providers);
 }
-
-// ============================================================
-// Route Change Tracker (Functional Guard/Initializer)
-// ============================================================
-
-/**
- * Initialize automatic route tracking.
- * Call this in your app initializer or root component.
- *
- * @example
- * ```typescript
- * // app.component.ts
- * import { Component, inject } from '@angular/core';
- * import { initRouteTracking } from '@kitbase/analytics-angular';
- *
- * @Component({ ... })
- * export class AppComponent {
- *   constructor() {
- *     initRouteTracking();
- *   }
- * }
- * ```
- */
-export function initRouteTracking(): void {
-  const kitbase = inject(KitbaseAnalyticsService);
-  const router = inject(Router, { optional: true });
-  const destroyRef = inject(DestroyRef);
-
-  if (!router) {
-    console.warn('[KitbaseAnalytics] Router not available, route tracking disabled');
-    return;
-  }
-
-  const subscription = router.events
-    .pipe(filter((event) => event instanceof NavigationEnd))
-    .subscribe((event) => {
-      const navEnd = event as NavigationEnd;
-      kitbase.trackPageView({
-        path: navEnd.urlAfterRedirects,
-      });
-    });
-
-  destroyRef.onDestroy(() => {
-    subscription.unsubscribe();
-  });
-}
-
-/**
- * Directive to track clicks on elements.
- *
- * @example
- * ```html
- * <button kitbaseTrack="Button Clicked" [kitbaseTrackTags]="{ button_id: 'cta' }">
- *   Click me
- * </button>
- * ```
- */
-// Note: Directive implementation would require @angular/core Directive decorator
-// For simplicity, this is documented but users can implement click tracking
-// using (click)="kitbase.track({...})" pattern

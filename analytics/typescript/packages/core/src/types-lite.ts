@@ -166,7 +166,7 @@ export interface LogPayload {
 export interface AnalyticsConfig {
   /**
    * Enable automatic pageview tracking on route changes
-   * @default false
+   * @default true
    */
   autoTrackPageViews?: boolean;
 
