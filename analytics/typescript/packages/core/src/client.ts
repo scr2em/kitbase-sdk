@@ -55,6 +55,45 @@ import type { QueuedEvent, QueueStats } from './queue/types.js';
  * });
  * ```
  */
+let _instance: KitbaseAnalytics | null = null;
+
+/**
+ * Initialize the Kitbase Analytics SDK
+ *
+ * Creates a singleton instance that is used for all tracking.
+ * Call this once at the top of your application entry point.
+ *
+ * @param config - SDK configuration
+ * @returns The KitbaseAnalytics instance
+ *
+ * @example
+ * ```typescript
+ * import { init } from '@kitbase/analytics';
+ *
+ * init({
+ *   token: '<YOUR_API_KEY>',
+ *   debug: true,
+ *   offline: { enabled: true },
+ * });
+ * ```
+ */
+export function init(config: KitbaseConfig): KitbaseAnalytics {
+  if (_instance) {
+    _instance.shutdown();
+  }
+  _instance = new KitbaseAnalytics(config);
+  return _instance;
+}
+
+/**
+ * Get the current KitbaseAnalytics singleton instance
+ *
+ * @returns The instance, or null if `init()` has not been called
+ */
+export function getInstance(): KitbaseAnalytics | null {
+  return _instance;
+}
+
 export class KitbaseAnalytics extends KitbaseAnalyticsBase {
   // Offline queue
   private queue: EventQueue | null = null;

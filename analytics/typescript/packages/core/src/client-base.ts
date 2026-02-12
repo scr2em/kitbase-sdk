@@ -872,16 +872,47 @@ export class KitbaseAnalytics {
   }
 
   /**
+   * CSS selector matching interactive elements for click tracking.
+   * Includes standard HTML elements and common web component tag names
+   * (Ionic, Material, Shoelace, etc.) that wrap native controls in Shadow DOM.
+   */
+  private static readonly CLICKABLE_SELECTOR = [
+    'a', 'button', 'input', 'select', 'textarea',
+    '[role="button"]', '[role="link"]', '[role="menuitem"]', '[role="tab"]',
+  ].join(', ');
+
+  /**
+   * Find the nearest clickable element from a click event.
+   * Uses `composedPath()` to traverse through Shadow DOM boundaries,
+   * then falls back to `closest()` on the event target.
+   */
+  private findClickableElement(event: MouseEvent): Element | null {
+    // composedPath() gives the full path including shadow DOM internals
+    const path = event.composedPath?.() as Element[] | undefined;
+
+    if (path) {
+      for (const node of path) {
+        if (!(node instanceof Element)) continue;
+        // Stop at the document/shadow root level
+        if (node === document.documentElement) break;
+        if (node.matches(KitbaseAnalytics.CLICKABLE_SELECTOR)) return node;
+      }
+    }
+
+    // Fallback for browsers without composedPath
+    const target = event.target as Element | null;
+    if (!target?.closest) return null;
+    return target.closest(KitbaseAnalytics.CLICKABLE_SELECTOR);
+  }
+
+  /**
    * Setup click tracking on interactive elements via event delegation
    */
   protected setupClickTracking(): void {
     if (typeof window === 'undefined' || this.clickTrackingListenerAdded) return;
 
     document.addEventListener('click', (event: MouseEvent) => {
-      const target = event.target as Element | null;
-      if (!target?.closest) return;
-
-      const element = target.closest('a, button, input, select, textarea, [role="button"]');
+      const element = this.findClickableElement(event);
       if (!element) return;
 
       // Skip outbound links — already handled by outbound link tracking

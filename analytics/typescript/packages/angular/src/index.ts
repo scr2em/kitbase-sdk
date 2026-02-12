@@ -38,7 +38,8 @@ import {
   EnvironmentProviders,
 } from '@angular/core';
 import {
-  KitbaseAnalytics,
+  init,
+  type KitbaseAnalytics,
   type KitbaseConfig,
   type TrackOptions,
   type TrackResponse,
@@ -138,7 +139,7 @@ class KitbaseAnalyticsServiceImpl extends KitbaseAnalyticsService {
 
   constructor(config: KitbaseConfig) {
     super();
-    this.kitbase = new KitbaseAnalytics(config);
+    this.kitbase = init(config);
   }
 
   getInstance(): KitbaseAnalytics {
@@ -295,10 +296,14 @@ class KitbaseAnalyticsServiceImpl extends KitbaseAnalyticsService {
  * ```
  */
 export function provideKitbaseAnalytics(config: KitbaseConfig): EnvironmentProviders {
+  // Create the instance eagerly so auto-tracking (clicks, page views,
+  // scroll depth, outbound links) is set up at bootstrap time.
+  const instance = new KitbaseAnalyticsServiceImpl(config);
+
   const providers: Provider[] = [
     {
       provide: KitbaseAnalyticsService,
-      useFactory: () => new KitbaseAnalyticsServiceImpl(config),
+      useValue: instance,
     },
   ];
 
