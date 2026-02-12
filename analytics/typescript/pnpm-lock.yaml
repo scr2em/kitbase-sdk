@@ -19,17 +19,11 @@ importers:
         version: link:../core
     devDependencies:
       '@angular/common':
-        specifier: ^17.0.0
-        version: 17.3.12(@angular/core@17.3.12(rxjs@7.8.2)(zone.js@0.14.10))(rxjs@7.8.2)
+        specifier: ^20.0.0
+        version: 20.3.16(@angular/core@20.3.16(rxjs@7.8.2)(zone.js@0.14.10))(rxjs@7.8.2)
       '@angular/core':
-        specifier: ^17.0.0
-        version: 17.3.12(rxjs@7.8.2)(zone.js@0.14.10)
-      '@angular/router':
-        specifier: ^17.0.0
-        version: 17.3.12(@angular/common@17.3.12(@angular/core@17.3.12(rxjs@7.8.2)(zone.js@0.14.10))(rxjs@7.8.2))(@angular/core@17.3.12(rxjs@7.8.2)(zone.js@0.14.10))(@angular/platform-browser@17.3.12(@angular/common@17.3.12(@angular/core@17.3.12(rxjs@7.8.2)(zone.js@0.14.10))(rxjs@7.8.2))(@angular/core@17.3.12(rxjs@7.8.2)(zone.js@0.14.10)))(rxjs@7.8.2)
-      rxjs:
-        specifier: ^7.8.0
-        version: 7.8.2
+        specifier: ^20.0.0
+        version: 20.3.16(rxjs@7.8.2)(zone.js@0.14.10)
       tsup:
         specifier: ^8.0.1
         version: 8.5.1(postcss@8.5.6)(typescript@5.9.3)
@@ -86,39 +80,25 @@ importers:
 
 packages:
 
-  '@angular/common@17.3.12':
-    resolution: {integrity: sha512-vabJzvrx76XXFrm1RJZ6o/CyG32piTB/1sfFfKHdlH1QrmArb8It4gyk9oEjZ1IkAD0HvBWlfWmn+T6Vx3pdUw==}
-    engines: {node: ^18.13.0 || >=20.9.0}
+  '@angular/common@20.3.16':
+    resolution: {integrity: sha512-GRAziNlntwdnJy3F+8zCOvDdy7id0gITjDnM6P9+n2lXvtDuBLGJKU3DWBbvxcCjtD6JK/g/rEX5fbCxbUHkQQ==}
+    engines: {node: ^20.19.0 || ^22.12.0 || >=24.0.0}
     peerDependencies:
-      '@angular/core': 17.3.12
+      '@angular/core': 20.3.16
       rxjs: ^6.5.3 || ^7.4.0
 
-  '@angular/core@17.3.12':
-    resolution: {integrity: sha512-MuFt5yKi161JmauUta4Dh0m8ofwoq6Ino+KoOtkYMBGsSx+A7dSm+DUxxNwdj7+DNyg3LjVGCFgBFnq4g8z06A==}
-    engines: {node: ^18.13.0 || >=20.9.0}
+  '@angular/core@20.3.16':
+    resolution: {integrity: sha512-KSFPKvOmWWLCJBbEO+CuRUXfecX2FRuO0jNi9c54ptXMOPHlK1lIojUnyXmMNzjdHgRug8ci9qDuftvC2B7MKg==}
+    engines: {node: ^20.19.0 || ^22.12.0 || >=24.0.0}
     peerDependencies:
+      '@angular/compiler': 20.3.16
       rxjs: ^6.5.3 || ^7.4.0
-      zone.js: ~0.14.0
-
-  '@angular/platform-browser@17.3.12':
-    resolution: {integrity: sha512-DYY04ptWh/ulMHzd+y52WCE8QnEYGeIiW3hEIFjCN8z0kbIdFdUtEB0IK5vjNL3ejyhUmphcpeT5PYf3YXtqWQ==}
-    engines: {node: ^18.13.0 || >=20.9.0}
-    peerDependencies:
-      '@angular/animations': 17.3.12
-      '@angular/common': 17.3.12
-      '@angular/core': 17.3.12
+      zone.js: ~0.15.0
     peerDependenciesMeta:
-      '@angular/animations':
+      '@angular/compiler':
         optional: true
-
-  '@angular/router@17.3.12':
-    resolution: {integrity: sha512-dg7PHBSW9fmPKTVzwvHEeHZPZdpnUqW/U7kj8D29HTP9ur8zZnx9QcnbplwPeYb8yYa62JMnZSEel2X4PxdYBg==}
-    engines: {node: ^18.13.0 || >=20.9.0}
-    peerDependencies:
-      '@angular/common': 17.3.12
-      '@angular/core': 17.3.12
-      '@angular/platform-browser': 17.3.12
-      rxjs: ^6.5.3 || ^7.4.0
+      zone.js:
+        optional: true
 
   '@esbuild/aix-ppc64@0.21.5':
     resolution: {integrity: sha512-1SDgH6ZSPTlggy1yI6+Dbkiz8xzpHJEVAlF/AM1tHPLsf5STom9rwtjE4hKAF20FfXXNTFqEYXyJNWh1GiZedQ==}
@@ -1062,31 +1042,18 @@ packages:
 
 snapshots:
 
-  '@angular/common@17.3.12(@angular/core@17.3.12(rxjs@7.8.2)(zone.js@0.14.10))(rxjs@7.8.2)':
+  '@angular/common@20.3.16(@angular/core@20.3.16(rxjs@7.8.2)(zone.js@0.14.10))(rxjs@7.8.2)':
     dependencies:
-      '@angular/core': 17.3.12(rxjs@7.8.2)(zone.js@0.14.10)
+      '@angular/core': 20.3.16(rxjs@7.8.2)(zone.js@0.14.10)
       rxjs: 7.8.2
       tslib: 2.8.1
 
-  '@angular/core@17.3.12(rxjs@7.8.2)(zone.js@0.14.10)':
+  '@angular/core@20.3.16(rxjs@7.8.2)(zone.js@0.14.10)':
     dependencies:
       rxjs: 7.8.2
       tslib: 2.8.1
+    optionalDependencies:
       zone.js: 0.14.10
-
-  '@angular/platform-browser@17.3.12(@angular/common@17.3.12(@angular/core@17.3.12(rxjs@7.8.2)(zone.js@0.14.10))(rxjs@7.8.2))(@angular/core@17.3.12(rxjs@7.8.2)(zone.js@0.14.10))':
-    dependencies:
-      '@angular/common': 17.3.12(@angular/core@17.3.12(rxjs@7.8.2)(zone.js@0.14.10))(rxjs@7.8.2)
-      '@angular/core': 17.3.12(rxjs@7.8.2)(zone.js@0.14.10)
-      tslib: 2.8.1
-
-  '@angular/router@17.3.12(@angular/common@17.3.12(@angular/core@17.3.12(rxjs@7.8.2)(zone.js@0.14.10))(rxjs@7.8.2))(@angular/core@17.3.12(rxjs@7.8.2)(zone.js@0.14.10))(@angular/platform-browser@17.3.12(@angular/common@17.3.12(@angular/core@17.3.12(rxjs@7.8.2)(zone.js@0.14.10))(rxjs@7.8.2))(@angular/core@17.3.12(rxjs@7.8.2)(zone.js@0.14.10)))(rxjs@7.8.2)':
-    dependencies:
-      '@angular/common': 17.3.12(@angular/core@17.3.12(rxjs@7.8.2)(zone.js@0.14.10))(rxjs@7.8.2)
-      '@angular/core': 17.3.12(rxjs@7.8.2)(zone.js@0.14.10)
-      '@angular/platform-browser': 17.3.12(@angular/common@17.3.12(@angular/core@17.3.12(rxjs@7.8.2)(zone.js@0.14.10))(rxjs@7.8.2))(@angular/core@17.3.12(rxjs@7.8.2)(zone.js@0.14.10))
-      rxjs: 7.8.2
-      tslib: 2.8.1
 
   '@esbuild/aix-ppc64@0.21.5':
     optional: true
@@ -1849,4 +1816,5 @@ snapshots:
 
   yocto-queue@1.2.2: {}
 
-  zone.js@0.14.10: {}
+  zone.js@0.14.10:
+    optional: true

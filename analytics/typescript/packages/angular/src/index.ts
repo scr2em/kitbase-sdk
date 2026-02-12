@@ -33,7 +33,6 @@
  */
 
 import {
-  InjectionToken,
   Provider,
   makeEnvironmentProviders,
   EnvironmentProviders,
@@ -67,20 +66,10 @@ export type {
 };
 
 /**
- * Injection token for the KitbaseAnalytics configuration
- */
-const KITBASE_CONFIG = new InjectionToken<KitbaseConfig>('KITBASE_CONFIG');
-
-/**
- * Injection token for the KitbaseAnalyticsService instance.
- * Use this with `inject(KitbaseAnalyticsService)` in your components.
- */
-export const KitbaseAnalyticsService = new InjectionToken<KitbaseAnalyticsServiceImpl>(
-  'KitbaseAnalyticsService',
-);
-
-/**
  * KitbaseAnalytics service for Angular applications.
+ *
+ * This abstract class serves as both the DI token and the type definition.
+ * Use `inject(KitbaseAnalyticsService)` in your components.
  *
  * @example
  * ```typescript
@@ -101,208 +90,159 @@ export const KitbaseAnalyticsService = new InjectionToken<KitbaseAnalyticsServic
  * }
  * ```
  */
-export class KitbaseAnalyticsServiceImpl {
+export abstract class KitbaseAnalyticsService {
+  /** Get the underlying KitbaseAnalytics instance for advanced usage */
+  abstract getInstance(): KitbaseAnalytics;
+
+  /** Shutdown the client and cleanup resources */
+  abstract shutdown(): void;
+
+  // Event Tracking
+  abstract track(options: TrackOptions): Promise<TrackResponse | void>;
+  abstract trackPageView(options?: PageViewOptions): Promise<TrackResponse | void>;
+  abstract trackRevenue(options: RevenueOptions): Promise<TrackResponse | void>;
+  abstract trackOutboundLink(options: { url: string; text?: string }): Promise<TrackResponse | void>;
+  abstract trackClick(tags: Tags): Promise<TrackResponse | void>;
+
+  // User Identification
+  abstract identify(options: IdentifyOptions): Promise<void>;
+  abstract getUserId(): string | null;
+  abstract reset(): void;
+
+  // Super Properties
+  abstract register(properties: Tags): void;
+  abstract registerOnce(properties: Tags): void;
+  abstract unregister(key: string): void;
+  abstract getSuperProperties(): Tags;
+  abstract clearSuperProperties(): void;
+
+  // Time Events
+  abstract timeEvent(eventName: string): void;
+  abstract cancelTimeEvent(eventName: string): void;
+  abstract getTimedEvents(): string[];
+  abstract getEventDuration(eventName: string): number | null;
+
+  // Privacy & Consent
+  abstract optOut(): Promise<void>;
+  abstract optIn(): void;
+  abstract isOptedOut(): boolean;
+  abstract hasConsent(): boolean;
+
+  // Debug & Utilities
+  abstract setDebugMode(enabled: boolean): void;
+  abstract isDebugMode(): boolean;
+}
+
+class KitbaseAnalyticsServiceImpl extends KitbaseAnalyticsService {
   private kitbase: KitbaseAnalytics;
 
   constructor(config: KitbaseConfig) {
+    super();
     this.kitbase = new KitbaseAnalytics(config);
   }
 
-  /**
-   * Get the underlying KitbaseAnalytics instance for advanced usage
-   */
   getInstance(): KitbaseAnalytics {
     return this.kitbase;
   }
 
-  /**
-   * Shutdown the client and cleanup resources
-   */
   shutdown(): void {
     this.kitbase.shutdown();
   }
 
-  // ============================================================
   // Event Tracking
-  // ============================================================
-
-  /**
-   * Track a custom event
-   */
   track(options: TrackOptions): Promise<TrackResponse | void> {
     return this.kitbase.track(options);
   }
 
-  /**
-   * Track a page view
-   */
   trackPageView(options?: PageViewOptions): Promise<TrackResponse | void> {
     return this.kitbase.trackPageView(options);
   }
 
-  /**
-   * Track a revenue event
-   */
   trackRevenue(options: RevenueOptions): Promise<TrackResponse | void> {
     return this.kitbase.trackRevenue(options);
   }
 
-  /**
-   * Track an outbound link click
-   */
   trackOutboundLink(options: { url: string; text?: string }): Promise<TrackResponse | void> {
     return this.kitbase.trackOutboundLink(options);
   }
 
-  /**
-   * Track a click on an interactive element
-   */
   trackClick(tags: Tags): Promise<TrackResponse | void> {
     return this.kitbase.trackClick(tags);
   }
 
-  // ============================================================
   // User Identification
-  // ============================================================
-
-  /**
-   * Identify a user
-   */
   identify(options: IdentifyOptions): Promise<void> {
     return this.kitbase.identify(options);
   }
 
-  /**
-   * Get the current user ID
-   */
   getUserId(): string | null {
     return this.kitbase.getUserId();
   }
 
-  /**
-   * Reset user identity
-   */
   reset(): void {
     this.kitbase.reset();
   }
 
-  // ============================================================
   // Super Properties
-  // ============================================================
-
-  /**
-   * Register super properties (included with every event)
-   */
   register(properties: Tags): void {
     this.kitbase.register(properties);
   }
 
-  /**
-   * Register super properties only if not already set
-   */
   registerOnce(properties: Tags): void {
     this.kitbase.registerOnce(properties);
   }
 
-  /**
-   * Remove a super property
-   */
   unregister(key: string): void {
     this.kitbase.unregister(key);
   }
 
-  /**
-   * Get all super properties
-   */
   getSuperProperties(): Tags {
     return this.kitbase.getSuperProperties();
   }
 
-  /**
-   * Clear all super properties
-   */
   clearSuperProperties(): void {
     this.kitbase.clearSuperProperties();
   }
 
-  // ============================================================
   // Time Events
-  // ============================================================
-
-  /**
-   * Start timing an event
-   */
   timeEvent(eventName: string): void {
     this.kitbase.timeEvent(eventName);
   }
 
-  /**
-   * Cancel a timed event
-   */
   cancelTimeEvent(eventName: string): void {
     this.kitbase.cancelTimeEvent(eventName);
   }
 
-  /**
-   * Get all timed events
-   */
   getTimedEvents(): string[] {
     return this.kitbase.getTimedEvents();
   }
 
-  /**
-   * Get duration of a timed event
-   */
   getEventDuration(eventName: string): number | null {
     return this.kitbase.getEventDuration(eventName);
   }
 
-  // ============================================================
   // Privacy & Consent
-  // ============================================================
-
-  /**
-   * Opt out of tracking
-   */
   optOut(): Promise<void> {
     return this.kitbase.optOut();
   }
 
-  /**
-   * Opt in to tracking
-   */
   optIn(): void {
     this.kitbase.optIn();
   }
 
-  /**
-   * Check if tracking is opted out
-   */
   isOptedOut(): boolean {
     return this.kitbase.isOptedOut();
   }
 
-  /**
-   * Check if user has consented
-   */
   hasConsent(): boolean {
     return this.kitbase.hasConsent();
   }
 
-  // ============================================================
   // Debug & Utilities
-  // ============================================================
-
-  /**
-   * Enable or disable debug mode
-   */
   setDebugMode(enabled: boolean): void {
     this.kitbase.setDebugMode(enabled);
   }
 
-  /**
-   * Check if debug mode is enabled
-   */
   isDebugMode(): boolean {
     return this.kitbase.isDebugMode();
   }
@@ -356,10 +296,6 @@ export class KitbaseAnalyticsServiceImpl {
  */
 export function provideKitbaseAnalytics(config: KitbaseConfig): EnvironmentProviders {
   const providers: Provider[] = [
-    {
-      provide: KITBASE_CONFIG,
-      useValue: config,
-    },
     {
       provide: KitbaseAnalyticsService,
       useFactory: () => new KitbaseAnalyticsServiceImpl(config),
