@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kitbase Analytics - Web Component Click Tracking Test</title>
+
+  <!-- Ionic 8 from CDN -->
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css" />
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f1117; color: #e1e4e8; }
+    .container { max-width: 900px; margin: 0 auto; padding: 2rem; padding-bottom: 260px; }
+    h1 { font-size: 1.5rem; margin-bottom: 0.25rem; }
+    .subtitle { color: #8b949e; margin-bottom: 2rem; font-size: 0.9rem; }
+    h2 { font-size: 1.15rem; margin: 2rem 0 0.75rem; color: #58a6ff; }
+    h3 { font-size: 0.95rem; margin: 1.25rem 0 0.5rem; color: #8b949e; }
+    p { color: #8b949e; font-size: 0.85rem; margin-bottom: 0.75rem; line-height: 1.5; }
+
+    .section {
+      background: #161b22; border: 1px solid #30363d; border-radius: 8px;
+      padding: 1.25rem; margin-bottom: 1rem;
+    }
+    .row { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin: 0.5rem 0; }
+
+    /* Native buttons for comparison */
+    button.native {
+      background: #238636; color: #fff; border: none; padding: 0.5rem 1rem;
+      border-radius: 6px; cursor: pointer; font-size: 0.85rem;
+    }
+    a.native { color: #58a6ff; text-decoration: underline; cursor: pointer; }
+
+    /* Custom web component styles */
+    custom-button {
+      display: inline-flex; align-items: center; justify-content: center;
+      background: #6e40c9; color: #fff; padding: 0.5rem 1rem;
+      border-radius: 6px; cursor: pointer; font-size: 0.85rem;
+      user-select: none;
+    }
+    custom-button:hover { background: #8b5cf6; }
+
+    /* Log panel */
+    #log-panel {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 9999;
+      background: #161b22; border-top: 2px solid #58a6ff;
+      max-height: 240px; overflow-y: auto;
+      font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.78rem; line-height: 1.5;
+      padding: 0.5rem 1rem;
+    }
+    #log-panel.collapsed { max-height: 32px; overflow: hidden; }
+    #log-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding-bottom: 0.4rem; border-bottom: 1px solid #30363d; margin-bottom: 0.4rem;
+      cursor: pointer; user-select: none;
+    }
+    #log-header h3 { font-size: 0.8rem; color: #58a6ff; margin: 0; }
+    .log-entry { padding: 1px 0; }
+    .log-time { color: #484f58; }
+    .log-tag { color: #d2a8ff; font-weight: 600; }
+    .log-data { color: #8b949e; }
+    .log-ok { color: #3fb950; }
+    .log-fail { color: #f85149; }
+    .log-info { color: #58a6ff; }
+
+    .badge {
+      display: inline-block; font-size: 0.7rem; padding: 2px 8px;
+      border-radius: 10px; margin-left: 0.5rem;
+    }
+    .badge-ok { background: #0d2818; color: #3fb950; }
+    .badge-shadow { background: #1a1030; color: #d2a8ff; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Web Component Click Tracking</h1>
+    <p class="subtitle">Tests that the SDK correctly tracks clicks on custom elements, shadow DOM, and Ionic components</p>
+
+    <!-- 1. Native HTML (baseline) -->
+    <div class="section">
+      <h2>1. Native HTML Elements <span class="badge badge-ok">baseline</span></h2>
+      <p>These should always work. Baseline to compare tracked data against.</p>
+      <div class="row">
+        <button class="native" id="native-btn">Native Button</button>
+        <a class="native" href="#section2">Native Link</a>
+        <input type="text" placeholder="Native Input" style="width:150px">
+      </div>
+    </div>
+
+    <!-- 2. Ionic Buttons -->
+    <div class="section">
+      <h2>2. Ionic Buttons <span class="badge badge-shadow">shadow DOM</span></h2>
+      <p>ion-button renders a &lt;button&gt; inside shadow DOM. The SDK should report <code>tag: ion-button</code> with the host's text/id, not the shadow internal.</p>
+      <div class="row">
+        <ion-button id="ionic-primary">Primary</ion-button>
+        <ion-button color="secondary" id="ionic-secondary">Secondary</ion-button>
+        <ion-button color="danger" id="ionic-danger">Danger</ion-button>
+        <ion-button fill="outline" id="ionic-outline">Outline</ion-button>
+        <ion-button fill="clear" id="ionic-clear">Clear</ion-button>
+        <ion-button size="small">Small</ion-button>
+        <ion-button size="large">Large</ion-button>
+      </div>
+    </div>
+
+    <!-- 3. Ionic Links -->
+    <div class="section">
+      <h2>3. Ionic Links <span class="badge badge-shadow">shadow DOM + href</span></h2>
+      <p>ion-button with href acts as a link. The SDK should capture the href attribute from the host.</p>
+      <div class="row">
+        <ion-button href="https://github.com" target="_blank" id="ionic-link-github">GitHub Link</ion-button>
+        <ion-button href="/features" id="ionic-link-internal">Internal Link</ion-button>
+        <ion-button href="https://google.com" target="_blank" fill="outline">Google (outbound)</ion-button>
+      </div>
+    </div>
+
+    <!-- 4. Ionic List Items -->
+    <div class="section">
+      <h2>4. Ionic List Items <span class="badge badge-shadow">shadow DOM</span></h2>
+      <p>ion-item with button attribute renders an interactive list item.</p>
+      <ion-list>
+        <ion-item button="true" id="item-1">
+          <ion-label>Clickable Item 1</ion-label>
+        </ion-item>
+        <ion-item button="true" id="item-2">
+          <ion-label>Clickable Item 2</ion-label>
+        </ion-item>
+        <ion-item href="https://example.com" id="item-link">
+          <ion-label>Item with href</ion-label>
+        </ion-item>
+      </ion-list>
+    </div>
+
+    <!-- 5. Ionic FAB -->
+    <div class="section">
+      <h2>5. Ionic FAB & Chip <span class="badge badge-shadow">shadow DOM</span></h2>
+      <div class="row">
+        <ion-fab-button id="fab-btn">
+          <ion-icon name="add"></ion-icon>
+        </ion-fab-button>
+        <ion-chip id="chip-1">
+          <ion-label>Chip A</ion-label>
+        </ion-chip>
+        <ion-chip id="chip-2" color="primary">
+          <ion-label>Chip B</ion-label>
+        </ion-chip>
+      </div>
+    </div>
+
+    <!-- 6. Ionic Segment -->
+    <div class="section">
+      <h2>6. Ionic Segment <span class="badge badge-shadow">shadow DOM</span></h2>
+      <ion-segment value="tab1" id="segment">
+        <ion-segment-button value="tab1">
+          <ion-label>Tab 1</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="tab2">
+          <ion-label>Tab 2</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="tab3">
+          <ion-label>Tab 3</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+    </div>
+
+    <!-- 7. Custom Web Components (no framework) -->
+    <div class="section">
+      <h2>7. Custom Elements (no framework) <span class="badge badge-shadow">shadow DOM</span></h2>
+      <p>Handwritten custom elements with shadow DOM to test the generic path.</p>
+      <div class="row">
+        <shadow-button id="shadow-btn-1">Shadow Button A</shadow-button>
+        <shadow-button id="shadow-btn-2" variant="outline">Shadow Button B</shadow-button>
+        <shadow-link id="shadow-link" href="https://example.com">Shadow Link</shadow-link>
+      </div>
+
+      <h3>Custom element without shadow DOM</h3>
+      <div class="row">
+        <custom-button id="custom-noshadow-1">No Shadow A</custom-button>
+        <custom-button id="custom-noshadow-2">No Shadow B</custom-button>
+      </div>
+    </div>
+
+    <!-- 8. ARIA roles on custom elements -->
+    <div class="section">
+      <h2>8. ARIA Roles on Custom Elements</h2>
+      <p>Custom elements with ARIA roles should be tracked via the role selector.</p>
+      <div class="row">
+        <custom-button role="button" id="aria-btn">role=button</custom-button>
+        <span role="button" id="aria-span" style="background:#30363d; padding:0.5rem 1rem; border-radius:6px; cursor:pointer;">span role=button</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Log Panel -->
+  <div id="log-panel">
+    <div id="log-header">
+      <h3>Click Log <span id="event-count">(0 clicks)</span></h3>
+      <span style="color:#8b949e; font-size:0.75rem; cursor:pointer;" id="toggle-hint">click to collapse</span>
+    </div>
+    <div id="log-entries"></div>
+  </div>
+
+  <script type="module" src="/web-components.js"></script>
+</body>
+</html>

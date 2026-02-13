@@ -1,0 +1,14 @@
+{
+  "name": "kitbase-analytics-example",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "@kitbase/analytics": "file:..",
+    "vite": "^7.3.1"
+  }
+}

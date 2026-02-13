@@ -44,3 +44,4 @@ composer.lock
 
 # Dart
 **/dart/.*
+.angular

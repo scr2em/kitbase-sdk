@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kitbase Analytics SDK - Test App</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f1117; color: #e1e4e8; padding: 2rem; }
+    h1 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+    .subtitle { color: #8b949e; margin-bottom: 2rem; font-size: 0.9rem; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; max-width: 1000px; }
+    .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 1.25rem; }
+    .card h2 { font-size: 1rem; margin-bottom: 1rem; color: #58a6ff; }
+    button { background: #238636; color: #fff; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; margin: 0.25rem; transition: background 0.15s; }
+    button:hover { background: #2ea043; }
+    button.secondary { background: #30363d; }
+    button.secondary:hover { background: #484f58; }
+    button.danger { background: #da3633; }
+    button.danger:hover { background: #f85149; }
+    input, select { background: #0d1117; border: 1px solid #30363d; color: #e1e4e8; padding: 0.5rem; border-radius: 6px; font-size: 0.85rem; width: 100%; margin-bottom: 0.5rem; }
+    label { display: block; font-size: 0.8rem; color: #8b949e; margin-bottom: 0.25rem; }
+    .log-container { grid-column: 1 / -1; }
+    #log { background: #0d1117; border: 1px solid #30363d; border-radius: 8px; padding: 1rem; height: 300px; overflow-y: auto; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.8rem; line-height: 1.6; }
+    .log-entry { padding: 2px 0; border-bottom: 1px solid #21262d; }
+    .log-time { color: #484f58; }
+    .log-success { color: #3fb950; }
+    .log-error { color: #f85149; }
+    .log-info { color: #58a6ff; }
+    .log-warn { color: #d29922; }
+    .status { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; margin-left: 0.5rem; }
+    .status.connected { background: #0d2818; color: #3fb950; }
+    .status.disconnected { background: #3d1a1a; color: #f85149; }
+    .btn-group { display: flex; flex-wrap: wrap; gap: 0.25rem; }
+    .field-row { margin-bottom: 0.75rem; }
+  </style>
+</head>
+<body>
+  <h1>Kitbase Analytics SDK <span class="status connected" id="status">initialized</span></h1>
+  <p class="subtitle">Interactive test app for @kitbase/analytics core package</p>
+
+  <div class="grid">
+    <!-- Track Custom Event -->
+    <div class="card">
+      <h2>Track Custom Event</h2>
+      <div class="field-row">
+        <label>Channel</label>
+        <input type="text" id="channel" value="payments" placeholder="e.g. payments, auth, users">
+      </div>
+      <div class="field-row">
+        <label>Event Name</label>
+        <input type="text" id="eventName" value="New Subscription" placeholder="e.g. User Signed Up">
+      </div>
+      <div class="field-row">
+        <label>Icon (emoji)</label>
+        <input type="text" id="icon" value="" placeholder="e.g. fire, rocket">
+      </div>
+      <div class="field-row">
+        <label>User ID (optional)</label>
+        <input type="text" id="userId" value="" placeholder="e.g. user-123">
+      </div>
+      <div class="field-row">
+        <label>Tags (JSON, optional)</label>
+        <input type="text" id="tags" value='{"plan": "premium", "cycle": "monthly"}' placeholder='{"key": "value"}'>
+      </div>
+      <div class="field-row">
+        <label><input type="checkbox" id="notify"> Send notification</label>
+      </div>
+      <button id="btn-track">Track Event</button>
+    </div>
+
+    <!-- Quick Events -->
+    <div class="card">
+      <h2>Quick Events</h2>
+      <div class="btn-group">
+        <button data-quick="auth|User Signed Up|wave|false">User Signed Up</button>
+        <button data-quick="auth|User Logged In|key|false">User Logged In</button>
+        <button data-quick="payments|New Subscription|money_bag|false">New Subscription</button>
+        <button data-quick="payments|Payment Failed|x|true">Payment Failed</button>
+        <button data-quick="features|Feature Used|sparkles|false">Feature Used</button>
+        <button data-quick="support|Bug Reported|bug|false">Bug Reported</button>
+      </div>
+
+      <h2 style="margin-top: 1.5rem;">Identify User</h2>
+      <div class="field-row">
+        <label>User ID</label>
+        <input type="text" id="identifyUserId" value="user-123" placeholder="user-123">
+      </div>
+      <div class="field-row">
+        <label>Email</label>
+        <input type="text" id="identifyEmail" value="test@example.com">
+      </div>
+      <button id="btn-identify">Identify</button>
+      <button class="secondary" id="btn-reset">Reset</button>
+    </div>
+
+    <!-- Super Properties -->
+    <div class="card">
+      <h2>Super Properties</h2>
+      <div class="field-row">
+        <label>Properties (JSON)</label>
+        <input type="text" id="superProps" value='{"app_version": "2.1.0", "platform": "web"}'>
+      </div>
+      <div class="btn-group">
+        <button id="btn-register">Register</button>
+        <button class="secondary" id="btn-register-once">Register Once</button>
+        <button class="secondary" id="btn-get-props">Get All</button>
+        <button class="danger" id="btn-clear-props">Clear All</button>
+      </div>
+    </div>
+
+    <!-- Time Events -->
+    <div class="card">
+      <h2>Time Events (Duration Tracking)</h2>
+      <div class="field-row">
+        <label>Event Name</label>
+        <input type="text" id="timedEventName" value="Video Watched">
+      </div>
+      <div class="btn-group">
+        <button id="btn-start-timer">Start Timer</button>
+        <button class="secondary" id="btn-stop-timer">Track (stops timer)</button>
+        <button class="danger" id="btn-cancel-timer">Cancel Timer</button>
+        <button class="secondary" id="btn-list-timers">List Active</button>
+      </div>
+    </div>
+
+    <!-- Analytics -->
+    <div class="card">
+      <h2>Analytics</h2>
+      <div class="btn-group">
+        <button id="btn-pageview">Track Page View</button>
+        <button id="btn-revenue">Track Revenue ($19.99)</button>
+        <button id="btn-outbound">Track Outbound Link</button>
+      </div>
+
+      <h2 style="margin-top: 1.5rem;">Privacy & Consent</h2>
+      <div class="btn-group">
+        <button class="danger" id="btn-optout">Opt Out</button>
+        <button id="btn-optin">Opt In</button>
+        <button class="secondary" id="btn-consent">Check Status</button>
+      </div>
+    </div>
+
+    <!-- Debug Controls -->
+    <div class="card">
+      <h2>Debug Controls</h2>
+      <div class="btn-group">
+        <button class="secondary" id="btn-debug">Toggle Debug Mode</button>
+        <button class="secondary" id="btn-bot">Check Bot Detection</button>
+        <button class="danger" id="btn-shutdown">Shutdown SDK</button>
+        <button id="btn-reinit">Re-initialize SDK</button>
+      </div>
+      <div style="margin-top: 1rem;">
+        <button class="secondary" id="btn-clear-log">Clear Log</button>
+      </div>
+    </div>
+
+    <!-- Log Output -->
+    <div class="card log-container">
+      <h2>Event Log</h2>
+      <div id="log"></div>
+    </div>
+  </div>
+
+  <script type="module" src="/main.js"></script>
+</body>
+</html>

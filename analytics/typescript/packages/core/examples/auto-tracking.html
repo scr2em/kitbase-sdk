@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kitbase Analytics - Auto Tracking Test</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f1117; color: #e1e4e8; }
+
+    /* Fixed log panel */
+    #log-panel {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 1000;
+      background: #161b22; border-top: 2px solid #58a6ff;
+      max-height: 220px; overflow-y: auto;
+      font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.78rem; line-height: 1.5;
+      padding: 0.5rem 1rem;
+      transition: max-height 0.2s;
+    }
+    #log-panel.collapsed { max-height: 32px; overflow: hidden; }
+    #log-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding-bottom: 0.4rem; border-bottom: 1px solid #30363d; margin-bottom: 0.4rem;
+      cursor: pointer; user-select: none;
+    }
+    #log-header h3 { font-size: 0.8rem; color: #58a6ff; }
+    #log-header span { color: #8b949e; font-size: 0.75rem; }
+    .log-entry { padding: 1px 0; }
+    .log-time { color: #484f58; }
+    .log-event { color: #3fb950; font-weight: 600; }
+    .log-data { color: #8b949e; }
+    .log-error { color: #f85149; }
+    .log-route { color: #d2a8ff; font-weight: 600; }
+    .log-scroll { color: #d29922; font-weight: 600; }
+    .log-click { color: #58a6ff; font-weight: 600; }
+
+    /* Nav */
+    nav {
+      background: #161b22; border-bottom: 1px solid #30363d;
+      padding: 1rem 2rem; display: flex; gap: 1.5rem; align-items: center;
+      position: sticky; top: 0; z-index: 100;
+    }
+    nav .brand { font-weight: 700; color: #58a6ff; font-size: 1rem; }
+    nav a {
+      color: #8b949e; text-decoration: none; font-size: 0.9rem; cursor: pointer;
+      padding: 0.25rem 0.5rem; border-radius: 4px; transition: all 0.15s;
+    }
+    nav a:hover, nav a.active { color: #e1e4e8; background: #30363d; }
+    nav .badge {
+      background: #238636; color: #fff; font-size: 0.65rem;
+      padding: 2px 6px; border-radius: 10px; margin-left: auto;
+    }
+
+    /* Page content */
+    .page { display: none; padding: 2rem; padding-bottom: 240px; }
+    .page.active { display: block; }
+
+    h1 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+    h2 { font-size: 1.3rem; margin: 2rem 0 1rem; color: #58a6ff; }
+    p { color: #8b949e; line-height: 1.7; margin-bottom: 1rem; max-width: 700px; }
+
+    /* Interactive elements for click tracking */
+    .btn-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0; }
+    button, .btn {
+      background: #238636; color: #fff; border: none; padding: 0.6rem 1.2rem;
+      border-radius: 6px; cursor: pointer; font-size: 0.85rem; transition: background 0.15s;
+    }
+    button:hover, .btn:hover { background: #2ea043; }
+    .btn-secondary { background: #30363d; }
+    .btn-secondary:hover { background: #484f58; }
+    .btn-danger { background: #da3633; }
+    .btn-danger:hover { background: #f85149; }
+
+    input, select, textarea {
+      background: #0d1117; border: 1px solid #30363d; color: #e1e4e8;
+      padding: 0.5rem; border-radius: 6px; font-size: 0.85rem; width: 100%; max-width: 400px;
+      margin-bottom: 0.5rem; display: block;
+    }
+    textarea { min-height: 80px; resize: vertical; }
+
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin: 1rem 0; }
+    .card {
+      background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 1.25rem;
+      transition: border-color 0.15s;
+    }
+    .card:hover { border-color: #58a6ff; }
+    .card h3 { font-size: 1rem; margin-bottom: 0.5rem; }
+    .card p { font-size: 0.85rem; }
+
+    a.link { color: #58a6ff; text-decoration: underline; cursor: pointer; }
+    a.outbound { color: #d2a8ff; }
+
+    /* Tall sections for scroll testing */
+    .tall-section {
+      min-height: 600px; padding: 2rem;
+      border-left: 3px solid #30363d; margin: 2rem 0; padding-left: 1.5rem;
+    }
+    .tall-section:nth-child(even) { border-color: #238636; }
+    .tall-section:nth-child(odd) { border-color: #58a6ff; }
+
+    [role="button"], [role="link"], [role="menuitem"], [role="tab"] {
+      cursor: pointer; padding: 0.4rem 0.8rem; border-radius: 4px;
+      display: inline-block; margin: 0.25rem;
+    }
+    [role="button"] { background: #30363d; }
+    [role="tab"] { background: #0d1117; border: 1px solid #30363d; }
+    [role="menuitem"] { background: #161b22; }
+    [role="link"] { color: #58a6ff; text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav>
+    <span class="brand">Auto-Tracking Test</span>
+    <a class="nav-link active" data-route="/">Home</a>
+    <a class="nav-link" data-route="/features">Features</a>
+    <a class="nav-link" data-route="/pricing">Pricing</a>
+    <a class="nav-link" data-route="/contact">Contact</a>
+    <span class="badge">all auto-tracking ON</span>
+  </nav>
+
+  <!-- Page: Home -->
+  <div class="page active" id="page-home" data-path="/">
+    <h1>Home Page</h1>
+    <p>This example app has all auto-tracking features enabled. Every click on interactive elements, scroll depth changes, and route navigations are automatically captured.</p>
+
+    <h2>Click Tracking Test</h2>
+    <p>Click any of these elements. Each click is auto-tracked with tag, id, class, text, and href.</p>
+
+    <div class="btn-row">
+      <button id="hero-cta">Get Started</button>
+      <button class="btn-secondary">Learn More</button>
+      <button class="btn-danger">Delete Account</button>
+    </div>
+
+    <div class="btn-row">
+      <a class="link" href="#section-2">Internal Link</a>
+      <a class="outbound" href="https://github.com" target="_blank">GitHub (outbound)</a>
+      <a class="outbound" href="https://stackoverflow.com" target="_blank">StackOverflow (outbound)</a>
+    </div>
+
+    <h2>ARIA Role Elements</h2>
+    <div class="btn-row">
+      <span role="button">role=button</span>
+      <span role="link">role=link</span>
+      <span role="menuitem">role=menuitem</span>
+      <span role="tab">role=tab</span>
+    </div>
+
+    <h2>Form Elements</h2>
+    <input type="text" placeholder="Click this text input">
+    <select>
+      <option>Click this select</option>
+      <option>Option B</option>
+    </select>
+    <textarea placeholder="Click this textarea"></textarea>
+
+    <h2 id="section-2">Scroll Depth Test</h2>
+    <p>Scroll down through these sections. The SDK tracks the maximum scroll depth reached and sends it when you navigate away.</p>
+
+    <div class="tall-section">
+      <h3>Section 1 - Introduction</h3>
+      <p>Keep scrolling to increase the tracked scroll depth percentage. The scroll depth is calculated as (scrollTop + viewportHeight) / documentHeight.</p>
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
+    </div>
+
+    <div class="tall-section">
+      <h3>Section 2 - Deep Content</h3>
+      <p>You should be at around 40-60% scroll depth now. The SDK uses requestAnimationFrame for efficient scroll tracking.</p>
+      <div class="card-grid">
+        <div class="card"><h3>Card A</h3><p>Click this card area</p></div>
+        <div class="card"><h3>Card B</h3><p>Another clickable card</p></div>
+        <div class="card"><h3>Card C</h3><p>And one more</p></div>
+      </div>
+    </div>
+
+    <div class="tall-section">
+      <h3>Section 3 - More Content</h3>
+      <p>Getting closer to the bottom. Scroll depth should be 70-90% now.</p>
+      <div class="btn-row">
+        <button>Deep Button 1</button>
+        <button class="btn-secondary">Deep Button 2</button>
+      </div>
+    </div>
+
+    <div class="tall-section">
+      <h3>Section 4 - Bottom</h3>
+      <p>If you can see this, you've reached ~100% scroll depth. Navigate to another page to trigger the scroll_depth event.</p>
+    </div>
+  </div>
+
+  <!-- Page: Features -->
+  <div class="page" id="page-features" data-path="/features">
+    <h1>Features Page</h1>
+    <p>You navigated here via pushState. A screen_view event was auto-tracked, and scroll_depth from the previous page was flushed.</p>
+
+    <h2>Feature Cards</h2>
+    <div class="card-grid">
+      <div class="card">
+        <h3>Auto Page Views</h3>
+        <p>Tracks pushState, replaceState, and popstate events automatically.</p>
+        <button>Try Feature</button>
+      </div>
+      <div class="card">
+        <h3>Click Tracking</h3>
+        <p>Captures clicks on buttons, links, inputs, selects, textareas, and ARIA roles.</p>
+        <button>Try Feature</button>
+      </div>
+      <div class="card">
+        <h3>Scroll Depth</h3>
+        <p>Measures max scroll depth per page using rAF. Flushed on navigation or unload.</p>
+        <button>Try Feature</button>
+      </div>
+      <div class="card">
+        <h3>Outbound Links</h3>
+        <p>Detects and tracks clicks on links pointing to external domains.</p>
+        <a class="outbound" href="https://google.com" target="_blank">Google (outbound)</a>
+      </div>
+    </div>
+
+    <div class="tall-section">
+      <h3>Scroll here too</h3>
+      <p>This page also has scrollable content to test per-page scroll depth tracking.</p>
+    </div>
+
+    <div class="tall-section">
+      <h3>More features content</h3>
+      <p>Each page tracks its own scroll depth independently.</p>
+      <div class="btn-row">
+        <button id="features-cta">Sign Up Now</button>
+        <button class="btn-secondary">Compare Plans</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Page: Pricing -->
+  <div class="page" id="page-pricing" data-path="/pricing">
+    <h1>Pricing Page</h1>
+    <p>Another route change tracked. Check the log for screen_view and scroll_depth events.</p>
+
+    <div class="card-grid">
+      <div class="card">
+        <h3>Free</h3>
+        <p>$0/month</p>
+        <button>Get Started</button>
+      </div>
+      <div class="card">
+        <h3>Pro</h3>
+        <p>$19/month</p>
+        <button>Subscribe</button>
+      </div>
+      <div class="card">
+        <h3>Enterprise</h3>
+        <p>Custom pricing</p>
+        <button>Contact Sales</button>
+      </div>
+    </div>
+
+    <div class="tall-section">
+      <h3>FAQ</h3>
+      <p>Can I cancel anytime? Yes. Do you offer refunds? Yes, within 30 days.</p>
+      <button class="btn-secondary">Read Full FAQ</button>
+    </div>
+  </div>
+
+  <!-- Page: Contact -->
+  <div class="page" id="page-contact" data-path="/contact">
+    <h1>Contact Page</h1>
+    <p>Form inputs are tracked on click too. Try clicking the fields and the submit button.</p>
+
+    <h2>Contact Form</h2>
+    <input type="text" id="contact-name" placeholder="Your name">
+    <input type="email" id="contact-email" placeholder="Your email">
+    <select id="contact-topic">
+      <option>General Inquiry</option>
+      <option>Bug Report</option>
+      <option>Feature Request</option>
+    </select>
+    <textarea id="contact-message" placeholder="Your message..."></textarea>
+    <div class="btn-row">
+      <button id="contact-submit">Send Message</button>
+      <button class="btn-secondary" id="contact-reset">Reset Form</button>
+    </div>
+
+    <div class="tall-section">
+      <h3>Office Locations</h3>
+      <p>San Francisco, London, Tokyo. Scroll down for more info about our global presence.</p>
+    </div>
+  </div>
+
+  <!-- Fixed Log Panel -->
+  <div id="log-panel">
+    <div id="log-header">
+      <h3>Event Log <span id="event-count">(0 events)</span></h3>
+      <span id="toggle-hint">click to collapse</span>
+    </div>
+    <div id="log-entries"></div>
+  </div>
+
+  <script type="module" src="/auto-tracking.js"></script>
+</body>
+</html>

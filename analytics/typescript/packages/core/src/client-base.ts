@@ -883,19 +883,35 @@ export class KitbaseAnalytics {
 
   /**
    * Find the nearest clickable element from a click event.
-   * Uses `composedPath()` to traverse through Shadow DOM boundaries,
-   * then falls back to `closest()` on the event target.
+   * Uses `composedPath()` to traverse through Shadow DOM boundaries.
+   * When a match is found inside a Shadow DOM, the custom-element host
+   * is returned so that tracked attributes (tag, id, class, text)
+   * reflect the public component rather than its internal template.
    */
   private findClickableElement(event: MouseEvent): Element | null {
-    // composedPath() gives the full path including shadow DOM internals
     const path = event.composedPath?.() as Element[] | undefined;
 
     if (path) {
       for (const node of path) {
         if (!(node instanceof Element)) continue;
-        // Stop at the document/shadow root level
         if (node === document.documentElement) break;
-        if (node.matches(KitbaseAnalytics.CLICKABLE_SELECTOR)) return node;
+
+        if (node.matches(KitbaseAnalytics.CLICKABLE_SELECTOR)) {
+          // If the matched element lives inside a Shadow DOM,
+          // promote to the custom-element host for meaningful attributes.
+          const root = node.getRootNode();
+          if (root instanceof ShadowRoot && root.host instanceof Element) {
+            return root.host;
+          }
+          return node;
+        }
+
+        // Custom elements (tag name contains a hyphen per spec) are
+        // interactive even without a native element inside — e.g. an
+        // <ion-button> that only renders a styled <div> in its shadow.
+        if (node.tagName.includes('-')) {
+          return node;
+        }
       }
     }
 
@@ -916,19 +932,21 @@ export class KitbaseAnalytics {
       if (!element) return;
 
       // Skip outbound links — already handled by outbound link tracking
-      if (this.autoTrackOutboundLinks && element.tagName === 'A') {
-        const link = element as HTMLAnchorElement;
-        try {
-          const linkUrl = new URL(link.href);
-          if (
-            (linkUrl.protocol === 'http:' || linkUrl.protocol === 'https:') &&
-            linkUrl.hostname !== window.location.hostname &&
-            !this.isSameRootDomain(window.location.hostname, linkUrl.hostname)
-          ) {
-            return;
+      if (this.autoTrackOutboundLinks) {
+        const elHref = (element as HTMLAnchorElement).href || element.getAttribute('href') || '';
+        if (elHref) {
+          try {
+            const linkUrl = new URL(elHref, window.location.origin);
+            if (
+              (linkUrl.protocol === 'http:' || linkUrl.protocol === 'https:') &&
+              linkUrl.hostname !== window.location.hostname &&
+              !this.isSameRootDomain(window.location.hostname, linkUrl.hostname)
+            ) {
+              return;
+            }
+          } catch {
+            // Invalid URL, continue with click tracking
           }
-        } catch {
-          // Invalid URL, continue with click tracking
         }
       }
 
@@ -936,7 +954,8 @@ export class KitbaseAnalytics {
       const id = element.id || '';
       const className = element.className && typeof element.className === 'string' ? element.className : '';
       const text = (element.textContent || '').trim().slice(0, 100);
-      const href = (element as HTMLAnchorElement).href || '';
+      // .href property only exists on <a>; fall back to the attribute for custom elements
+      const href = (element as HTMLAnchorElement).href || element.getAttribute('href') || '';
 
       const path = window.location.pathname;
 
