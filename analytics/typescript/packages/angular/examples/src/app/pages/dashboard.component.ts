@@ -104,6 +104,45 @@ import { LogService } from '../log.service';
         </div>
       </div>
 
+      <!-- Data-Attribute Click Tracking Demo -->
+      <div class="card">
+        <h2>Data-Attribute Click Tracking</h2>
+        <p style="margin-bottom: 0.75rem; color: #666; font-size: 0.875rem;">
+          These buttons use <code>data-kb-track-click</code> to fire named events — no TypeScript needed.
+        </p>
+        <div class="btn-group">
+          <button data-kb-track-click="CTA Clicked" data-kb-click-channel="marketing">
+            CTA Button (marketing)
+          </button>
+          <button data-kb-track-click="Add to Cart">
+            Add to Cart (engagement)
+          </button>
+        </div>
+      </div>
+
+      <!-- Visibility Tracking Demo -->
+      <div class="card">
+        <h2>Visibility Tracking</h2>
+        <p style="margin-bottom: 0.75rem; color: #666; font-size: 0.875rem;">
+          Scroll these sections into view — the SDK tracks how long each is visible and fires events on navigation or unload.
+        </p>
+        <div
+          data-kb-track-visibility="Pricing Section Viewed"
+          data-kb-visibility-channel="marketing"
+          style="background: #e8f5e9; padding: 1rem; border-radius: 6px; margin-bottom: 0.5rem;"
+        >
+          <strong>Pricing Section</strong> — channel: marketing, threshold: 0.5 (default)
+        </div>
+        <div
+          data-kb-track-visibility="Hero Banner Viewed"
+          data-kb-visibility-channel="engagement"
+          data-kb-visibility-threshold="0.75"
+          style="background: #e3f2fd; padding: 1rem; border-radius: 6px;"
+        >
+          <strong>Hero Banner</strong> — channel: engagement, threshold: 0.75
+        </div>
+      </div>
+
       <!-- Log -->
       <div class="card log-container">
         <h2>Event Log <button class="secondary" (click)="logService.clear()" style="float:right;font-size:0.75rem;">Clear</button></h2>

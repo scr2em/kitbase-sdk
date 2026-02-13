@@ -88,6 +88,7 @@ export class KitbaseAnalytics {
   protected autoTrackOutboundLinks: boolean;
   protected autoTrackClicks: boolean;
   protected autoTrackScrollDepth: boolean;
+  protected autoTrackVisibility: boolean;
   protected userId: string | null = null;
   protected clickListenerAdded = false;
   protected clickTrackingListenerAdded = false;
@@ -98,6 +99,13 @@ export class KitbaseAnalytics {
   private scrollListener: (() => void) | null = null;
   private beforeUnloadListener: (() => void) | null = null;
   private scrollRafScheduled = false;
+
+  // Visibility tracking
+  private visibilityTrackingActive = false;
+  private visibilityObservers: Map<number, IntersectionObserver> = new Map();
+  private visibilityMutationObserver: MutationObserver | null = null;
+  private visibilityData: Map<Element, { visibleSince: number | null; totalMs: number; event: string; channel: string }> = new Map();
+  private visibilityBeforeUnloadListener: (() => void) | null = null;
 
   // Bot detection
   protected botDetectionConfig: BotDetectionConfig;
@@ -128,6 +136,7 @@ export class KitbaseAnalytics {
     this.autoTrackOutboundLinks = config.analytics?.autoTrackOutboundLinks ?? true;
     this.autoTrackClicks = config.analytics?.autoTrackClicks ?? true;
     this.autoTrackScrollDepth = config.analytics?.autoTrackScrollDepth ?? true;
+    this.autoTrackVisibility = config.analytics?.autoTrackVisibility ?? true;
 
     // Auto-track pageviews if enabled
     if (this.autoTrackPageViews && typeof window !== 'undefined') {
@@ -147,6 +156,11 @@ export class KitbaseAnalytics {
     // Setup scroll depth tracking if enabled
     if (this.autoTrackScrollDepth && typeof window !== 'undefined') {
       this.setupScrollDepthTracking();
+    }
+
+    // Setup visibility tracking if enabled
+    if (this.autoTrackVisibility && typeof window !== 'undefined') {
+      this.setupVisibilityTracking();
     }
 
     // Initialize bot detection
@@ -928,6 +942,25 @@ export class KitbaseAnalytics {
     if (typeof window === 'undefined' || this.clickTrackingListenerAdded) return;
 
     document.addEventListener('click', (event: MouseEvent) => {
+      const target = event.target as Element | null;
+
+      // data-kb-track-click — user-defined click events via data attributes
+      const annotated = target?.closest?.('[data-kb-track-click]');
+      if (annotated) {
+        const eventName = annotated.getAttribute('data-kb-track-click');
+        if (eventName) {
+          const channel = annotated.getAttribute('data-kb-click-channel') || 'engagement';
+          this.track({
+            channel,
+            event: eventName,
+            tags: {
+              __path: window.location.pathname,
+            },
+          }).catch((err) => this.log('Failed to track data-attribute click', err));
+          return; // skip generic click tracking for annotated elements
+        }
+      }
+
       const element = this.findClickableElement(event);
       if (!element) return;
 
@@ -1269,6 +1302,198 @@ export class KitbaseAnalytics {
   }
 
   // ============================================================
+  // Visibility Tracking
+  // ============================================================
+
+  /**
+   * Setup visibility duration tracking for elements with data-kb-track-visibility
+   */
+  protected setupVisibilityTracking(): void {
+    if (typeof window === 'undefined' || this.visibilityTrackingActive) return;
+    if (typeof IntersectionObserver === 'undefined' || typeof MutationObserver === 'undefined') return;
+
+    // Scan existing DOM elements
+    this.scanForVisibilityElements();
+
+    // Watch for dynamically added/removed elements
+    this.visibilityMutationObserver = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        for (const node of Array.from(mutation.addedNodes)) {
+          if (node instanceof Element) {
+            this.observeVisibilityElement(node);
+            // Also check descendants
+            for (const el of Array.from(node.querySelectorAll('[data-kb-track-visibility]'))) {
+              this.observeVisibilityElement(el);
+            }
+          }
+        }
+        for (const node of Array.from(mutation.removedNodes)) {
+          if (node instanceof Element) {
+            this.flushVisibilityForElement(node);
+            for (const el of Array.from(node.querySelectorAll('[data-kb-track-visibility]'))) {
+              this.flushVisibilityForElement(el);
+            }
+          }
+        }
+      }
+    });
+
+    this.visibilityMutationObserver.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+
+    // Flush on beforeunload
+    this.visibilityBeforeUnloadListener = () => {
+      this.flushAllVisibilityEvents();
+    };
+    window.addEventListener('beforeunload', this.visibilityBeforeUnloadListener);
+
+    // Flush on SPA navigation (pushState / popstate)
+    const originalPushState = history.pushState;
+    const self = this;
+    history.pushState = function (...args) {
+      self.flushAllVisibilityEvents();
+      return originalPushState.apply(this, args);
+    };
+
+    window.addEventListener('popstate', () => {
+      this.flushAllVisibilityEvents();
+    });
+
+    this.visibilityTrackingActive = true;
+    this.log('Visibility tracking enabled');
+  }
+
+  /**
+   * Scan DOM for existing elements with data-kb-track-visibility
+   */
+  private scanForVisibilityElements(): void {
+    for (const el of Array.from(document.querySelectorAll('[data-kb-track-visibility]'))) {
+      this.observeVisibilityElement(el);
+    }
+  }
+
+  /**
+   * Start observing a single element for visibility
+   */
+  private observeVisibilityElement(el: Element): void {
+    const eventName = el.getAttribute('data-kb-track-visibility');
+    if (!eventName || this.visibilityData.has(el)) return;
+
+    const channel = el.getAttribute('data-kb-visibility-channel') || 'engagement';
+    const threshold = parseFloat(el.getAttribute('data-kb-visibility-threshold') || '0.5');
+    const clampedThreshold = Math.max(0, Math.min(1, isNaN(threshold) ? 0.5 : threshold));
+
+    this.visibilityData.set(el, {
+      visibleSince: null,
+      totalMs: 0,
+      event: eventName,
+      channel,
+    });
+
+    const observer = this.getOrCreateObserver(clampedThreshold);
+    observer.observe(el);
+  }
+
+  /**
+   * Get or create an IntersectionObserver for a given threshold
+   */
+  private getOrCreateObserver(threshold: number): IntersectionObserver {
+    // Round to 2 decimals to avoid floating-point key mismatches
+    const key = Math.round(threshold * 100);
+
+    let observer = this.visibilityObservers.get(key);
+    if (observer) return observer;
+
+    observer = new IntersectionObserver(
+      (entries) => {
+        const now = Date.now();
+        for (const entry of entries) {
+          const data = this.visibilityData.get(entry.target);
+          if (!data) continue;
+
+          if (entry.isIntersecting) {
+            // Element entered viewport
+            data.visibleSince = now;
+          } else if (data.visibleSince !== null) {
+            // Element left viewport — accumulate time
+            data.totalMs += now - data.visibleSince;
+            data.visibleSince = null;
+          }
+        }
+      },
+      { threshold },
+    );
+
+    this.visibilityObservers.set(key, observer);
+    return observer;
+  }
+
+  /**
+   * Flush visibility event for a single element (e.g. when removed from DOM)
+   */
+  private flushVisibilityForElement(el: Element): void {
+    const data = this.visibilityData.get(el);
+    if (!data) return;
+
+    // Accumulate any in-progress visible time
+    if (data.visibleSince !== null) {
+      data.totalMs += Date.now() - data.visibleSince;
+      data.visibleSince = null;
+    }
+
+    if (data.totalMs > 0) {
+      const durationMs = Math.round(data.totalMs);
+      const durationSeconds = Math.round(durationMs / 1000);
+      this.track({
+        channel: data.channel,
+        event: data.event,
+        tags: {
+          duration_seconds: durationSeconds,
+          duration_ms: durationMs,
+        },
+      }).catch((err) => this.log('Failed to track visibility event', err));
+    }
+
+    // Stop observing and clean up
+    for (const observer of this.visibilityObservers.values()) {
+      observer.unobserve(el);
+    }
+    this.visibilityData.delete(el);
+  }
+
+  /**
+   * Flush all pending visibility events (e.g. on navigation or unload)
+   */
+  protected flushAllVisibilityEvents(): void {
+    for (const [el, data] of this.visibilityData.entries()) {
+      // Accumulate any in-progress visible time
+      if (data.visibleSince !== null) {
+        data.totalMs += Date.now() - data.visibleSince;
+        data.visibleSince = null;
+      }
+
+      if (data.totalMs > 0) {
+        const durationMs = Math.round(data.totalMs);
+        const durationSeconds = Math.round(durationMs / 1000);
+        this.track({
+          channel: data.channel,
+          event: data.event,
+          tags: {
+            duration_seconds: durationSeconds,
+            duration_ms: durationMs,
+          },
+        }).catch((err) => this.log('Failed to track visibility event', err));
+      }
+
+      // Reset for next page / session
+      data.totalMs = 0;
+      data.visibleSince = null;
+    }
+  }
+
+  // ============================================================
   // Cleanup
   // ============================================================
 
@@ -1299,6 +1524,25 @@ export class KitbaseAnalytics {
         this.beforeUnloadListener = null;
       }
       this.scrollTrackingActive = false;
+    }
+
+    // Cleanup visibility tracking
+    if (this.visibilityTrackingActive) {
+      this.flushAllVisibilityEvents();
+      for (const observer of this.visibilityObservers.values()) {
+        observer.disconnect();
+      }
+      this.visibilityObservers.clear();
+      if (this.visibilityMutationObserver) {
+        this.visibilityMutationObserver.disconnect();
+        this.visibilityMutationObserver = null;
+      }
+      if (this.visibilityBeforeUnloadListener) {
+        window.removeEventListener('beforeunload', this.visibilityBeforeUnloadListener);
+        this.visibilityBeforeUnloadListener = null;
+      }
+      this.visibilityData.clear();
+      this.visibilityTrackingActive = false;
     }
 
     this.log('Shutdown complete');

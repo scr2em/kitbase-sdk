@@ -188,6 +188,13 @@ export interface AnalyticsConfig {
    * @default true
    */
   autoTrackScrollDepth?: boolean;
+
+  /**
+   * Track visibility duration of elements with `data-kb-track-visibility` attribute.
+   * Uses IntersectionObserver to measure how long elements are visible in the viewport.
+   * @default true
+   */
+  autoTrackVisibility?: boolean;
 }
 
 /**

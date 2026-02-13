@@ -1,25 +1,30 @@
 /**
  * Angular integration for Kitbase Analytics SDK
  *
- * Provides an Angular service for easy integration with Angular applications.
- * No Angular decorators are used — the service is provided via a factory function,
- * making it compatible with AOT compilation without requiring ng-packagr.
+ * Two ways to use:
  *
- * @example
+ * **1. Direct usage — just call `init()`:**
  * ```typescript
- * // main.ts or app.config.ts (standalone)
+ * import { init } from '@kitbase/analytics-angular';
+ *
+ * const kitbase = init({ token: 'your-api-key' });
+ * kitbase.track({ channel: 'ui', event: 'Button Clicked' });
+ * ```
+ *
+ * **2. Angular DI — use `provideKitbaseAnalytics()` + `inject()`:**
+ * ```typescript
+ * // app.config.ts
  * import { provideKitbaseAnalytics } from '@kitbase/analytics-angular';
  *
- * bootstrapApplication(AppComponent, {
+ * export const appConfig = {
  *   providers: [
  *     provideKitbaseAnalytics({ token: 'your-api-key' }),
  *   ],
- * });
+ * };
  *
  * // component.ts
  * import { KitbaseAnalyticsService } from '@kitbase/analytics-angular';
  *
- * @Component({ ... })
  * export class MyComponent {
  *   private kitbase = inject(KitbaseAnalyticsService);
  *
@@ -39,6 +44,7 @@ import {
 } from '@angular/core';
 import {
   init,
+  getInstance,
   type KitbaseAnalytics,
   type KitbaseConfig,
   type TrackOptions,
@@ -52,8 +58,12 @@ import {
   type PrivacyConfig,
 } from '@kitbase/analytics';
 
+// Re-export init & getInstance for direct usage without DI
+export { init, getInstance };
+
 // Re-export types from core
 export type {
+  KitbaseAnalytics,
   KitbaseConfig,
   TrackOptions,
   TrackResponse,
