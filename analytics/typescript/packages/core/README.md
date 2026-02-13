@@ -1,6 +1,6 @@
 # @kitbase/analytics
 
-Official Kitbase SDK for event tracking and web analytics in TypeScript and JavaScript applications.
+Core Kitbase Analytics SDK for TypeScript and JavaScript. Framework-agnostic — works in any browser environment.
 
 ## Installation
 
@@ -19,55 +19,148 @@ import { Kitbase } from '@kitbase/analytics';
 
 const kitbase = new Kitbase({
   token: 'your-api-key',
+  debug: true,
 });
 
 // Track a custom event
 await kitbase.track({
   channel: 'payments',
   event: 'Purchase Completed',
-  tags: {
-    product_id: 'prod_123',
-    amount: 4999,
-  },
+  tags: { product_id: 'prod_123', amount: 4999 },
 });
 ```
 
-## Features
+### Lite Build
 
-- **Event Tracking** - Track custom events with metadata
-- **Web Analytics** - Automatic pageview tracking and outbound link tracking
-- **User Identification** - Identify users and attach traits
-- **Offline Support** - Queue events locally when offline, sync when back online
-- **Super Properties** - Set properties that are included with every event
-- **Duration Tracking** - Measure how long actions take
+For a smaller bundle without offline queue support:
+
+```typescript
+import { KitbaseAnalytics } from '@kitbase/analytics/lite';
+
+const kitbase = new KitbaseAnalytics({ token: 'your-api-key' });
+```
+
+### Script Tag (CDN)
+
+```html
+<script>
+  window.KITBASE_CONFIG = { token: 'your-api-key' };
+</script>
+<script defer src="https://kitbase.dev/script.js"></script>
+```
+
+The script auto-initializes and exposes `window.kitbase` for tracking events:
+
+```html
+<script>
+  window.kitbase.track({
+    channel: 'web',
+    event: 'Button Clicked',
+    tags: { button_id: 'signup' },
+  });
+</script>
+```
 
 ## Configuration
 
 ```typescript
 const kitbase = new Kitbase({
-  // Required: Your API key
+  // Required
   token: 'your-api-key',
 
-  // Optional: Custom API endpoint
+  // Optional
+  debug: false,
   baseUrl: 'https://api.kitbase.dev',
 
-  // Optional: Enable debug logging
-  debug: true,
-
-  // Optional: Offline queue configuration
-  offline: {
-    enabled: true,
-    maxSize: 1000,           // Max events to queue
-    flushInterval: 30000,    // Flush every 30 seconds
+  analytics: {
+    autoTrackPageViews: true,      // track route changes automatically
+    autoTrackOutboundLinks: true,  // track external link clicks
+    autoTrackClicks: true,         // track button/link/input clicks + data-kb-track-click
+    autoTrackScrollDepth: true,    // track max scroll depth per page
+    autoTrackVisibility: true,     // track visibility duration via data attributes
   },
 
-  // Optional: Analytics configuration
-  analytics: {
-    autoTrackPageViews: false,       // Track pageviews on route changes
-    autoTrackOutboundLinks: true,    // Track outbound link clicks (default: true)
+  privacy: {
+    optOutByDefault: false,
+    optOutStorageKey: '_ka_opt_out',
+    clearQueueOnOptOut: true,
+  },
+
+  offline: {
+    enabled: true,
+    maxQueueSize: 1000,
+    flushInterval: 30000,
+    flushBatchSize: 50,
+    maxRetries: 3,
+  },
+
+  botDetection: {
+    enabled: false,
   },
 });
 ```
+
+## Auto-Tracked Events
+
+All enabled by default. The SDK automatically tracks:
+
+| Event | Channel | Trigger |
+|-------|---------|---------|
+| `screen_view` | `__analytics` | Page navigation (init, pushState, popstate) |
+| `outbound_link` | `__analytics` | Click on external link |
+| `click` | `__analytics` | Click on interactive element |
+| `scroll_depth` | `__analytics` | Navigation / unload (max depth per page) |
+
+Page views, clicks, outbound links, and scroll depth are tracked automatically. The SDK intercepts `history.pushState`/`popstate` for SPA support — no framework router integration needed.
+
+## Data Attribute Events
+
+Track events from HTML using data attributes — no JavaScript needed. Works in any framework or vanilla HTML.
+
+### Click Tracking
+
+Fire a named event when a user clicks an element:
+
+```html
+<!-- Basic -->
+<button data-kb-track-click="CTA Clicked">Sign Up Now</button>
+
+<!-- With custom channel -->
+<button data-kb-track-click="Add to Cart" data-kb-click-channel="ecommerce">
+  Add to Cart
+</button>
+```
+
+| Attribute | Required | Default | Description |
+|-----------|----------|---------|-------------|
+| `data-kb-track-click` | Yes | — | Event name to fire |
+| `data-kb-click-channel` | No | `'engagement'` | Channel for the event |
+
+Elements with `data-kb-track-click` skip the generic auto-click tracking to avoid double-counting. Disable with `autoTrackClicks: false`.
+
+### Visibility Duration
+
+Track how long elements are visible in the viewport:
+
+```html
+<!-- Basic -->
+<section data-kb-track-visibility="Pricing Section Viewed">...</section>
+
+<!-- With optional channel and threshold -->
+<div
+  data-kb-track-visibility="Hero Banner Viewed"
+  data-kb-visibility-channel="marketing"
+  data-kb-visibility-threshold="0.5"
+>...</div>
+```
+
+| Attribute | Required | Default | Description |
+|-----------|----------|---------|-------------|
+| `data-kb-track-visibility` | Yes | — | Event name to fire |
+| `data-kb-visibility-channel` | No | `'engagement'` | Channel for the event |
+| `data-kb-visibility-threshold` | No | `0.5` | IntersectionObserver threshold (0–1) |
+
+Fires an event with `duration_seconds` and `duration_ms` tags when the element leaves the viewport, is removed from the DOM, or the user navigates away. Dynamically added elements are picked up via MutationObserver. Disable with `autoTrackVisibility: false`.
 
 ## Event Tracking
 
@@ -100,29 +193,26 @@ await kitbase.track({
 
 ### Duration Tracking
 
-Measure how long an action takes:
-
 ```typescript
 // Start timing
 kitbase.timeEvent('Video Watched');
 
 // ... user watches video ...
 
-// Track with automatic duration
+// Track with automatic duration — $duration tag included automatically
 await kitbase.track({
   channel: 'engagement',
   event: 'Video Watched',
   tags: { video_id: '123' },
 });
-// Event includes $duration property in seconds
 ```
 
 ## Web Analytics
 
-### Track Page Views
+### Page Views
 
 ```typescript
-// Manual pageview tracking
+// Manual
 await kitbase.trackPageView();
 
 // With custom path/title
@@ -130,48 +220,31 @@ await kitbase.trackPageView({
   path: '/products/123',
   title: 'Product Details',
 });
-```
 
-### Auto-track Page Views (SPAs)
-
-```typescript
 // Enable automatic tracking on route changes
 kitbase.enableAutoPageViews();
 ```
 
-### Track Revenue
+### Revenue
 
 ```typescript
 await kitbase.trackRevenue({
-  amount: 4999, // Amount in cents ($49.99)
+  amount: 4999,
   currency: 'USD',
-  tags: {
-    product_id: 'prod_123',
-    coupon: 'SAVE20',
-  },
+  tags: { product_id: 'prod_123', coupon: 'SAVE20' },
 });
 ```
 
 ## User Identification
 
-### Identify a User
-
 ```typescript
-kitbase.identify({
+// Identify a user
+await kitbase.identify({
   userId: 'user_123',
-  traits: {
-    email: 'user@example.com',
-    plan: 'premium',
-    company: 'Acme Inc',
-  },
+  traits: { email: 'user@example.com', plan: 'premium' },
 });
-```
 
-### Reset on Logout
-
-Clear user identity and start fresh:
-
-```typescript
+// Reset on logout
 kitbase.reset();
 ```
 
@@ -180,23 +253,44 @@ kitbase.reset();
 Properties included with every event:
 
 ```typescript
-// Set super properties
-kitbase.register({
-  app_version: '2.1.0',
-  platform: 'web',
-});
+kitbase.register({ app_version: '2.1.0', platform: 'web' });
 
 // Set only if not already set
-kitbase.registerOnce({
-  first_visit: new Date().toISOString(),
-});
+kitbase.registerOnce({ first_visit: new Date().toISOString() });
 
-// Remove a super property
+// Remove / clear
 kitbase.unregister('platform');
-
-// Clear all
 kitbase.clearSuperProperties();
 ```
+
+## Privacy & Consent
+
+```typescript
+// Opt out (persisted to localStorage)
+kitbase.optOut();
+
+// Opt in
+kitbase.optIn();
+
+// Check status
+kitbase.isOptedOut();  // boolean
+kitbase.hasConsent();  // boolean
+```
+
+## Bot Detection
+
+```typescript
+const kitbase = new Kitbase({
+  token: 'your-api-key',
+  botDetection: { enabled: true },
+});
+
+kitbase.isBot();                // boolean
+kitbase.getBotDetectionResult(); // detailed result
+kitbase.redetectBot();          // force re-run
+```
+
+When bot detection is enabled and a bot is detected, all tracking calls are silently blocked.
 
 ## Offline Support
 
@@ -205,16 +299,11 @@ Events are queued locally when offline and synced when back online:
 ```typescript
 const kitbase = new Kitbase({
   token: 'your-api-key',
-  offline: {
-    enabled: true,
-    maxSize: 1000,        // Maximum events to store
-    flushInterval: 30000, // Sync interval in ms
-  },
+  offline: { enabled: true },
 });
 
 // Check queue status
 const stats = await kitbase.getQueueStats();
-// { size: 5, isFlushing: false }
 
 // Manual flush
 await kitbase.flushQueue();
@@ -223,126 +312,113 @@ await kitbase.flushQueue();
 await kitbase.clearQueue();
 ```
 
-## Lite Build
-
-For a smaller bundle size (~20KB vs ~56KB), use the lite build without offline queue support:
-
-```typescript
-import { Kitbase } from '@kitbase/analytics/lite';
-
-const kitbase = new Kitbase({
-  token: 'your-api-key',
-});
-```
-
-## CDN Usage
-
-For quick integration without a build step, use the hosted script with `window.KITBASE_CONFIG`:
-
-```html
-<script>
-  window.KITBASE_CONFIG = {
-    token: 'your-api-key',
-  };
-</script>`
-<script defer src="https://kitbase.dev/script.js"></script>
-```
-
-The script auto-initializes and exposes `window.kitbase` for tracking events.
-
-### Configuration Options
-
-```html
-<script>
-  window.KITBASE_CONFIG = {
-    token: 'your-api-key',
-    debug: true,
-    analytics: {
-      autoTrackPageViews: true,
-    },
-  };
-</script>
-<script defer src="https://kitbase.dev/script.js"></script>
-```
-
-### Tracking Events
-
-Once loaded, use the global `window.kitbase` instance:
-
-```html
-<script>
-  window.kitbase.track({
-    channel: 'web',
-    event: 'Button Clicked',
-    tags: { button_id: 'signup' },
-  });
-</script>
-```
-
 ## Debug Mode
 
 ```typescript
-// Enable at initialization
-const kitbase = new Kitbase({
-  token: 'your-api-key',
-  debug: true,
-});
-
-// Or toggle at runtime
 kitbase.setDebugMode(true);
 kitbase.setDebugMode(false);
-
-// Check status
-const isDebug = kitbase.isDebugMode();
+kitbase.isDebugMode(); // boolean
 ```
 
 ## Cleanup
 
-Properly shutdown when done:
-
 ```typescript
-await kitbase.shutdown();
+kitbase.shutdown();
 ```
+
+Disconnects observers, flushes pending scroll depth and visibility events, and cleans up event listeners.
 
 ## API Reference
 
-### Kitbase Class
+### Event Tracking
 
 | Method | Description |
 |--------|-------------|
 | `track(options)` | Track a custom event |
 | `trackPageView(options?)` | Track a page view |
 | `trackRevenue(options)` | Track a revenue event |
-| `identify(options)` | Identify the current user |
-| `reset()` | Reset user identity |
-| `register(props)` | Set super properties |
-| `registerOnce(props)` | Set super properties if not already set |
+| `trackOutboundLink(options)` | Track an outbound link click |
+| `trackClick(tags)` | Track a click event |
+
+### User Identification
+
+| Method | Description |
+|--------|-------------|
+| `identify(options)` | Identify a user with traits |
+| `getUserId()` | Get the identified user ID |
+| `reset()` | Reset user identity and session |
+
+### Super Properties
+
+| Method | Description |
+|--------|-------------|
+| `register(properties)` | Set properties included in all events |
+| `registerOnce(properties)` | Set properties only if not already set |
 | `unregister(key)` | Remove a super property |
+| `getSuperProperties()` | Get all super properties |
 | `clearSuperProperties()` | Clear all super properties |
-| `timeEvent(name)` | Start timing an event |
-| `cancelTimeEvent(name)` | Cancel timing an event |
-| `getUserId()` | Get identified user ID |
+
+### Time Events
+
+| Method | Description |
+|--------|-------------|
+| `timeEvent(eventName)` | Start timing an event |
+| `cancelTimeEvent(eventName)` | Cancel timing an event |
+| `getTimedEvents()` | List all active timed events |
+| `getEventDuration(eventName)` | Get elapsed time without stopping |
+
+### Privacy & Consent
+
+| Method | Description |
+|--------|-------------|
+| `optOut()` | Opt out of tracking |
+| `optIn()` | Opt in to tracking |
+| `isOptedOut()` | Check if opted out |
+| `hasConsent()` | Check if user has consented |
+
+### Bot Detection
+
+| Method | Description |
+|--------|-------------|
+| `isBot()` | Check if current visitor is a bot |
+| `getBotDetectionResult()` | Get detailed detection result |
+| `redetectBot()` | Force re-run detection |
+
+### Debug & Lifecycle
+
+| Method | Description |
+|--------|-------------|
+| `setDebugMode(enabled)` | Toggle debug logging |
+| `isDebugMode()` | Check if debug mode is on |
 | `enableAutoPageViews()` | Enable automatic pageview tracking |
-| `setDebugMode(enabled)` | Enable/disable debug logging |
-| `getQueueStats()` | Get offline queue statistics |
-| `flushQueue()` | Manually flush the offline queue |
-| `clearQueue()` | Clear the offline queue |
-| `shutdown()` | Cleanup and shutdown the client |
+| `shutdown()` | Flush pending events and cleanup resources |
+
+### Offline Queue (full build only)
+
+| Method | Description |
+|--------|-------------|
+| `getQueueStats()` | Get queue size and status |
+| `flushQueue()` | Manually flush the queue |
+| `clearQueue()` | Clear all queued events |
 
 ## TypeScript Support
 
 Full TypeScript support with exported types:
 
 ```typescript
-import {
-  Kitbase,
+import type {
   KitbaseConfig,
   TrackOptions,
   TrackResponse,
   PageViewOptions,
   RevenueOptions,
   IdentifyOptions,
+  AnalyticsConfig,
   Tags,
+  TagValue,
+  OfflineConfig,
+  PrivacyConfig,
+  BotDetectionConfig,
 } from '@kitbase/analytics';
 ```
 

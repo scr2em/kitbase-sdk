@@ -94,7 +94,7 @@ init({
   analytics: {
     autoTrackPageViews: true,     // track route changes automatically
     autoTrackOutboundLinks: true, // track external link clicks
-    autoTrackClicks: true,        // track button/link/input clicks
+    autoTrackClicks: true,        // track button/link/input clicks + data-kb-track-click
     autoTrackScrollDepth: true,   // track max scroll depth per page
     autoTrackVisibility: true,    // track visibility duration via data attributes
   },
