@@ -20,6 +20,7 @@ import {
   type BotDetectionConfig,
   type BotDetectionResult,
 } from './botDetection.js';
+import { onCLS, onFCP, onINP, onLCP, onTTFB } from 'web-vitals';
 
 const DEFAULT_BASE_URL = 'https://api.kitbase.dev';
 const TIMEOUT = 30000;
@@ -107,6 +108,16 @@ export class KitbaseAnalytics {
   private visibilityData: Map<Element, { visibleSince: number | null; totalMs: number; event: string; channel: string }> = new Map();
   private visibilityBeforeUnloadListener: (() => void) | null = null;
 
+  // Web Vitals tracking
+  protected autoTrackWebVitals: boolean;
+  private webVitalsActive = false;
+  private webVitalsSent = false;
+  private webVitalsTimeout: ReturnType<typeof setTimeout> | null = null;
+  private webVitalsData: { lcp: number | null; cls: number | null; inp: number | null; fcp: number | null; ttfb: number | null } = {
+    lcp: null, cls: null, inp: null, fcp: null, ttfb: null,
+  };
+  private webVitalsBeforeUnloadListener: (() => void) | null = null;
+
   // Bot detection
   protected botDetectionConfig: BotDetectionConfig;
   protected botDetectionResult: BotDetectionResult | null = null;
@@ -137,6 +148,7 @@ export class KitbaseAnalytics {
     this.autoTrackClicks = config.analytics?.autoTrackClicks ?? true;
     this.autoTrackScrollDepth = config.analytics?.autoTrackScrollDepth ?? true;
     this.autoTrackVisibility = config.analytics?.autoTrackVisibility ?? true;
+    this.autoTrackWebVitals = config.analytics?.autoTrackWebVitals ?? false;
 
     // Auto-track pageviews if enabled
     if (this.autoTrackPageViews && typeof window !== 'undefined') {
@@ -161,6 +173,11 @@ export class KitbaseAnalytics {
     // Setup visibility tracking if enabled
     if (this.autoTrackVisibility && typeof window !== 'undefined') {
       this.setupVisibilityTracking();
+    }
+
+    // Setup web vitals tracking if enabled
+    if (this.autoTrackWebVitals && typeof window !== 'undefined') {
+      this.setupWebVitalsTracking();
     }
 
     // Initialize bot detection
@@ -1494,6 +1511,108 @@ export class KitbaseAnalytics {
   }
 
   // ============================================================
+  // Web Vitals Tracking
+  // ============================================================
+
+  /**
+   * Setup Core Web Vitals tracking.
+   * Registers callbacks for all 5 metrics (LCP, CLS, INP, FCP, TTFB)
+   * and sends them as a single event once all are collected or after a 30s timeout.
+   */
+  protected setupWebVitalsTracking(): void {
+    if (typeof window === 'undefined' || this.webVitalsActive) return;
+
+    const checkAndSend = () => {
+      const { lcp, cls, inp, fcp, ttfb } = this.webVitalsData;
+      if (lcp !== null && cls !== null && inp !== null && fcp !== null && ttfb !== null) {
+        this.sendWebVitals();
+      }
+    };
+
+    onLCP((metric) => {
+      this.webVitalsData.lcp = metric.value;
+      this.log('Web Vital collected', { name: 'LCP', value: metric.value });
+      checkAndSend();
+    });
+
+    onCLS((metric) => {
+      this.webVitalsData.cls = metric.value;
+      this.log('Web Vital collected', { name: 'CLS', value: metric.value });
+      checkAndSend();
+    });
+
+    onINP((metric) => {
+      this.webVitalsData.inp = metric.value;
+      this.log('Web Vital collected', { name: 'INP', value: metric.value });
+      checkAndSend();
+    });
+
+    onFCP((metric) => {
+      this.webVitalsData.fcp = metric.value;
+      this.log('Web Vital collected', { name: 'FCP', value: metric.value });
+      checkAndSend();
+    });
+
+    onTTFB((metric) => {
+      this.webVitalsData.ttfb = metric.value;
+      this.log('Web Vital collected', { name: 'TTFB', value: metric.value });
+      checkAndSend();
+    });
+
+    // Safety timeout — send whatever we have after 30s
+    this.webVitalsTimeout = setTimeout(() => {
+      this.webVitalsTimeout = null;
+      this.sendWebVitals();
+    }, 30_000);
+
+    // Also send on beforeunload if not already sent
+    this.webVitalsBeforeUnloadListener = () => {
+      this.sendWebVitals();
+    };
+    window.addEventListener('beforeunload', this.webVitalsBeforeUnloadListener);
+
+    this.webVitalsActive = true;
+    this.log('Web Vitals tracking enabled');
+  }
+
+  /**
+   * Send collected web vitals as a single event.
+   * Only sends once per page load; only includes metrics that were actually collected.
+   */
+  private sendWebVitals(): void {
+    if (this.webVitalsSent) return;
+
+    const { lcp, cls, inp, fcp, ttfb } = this.webVitalsData;
+
+    // Don't send if no metrics were collected at all
+    if (lcp === null && cls === null && inp === null && fcp === null && ttfb === null) return;
+
+    this.webVitalsSent = true;
+
+    // Clear the timeout since we're sending now
+    if (this.webVitalsTimeout !== null) {
+      clearTimeout(this.webVitalsTimeout);
+      this.webVitalsTimeout = null;
+    }
+
+    // Build tags — only include non-null values
+    const tags: Tags = {};
+    if (lcp !== null) tags.__lcp = lcp;
+    if (cls !== null) tags.__cls = cls;
+    if (inp !== null) tags.__inp = inp;
+    if (fcp !== null) tags.__fcp = fcp;
+    if (ttfb !== null) tags.__ttfb = ttfb;
+
+    this.log('Sending Web Vitals', tags);
+
+    this.track({
+      channel: ANALYTICS_CHANNEL,
+      event: 'web_vitals',
+      tags,
+    }).catch((err) => this.log('Failed to track web vitals', err));
+  }
+
+  // ============================================================
   // Cleanup
   // ============================================================
 
@@ -1524,6 +1643,20 @@ export class KitbaseAnalytics {
         this.beforeUnloadListener = null;
       }
       this.scrollTrackingActive = false;
+    }
+
+    // Cleanup web vitals tracking
+    if (this.webVitalsActive) {
+      if (this.webVitalsTimeout !== null) {
+        clearTimeout(this.webVitalsTimeout);
+        this.webVitalsTimeout = null;
+      }
+      this.sendWebVitals();
+      if (this.webVitalsBeforeUnloadListener) {
+        window.removeEventListener('beforeunload', this.webVitalsBeforeUnloadListener);
+        this.webVitalsBeforeUnloadListener = null;
+      }
+      this.webVitalsActive = false;
     }
 
     // Cleanup visibility tracking

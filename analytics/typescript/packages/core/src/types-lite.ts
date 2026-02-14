@@ -195,6 +195,14 @@ export interface AnalyticsConfig {
    * @default true
    */
   autoTrackVisibility?: boolean;
+
+  /**
+   * Track Core Web Vitals (LCP, CLS, INP, FCP, TTFB).
+   * Collects all metrics and sends them as a single `web_vitals` event.
+   * Requires the `web-vitals` library (included as a dependency).
+   * @default false
+   */
+  autoTrackWebVitals?: boolean;
 }
 
 /**

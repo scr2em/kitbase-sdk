@@ -12,23 +12,29 @@ Documentation lives in a separate repo at `/Users/mohamed/private/kitbase-mono/d
 
 ## Documentation Sync Rules
 
-### Auto-Tracked Events Page
+Whenever you modify the SDK, you **must** update the matching documentation pages AND the package READMEs.
 
-**File:** `/Users/mohamed/private/kitbase-mono/docs/features/events/auto-events.md`
+### Documentation Pages to Update
 
-Whenever you modify auto-tracking behavior in `analytics/typescript/packages/core/src/client-base.ts` — adding, removing, or changing an auto-tracked event, its tags, its channel, or its trigger conditions — you **must** update the auto-events documentation page to match.
+| What Changed | Docs to Update |
+|---|---|
+| Auto-tracking behavior (events, tags, channels, triggers) | `docs/autocapture.md` and `docs/features/events/auto-events.md` |
+| Public methods (track, identify, revenue, etc.) | `docs/sdks/javascript.md` and `docs/track-events.md` |
+| Config options (KitbaseConfig, AnalyticsConfig, PrivacyConfig, OfflineConfig) | `docs/sdks/javascript.md` and `docs/tracking-script.md` |
+| Identify behavior | `docs/identify-users.md` |
+| Data attributes (data-kb-track-click, data-kb-track-visibility) | `docs/autocapture.md` |
+| Angular wrapper | `docs/sdks/angular.md` |
+| Error types or handling | `docs/sdks/javascript.md` (Error Types section) |
+| Offline queue behavior | `docs/sdks/javascript.md` (Offline Support section) |
+| Privacy/consent behavior | `docs/sdks/javascript.md` (Privacy & Consent section) |
+| Session management | `docs/sdks/javascript.md` and `docs/guide/sessions.md` |
+| TypeScript types (interfaces, enums) | `docs/sdks/javascript.md` (TypeScript Types section) |
 
-This includes changes to:
-- Event names or channels
-- Tag keys, types, or descriptions
-- Trigger conditions (when events fire)
-- Data attributes (e.g. `data-kb-track-visibility`, `data-kb-track-click`)
-- Config flags in `AnalyticsConfig` (e.g. `autoTrackVisibility`)
-- Common payload fields (`client_timestamp`, `client_session_id`, etc.)
+All doc paths are relative to `/Users/mohamed/private/kitbase-mono/`.
 
 ### Package READMEs
 
-Whenever you modify the core SDK implementation (public API, config options, features, data attributes), you **must** update both package READMEs to reflect the changes:
+Whenever you modify the core SDK implementation (public API, config options, features, data attributes), you **must** also update both package READMEs:
 
 - **Core:** `analytics/typescript/packages/core/README.md`
 - **Angular:** `analytics/typescript/packages/angular/README.md`
@@ -39,3 +45,7 @@ This includes changes to:
 - Auto-tracked events or data attributes
 - Exported types
 - Build variants (full vs lite)
+
+### Full Doc Structure Reference
+
+See `/Users/mohamed/private/kitbase-mono/CLAUDE.md` for the complete documentation structure and cross-project sync rules.

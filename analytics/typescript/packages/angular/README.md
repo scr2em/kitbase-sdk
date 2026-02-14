@@ -97,6 +97,7 @@ init({
     autoTrackClicks: true,        // track button/link/input clicks + data-kb-track-click
     autoTrackScrollDepth: true,   // track max scroll depth per page
     autoTrackVisibility: true,    // track visibility duration via data attributes
+    autoTrackWebVitals: false,    // track Core Web Vitals (LCP, CLS, INP, FCP, TTFB)
   },
 
   privacy: {
@@ -166,6 +167,21 @@ Track how long elements are visible in the viewport:
 When the element leaves the viewport, navigates away, or is removed from the DOM, the SDK fires an event with `duration_seconds` and `duration_ms` tags.
 
 Dynamically added elements (e.g. from Angular `@if` or `*ngIf`) are picked up automatically via MutationObserver. Disable with `autoTrackVisibility: false`.
+
+## Web Vitals
+
+Track [Core Web Vitals](https://web.dev/vitals/) by enabling `autoTrackWebVitals`:
+
+```typescript
+init({
+  token: 'your-api-key',
+  analytics: {
+    autoTrackWebVitals: true,
+  },
+});
+```
+
+The SDK collects all 5 metrics (LCP, CLS, INP, FCP, TTFB) and sends them as a single `web_vitals` event. Metrics are sent once per page load with a 30-second timeout. Only collected metrics are included. See the [core SDK README](../core/README.md#web-vitals) for full details.
 
 ## API Reference
 

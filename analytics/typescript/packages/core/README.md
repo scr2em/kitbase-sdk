@@ -78,6 +78,7 @@ const kitbase = new Kitbase({
     autoTrackClicks: true,         // track button/link/input clicks + data-kb-track-click
     autoTrackScrollDepth: true,    // track max scroll depth per page
     autoTrackVisibility: true,     // track visibility duration via data attributes
+    autoTrackWebVitals: false,     // track Core Web Vitals (LCP, CLS, INP, FCP, TTFB)
   },
 
   privacy: {
@@ -110,6 +111,7 @@ All enabled by default. The SDK automatically tracks:
 | `outbound_link` | `__analytics` | Click on external link |
 | `click` | `__analytics` | Click on interactive element |
 | `scroll_depth` | `__analytics` | Navigation / unload (max depth per page) |
+| `web_vitals` | `__analytics` | Once per page load (opt-in via `autoTrackWebVitals`) |
 
 Page views, clicks, outbound links, and scroll depth are tracked automatically. The SDK intercepts `history.pushState`/`popstate` for SPA support — no framework router integration needed.
 
@@ -161,6 +163,31 @@ Track how long elements are visible in the viewport:
 | `data-kb-visibility-threshold` | No | `0.5` | IntersectionObserver threshold (0–1) |
 
 Fires an event with `duration_seconds` and `duration_ms` tags when the element leaves the viewport, is removed from the DOM, or the user navigates away. Dynamically added elements are picked up via MutationObserver. Disable with `autoTrackVisibility: false`.
+
+## Web Vitals
+
+Track [Core Web Vitals](https://web.dev/vitals/) by enabling `autoTrackWebVitals`:
+
+```typescript
+const kitbase = new Kitbase({
+  token: 'your-api-key',
+  analytics: {
+    autoTrackWebVitals: true,
+  },
+});
+```
+
+The SDK collects all 5 metrics and sends them as a single `web_vitals` event on the `__analytics` channel:
+
+| Tag | Metric | Description |
+|-----|--------|-------------|
+| `__lcp` | Largest Contentful Paint | Loading performance (ms) |
+| `__cls` | Cumulative Layout Shift | Visual stability (score) |
+| `__inp` | Interaction to Next Paint | Interactivity (ms) |
+| `__fcp` | First Contentful Paint | First render (ms) |
+| `__ttfb` | Time to First Byte | Server response time (ms) |
+
+Metrics are sent once per page load. A 30-second timeout ensures data is sent even if some metrics never fire (e.g., INP requires user interaction). Only collected metrics are included in the event tags.
 
 ## Event Tracking
 
