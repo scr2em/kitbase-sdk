@@ -9,6 +9,7 @@ import { ValidationError } from './errors.js';
 import { KitbaseAnalytics as KitbaseAnalyticsBase } from './client-base.js';
 import { EventQueue } from './queue/index.js';
 import type { QueuedEvent, QueueStats } from './queue/types.js';
+import { createDefaultPlugins } from './plugins/defaults.js';
 
 /**
  * Kitbase client for tracking events with full offline queue support
@@ -101,7 +102,7 @@ export class KitbaseAnalytics extends KitbaseAnalyticsBase {
   private clearQueueOnOptOut: boolean;
 
   constructor(config: KitbaseConfig) {
-    super(config);
+    super(config, createDefaultPlugins(config.analytics));
 
     // Initialize offline queue if enabled
     this.offlineEnabled = config.offline?.enabled ?? false;
@@ -339,18 +340,19 @@ export class KitbaseAnalytics extends KitbaseAnalyticsBase {
    * ```
    */
   override async shutdown(): Promise<void> {
-    this.log('Shutting down');
+    // Flush queue before plugin teardown so teardown events can still be queued
+    if (this.queue) {
+      await this.queue.flush();
+    }
 
-    // Flush any remaining queued events
+    // Base shutdown: tears down plugins, clears timed events
+    super.shutdown();
+
+    // Final flush and close queue
     if (this.queue) {
       await this.queue.flush();
       await this.queue.close();
       this.queue = null;
     }
-
-    // Clear timed events
-    this.timedEvents.clear();
-
-    this.log('Shutdown complete');
   }
 }

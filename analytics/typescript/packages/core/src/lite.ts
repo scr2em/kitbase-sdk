@@ -80,9 +80,14 @@ export {
   TimeoutError,
 } from './errors.js';
 
+// Plugin exports
+export type { KitbasePlugin, PluginContext } from './plugins/types.js';
+export { createDefaultPlugins } from './plugins/defaults.js';
+
 // Import types for window augmentation
 import type { KitbaseLiteConfig } from './types-lite.js';
 import { KitbaseAnalytics } from './client-base.js';
+import { createDefaultPlugins } from './plugins/defaults.js';
 
 // Window type augmentation for auto-initialization
 declare global {
@@ -105,7 +110,10 @@ declare global {
 // Auto-initialize when script loads if KITBASE_CONFIG is set
 if (typeof window !== 'undefined' && window.KITBASE_CONFIG) {
   try {
-    window.kitbase = new KitbaseAnalytics(window.KITBASE_CONFIG);
+    window.kitbase = new KitbaseAnalytics(
+      window.KITBASE_CONFIG,
+      createDefaultPlugins(window.KITBASE_CONFIG.analytics),
+    );
 
     // Log initialization in debug mode
     if (window.KITBASE_CONFIG.debug) {

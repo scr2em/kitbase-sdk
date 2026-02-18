@@ -20,7 +20,14 @@ import {
   type BotDetectionConfig,
   type BotDetectionResult,
 } from './botDetection.js';
-import { onCLS, onFCP, onINP, onLCP, onTTFB } from 'web-vitals';
+import type { KitbasePlugin, PluginContext } from './plugins/types.js';
+import {
+  findClickableElement,
+  CLICKABLE_SELECTOR,
+  getRootDomain,
+  isSameRootDomain,
+  getUtmParams,
+} from './plugins/utils.js';
 
 const DEFAULT_BASE_URL = 'https://api.kitbase.dev';
 const TIMEOUT = 30000;
@@ -84,39 +91,10 @@ export class KitbaseAnalytics {
   // Debug mode
   protected debugMode: boolean;
 
-  // Analytics tracking
-  protected autoTrackPageViews: boolean;
-  protected autoTrackOutboundLinks: boolean;
-  protected autoTrackClicks: boolean;
-  protected autoTrackScrollDepth: boolean;
-  protected autoTrackVisibility: boolean;
+  // Analytics config (stored for PluginContext)
+  protected analyticsConfig: KitbaseLiteConfig['analytics'];
+
   protected userId: string | null = null;
-  protected clickListenerAdded = false;
-  protected clickTrackingListenerAdded = false;
-
-  // Scroll depth tracking
-  protected scrollTrackingActive = false;
-  protected maxScrollDepth = 0;
-  private scrollListener: (() => void) | null = null;
-  private beforeUnloadListener: (() => void) | null = null;
-  private scrollRafScheduled = false;
-
-  // Visibility tracking
-  private visibilityTrackingActive = false;
-  private visibilityObservers: Map<number, IntersectionObserver> = new Map();
-  private visibilityMutationObserver: MutationObserver | null = null;
-  private visibilityData: Map<Element, { visibleSince: number | null; totalMs: number; event: string; channel: string }> = new Map();
-  private visibilityBeforeUnloadListener: (() => void) | null = null;
-
-  // Web Vitals tracking
-  protected autoTrackWebVitals: boolean;
-  private webVitalsActive = false;
-  private webVitalsSent = false;
-  private webVitalsTimeout: ReturnType<typeof setTimeout> | null = null;
-  private webVitalsData: { lcp: number | null; cls: number | null; inp: number | null; fcp: number | null; ttfb: number | null } = {
-    lcp: null, cls: null, inp: null, fcp: null, ttfb: null,
-  };
-  private webVitalsBeforeUnloadListener: (() => void) | null = null;
 
   // Bot detection
   protected botDetectionConfig: BotDetectionConfig;
@@ -132,7 +110,11 @@ export class KitbaseAnalytics {
   private lastActivityAt: number = 0;
   private static readonly SESSION_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
 
-  constructor(config: KitbaseLiteConfig) {
+  // Plugin system
+  private _plugins: Map<string, KitbasePlugin> = new Map();
+  private _pluginContext: PluginContext | null = null;
+
+  constructor(config: KitbaseLiteConfig, defaultPlugins?: KitbasePlugin[]) {
     if (!config.token) {
       throw new ValidationError('API token is required', 'token');
     }
@@ -142,43 +124,8 @@ export class KitbaseAnalytics {
     this.baseUrl = (config.baseUrl ?? DEFAULT_BASE_URL).replace(/\/+$/, '');
     this.debugMode = config.debug ?? false;
 
-    // Initialize analytics configuration
-    this.autoTrackPageViews = config.analytics?.autoTrackPageViews ?? true;
-    this.autoTrackOutboundLinks = config.analytics?.autoTrackOutboundLinks ?? true;
-    this.autoTrackClicks = config.analytics?.autoTrackClicks ?? true;
-    this.autoTrackScrollDepth = config.analytics?.autoTrackScrollDepth ?? true;
-    this.autoTrackVisibility = config.analytics?.autoTrackVisibility ?? true;
-    this.autoTrackWebVitals = config.analytics?.autoTrackWebVitals ?? false;
-
-    // Auto-track pageviews if enabled
-    if (this.autoTrackPageViews && typeof window !== 'undefined') {
-      this.enableAutoPageViews();
-    }
-
-    // Setup outbound link tracking if enabled
-    if (this.autoTrackOutboundLinks && typeof window !== 'undefined') {
-      this.setupOutboundLinkTracking();
-    }
-
-    // Setup click tracking if enabled
-    if (this.autoTrackClicks && typeof window !== 'undefined') {
-      this.setupClickTracking();
-    }
-
-    // Setup scroll depth tracking if enabled
-    if (this.autoTrackScrollDepth && typeof window !== 'undefined') {
-      this.setupScrollDepthTracking();
-    }
-
-    // Setup visibility tracking if enabled
-    if (this.autoTrackVisibility && typeof window !== 'undefined') {
-      this.setupVisibilityTracking();
-    }
-
-    // Setup web vitals tracking if enabled
-    if (this.autoTrackWebVitals && typeof window !== 'undefined') {
-      this.setupWebVitalsTracking();
-    }
+    // Store analytics config for plugin context
+    this.analyticsConfig = config.analytics;
 
     // Initialize bot detection
     this.botDetectionConfig = {
@@ -202,6 +149,80 @@ export class KitbaseAnalytics {
     this.optOutStorageKey = config.privacy?.optOutStorageKey ?? DEFAULT_OPT_OUT_STORAGE_KEY;
     this.optOutStorage = getDefaultStorage();
     this.initializeOptOutState(config.privacy?.optOutByDefault ?? false);
+
+    // Register default plugins
+    if (defaultPlugins) {
+      for (const plugin of defaultPlugins) {
+        this.use(plugin);
+      }
+    }
+  }
+
+  // ============================================================
+  // Plugin System
+  // ============================================================
+
+  /**
+   * Register a plugin
+   *
+   * @param plugin - The plugin instance to register
+   *
+   * @example
+   * ```typescript
+   * kitbase.use(new WebVitalsPlugin());
+   * ```
+   */
+  use(plugin: KitbasePlugin): void {
+    if (this._plugins.has(plugin.name)) {
+      this.log(`Plugin "${plugin.name}" already registered`);
+      return;
+    }
+
+    const ctx = this.getPluginContext();
+    const result = plugin.setup(ctx);
+    if (result === false) {
+      this.log(`Plugin "${plugin.name}" declined to activate`);
+      return;
+    }
+
+    this._plugins.set(plugin.name, plugin);
+
+    // Install public methods from plugin
+    const methods = plugin.methods;
+    if (methods) {
+      for (const [name, fn] of Object.entries(methods)) {
+        (this as any)[name] = fn;
+      }
+    }
+
+    this.log(`Plugin "${plugin.name}" registered`);
+  }
+
+  /**
+   * Get the names of all registered plugins
+   */
+  getPlugins(): string[] {
+    return Array.from(this._plugins.keys());
+  }
+
+  private getPluginContext(): PluginContext {
+    if (this._pluginContext) return this._pluginContext;
+
+    this._pluginContext = {
+      track: (options: TrackOptions) => this.track(options),
+      config: Object.freeze({ ...(this.analyticsConfig ?? {}) }) as any,
+      debug: this.debugMode,
+      log: (message: string, data?: unknown) => this.log(message, data),
+      isOptedOut: () => this.isOptedOut(),
+      isBotBlockingActive: () => this.isBotBlockingActive(),
+      findClickableElement,
+      CLICKABLE_SELECTOR,
+      getRootDomain,
+      isSameRootDomain,
+      getUtmParams,
+    };
+
+    return this._pluginContext;
   }
 
   // ============================================================
@@ -790,91 +811,33 @@ export class KitbaseAnalytics {
   }
 
   // ============================================================
-  // Analytics
+  // Analytics — Stub methods (overridden by plugins via methods)
   // ============================================================
 
   /**
-   * Setup outbound link click tracking
+   * Track a page view
+   *
+   * @param options - Page view options
+   * @returns Promise resolving to the track response
+   *
+   * @example
+   * ```typescript
+   * // Track current page
+   * await kitbase.trackPageView();
+   *
+   * // Track with custom path
+   * await kitbase.trackPageView({ path: '/products/123', title: 'Product Details' });
+   * ```
    */
-  protected setupOutboundLinkTracking(): void {
-    if (typeof window === 'undefined' || this.clickListenerAdded) return;
-
-    const handleClick = (event: MouseEvent) => {
-      const link = (event.target as Element)?.closest?.('a');
-      if (link) {
-        this.handleLinkClick(link as HTMLAnchorElement);
-      }
-    };
-
-    const handleKeydown = (event: KeyboardEvent) => {
-      if (event.key === 'Enter' || event.key === ' ') {
-        const link = (event.target as Element)?.closest?.('a');
-        if (link) {
-          this.handleLinkClick(link as HTMLAnchorElement);
-        }
-      }
-    };
-
-    document.addEventListener('click', handleClick);
-    document.addEventListener('keydown', handleKeydown);
-
-    this.clickListenerAdded = true;
-    this.log('Outbound link tracking enabled');
+  async trackPageView(options?: PageViewOptions): Promise<TrackResponse | void> {
+    this.log('trackPageView() called but page-view plugin is not registered');
   }
 
   /**
-   * Handle link click for outbound tracking
+   * Track a click on an interactive element
    */
-  protected handleLinkClick(link: HTMLAnchorElement): void {
-    if (!link.href) return;
-
-    try {
-      const linkUrl = new URL(link.href);
-
-      // Only track http/https links
-      if (linkUrl.protocol !== 'http:' && linkUrl.protocol !== 'https:') {
-        return;
-      }
-
-      const currentHost = window.location.hostname;
-      const linkHost = linkUrl.hostname;
-
-      // Skip if same host
-      if (linkHost === currentHost) {
-        return;
-      }
-
-      // Skip if same root domain (e.g., blog.example.com -> example.com)
-      if (this.isSameRootDomain(currentHost, linkHost)) {
-        return;
-      }
-
-      // Track as outbound link
-      this.trackOutboundLink({
-        url: link.href,
-        text: link.textContent?.trim() || '',
-      }).catch((err) => this.log('Failed to track outbound link', err));
-    } catch {
-      // Invalid URL, skip
-    }
-  }
-
-  /**
-   * Get root domain from hostname (e.g., blog.example.com -> example.com)
-   */
-  protected getRootDomain(hostname: string): string {
-    const parts = hostname.replace(/^www\./, '').split('.');
-    if (parts.length >= 2) {
-      return parts.slice(-2).join('.');
-    }
-    return hostname;
-  }
-
-  /**
-   * Check if two hostnames share the same root domain
-   */
-  protected isSameRootDomain(host1: string, host2: string): boolean {
-    return this.getRootDomain(host1) === this.getRootDomain(host2);
+  async trackClick(tags: Tags): Promise<TrackResponse | void> {
+    this.log('trackClick() called but click-tracking plugin is not registered');
   }
 
   /**
@@ -892,309 +855,12 @@ export class KitbaseAnalytics {
    * ```
    */
   async trackOutboundLink(options: { url: string; text?: string }): Promise<TrackResponse | void> {
-    return this.track({
-      channel: ANALYTICS_CHANNEL,
-      event: 'outbound_link',
-      tags: {
-        __url: options.url,
-        __text: options.text || '',
-      },
-    });
+    this.log('trackOutboundLink() called but outbound-links plugin is not registered');
   }
 
-  /**
-   * CSS selector matching interactive elements for click tracking.
-   * Includes standard HTML elements and common web component tag names
-   * (Ionic, Material, Shoelace, etc.) that wrap native controls in Shadow DOM.
-   */
-  private static readonly CLICKABLE_SELECTOR = [
-    'a', 'button', 'input', 'select', 'textarea',
-    '[role="button"]', '[role="link"]', '[role="menuitem"]', '[role="tab"]',
-  ].join(', ');
-
-  /**
-   * Find the nearest clickable element from a click event.
-   * Uses `composedPath()` to traverse through Shadow DOM boundaries.
-   * When a match is found inside a Shadow DOM, the custom-element host
-   * is returned so that tracked attributes (tag, id, class, text)
-   * reflect the public component rather than its internal template.
-   */
-  private findClickableElement(event: MouseEvent): Element | null {
-    const path = event.composedPath?.() as Element[] | undefined;
-
-    if (path) {
-      for (const node of path) {
-        if (!(node instanceof Element)) continue;
-        if (node === document.documentElement) break;
-
-        if (node.matches(KitbaseAnalytics.CLICKABLE_SELECTOR)) {
-          // If the matched element lives inside a Shadow DOM,
-          // promote to the custom-element host for meaningful attributes.
-          const root = node.getRootNode();
-          if (root instanceof ShadowRoot && root.host instanceof Element) {
-            return root.host;
-          }
-          return node;
-        }
-
-        // Custom elements (tag name contains a hyphen per spec) are
-        // interactive even without a native element inside — e.g. an
-        // <ion-button> that only renders a styled <div> in its shadow.
-        if (node.tagName.includes('-')) {
-          return node;
-        }
-      }
-    }
-
-    // Fallback for browsers without composedPath
-    const target = event.target as Element | null;
-    if (!target?.closest) return null;
-    return target.closest(KitbaseAnalytics.CLICKABLE_SELECTOR);
-  }
-
-  /**
-   * Setup click tracking on interactive elements via event delegation
-   */
-  protected setupClickTracking(): void {
-    if (typeof window === 'undefined' || this.clickTrackingListenerAdded) return;
-
-    document.addEventListener('click', (event: MouseEvent) => {
-      const target = event.target as Element | null;
-
-      // data-kb-track-click — user-defined click events via data attributes
-      const annotated = target?.closest?.('[data-kb-track-click]');
-      if (annotated) {
-        const eventName = annotated.getAttribute('data-kb-track-click');
-        if (eventName) {
-          const channel = annotated.getAttribute('data-kb-click-channel') || 'engagement';
-          this.track({
-            channel,
-            event: eventName,
-            tags: {
-              __path: window.location.pathname,
-            },
-          }).catch((err) => this.log('Failed to track data-attribute click', err));
-          return; // skip generic click tracking for annotated elements
-        }
-      }
-
-      const element = this.findClickableElement(event);
-      if (!element) return;
-
-      // Skip outbound links — already handled by outbound link tracking
-      if (this.autoTrackOutboundLinks) {
-        const elHref = (element as HTMLAnchorElement).href || element.getAttribute('href') || '';
-        if (elHref) {
-          try {
-            const linkUrl = new URL(elHref, window.location.origin);
-            if (
-              (linkUrl.protocol === 'http:' || linkUrl.protocol === 'https:') &&
-              linkUrl.hostname !== window.location.hostname &&
-              !this.isSameRootDomain(window.location.hostname, linkUrl.hostname)
-            ) {
-              return;
-            }
-          } catch {
-            // Invalid URL, continue with click tracking
-          }
-        }
-      }
-
-      const tag = element.tagName.toLowerCase();
-      const id = element.id || '';
-      const className = element.className && typeof element.className === 'string' ? element.className : '';
-      const text = (element.textContent || '').trim().slice(0, 100);
-      // .href property only exists on <a>; fall back to the attribute for custom elements
-      const href = (element as HTMLAnchorElement).href || element.getAttribute('href') || '';
-
-      const path = window.location.pathname;
-
-      this.trackClick({ __tag: tag, __id: id, __class: className, __text: text, __href: href, __path: path }).catch(
-        (err) => this.log('Failed to track click', err),
-      );
-    });
-
-    this.clickTrackingListenerAdded = true;
-    this.log('Click tracking enabled');
-  }
-
-  /**
-   * Track a click on an interactive element
-   */
-  async trackClick(tags: Tags): Promise<TrackResponse | void> {
-    return this.track({
-      channel: ANALYTICS_CHANNEL,
-      event: 'click',
-      tags,
-    });
-  }
-
-  /**
-   * Setup scroll depth tracking
-   */
-  protected setupScrollDepthTracking(): void {
-    if (typeof window === 'undefined' || this.scrollTrackingActive) return;
-
-    this.scrollListener = () => {
-      if (this.scrollRafScheduled) return;
-      this.scrollRafScheduled = true;
-      requestAnimationFrame(() => {
-        this.scrollRafScheduled = false;
-        const scrollTop = window.scrollY || document.documentElement.scrollTop;
-        const viewportHeight = window.innerHeight;
-        const documentHeight = Math.max(
-          document.body.scrollHeight,
-          document.documentElement.scrollHeight,
-        );
-        if (documentHeight <= 0) return;
-        const depth = Math.min(100, Math.round(((scrollTop + viewportHeight) / documentHeight) * 100));
-        if (depth > this.maxScrollDepth) {
-          this.maxScrollDepth = depth;
-        }
-      });
-    };
-
-    this.beforeUnloadListener = () => {
-      this.flushScrollDepth();
-    };
-
-    window.addEventListener('scroll', this.scrollListener, { passive: true });
-    window.addEventListener('beforeunload', this.beforeUnloadListener);
-
-    // Also fire on SPA navigation (pushState / popstate)
-    const originalPushState = history.pushState;
-    const self = this;
-    history.pushState = function (...args) {
-      self.flushScrollDepth();
-      return originalPushState.apply(this, args);
-    };
-
-    window.addEventListener('popstate', () => {
-      this.flushScrollDepth();
-    });
-
-    this.scrollTrackingActive = true;
-    this.log('Scroll depth tracking enabled');
-  }
-
-  /**
-   * Flush scroll depth and reset for next page
-   */
-  protected flushScrollDepth(): void {
-    if (this.maxScrollDepth > 0) {
-      const path = typeof window !== 'undefined' ? window.location.pathname : '';
-      this.trackScrollDepth(this.maxScrollDepth, path);
-      this.maxScrollDepth = 0;
-    }
-  }
-
-  /**
-   * Track scroll depth
-   */
-  protected trackScrollDepth(depth: number, path: string): void {
-    this.track({
-      channel: ANALYTICS_CHANNEL,
-      event: 'scroll_depth',
-      tags: {
-        __depth: depth,
-        __path: path,
-      },
-    }).catch((err) => this.log('Failed to track scroll depth', err));
-  }
-
-  /**
-   * Get UTM parameters from URL
-   */
-  protected getUtmParams(): Tags {
-    if (typeof window === 'undefined') return {};
-
-    const params = new URLSearchParams(window.location.search);
-    const utmParams: Tags = {};
-
-    const utmKeys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
-    for (const key of utmKeys) {
-      const value = params.get(key);
-      if (value) {
-        utmParams[`__${key}`] = value;
-      }
-    }
-
-    return utmParams;
-  }
-
-  /**
-   * Track a page view
-   *
-   * @param options - Page view options
-   * @returns Promise resolving to the track response
-   *
-   * @example
-   * ```typescript
-   * // Track current page
-   * await kitbase.trackPageView();
-   *
-   * // Track with custom path
-   * await kitbase.trackPageView({ path: '/products/123', title: 'Product Details' });
-   * ```
-   */
-  async trackPageView(options: PageViewOptions = {}): Promise<TrackResponse | void> {
-    const path = options.path ?? (typeof window !== 'undefined' ? window.location.pathname : '');
-    const title = options.title ?? (typeof document !== 'undefined' ? document.title : '');
-    const referrer = options.referrer ?? (typeof document !== 'undefined' ? document.referrer : '');
-
-    return this.track({
-      channel: ANALYTICS_CHANNEL,
-      event: 'screen_view',
-      tags: {
-        __path: path,
-        __title: title,
-        __referrer: referrer,
-        ...this.getUtmParams(),
-        ...(options.tags ?? {}),
-      },
-    });
-  }
-
-  /**
-   * Enable automatic page view tracking
-   * Intercepts browser history changes (pushState, replaceState, popstate)
-   *
-   * @example
-   * ```typescript
-   * kitbase.enableAutoPageViews();
-   * // Now all route changes will automatically be tracked
-   * ```
-   */
-  enableAutoPageViews(): void {
-    if (typeof window === 'undefined') {
-      this.log('Auto page views not available in non-browser environment');
-      return;
-    }
-
-    // Track initial page view
-    this.trackPageView().catch((err) => this.log('Failed to track initial page view', err));
-
-    // Intercept pushState
-    const originalPushState = history.pushState.bind(history);
-    history.pushState = (...args) => {
-      originalPushState(...args);
-      this.trackPageView().catch((err) => this.log('Failed to track page view (pushState)', err));
-    };
-
-    // Intercept replaceState
-    const originalReplaceState = history.replaceState.bind(history);
-    history.replaceState = (...args) => {
-      originalReplaceState(...args);
-      // Don't track replaceState as it's usually not a navigation
-    };
-
-    // Listen to popstate (browser back/forward)
-    window.addEventListener('popstate', () => {
-      this.trackPageView().catch((err) => this.log('Failed to track page view (popstate)', err));
-    });
-
-    this.log('Auto page view tracking enabled');
-  }
+  // ============================================================
+  // Analytics — Revenue & Identity (non-plugin)
+  // ============================================================
 
   /**
    * Track a revenue event
@@ -1319,300 +985,6 @@ export class KitbaseAnalytics {
   }
 
   // ============================================================
-  // Visibility Tracking
-  // ============================================================
-
-  /**
-   * Setup visibility duration tracking for elements with data-kb-track-visibility
-   */
-  protected setupVisibilityTracking(): void {
-    if (typeof window === 'undefined' || this.visibilityTrackingActive) return;
-    if (typeof IntersectionObserver === 'undefined' || typeof MutationObserver === 'undefined') return;
-
-    // Scan existing DOM elements
-    this.scanForVisibilityElements();
-
-    // Watch for dynamically added/removed elements
-    this.visibilityMutationObserver = new MutationObserver((mutations) => {
-      for (const mutation of mutations) {
-        for (const node of Array.from(mutation.addedNodes)) {
-          if (node instanceof Element) {
-            this.observeVisibilityElement(node);
-            // Also check descendants
-            for (const el of Array.from(node.querySelectorAll('[data-kb-track-visibility]'))) {
-              this.observeVisibilityElement(el);
-            }
-          }
-        }
-        for (const node of Array.from(mutation.removedNodes)) {
-          if (node instanceof Element) {
-            this.flushVisibilityForElement(node);
-            for (const el of Array.from(node.querySelectorAll('[data-kb-track-visibility]'))) {
-              this.flushVisibilityForElement(el);
-            }
-          }
-        }
-      }
-    });
-
-    this.visibilityMutationObserver.observe(document.body, {
-      childList: true,
-      subtree: true,
-    });
-
-    // Flush on beforeunload
-    this.visibilityBeforeUnloadListener = () => {
-      this.flushAllVisibilityEvents();
-    };
-    window.addEventListener('beforeunload', this.visibilityBeforeUnloadListener);
-
-    // Flush on SPA navigation (pushState / popstate)
-    const originalPushState = history.pushState;
-    const self = this;
-    history.pushState = function (...args) {
-      self.flushAllVisibilityEvents();
-      return originalPushState.apply(this, args);
-    };
-
-    window.addEventListener('popstate', () => {
-      this.flushAllVisibilityEvents();
-    });
-
-    this.visibilityTrackingActive = true;
-    this.log('Visibility tracking enabled');
-  }
-
-  /**
-   * Scan DOM for existing elements with data-kb-track-visibility
-   */
-  private scanForVisibilityElements(): void {
-    for (const el of Array.from(document.querySelectorAll('[data-kb-track-visibility]'))) {
-      this.observeVisibilityElement(el);
-    }
-  }
-
-  /**
-   * Start observing a single element for visibility
-   */
-  private observeVisibilityElement(el: Element): void {
-    const eventName = el.getAttribute('data-kb-track-visibility');
-    if (!eventName || this.visibilityData.has(el)) return;
-
-    const channel = el.getAttribute('data-kb-visibility-channel') || 'engagement';
-    const threshold = parseFloat(el.getAttribute('data-kb-visibility-threshold') || '0.5');
-    const clampedThreshold = Math.max(0, Math.min(1, isNaN(threshold) ? 0.5 : threshold));
-
-    this.visibilityData.set(el, {
-      visibleSince: null,
-      totalMs: 0,
-      event: eventName,
-      channel,
-    });
-
-    const observer = this.getOrCreateObserver(clampedThreshold);
-    observer.observe(el);
-  }
-
-  /**
-   * Get or create an IntersectionObserver for a given threshold
-   */
-  private getOrCreateObserver(threshold: number): IntersectionObserver {
-    // Round to 2 decimals to avoid floating-point key mismatches
-    const key = Math.round(threshold * 100);
-
-    let observer = this.visibilityObservers.get(key);
-    if (observer) return observer;
-
-    observer = new IntersectionObserver(
-      (entries) => {
-        const now = Date.now();
-        for (const entry of entries) {
-          const data = this.visibilityData.get(entry.target);
-          if (!data) continue;
-
-          if (entry.isIntersecting) {
-            // Element entered viewport
-            data.visibleSince = now;
-          } else if (data.visibleSince !== null) {
-            // Element left viewport — accumulate time
-            data.totalMs += now - data.visibleSince;
-            data.visibleSince = null;
-          }
-        }
-      },
-      { threshold },
-    );
-
-    this.visibilityObservers.set(key, observer);
-    return observer;
-  }
-
-  /**
-   * Flush visibility event for a single element (e.g. when removed from DOM)
-   */
-  private flushVisibilityForElement(el: Element): void {
-    const data = this.visibilityData.get(el);
-    if (!data) return;
-
-    // Accumulate any in-progress visible time
-    if (data.visibleSince !== null) {
-      data.totalMs += Date.now() - data.visibleSince;
-      data.visibleSince = null;
-    }
-
-    if (data.totalMs > 0) {
-      const durationMs = Math.round(data.totalMs);
-      const durationSeconds = Math.round(durationMs / 1000);
-      this.track({
-        channel: data.channel,
-        event: data.event,
-        tags: {
-          duration_seconds: durationSeconds,
-          duration_ms: durationMs,
-        },
-      }).catch((err) => this.log('Failed to track visibility event', err));
-    }
-
-    // Stop observing and clean up
-    for (const observer of this.visibilityObservers.values()) {
-      observer.unobserve(el);
-    }
-    this.visibilityData.delete(el);
-  }
-
-  /**
-   * Flush all pending visibility events (e.g. on navigation or unload)
-   */
-  protected flushAllVisibilityEvents(): void {
-    for (const [el, data] of this.visibilityData.entries()) {
-      // Accumulate any in-progress visible time
-      if (data.visibleSince !== null) {
-        data.totalMs += Date.now() - data.visibleSince;
-        data.visibleSince = null;
-      }
-
-      if (data.totalMs > 0) {
-        const durationMs = Math.round(data.totalMs);
-        const durationSeconds = Math.round(durationMs / 1000);
-        this.track({
-          channel: data.channel,
-          event: data.event,
-          tags: {
-            duration_seconds: durationSeconds,
-            duration_ms: durationMs,
-          },
-        }).catch((err) => this.log('Failed to track visibility event', err));
-      }
-
-      // Reset for next page / session
-      data.totalMs = 0;
-      data.visibleSince = null;
-    }
-  }
-
-  // ============================================================
-  // Web Vitals Tracking
-  // ============================================================
-
-  /**
-   * Setup Core Web Vitals tracking.
-   * Registers callbacks for all 5 metrics (LCP, CLS, INP, FCP, TTFB)
-   * and sends them as a single event once all are collected or after a 30s timeout.
-   */
-  protected setupWebVitalsTracking(): void {
-    if (typeof window === 'undefined' || this.webVitalsActive) return;
-
-    const checkAndSend = () => {
-      const { lcp, cls, inp, fcp, ttfb } = this.webVitalsData;
-      if (lcp !== null && cls !== null && inp !== null && fcp !== null && ttfb !== null) {
-        this.sendWebVitals();
-      }
-    };
-
-    onLCP((metric) => {
-      this.webVitalsData.lcp = metric.value;
-      this.log('Web Vital collected', { name: 'LCP', value: metric.value });
-      checkAndSend();
-    });
-
-    onCLS((metric) => {
-      this.webVitalsData.cls = metric.value;
-      this.log('Web Vital collected', { name: 'CLS', value: metric.value });
-      checkAndSend();
-    });
-
-    onINP((metric) => {
-      this.webVitalsData.inp = metric.value;
-      this.log('Web Vital collected', { name: 'INP', value: metric.value });
-      checkAndSend();
-    });
-
-    onFCP((metric) => {
-      this.webVitalsData.fcp = metric.value;
-      this.log('Web Vital collected', { name: 'FCP', value: metric.value });
-      checkAndSend();
-    });
-
-    onTTFB((metric) => {
-      this.webVitalsData.ttfb = metric.value;
-      this.log('Web Vital collected', { name: 'TTFB', value: metric.value });
-      checkAndSend();
-    });
-
-    // Safety timeout — send whatever we have after 30s
-    this.webVitalsTimeout = setTimeout(() => {
-      this.webVitalsTimeout = null;
-      this.sendWebVitals();
-    }, 30_000);
-
-    // Also send on beforeunload if not already sent
-    this.webVitalsBeforeUnloadListener = () => {
-      this.sendWebVitals();
-    };
-    window.addEventListener('beforeunload', this.webVitalsBeforeUnloadListener);
-
-    this.webVitalsActive = true;
-    this.log('Web Vitals tracking enabled');
-  }
-
-  /**
-   * Send collected web vitals as a single event.
-   * Only sends once per page load; only includes metrics that were actually collected.
-   */
-  private sendWebVitals(): void {
-    if (this.webVitalsSent) return;
-
-    const { lcp, cls, inp, fcp, ttfb } = this.webVitalsData;
-
-    // Don't send if no metrics were collected at all
-    if (lcp === null && cls === null && inp === null && fcp === null && ttfb === null) return;
-
-    this.webVitalsSent = true;
-
-    // Clear the timeout since we're sending now
-    if (this.webVitalsTimeout !== null) {
-      clearTimeout(this.webVitalsTimeout);
-      this.webVitalsTimeout = null;
-    }
-
-    // Build tags — only include non-null values
-    const tags: Tags = {};
-    if (lcp !== null) tags.__lcp = lcp;
-    if (cls !== null) tags.__cls = cls;
-    if (inp !== null) tags.__inp = inp;
-    if (fcp !== null) tags.__fcp = fcp;
-    if (ttfb !== null) tags.__ttfb = ttfb;
-
-    this.log('Sending Web Vitals', tags);
-
-    this.track({
-      channel: ANALYTICS_CHANNEL,
-      event: 'web_vitals',
-      tags,
-    }).catch((err) => this.log('Failed to track web vitals', err));
-  }
-
-  // ============================================================
   // Cleanup
   // ============================================================
 
@@ -1631,52 +1003,19 @@ export class KitbaseAnalytics {
     // Clear timed events
     this.timedEvents.clear();
 
-    // Cleanup scroll depth tracking
-    if (this.scrollTrackingActive) {
-      this.flushScrollDepth();
-      if (this.scrollListener) {
-        window.removeEventListener('scroll', this.scrollListener);
-        this.scrollListener = null;
+    // Teardown plugins in reverse order
+    const pluginNames = Array.from(this._plugins.keys()).reverse();
+    for (const name of pluginNames) {
+      const plugin = this._plugins.get(name)!;
+      try {
+        plugin.teardown();
+        this.log(`Plugin "${name}" torn down`);
+      } catch (err) {
+        this.log(`Plugin "${name}" teardown failed`, err);
       }
-      if (this.beforeUnloadListener) {
-        window.removeEventListener('beforeunload', this.beforeUnloadListener);
-        this.beforeUnloadListener = null;
-      }
-      this.scrollTrackingActive = false;
     }
-
-    // Cleanup web vitals tracking
-    if (this.webVitalsActive) {
-      if (this.webVitalsTimeout !== null) {
-        clearTimeout(this.webVitalsTimeout);
-        this.webVitalsTimeout = null;
-      }
-      this.sendWebVitals();
-      if (this.webVitalsBeforeUnloadListener) {
-        window.removeEventListener('beforeunload', this.webVitalsBeforeUnloadListener);
-        this.webVitalsBeforeUnloadListener = null;
-      }
-      this.webVitalsActive = false;
-    }
-
-    // Cleanup visibility tracking
-    if (this.visibilityTrackingActive) {
-      this.flushAllVisibilityEvents();
-      for (const observer of this.visibilityObservers.values()) {
-        observer.disconnect();
-      }
-      this.visibilityObservers.clear();
-      if (this.visibilityMutationObserver) {
-        this.visibilityMutationObserver.disconnect();
-        this.visibilityMutationObserver = null;
-      }
-      if (this.visibilityBeforeUnloadListener) {
-        window.removeEventListener('beforeunload', this.visibilityBeforeUnloadListener);
-        this.visibilityBeforeUnloadListener = null;
-      }
-      this.visibilityData.clear();
-      this.visibilityTrackingActive = false;
-    }
+    this._plugins.clear();
+    this._pluginContext = null;
 
     this.log('Shutdown complete');
   }

@@ -40,3 +40,16 @@ export {
   ValidationError,
   TimeoutError,
 } from './errors.js';
+
+// Plugin system
+export type { KitbasePlugin, PluginContext } from './plugins/types.js';
+export {
+  createDefaultPlugins,
+  PageViewPlugin,
+  OutboundLinksPlugin,
+  ClickTrackingPlugin,
+  ScrollDepthPlugin,
+  VisibilityPlugin,
+  WebVitalsPlugin,
+  FrustrationPlugin,
+} from './plugins/index.js';

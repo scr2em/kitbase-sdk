@@ -203,6 +203,14 @@ export interface AnalyticsConfig {
    * @default false
    */
   autoTrackWebVitals?: boolean;
+
+  /**
+   * Detect frustration signals (rage clicks and dead clicks).
+   * Rage clicks: 3+ rapid clicks in the same area within 1 second.
+   * Dead clicks: clicks on interactive elements that produce no DOM change.
+   * @default true
+   */
+  autoDetectFrustration?: boolean;
 }
 
 /**

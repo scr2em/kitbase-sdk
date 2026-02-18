@@ -220,6 +220,22 @@ export interface AnalyticsConfig {
    * @default true
    */
   autoTrackVisibility?: boolean;
+
+  /**
+   * Track Core Web Vitals (LCP, CLS, INP, FCP, TTFB).
+   * Collects all metrics and sends them as a single `web_vitals` event.
+   * Requires the `web-vitals` library (included as a dependency).
+   * @default false
+   */
+  autoTrackWebVitals?: boolean;
+
+  /**
+   * Detect frustration signals (rage clicks and dead clicks).
+   * Rage clicks: 3+ rapid clicks in the same area within 1 second.
+   * Dead clicks: clicks on interactive elements that produce no DOM change.
+   * @default true
+   */
+  autoDetectFrustration?: boolean;
 }
 
 /**
