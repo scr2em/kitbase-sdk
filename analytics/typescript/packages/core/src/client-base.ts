@@ -210,7 +210,15 @@ export class KitbaseAnalytics {
 
     this._pluginContext = {
       track: (options: TrackOptions) => this.track(options),
-      config: Object.freeze({ ...(this.analyticsConfig ?? {}) }) as any,
+      config: Object.freeze({
+        autoTrackPageViews: this.analyticsConfig?.autoTrackPageViews,
+        autoTrackOutboundLinks: this.analyticsConfig?.autoTrackOutboundLinks,
+        autoTrackClicks: this.analyticsConfig?.autoTrackClicks,
+        autoTrackScrollDepth: this.analyticsConfig?.autoTrackScrollDepth,
+        autoTrackVisibility: this.analyticsConfig?.autoTrackVisibility,
+        autoTrackWebVitals: this.analyticsConfig?.autoTrackWebVitals,
+        autoDetectFrustration: this.analyticsConfig?.autoDetectFrustration,
+      }),
       debug: this.debugMode,
       log: (message: string, data?: unknown) => this.log(message, data),
       isOptedOut: () => this.isOptedOut(),

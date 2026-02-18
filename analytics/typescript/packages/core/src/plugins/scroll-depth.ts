@@ -5,14 +5,17 @@ const ANALYTICS_CHANNEL = '__analytics';
 export class ScrollDepthPlugin implements KitbasePlugin {
   readonly name = 'scroll-depth';
   private ctx!: PluginContext;
+  private active = false;
   private maxScrollDepth = 0;
   private scrollListener: (() => void) | null = null;
   private beforeUnloadListener: (() => void) | null = null;
+  private popstateListener: (() => void) | null = null;
   private scrollRafScheduled = false;
 
   setup(ctx: PluginContext): void | false {
     if (typeof window === 'undefined') return false;
     this.ctx = ctx;
+    this.active = true;
 
     this.scrollListener = () => {
       if (this.scrollRafScheduled) return;
@@ -44,18 +47,20 @@ export class ScrollDepthPlugin implements KitbasePlugin {
     const originalPushState = history.pushState;
     const self = this;
     history.pushState = function (...args) {
-      self.flushScrollDepth();
+      if (self.active) self.flushScrollDepth();
       return originalPushState.apply(this, args);
     };
 
-    window.addEventListener('popstate', () => {
-      this.flushScrollDepth();
-    });
+    this.popstateListener = () => {
+      if (this.active) this.flushScrollDepth();
+    };
+    window.addEventListener('popstate', this.popstateListener);
 
     ctx.log('Scroll depth tracking enabled');
   }
 
   teardown(): void {
+    this.active = false;
     this.flushScrollDepth();
     if (this.scrollListener) {
       window.removeEventListener('scroll', this.scrollListener);
@@ -64,6 +69,10 @@ export class ScrollDepthPlugin implements KitbasePlugin {
     if (this.beforeUnloadListener) {
       window.removeEventListener('beforeunload', this.beforeUnloadListener);
       this.beforeUnloadListener = null;
+    }
+    if (this.popstateListener) {
+      window.removeEventListener('popstate', this.popstateListener);
+      this.popstateListener = null;
     }
   }
 

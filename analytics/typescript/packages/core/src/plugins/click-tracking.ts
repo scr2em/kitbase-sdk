@@ -1,6 +1,5 @@
 import type { KitbasePlugin, PluginContext } from './types.js';
 import type { Tags, TrackResponse } from '../types-lite.js';
-import { findClickableElement, isSameRootDomain } from './utils.js';
 
 const ANALYTICS_CHANNEL = '__analytics';
 
@@ -33,7 +32,7 @@ export class ClickTrackingPlugin implements KitbasePlugin {
         }
       }
 
-      const element = findClickableElement(event);
+      const element = ctx.findClickableElement(event);
       if (!element) return;
 
       // Skip outbound links — already handled by outbound link tracking
@@ -45,7 +44,7 @@ export class ClickTrackingPlugin implements KitbasePlugin {
             if (
               (linkUrl.protocol === 'http:' || linkUrl.protocol === 'https:') &&
               linkUrl.hostname !== window.location.hostname &&
-              !isSameRootDomain(window.location.hostname, linkUrl.hostname)
+              !ctx.isSameRootDomain(window.location.hostname, linkUrl.hostname)
             ) {
               return;
             }

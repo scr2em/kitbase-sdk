@@ -3,15 +3,18 @@ import type { KitbasePlugin, PluginContext } from './types.js';
 export class VisibilityPlugin implements KitbasePlugin {
   readonly name = 'visibility';
   private ctx!: PluginContext;
+  private active = false;
   private visibilityObservers: Map<number, IntersectionObserver> = new Map();
   private visibilityMutationObserver: MutationObserver | null = null;
   private visibilityData: Map<Element, { visibleSince: number | null; totalMs: number; event: string; channel: string }> = new Map();
   private beforeUnloadListener: (() => void) | null = null;
+  private popstateListener: (() => void) | null = null;
 
   setup(ctx: PluginContext): void | false {
     if (typeof window === 'undefined') return false;
     if (typeof IntersectionObserver === 'undefined' || typeof MutationObserver === 'undefined') return false;
     this.ctx = ctx;
+    this.active = true;
 
     // Scan existing DOM elements
     this.scanForVisibilityElements();
@@ -53,18 +56,20 @@ export class VisibilityPlugin implements KitbasePlugin {
     const originalPushState = history.pushState;
     const self = this;
     history.pushState = function (...args) {
-      self.flushAllVisibilityEvents();
+      if (self.active) self.flushAllVisibilityEvents();
       return originalPushState.apply(this, args);
     };
 
-    window.addEventListener('popstate', () => {
-      this.flushAllVisibilityEvents();
-    });
+    this.popstateListener = () => {
+      if (this.active) this.flushAllVisibilityEvents();
+    };
+    window.addEventListener('popstate', this.popstateListener);
 
     ctx.log('Visibility tracking enabled');
   }
 
   teardown(): void {
+    this.active = false;
     this.flushAllVisibilityEvents();
     for (const observer of this.visibilityObservers.values()) {
       observer.disconnect();
@@ -77,6 +82,10 @@ export class VisibilityPlugin implements KitbasePlugin {
     if (this.beforeUnloadListener) {
       window.removeEventListener('beforeunload', this.beforeUnloadListener);
       this.beforeUnloadListener = null;
+    }
+    if (this.popstateListener) {
+      window.removeEventListener('popstate', this.popstateListener);
+      this.popstateListener = null;
     }
     this.visibilityData.clear();
   }

@@ -7,19 +7,28 @@ const ANALYTICS_CHANNEL = '__analytics';
 export class PageViewPlugin implements KitbasePlugin {
   readonly name = 'page-view';
   private ctx!: PluginContext;
+  private active = false;
+  private popstateListener: (() => void) | null = null;
 
   setup(ctx: PluginContext): void | false {
     if (typeof window === 'undefined') return false;
     this.ctx = ctx;
+    this.active = true;
 
-    // Track initial page view
-    this.trackPageView().catch((err) => ctx.log('Failed to track initial page view', err));
+    // Defer initial page view so subclass constructors (e.g. offline queue) finish first
+    Promise.resolve().then(() => {
+      if (this.active) {
+        this.trackPageView().catch((err) => ctx.log('Failed to track initial page view', err));
+      }
+    });
 
     // Intercept pushState
     const originalPushState = history.pushState.bind(history);
     history.pushState = (...args) => {
       originalPushState(...args);
-      this.trackPageView().catch((err) => ctx.log('Failed to track page view (pushState)', err));
+      if (this.active) {
+        this.trackPageView().catch((err) => ctx.log('Failed to track page view (pushState)', err));
+      }
     };
 
     // Intercept replaceState (preserve behavior, no tracking)
@@ -29,15 +38,22 @@ export class PageViewPlugin implements KitbasePlugin {
     };
 
     // Listen to popstate (browser back/forward)
-    window.addEventListener('popstate', () => {
-      this.trackPageView().catch((err) => ctx.log('Failed to track page view (popstate)', err));
-    });
+    this.popstateListener = () => {
+      if (this.active) {
+        this.trackPageView().catch((err) => ctx.log('Failed to track page view (popstate)', err));
+      }
+    };
+    window.addEventListener('popstate', this.popstateListener);
 
     ctx.log('Auto page view tracking enabled');
   }
 
   teardown(): void {
-    // History monkey-patches can't be cleanly removed
+    this.active = false;
+    if (this.popstateListener) {
+      window.removeEventListener('popstate', this.popstateListener);
+      this.popstateListener = null;
+    }
   }
 
   get methods() {
