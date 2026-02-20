@@ -159,9 +159,9 @@ export class VisibilityPlugin implements KitbasePlugin {
         channel: data.channel,
         event: 'element_visible',
         tags: {
-          element_name: data.event,
-          duration_seconds: durationSeconds,
-          duration_ms: durationMs,
+          __element_name: data.event,
+          __duration_seconds: durationSeconds,
+          __duration_ms: durationMs,
         },
       }).catch((err) => this.ctx.log('Failed to track visibility event', err));
     }
