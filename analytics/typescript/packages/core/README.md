@@ -79,6 +79,7 @@ const kitbase = new Kitbase({
     autoTrackScrollDepth: true,    // track max scroll depth per page
     autoTrackVisibility: true,     // track visibility duration via data attributes
     autoTrackWebVitals: false,     // track Core Web Vitals (LCP, CLS, INP, FCP, TTFB)
+    autoDetectFrustration: true,   // detect rage clicks and dead clicks
   },
 
   privacy: {
@@ -105,15 +106,17 @@ const kitbase = new Kitbase({
 
 All enabled by default. The SDK automatically tracks:
 
-| Event | Channel | Trigger |
-|-------|---------|---------|
-| `screen_view` | `__analytics` | Page navigation (init, pushState, popstate) |
-| `outbound_link` | `__analytics` | Click on external link |
-| `click` | `__analytics` | Click on interactive element |
-| `scroll_depth` | `__analytics` | Navigation / unload (max depth per page) |
-| `web_vitals` | `__analytics` | Once per page load (opt-in via `autoTrackWebVitals`) |
+| Event | Channel | Trigger | Config |
+|-------|---------|---------|--------|
+| `screen_view` | `__analytics` | Page navigation (init, pushState, popstate) | `autoTrackPageViews` (default `true`) |
+| `outbound_link` | `__analytics` | Click on external link | `autoTrackOutboundLinks` (default `true`) |
+| `click` | `__analytics` | Click on interactive element | `autoTrackClicks` (default `true`) |
+| `scroll_depth` | `__analytics` | Navigation / unload (max depth per page) | `autoTrackScrollDepth` (default `true`) |
+| `rage_click` | `__analytics` | 3+ clicks within 1s in same area | `autoDetectFrustration` (default `true`) |
+| `dead_click` | `__analytics` | Click with no DOM change within 1s | `autoDetectFrustration` (default `true`) |
+| `web_vitals` | `__analytics` | Once per page load | `autoTrackWebVitals` (default `false`) |
 
-Page views, clicks, outbound links, and scroll depth are tracked automatically. The SDK intercepts `history.pushState`/`popstate` for SPA support — no framework router integration needed.
+Page views, clicks, outbound links, scroll depth, and frustration signals are tracked automatically. The SDK intercepts `history.pushState`/`popstate` for SPA support — no framework router integration needed.
 
 ## Data Attribute Events
 
@@ -188,6 +191,39 @@ The SDK collects all 5 metrics and sends them as a single `web_vitals` event on 
 | `__ttfb` | Time to First Byte | Server response time (ms) |
 
 Metrics are sent once per page load. A 30-second timeout ensures data is sent even if some metrics never fire (e.g., INP requires user interaction). Only collected metrics are included in the event tags.
+
+## Frustration Signals
+
+The SDK automatically detects two types of user frustration. Enabled by default — disable with `autoDetectFrustration: false`.
+
+### Rage Click
+
+Fired when 3+ clicks occur within 1 second in the same area (30px radius). Indicates the user is clicking repeatedly out of frustration.
+
+| Tag | Type | Description |
+|-----|------|-------------|
+| `__selector` | `string` | CSS selector of the element |
+| `__tag` | `string` | HTML tag name |
+| `__id` | `string` | Element `id` attribute |
+| `__class` | `string` | Element `className` |
+| `__text` | `string` | Text content (first 100 chars) |
+| `__click_count` | `number` | Number of rapid clicks detected |
+| `__path` | `string` | Current page path |
+
+### Dead Click
+
+Fired when a click on an interactive element produces no DOM change within 1 second. Indicates the user clicked something that looked interactive but had no effect.
+
+| Tag | Type | Description |
+|-----|------|-------------|
+| `__selector` | `string` | CSS selector of the element |
+| `__tag` | `string` | HTML tag name |
+| `__id` | `string` | Element `id` attribute |
+| `__class` | `string` | Element `className` |
+| `__text` | `string` | Text content (first 100 chars) |
+| `__path` | `string` | Current page path |
+
+Dead click detection uses a `MutationObserver` to watch for any DOM change (child nodes, attributes, character data) after a click. If nothing changes within 1 second, the event fires.
 
 ## Event Tracking
 

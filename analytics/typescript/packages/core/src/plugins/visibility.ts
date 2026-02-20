@@ -157,8 +157,9 @@ export class VisibilityPlugin implements KitbasePlugin {
       const durationSeconds = Math.round(durationMs / 1000);
       this.ctx.track({
         channel: data.channel,
-        event: data.event,
+        event: 'element_visible',
         tags: {
+          element_name: data.event,
           duration_seconds: durationSeconds,
           duration_ms: durationMs,
         },
@@ -183,8 +184,9 @@ export class VisibilityPlugin implements KitbasePlugin {
         const durationSeconds = Math.round(durationMs / 1000);
         this.ctx.track({
           channel: data.channel,
-          event: data.event,
+          event: 'element_visible',
           tags: {
+            element_name: data.event,
             duration_seconds: durationSeconds,
             duration_ms: durationMs,
           },

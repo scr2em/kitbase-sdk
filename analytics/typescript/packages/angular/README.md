@@ -98,6 +98,7 @@ init({
     autoTrackScrollDepth: true,   // track max scroll depth per page
     autoTrackVisibility: true,    // track visibility duration via data attributes
     autoTrackWebVitals: false,    // track Core Web Vitals (LCP, CLS, INP, FCP, TTFB)
+    autoDetectFrustration: true,  // detect rage clicks and dead clicks
   },
 
   privacy: {
