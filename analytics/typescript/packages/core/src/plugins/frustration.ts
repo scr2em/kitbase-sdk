@@ -66,6 +66,10 @@ export class FrustrationPlugin implements KitbasePlugin {
       const clickedElement = findClickableElement(event);
       if (!clickedElement) return;
 
+      // Skip dead click detection for links with href — navigating is the expected behavior,
+      // not a DOM mutation on the current page (especially target="_blank" links).
+      if (target.closest?.('a[href]')) return;
+
       // Clear any pending dead click check
       if (this.deadClickTimeout !== null) {
         clearTimeout(this.deadClickTimeout);
