@@ -1,33 +1,37 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const mockInstance = {
-  track: vi.fn().mockResolvedValue({ id: 'evt-1' }),
-  identify: vi.fn().mockResolvedValue(undefined),
-  trackPageView: vi.fn().mockResolvedValue({ id: 'pv-1' }),
-  trackRevenue: vi.fn().mockResolvedValue({ id: 'rev-1' }),
-  trackOutboundLink: vi.fn().mockResolvedValue({ id: 'out-1' }),
-  trackClick: vi.fn().mockResolvedValue({ id: 'click-1' }),
-  timeEvent: vi.fn(),
-  cancelTimeEvent: vi.fn(),
-  getEventDuration: vi.fn().mockReturnValue(1500),
-  getTimedEvents: vi.fn().mockReturnValue([]),
-  register: vi.fn(),
-  registerOnce: vi.fn(),
-  unregister: vi.fn(),
-  getSuperProperties: vi.fn().mockReturnValue({}),
-  clearSuperProperties: vi.fn(),
-  getUserId: vi.fn().mockReturnValue(null),
-  reset: vi.fn(),
-  optIn: vi.fn(),
-  optOut: vi.fn().mockResolvedValue(undefined),
-  isOptedOut: vi.fn().mockReturnValue(false),
-  hasConsent: vi.fn().mockReturnValue(true),
-  setDebugMode: vi.fn(),
-  isDebugMode: vi.fn().mockReturnValue(false),
-  shutdown: vi.fn(),
-  use: vi.fn(),
-  getPlugins: vi.fn().mockReturnValue(['page-view', 'click-tracking']),
-};
+const { mockInstance } = vi.hoisted(() => {
+  const fn = vi.fn;
+  const mockInstance = {
+    track: fn().mockResolvedValue({ id: 'evt-1' }),
+    identify: fn().mockResolvedValue(undefined),
+    trackPageView: fn().mockResolvedValue({ id: 'pv-1' }),
+    trackRevenue: fn().mockResolvedValue({ id: 'rev-1' }),
+    trackOutboundLink: fn().mockResolvedValue({ id: 'out-1' }),
+    trackClick: fn().mockResolvedValue({ id: 'click-1' }),
+    timeEvent: fn(),
+    cancelTimeEvent: fn(),
+    getEventDuration: fn().mockReturnValue(1500),
+    getTimedEvents: fn().mockReturnValue([]),
+    register: fn(),
+    registerOnce: fn(),
+    unregister: fn(),
+    getSuperProperties: fn().mockReturnValue({}),
+    clearSuperProperties: fn(),
+    getUserId: fn().mockReturnValue(null),
+    reset: fn(),
+    optIn: fn(),
+    optOut: fn().mockResolvedValue(undefined),
+    isOptedOut: fn().mockReturnValue(false),
+    hasConsent: fn().mockReturnValue(true),
+    setDebugMode: fn(),
+    isDebugMode: fn().mockReturnValue(false),
+    shutdown: fn(),
+    use: fn(),
+    getPlugins: fn().mockReturnValue(['page-view', 'click-tracking']),
+  };
+  return { mockInstance };
+});
 
 // Mock @angular/core before importing the module under test
 vi.mock('@angular/core', () => ({
@@ -36,7 +40,7 @@ vi.mock('@angular/core', () => ({
   EnvironmentProviders: class {},
 }));
 
-// Mock KitbaseAnalytics core — factory must not reference outer variables
+// Mock KitbaseAnalytics core
 vi.mock('@kitbase/analytics', () => ({
   init: vi.fn().mockReturnValue(mockInstance),
   getInstance: vi.fn().mockReturnValue(mockInstance),

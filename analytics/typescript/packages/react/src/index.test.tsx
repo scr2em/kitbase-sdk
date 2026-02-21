@@ -1,6 +1,60 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { type ReactNode } from 'react';
+
+const mockInstance = {
+  track: vi.fn().mockResolvedValue({ id: 'evt-1' }),
+  identify: vi.fn().mockResolvedValue(undefined),
+  trackPageView: vi.fn().mockResolvedValue({ id: 'pv-1' }),
+  trackRevenue: vi.fn().mockResolvedValue({ id: 'rev-1' }),
+  trackOutboundLink: vi.fn().mockResolvedValue({ id: 'out-1' }),
+  trackClick: vi.fn().mockResolvedValue({ id: 'click-1' }),
+  timeEvent: vi.fn(),
+  cancelTimeEvent: vi.fn(),
+  getEventDuration: vi.fn().mockReturnValue(1500),
+  getTimedEvents: vi.fn().mockReturnValue([]),
+  register: vi.fn(),
+  registerOnce: vi.fn(),
+  unregister: vi.fn(),
+  getSuperProperties: vi.fn().mockReturnValue({}),
+  clearSuperProperties: vi.fn(),
+  getUserId: vi.fn().mockReturnValue(null),
+  reset: vi.fn(),
+  optIn: vi.fn(),
+  optOut: vi.fn().mockResolvedValue(undefined),
+  isOptedOut: vi.fn().mockReturnValue(false),
+  hasConsent: vi.fn().mockReturnValue(true),
+  setDebugMode: vi.fn(),
+  isDebugMode: vi.fn().mockReturnValue(false),
+  shutdown: vi.fn(),
+  use: vi.fn(),
+  getPlugins: vi.fn().mockReturnValue([]),
+};
+
+// Mock KitbaseAnalytics
+vi.mock('@kitbase/analytics', () => ({
+  KitbaseAnalytics: vi.fn().mockImplementation(() => mockInstance),
+  init: vi.fn(),
+  getInstance: vi.fn(),
+  KitbaseError: class KitbaseError extends Error {},
+  ApiError: class ApiError extends Error {},
+  AuthenticationError: class AuthenticationError extends Error {},
+  ValidationError: class ValidationError extends Error {},
+  TimeoutError: class TimeoutError extends Error {},
+  detectBot: vi.fn(),
+  isBot: vi.fn(),
+  isUserAgentBot: vi.fn(),
+  getUserAgent: vi.fn(),
+  createDefaultPlugins: vi.fn(),
+  PageViewPlugin: class {},
+  OutboundLinksPlugin: class {},
+  ClickTrackingPlugin: class {},
+  ScrollDepthPlugin: class {},
+  VisibilityPlugin: class {},
+  WebVitalsPlugin: class {},
+  FrustrationPlugin: class {},
+}));
+
 import {
   KitbaseAnalyticsProvider,
   useKitbaseAnalytics,
@@ -15,75 +69,7 @@ import {
   useConsent,
 } from './index.js';
 
-// Re-export checks
 import * as exports from './index.js';
-
-// Mock KitbaseAnalytics
-vi.mock('@kitbase/analytics', () => {
-  const mockInstance = {
-    track: vi.fn().mockResolvedValue({ id: 'evt-1' }),
-    identify: vi.fn().mockResolvedValue(undefined),
-    trackPageView: vi.fn().mockResolvedValue({ id: 'pv-1' }),
-    trackRevenue: vi.fn().mockResolvedValue({ id: 'rev-1' }),
-    trackOutboundLink: vi.fn().mockResolvedValue({ id: 'out-1' }),
-    trackClick: vi.fn().mockResolvedValue({ id: 'click-1' }),
-    timeEvent: vi.fn(),
-    cancelTimeEvent: vi.fn(),
-    getEventDuration: vi.fn().mockReturnValue(1500),
-    getTimedEvents: vi.fn().mockReturnValue([]),
-    register: vi.fn(),
-    registerOnce: vi.fn(),
-    unregister: vi.fn(),
-    getSuperProperties: vi.fn().mockReturnValue({}),
-    clearSuperProperties: vi.fn(),
-    getUserId: vi.fn().mockReturnValue(null),
-    reset: vi.fn(),
-    optIn: vi.fn(),
-    optOut: vi.fn().mockResolvedValue(undefined),
-    isOptedOut: vi.fn().mockReturnValue(false),
-    hasConsent: vi.fn().mockReturnValue(true),
-    setDebugMode: vi.fn(),
-    isDebugMode: vi.fn().mockReturnValue(false),
-    shutdown: vi.fn(),
-    use: vi.fn(),
-    getPlugins: vi.fn().mockReturnValue([]),
-    isBot: vi.fn().mockReturnValue(false),
-    getBotDetectionResult: vi.fn().mockReturnValue(null),
-    redetectBot: vi.fn().mockReturnValue({ isBot: false }),
-    isBotBlockingActive: vi.fn().mockReturnValue(false),
-    getQueueStats: vi.fn().mockResolvedValue(null),
-    flushQueue: vi.fn().mockResolvedValue(undefined),
-    clearQueue: vi.fn().mockResolvedValue(undefined),
-  };
-
-  return {
-    KitbaseAnalytics: vi.fn().mockImplementation(() => mockInstance),
-    __mockInstance: mockInstance,
-    // Re-export stubs for types/classes that get re-exported
-    init: vi.fn(),
-    getInstance: vi.fn(),
-    KitbaseError: class KitbaseError extends Error {},
-    ApiError: class ApiError extends Error {},
-    AuthenticationError: class AuthenticationError extends Error {},
-    ValidationError: class ValidationError extends Error {},
-    TimeoutError: class TimeoutError extends Error {},
-    detectBot: vi.fn(),
-    isBot: vi.fn(),
-    isUserAgentBot: vi.fn(),
-    getUserAgent: vi.fn(),
-    createDefaultPlugins: vi.fn(),
-    PageViewPlugin: class {},
-    OutboundLinksPlugin: class {},
-    ClickTrackingPlugin: class {},
-    ScrollDepthPlugin: class {},
-    VisibilityPlugin: class {},
-    WebVitalsPlugin: class {},
-    FrustrationPlugin: class {},
-  };
-});
-
-// Get mock instance for assertions
-const { __mockInstance: mockKitbase } = await import('@kitbase/analytics') as any;
 
 function wrapper({ children }: { children: ReactNode }) {
   return (
@@ -134,7 +120,7 @@ describe('useTrack', () => {
       await result.current(options);
     });
 
-    expect(mockKitbase.track).toHaveBeenCalledWith(options);
+    expect(mockInstance.track).toHaveBeenCalledWith(options);
   });
 });
 
@@ -147,7 +133,7 @@ describe('useIdentify', () => {
       await result.current(options);
     });
 
-    expect(mockKitbase.identify).toHaveBeenCalledWith(options);
+    expect(mockInstance.identify).toHaveBeenCalledWith(options);
   });
 });
 
@@ -159,7 +145,7 @@ describe('usePageView', () => {
       await result.current({ path: '/test' });
     });
 
-    expect(mockKitbase.trackPageView).toHaveBeenCalledWith({ path: '/test' });
+    expect(mockInstance.trackPageView).toHaveBeenCalledWith({ path: '/test' });
   });
 });
 
@@ -172,7 +158,7 @@ describe('useRevenue', () => {
       await result.current(options);
     });
 
-    expect(mockKitbase.trackRevenue).toHaveBeenCalledWith(options);
+    expect(mockInstance.trackRevenue).toHaveBeenCalledWith(options);
   });
 });
 
@@ -191,17 +177,17 @@ describe('useTimeEvent', () => {
     act(() => {
       result.current.start();
     });
-    expect(mockKitbase.timeEvent).toHaveBeenCalledWith('Video Watched');
+    expect(mockInstance.timeEvent).toHaveBeenCalledWith('Video Watched');
 
     act(() => {
       result.current.stop();
     });
-    expect(mockKitbase.cancelTimeEvent).toHaveBeenCalledWith('Video Watched');
+    expect(mockInstance.cancelTimeEvent).toHaveBeenCalledWith('Video Watched');
 
     act(() => {
       result.current.getDuration();
     });
-    expect(mockKitbase.getEventDuration).toHaveBeenCalledWith('Video Watched');
+    expect(mockInstance.getEventDuration).toHaveBeenCalledWith('Video Watched');
   });
 });
 
@@ -212,7 +198,7 @@ describe('useUserId', () => {
   });
 
   it('should return user ID when set', () => {
-    mockKitbase.getUserId.mockReturnValue('user-42');
+    mockInstance.getUserId.mockReturnValue('user-42');
     const { result } = renderHook(() => useUserId(), { wrapper });
     expect(result.current).toBe('user-42');
   });
@@ -226,13 +212,13 @@ describe('useReset', () => {
       result.current();
     });
 
-    expect(mockKitbase.reset).toHaveBeenCalled();
+    expect(mockInstance.reset).toHaveBeenCalled();
   });
 });
 
 describe('useOptedOut', () => {
   it('should return opted out status', () => {
-    mockKitbase.isOptedOut.mockReturnValue(true);
+    mockInstance.isOptedOut.mockReturnValue(true);
     const { result } = renderHook(() => useOptedOut(), { wrapper });
     expect(result.current).toBe(true);
   });
@@ -253,17 +239,17 @@ describe('useConsent', () => {
     act(() => {
       result.current.optIn();
     });
-    expect(mockKitbase.optIn).toHaveBeenCalled();
+    expect(mockInstance.optIn).toHaveBeenCalled();
 
     act(() => {
       result.current.optOut();
     });
-    expect(mockKitbase.optOut).toHaveBeenCalled();
+    expect(mockInstance.optOut).toHaveBeenCalled();
 
     act(() => {
       result.current.hasConsent();
     });
-    expect(mockKitbase.hasConsent).toHaveBeenCalled();
+    expect(mockInstance.hasConsent).toHaveBeenCalled();
   });
 });
 
