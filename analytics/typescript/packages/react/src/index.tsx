@@ -50,16 +50,8 @@ import {
   type Tags,
 } from '@kitbase/analytics';
 
-// Re-export types from core
-export type {
-  KitbaseConfig,
-  TrackOptions,
-  TrackResponse,
-  PageViewOptions,
-  RevenueOptions,
-  IdentifyOptions,
-  Tags,
-};
+// Re-export everything from core
+export * from '@kitbase/analytics';
 
 // ============================================================
 // Context

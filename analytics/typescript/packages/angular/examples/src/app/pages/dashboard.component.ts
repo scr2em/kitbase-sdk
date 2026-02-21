@@ -104,6 +104,14 @@ import { LogService } from '../log.service';
         </div>
       </div>
 
+      <!-- Plugins -->
+      <div class="card">
+        <h2>Plugins</h2>
+        <div class="btn-group">
+          <button (click)="listPlugins()">List Active Plugins</button>
+        </div>
+      </div>
+
       <!-- Data-Attribute Click Tracking Demo -->
       <div class="card">
         <h2>Data-Attribute Click Tracking</h2>
@@ -300,5 +308,10 @@ export class DashboardComponent {
     const current = this.kitbase.isDebugMode();
     this.kitbase.setDebugMode(!current);
     this.logService.log(`Debug mode: ${!current}`, 'info');
+  }
+
+  listPlugins() {
+    const plugins = this.kitbase.getPlugins();
+    this.logService.log(`Active plugins: ${plugins.length ? plugins.join(', ') : '(none)'}`, 'info');
   }
 }

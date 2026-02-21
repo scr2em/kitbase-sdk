@@ -232,6 +232,13 @@ The SDK collects all 5 metrics (LCP, CLS, INP, FCP, TTFB) and sends them as a si
 | `isOptedOut()` | Check if opted out |
 | `hasConsent()` | Check if user has consented |
 
+### Plugin System
+
+| Method | Description |
+|--------|-------------|
+| `use(plugin)` | Register a plugin |
+| `getPlugins()` | Get names of all registered plugins |
+
 ### Debug
 
 | Method | Description |
@@ -239,6 +246,7 @@ The SDK collects all 5 metrics (LCP, CLS, INP, FCP, TTFB) and sends them as a si
 | `setDebugMode(enabled)` | Toggle debug logging |
 | `isDebugMode()` | Check if debug mode is on |
 | `shutdown()` | Shutdown the SDK and cleanup |
+| `getInstance()` | Get the underlying KitbaseAnalytics instance |
 
 ## Examples
 
@@ -288,6 +296,39 @@ kitbase.trackRevenue({
   currency: 'USD',
   tags: { plan: 'pro', cycle: 'monthly' },
 });
+```
+
+### Plugins
+
+```typescript
+import { KitbaseAnalyticsService, WebVitalsPlugin } from '@kitbase/analytics-angular';
+
+@Component({
+  selector: 'app-root',
+  template: '<router-outlet />',
+})
+export class AppComponent {
+  private kitbase = inject(KitbaseAnalyticsService);
+
+  constructor() {
+    this.kitbase.use(new WebVitalsPlugin());
+    console.log('Active plugins:', this.kitbase.getPlugins());
+  }
+}
+```
+
+### Re-exported Types
+
+All types, errors, and utilities from `@kitbase/analytics` are re-exported:
+
+```typescript
+import {
+  type KitbaseConfig,
+  type TrackOptions,
+  type KitbasePlugin,
+  KitbaseError,
+  ValidationError,
+} from '@kitbase/analytics-angular';
 ```
 
 ### Consent Management

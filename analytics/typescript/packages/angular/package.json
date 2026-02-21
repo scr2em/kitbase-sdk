@@ -1,6 +1,6 @@
 {
   "name": "@kitbase/analytics-angular",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Angular integration for Kitbase Analytics SDK",
   "type": "module",
   "module": "./dist/fesm2022/kitbase-analytics-angular.mjs",
@@ -20,7 +20,7 @@
   "sideEffects": false,
   "scripts": {
     "build": "ng-packagr -p ng-package.json",
-    "test": "echo 'No tests yet'",
+    "test": "vitest run",
     "lint": "eslint src",
     "clean": "rm -rf dist"
   },
@@ -39,18 +39,19 @@
     "directory": "customEvents/typescript/packages/angular"
   },
   "peerDependencies": {
-    "@angular/core": ">=17.0.0",
-    "@angular/common": ">=17.0.0"
+    "@angular/common": ">=17.0.0",
+    "@angular/core": ">=17.0.0"
   },
   "dependencies": {
     "@kitbase/analytics": "workspace:*"
   },
   "devDependencies": {
-    "@angular/core": "^20.0.0",
     "@angular/common": "^20.0.0",
     "@angular/compiler": "^20.0.0",
     "@angular/compiler-cli": "^20.0.0",
+    "@angular/core": "^20.0.0",
     "ng-packagr": "^20.0.0",
-    "typescript": "^5.8.0"
+    "typescript": "^5.8.0",
+    "vitest": "^1.2.0"
   }
 }

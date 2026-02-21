@@ -1,6 +1,6 @@
 {
   "name": "@kitbase/analytics-react",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "React integration for Kitbase Analytics SDK",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -25,7 +25,7 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "test": "echo 'No tests yet'",
+    "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint src",
     "clean": "rm -rf dist"
@@ -51,8 +51,12 @@
     "@kitbase/analytics": "workspace:*"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
     "@types/react": "^18.2.0",
+    "jsdom": "^28.1.0",
     "react": "^18.2.0",
+    "react-dom": "18",
     "tsup": "^8.0.1",
     "typescript": "^5.3.3",
     "vitest": "^1.2.0"

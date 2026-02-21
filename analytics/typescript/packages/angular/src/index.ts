@@ -56,25 +56,11 @@ import {
   type TagValue,
   type AnalyticsConfig,
   type PrivacyConfig,
+  type KitbasePlugin,
 } from '@kitbase/analytics';
 
-// Re-export init & getInstance for direct usage without DI
-export { init, getInstance };
-
-// Re-export types from core
-export type {
-  KitbaseAnalytics,
-  KitbaseConfig,
-  TrackOptions,
-  TrackResponse,
-  PageViewOptions,
-  RevenueOptions,
-  IdentifyOptions,
-  Tags,
-  TagValue,
-  AnalyticsConfig,
-  PrivacyConfig,
-};
+// Re-export everything from core
+export * from '@kitbase/analytics';
 
 /**
  * KitbaseAnalytics service for Angular applications.
@@ -142,6 +128,10 @@ export abstract class KitbaseAnalyticsService {
   // Debug & Utilities
   abstract setDebugMode(enabled: boolean): void;
   abstract isDebugMode(): boolean;
+
+  // Plugin System
+  abstract use(plugin: KitbasePlugin): void;
+  abstract getPlugins(): string[];
 }
 
 class KitbaseAnalyticsServiceImpl extends KitbaseAnalyticsService {
@@ -256,6 +246,15 @@ class KitbaseAnalyticsServiceImpl extends KitbaseAnalyticsService {
 
   isDebugMode(): boolean {
     return this.kitbase.isDebugMode();
+  }
+
+  // Plugin System
+  use(plugin: KitbasePlugin): void {
+    this.kitbase.use(plugin);
+  }
+
+  getPlugins(): string[] {
+    return this.kitbase.getPlugins();
   }
 }
 

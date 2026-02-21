@@ -15,13 +15,13 @@ yarn add @kitbase/analytics-react
 ## Quick Start
 
 ```tsx
-import { KitbaseProvider, useTrack } from '@kitbase/analytics-react';
+import { KitbaseAnalyticsProvider, useTrack } from '@kitbase/analytics-react';
 
 function App() {
   return (
-    <KitbaseProvider config={{ token: 'your-api-key' }}>
+    <KitbaseAnalyticsProvider config={{ token: 'your-api-key' }}>
       <MyComponent />
-    </KitbaseProvider>
+    </KitbaseAnalyticsProvider>
   );
 }
 
@@ -40,12 +40,12 @@ function MyComponent() {
 
 ### Provider
 
-#### `KitbaseProvider`
+#### `KitbaseAnalyticsProvider`
 
 Wrap your app with this provider to initialize Kitbase.
 
 ```tsx
-<KitbaseProvider
+<KitbaseAnalyticsProvider
   config={{
     token: 'your-api-key',
     debug: true,
@@ -53,14 +53,14 @@ Wrap your app with this provider to initialize Kitbase.
   }}
 >
   <App />
-</KitbaseProvider>
+</KitbaseAnalyticsProvider>
 ```
 
 ### Hooks
 
 | Hook | Description |
 |------|-------------|
-| `useKitbase()` | Access the Kitbase instance directly |
+| `useKitbaseAnalytics()` | Access the KitbaseAnalytics instance directly |
 | `useTrack()` | Track custom events |
 | `useIdentify()` | Identify users |
 | `usePageView()` | Track page views manually |
@@ -72,6 +72,39 @@ Wrap your app with this provider to initialize Kitbase.
 | `useReset()` | Reset user identity |
 | `useOptedOut()` | Check if tracking is opted out |
 | `useConsent()` | Manage tracking consent |
+
+### Direct Instance Access
+
+For features not covered by the convenience hooks (plugins, debug mode, etc.), use `useKitbaseAnalytics()` to get the raw `KitbaseAnalytics` instance:
+
+```tsx
+import { useKitbaseAnalytics, WebVitalsPlugin } from '@kitbase/analytics-react';
+
+function PluginLoader() {
+  const kitbase = useKitbaseAnalytics();
+
+  useEffect(() => {
+    kitbase.use(new WebVitalsPlugin());
+    console.log('Active plugins:', kitbase.getPlugins());
+  }, [kitbase]);
+
+  return null;
+}
+```
+
+### Re-exported Types
+
+All types, errors, and utilities from `@kitbase/analytics` are re-exported, so you can import everything from a single package:
+
+```tsx
+import {
+  type KitbaseConfig,
+  type TrackOptions,
+  type KitbasePlugin,
+  KitbaseError,
+  ValidationError,
+} from '@kitbase/analytics-react';
+```
 
 ### Examples
 

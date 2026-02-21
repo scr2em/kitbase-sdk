@@ -25,6 +25,7 @@ import { LogService } from '../log.service';
           <div>Has consent: <strong>{{ kitbase.hasConsent() }}</strong></div>
           <div>User ID: <strong>{{ kitbase.getUserId() ?? '(none)' }}</strong></div>
           <div>Active timers: <strong>{{ kitbase.getTimedEvents().length }}</strong></div>
+          <div>Plugins: <strong>{{ kitbase.getPlugins().join(', ') || '(none)' }}</strong></div>
         </div>
       </div>
     </div>
