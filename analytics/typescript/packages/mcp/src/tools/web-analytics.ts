@@ -100,6 +100,41 @@ export function registerWebAnalyticsTools(server: McpServer, client: KitbaseApiC
       }
     },
   );
+
+  // compare_periods
+  server.tool(
+    'compare_periods',
+    'Compare web analytics between two time periods — shows which dimension values changed the most',
+    {
+      dimension: z.string().describe('Dimension to compare (e.g., "page", "country", "browser", "os", "device", "referrer", "utm_source", "utm_medium", "utm_campaign")'),
+      currentFrom: z.string().describe('Current period start date (YYYY-MM-DD)'),
+      currentTo: z.string().describe('Current period end date (YYYY-MM-DD)'),
+      previousFrom: z.string().describe('Previous period start date (YYYY-MM-DD)'),
+      previousTo: z.string().describe('Previous period end date (YYYY-MM-DD)'),
+      timezone: z.string().optional().describe('Timezone (default: UTC)'),
+      limit: z.number().optional().describe('Max number of results (default: 10)'),
+      filters: z.array(z.string()).optional().describe('Filters in format "dimension:operator:values"'),
+    },
+    async (params) => {
+      try {
+        const result = await client.request('/projects/{projectId}/web-analytics/compare', {
+          params: {
+            dimension: params.dimension,
+            currentFrom: params.currentFrom,
+            currentTo: params.currentTo,
+            previousFrom: params.previousFrom,
+            previousTo: params.previousTo,
+            timezone: params.timezone ?? 'UTC',
+            limit: params.limit,
+            ...filtersToParams(params.filters),
+          },
+        });
+        return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+      } catch (error) {
+        return formatToolError(error);
+      }
+    },
+  );
 }
 
 function filtersToParams(filters?: string[]): Record<string, string> {

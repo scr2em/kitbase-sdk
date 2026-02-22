@@ -36,4 +36,76 @@ export function registerUsersTools(server: McpServer, client: KitbaseApiClient):
       }
     },
   );
+
+  // get_user_summary
+  server.tool(
+    'get_user_summary',
+    'Get comprehensive analytics summary for a specific user (total events, first/last seen, top events, etc.)',
+    {
+      userId: z.string().describe('The user ID to look up'),
+      type: z.enum(['identified', 'anonymous']).describe('Whether the user is identified or anonymous'),
+    },
+    async (params) => {
+      try {
+        const result = await client.request(`/projects/{projectId}/analytics/users/${encodeURIComponent(params.userId)}/summary`, {
+          params: {
+            type: params.type,
+          },
+        });
+        return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+      } catch (error) {
+        return formatToolError(error);
+      }
+    },
+  );
+
+  // get_user_activity
+  server.tool(
+    'get_user_activity',
+    'Get daily activity heatmap data for a specific user over the last N months',
+    {
+      userId: z.string().describe('The user ID to look up'),
+      type: z.enum(['identified', 'anonymous']).describe('Whether the user is identified or anonymous'),
+      months: z.number().optional().describe('Number of months of activity to return (default: 4)'),
+    },
+    async (params) => {
+      try {
+        const result = await client.request(`/projects/{projectId}/analytics/users/${encodeURIComponent(params.userId)}/activity`, {
+          params: {
+            type: params.type,
+            months: params.months,
+          },
+        });
+        return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+      } catch (error) {
+        return formatToolError(error);
+      }
+    },
+  );
+
+  // get_user_events
+  server.tool(
+    'get_user_events',
+    'List paginated events for a specific user',
+    {
+      userId: z.string().describe('The user ID to look up'),
+      type: z.enum(['identified', 'anonymous']).describe('Whether the user is identified or anonymous'),
+      page: z.number().optional().describe('Page number (0-indexed)'),
+      size: z.number().optional().describe('Page size (default: 20)'),
+    },
+    async (params) => {
+      try {
+        const result = await client.request(`/projects/{projectId}/analytics/users/${encodeURIComponent(params.userId)}/events`, {
+          params: {
+            type: params.type,
+            page: params.page,
+            size: params.size,
+          },
+        });
+        return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+      } catch (error) {
+        return formatToolError(error);
+      }
+    },
+  );
 }

@@ -25,25 +25,30 @@ describe('Tool registrations', () => {
     return client;
   }
 
-  it('registers all 10 tools', () => {
+  it('registers all 15 tools', () => {
     const server = createMockServer();
     const client = createMockClient();
 
     registerAllTools(server as any, client);
 
-    expect(server.tool).toHaveBeenCalledTimes(10);
+    expect(server.tool).toHaveBeenCalledTimes(15);
 
     const toolNames = server.tools.map((t) => t.name);
     expect(toolNames).toContain('get_web_summary');
     expect(toolNames).toContain('get_web_timeline');
     expect(toolNames).toContain('get_web_breakdown');
+    expect(toolNames).toContain('compare_periods');
     expect(toolNames).toContain('list_events');
     expect(toolNames).toContain('get_event_stats');
     expect(toolNames).toContain('list_users');
+    expect(toolNames).toContain('get_user_summary');
+    expect(toolNames).toContain('get_user_activity');
+    expect(toolNames).toContain('get_user_events');
     expect(toolNames).toContain('list_sessions');
     expect(toolNames).toContain('get_session_detail');
     expect(toolNames).toContain('analyze_funnel');
     expect(toolNames).toContain('analyze_journeys');
+    expect(toolNames).toContain('get_frustration_report');
   });
 
   it('get_web_summary calls correct endpoint', async () => {

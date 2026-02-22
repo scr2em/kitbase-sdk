@@ -6,6 +6,7 @@ import { registerUsersTools } from './users.js';
 import { registerSessionsTools } from './sessions.js';
 import { registerFunnelsTools } from './funnels.js';
 import { registerJourneysTools } from './journeys.js';
+import { registerFrustrationTools } from './frustration.js';
 
 export function registerAllTools(server: McpServer, client: KitbaseApiClient): void {
   registerWebAnalyticsTools(server, client);
@@ -14,4 +15,5 @@ export function registerAllTools(server: McpServer, client: KitbaseApiClient): v
   registerSessionsTools(server, client);
   registerFunnelsTools(server, client);
   registerJourneysTools(server, client);
+  registerFrustrationTools(server, client);
 }
