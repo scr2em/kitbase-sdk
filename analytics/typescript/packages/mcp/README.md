@@ -29,7 +29,13 @@ The project and environment are automatically resolved from the API key — no n
 
 ### Claude Code
 
-Add to your Claude Code MCP settings:
+Run this command to add the MCP server:
+
+```bash
+claude mcp add kitbase-analytics -e "KITBASE_API_KEY=sk_kitbase_your_key_here" -- npx @kitbase/analytics-mcp
+```
+
+Or add it manually to your MCP settings:
 
 ```json
 {
@@ -47,7 +53,7 @@ Add to your Claude Code MCP settings:
 
 ### Cursor / Other MCP Clients
 
-Use the same configuration format. The server communicates over stdio using the standard MCP protocol.
+Use the same JSON configuration format. The server communicates over stdio using the standard MCP protocol.
 
 ## Available Tools
 
@@ -58,6 +64,7 @@ Use the same configuration format. The server communicates over stdio using the 
 | `get_web_summary` | Get summary KPIs (visitors, pageviews, bounce rate, etc.) with percentage changes vs previous period |
 | `get_web_timeline` | Get metrics over time (timeseries data for charting trends) |
 | `get_web_breakdown` | Break down metrics by dimension (pages, countries, browsers, referrers, etc.) |
+| `compare_periods` | Compare web analytics between two time periods — shows which dimension values changed the most |
 
 ### Events
 
@@ -71,7 +78,9 @@ Use the same configuration format. The server communicates over stdio using the 
 | Tool | Description |
 |---|---|
 | `list_users` | List or search users in the project |
-| `get_user_summary` | Get a full user profile including summary, recent activity, and events |
+| `get_user_summary` | Get comprehensive analytics summary for a specific user (total events, first/last seen, top events, etc.) |
+| `get_user_activity` | Get daily activity heatmap data for a specific user over the last N months |
+| `get_user_events` | List paginated events for a specific user |
 
 ### Sessions
 
@@ -92,13 +101,19 @@ Use the same configuration format. The server communicates over stdio using the 
 |---|---|
 | `analyze_journeys` | Analyze user navigation paths showing common routes through pages or events |
 
+### Frustration Signals
+
+| Tool | Description |
+|---|---|
+| `get_frustration_report` | Get frustration signals report (rage clicks, dead clicks) with top frustrated pages and elements |
+
 ## Common Parameters
 
 ### Date Filtering
 
 Most tools accept date filtering via either a preset or explicit date range:
 
-- **`preset`**: One of `today`, `yesterday`, `last_7_days`, `last_30_days`, `last_3_months`, `last_12_months`
+- **`preset`**: One of `last_30_minutes`, `last_hour`, `today`, `yesterday`, `last_7_days`, `last_30_days`, `this_month`, `this_year`
 - **`from`** / **`to`**: Explicit date range in `YYYY-MM-DD` format
 - **`timezone`**: Timezone for date calculations (default: `UTC`)
 
@@ -125,10 +140,13 @@ Once connected, you can ask your AI assistant questions like:
 
 - "How many visitors did we get last week?"
 - "What are our top pages by pageviews this month?"
+- "Compare this week's traffic sources to last week"
 - "Show me the signup funnel conversion rate"
 - "What countries are our users coming from?"
 - "Find sessions for user john@example.com"
+- "Show me a summary of user john@example.com's activity"
 - "What's the most common user journey from the homepage?"
+- "Are there any frustration signals on our site?"
 
 ## Development
 
