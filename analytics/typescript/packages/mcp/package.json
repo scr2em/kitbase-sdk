@@ -1,6 +1,6 @@
 {
   "name": "@kitbase/analytics-mcp",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "MCP server for querying Kitbase analytics data",
   "type": "module",
   "bin": {
