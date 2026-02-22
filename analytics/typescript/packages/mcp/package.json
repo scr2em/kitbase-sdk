@@ -1,0 +1,43 @@
+{
+  "name": "@kitbase/analytics-mcp",
+  "version": "0.1.0",
+  "description": "MCP server for querying Kitbase analytics data",
+  "type": "module",
+  "bin": {
+    "kitbase-analytics-mcp": "./dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "clean": "rm -rf dist",
+    "mcp:install": "claude mcp remove kitbase-analytics && claude mcp add kitbase-analytics -e \"KITBASE_API_KEY=sk_kitbase_Ntp2pduXNVGovB4jrxQXtfRfVXVIb50g\" -e \"KITBASE_API_URL=http://localhost:8100\" -- node $(pwd)/dist/index.js",
+    "prepublishOnly": "pnpm build"
+  },
+  "keywords": [
+    "kitbase",
+    "analytics",
+    "mcp",
+    "model-context-protocol"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.3",
+    "vitest": "^1.2.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
