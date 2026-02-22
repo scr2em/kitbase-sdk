@@ -69,7 +69,7 @@ export function registerWebAnalyticsTools(server: McpServer, client: KitbaseApiC
     'get_web_breakdown',
     'Get web analytics broken down by a dimension (e.g., top pages, countries, browsers, referrers)',
     {
-      dimension: z.string().describe('Dimension to break down by (e.g., "page", "country", "browser", "os", "device", "referrer", "utm_source", "utm_medium", "utm_campaign")'),
+      dimension: z.enum(['path', 'entry_page', 'exit_page', 'top_page', 'referrer', 'top_referrer', 'outbound_link', 'country', 'region', 'city', 'device', 'browser', 'browser_version', 'os', 'os_version', 'brand', 'model', 'utm_source', 'utm_medium', 'utm_campaign', 'custom_events', 'event_name', 'user']).describe('Dimension to break down by'),
       metric: z.string().optional().describe('Metric to sort by (default: "visitors")'),
       preset: z.enum(['last_30_minutes', 'last_hour', 'today', 'yesterday', 'last_7_days', 'last_30_days', 'this_month', 'this_year']).optional().describe('Date preset'),
       from: z.string().optional().describe('Start date (YYYY-MM-DD)'),
@@ -106,7 +106,7 @@ export function registerWebAnalyticsTools(server: McpServer, client: KitbaseApiC
     'compare_periods',
     'Compare web analytics between two time periods — shows which dimension values changed the most',
     {
-      dimension: z.string().describe('Dimension to compare (e.g., "page", "country", "browser", "os", "device", "referrer", "utm_source", "utm_medium", "utm_campaign")'),
+      dimension: z.enum(['path', 'entry_page', 'exit_page', 'top_page', 'referrer', 'top_referrer', 'outbound_link', 'country', 'region', 'city', 'device', 'browser', 'browser_version', 'os', 'os_version', 'brand', 'model', 'utm_source', 'utm_medium', 'utm_campaign', 'custom_events', 'event_name', 'user']).describe('Dimension to compare'),
       currentFrom: z.string().describe('Current period start date (YYYY-MM-DD)'),
       currentTo: z.string().describe('Current period end date (YYYY-MM-DD)'),
       previousFrom: z.string().describe('Previous period start date (YYYY-MM-DD)'),

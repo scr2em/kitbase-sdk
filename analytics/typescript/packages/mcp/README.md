@@ -11,7 +11,7 @@ npm install @kitbase/analytics-mcp
 Or run directly with npx:
 
 ```bash
-npx @kitbase/analytics-mcp
+npx -y @kitbase/analytics-mcp
 ```
 
 ## Configuration
@@ -32,7 +32,7 @@ The project and environment are automatically resolved from the API key — no n
 Run this command to add the MCP server:
 
 ```bash
-claude mcp add kitbase-analytics -e "KITBASE_API_KEY=sk_kitbase_your_key_here" -- npx @kitbase/analytics-mcp
+claude mcp add kitbase-analytics -e "KITBASE_API_KEY=sk_kitbase_your_key_here" -- npx -y @kitbase/analytics-mcp
 ```
 
 Or add it manually to your MCP settings:
