@@ -2,6 +2,7 @@ import type { BotDetectionConfig } from './botDetection.js';
 
 /**
  * Configuration options for bot detection
+ * @internal This is an internal API and may change without notice.
  */
 export type { BotDetectionConfig };
 
@@ -53,6 +54,7 @@ export interface KitbaseLiteConfig {
   /**
    * Bot detection configuration.
    * When enabled, detects automated traffic and can block tracking for bots.
+   * @internal This is an internal API and may change without notice.
    */
   botDetection?: BotDetectionConfig;
 
