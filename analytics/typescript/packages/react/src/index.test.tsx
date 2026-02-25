@@ -20,10 +20,6 @@ const mockInstance = {
   clearSuperProperties: vi.fn(),
   getUserId: vi.fn().mockReturnValue(null),
   reset: vi.fn(),
-  optIn: vi.fn(),
-  optOut: vi.fn().mockResolvedValue(undefined),
-  isOptedOut: vi.fn().mockReturnValue(false),
-  hasConsent: vi.fn().mockReturnValue(true),
   setDebugMode: vi.fn(),
   isDebugMode: vi.fn().mockReturnValue(false),
   shutdown: vi.fn(),
@@ -65,8 +61,6 @@ import {
   useTimeEvent,
   useUserId,
   useReset,
-  useOptedOut,
-  useConsent,
 } from './index.js';
 
 import * as exports from './index.js';
@@ -213,43 +207,6 @@ describe('useReset', () => {
     });
 
     expect(mockInstance.reset).toHaveBeenCalled();
-  });
-});
-
-describe('useOptedOut', () => {
-  it('should return opted out status', () => {
-    mockInstance.isOptedOut.mockReturnValue(true);
-    const { result } = renderHook(() => useOptedOut(), { wrapper });
-    expect(result.current).toBe(true);
-  });
-});
-
-describe('useConsent', () => {
-  it('should return optIn, optOut, and hasConsent', () => {
-    const { result } = renderHook(() => useConsent(), { wrapper });
-
-    expect(typeof result.current.optIn).toBe('function');
-    expect(typeof result.current.optOut).toBe('function');
-    expect(typeof result.current.hasConsent).toBe('function');
-  });
-
-  it('should delegate to kitbase methods', () => {
-    const { result } = renderHook(() => useConsent(), { wrapper });
-
-    act(() => {
-      result.current.optIn();
-    });
-    expect(mockInstance.optIn).toHaveBeenCalled();
-
-    act(() => {
-      result.current.optOut();
-    });
-    expect(mockInstance.optOut).toHaveBeenCalled();
-
-    act(() => {
-      result.current.hasConsent();
-    });
-    expect(mockInstance.hasConsent).toHaveBeenCalled();
   });
 });
 

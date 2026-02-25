@@ -21,8 +21,6 @@ import { LogService } from '../log.service';
         <h2>SDK Info</h2>
         <div style="font-size: 0.85rem; line-height: 1.8;">
           <div>Debug mode: <strong>{{ kitbase.isDebugMode() }}</strong></div>
-          <div>Opted out: <strong>{{ kitbase.isOptedOut() }}</strong></div>
-          <div>Has consent: <strong>{{ kitbase.hasConsent() }}</strong></div>
           <div>User ID: <strong>{{ kitbase.getUserId() ?? '(none)' }}</strong></div>
           <div>Active timers: <strong>{{ kitbase.getTimedEvents().length }}</strong></div>
           <div>Plugins: <strong>{{ kitbase.getPlugins().join(', ') || '(none)' }}</strong></div>

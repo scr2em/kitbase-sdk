@@ -11,7 +11,6 @@
  * - Super properties (register, registerOnce, unregister)
  * - Time events (timeEvent, cancelTimeEvent)
  * - Bot detection (internal)
- * - Privacy/consent management (optOut, optIn)
  *
  * Features excluded:
  * - Offline queue (events are sent directly to API)
@@ -56,8 +55,6 @@ export type {
   PageViewOptions,
   RevenueOptions,
   IdentifyOptions,
-  PrivacyConfigLite,
-  PrivacyConfigLite as PrivacyConfig,
 } from './types-lite.js';
 
 // Bot detection utilities (@internal — may change without notice)

@@ -31,26 +31,7 @@ import {
 
 const DEFAULT_BASE_URL = 'https://api.kitbase.dev';
 const TIMEOUT = 30000;
-const DEFAULT_OPT_OUT_STORAGE_KEY = '_ka_opt_out';
 const ANALYTICS_CHANNEL = '__analytics';
-
-/**
- * Simple storage interface used internally for opt-out persistence
- */
-interface SimpleStorage {
-  getItem(key: string): string | null;
-  setItem(key: string, value: string): void;
-}
-
-/**
- * Get the default storage (localStorage in browser, or null)
- */
-function getDefaultStorage(): SimpleStorage | null {
-  if (typeof window !== 'undefined' && window.localStorage) {
-    return window.localStorage;
-  }
-  return null;
-}
 
 /**
  * Kitbase base client for tracking events (lite version without offline queue)
@@ -100,11 +81,6 @@ export class KitbaseAnalytics {
   protected botDetectionConfig: BotDetectionConfig;
   protected botDetectionResult: BotDetectionResult | null = null;
 
-  // Privacy & Consent
-  protected optedOut: boolean = false;
-  protected optOutStorageKey: string;
-  private optOutStorage: SimpleStorage | null;
-
   // Client-side session tracking
   private clientSessionId: string | null = null;
   private lastActivityAt: number = 0;
@@ -144,11 +120,6 @@ export class KitbaseAnalytics {
         this.log('Bot detection enabled, no bot detected');
       }
     }
-
-    // Initialize privacy/consent settings
-    this.optOutStorageKey = config.privacy?.optOutStorageKey ?? DEFAULT_OPT_OUT_STORAGE_KEY;
-    this.optOutStorage = getDefaultStorage();
-    this.initializeOptOutState(config.privacy?.optOutByDefault ?? false);
 
     // Register default plugins
     if (defaultPlugins) {
@@ -221,7 +192,6 @@ export class KitbaseAnalytics {
       }),
       debug: this.debugMode,
       log: (message: string, data?: unknown) => this.log(message, data),
-      isOptedOut: () => this.isOptedOut(),
       isBotBlockingActive: () => this.isBotBlockingActive(),
       findClickableElement,
       CLICKABLE_SELECTOR,
@@ -535,107 +505,6 @@ export class KitbaseAnalytics {
   }
 
   // ============================================================
-  // Privacy & Consent Management
-  // ============================================================
-
-  /**
-   * Initialize opt-out state from storage or default
-   */
-  protected initializeOptOutState(optOutByDefault: boolean): void {
-    if (this.optOutStorage) {
-      const stored = this.optOutStorage.getItem(this.optOutStorageKey);
-      if (stored !== null) {
-        this.optedOut = stored === 'true';
-        this.log('Opt-out state loaded from storage', { optedOut: this.optedOut });
-        return;
-      }
-    }
-
-    // Use default if no stored value
-    this.optedOut = optOutByDefault;
-    if (optOutByDefault) {
-      this.log('Tracking opted out by default');
-    }
-  }
-
-  /**
-   * Opt out of tracking
-   * When opted out, all tracking calls will be silently ignored.
-   * The opt-out state is persisted to storage and survives page reloads.
-   *
-   * @example
-   * ```typescript
-   * // User clicks "Reject" on cookie consent banner
-   * kitbase.optOut();
-   * ```
-   */
-  optOut(): void {
-    this.optedOut = true;
-
-    // Persist to storage
-    if (this.optOutStorage) {
-      this.optOutStorage.setItem(this.optOutStorageKey, 'true');
-    }
-
-    this.log('User opted out of tracking');
-  }
-
-  /**
-   * Opt back in to tracking
-   * Re-enables tracking after a previous opt-out.
-   * The opt-in state is persisted to storage.
-   *
-   * @example
-   * ```typescript
-   * // User clicks "Accept" on cookie consent banner
-   * kitbase.optIn();
-   * ```
-   */
-  optIn(): void {
-    this.optedOut = false;
-
-    // Persist to storage
-    if (this.optOutStorage) {
-      this.optOutStorage.setItem(this.optOutStorageKey, 'false');
-    }
-
-    this.log('User opted in to tracking');
-  }
-
-  /**
-   * Check if tracking is currently opted out
-   *
-   * @returns true if the user has opted out of tracking
-   *
-   * @example
-   * ```typescript
-   * if (kitbase.isOptedOut()) {
-   *   console.log('Tracking is disabled');
-   * }
-   * ```
-   */
-  isOptedOut(): boolean {
-    return this.optedOut;
-  }
-
-  /**
-   * Check if tracking has user consent (not opted out)
-   * Convenience method - inverse of isOptedOut()
-   *
-   * @returns true if the user has consented to tracking
-   *
-   * @example
-   * ```typescript
-   * if (kitbase.hasConsent()) {
-   *   // Show personalized content
-   * }
-   * ```
-   */
-  hasConsent(): boolean {
-    return !this.optedOut;
-  }
-
-  // ============================================================
   // Client Session Tracking
   // ============================================================
 
@@ -702,12 +571,6 @@ export class KitbaseAnalytics {
    */
   async track(options: TrackOptions): Promise<TrackResponse | void> {
     this.validateTrackOptions(options);
-
-    // Check if user has opted out of tracking
-    if (this.optedOut) {
-      this.log('Event skipped - user opted out', { event: options.event });
-      return;
-    }
 
     // Check if bot blocking is active
     if (this.isBotBlockingActive()) {
@@ -920,12 +783,6 @@ export class KitbaseAnalytics {
    * ```
    */
   async identify(options: IdentifyOptions): Promise<void> {
-    // Check if user has opted out of tracking
-    if (this.optedOut) {
-      this.log('Identify skipped - user opted out', { userId: options.userId });
-      return;
-    }
-
     this.userId = options.userId;
 
     // Register user traits as super properties

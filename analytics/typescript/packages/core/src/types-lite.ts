@@ -7,24 +7,6 @@ import type { BotDetectionConfig } from './botDetection.js';
 export type { BotDetectionConfig };
 
 /**
- * Configuration options for privacy and consent management (lite version)
- */
-export interface PrivacyConfigLite {
-  /**
-   * Start with tracking opted out by default.
-   * User must explicitly call optIn() to enable tracking.
-   * @default false
-   */
-  optOutByDefault?: boolean;
-
-  /**
-   * Storage key for the opt-out state.
-   * @default '_ka_opt_out'
-   */
-  optOutStorageKey?: string;
-}
-
-/**
  * Configuration options for the Kitbase lite client (without offline queue)
  */
 export interface KitbaseLiteConfig {
@@ -58,11 +40,6 @@ export interface KitbaseLiteConfig {
    */
   botDetection?: BotDetectionConfig;
 
-  /**
-   * Privacy and consent management configuration.
-   * Allows users to opt out of tracking for GDPR/CCPA compliance.
-   */
-  privacy?: PrivacyConfigLite;
 }
 
 /**

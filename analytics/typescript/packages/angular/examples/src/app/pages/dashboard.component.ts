@@ -91,13 +91,6 @@ import { LogService } from '../log.service';
           <button (click)="trackOutbound()">Track Outbound Link</button>
         </div>
 
-        <h2 style="margin-top: 1.5rem;">Privacy & Consent</h2>
-        <div class="btn-group">
-          <button class="danger" (click)="optOut()">Opt Out</button>
-          <button (click)="optIn()">Opt In</button>
-          <button class="secondary" (click)="checkConsent()">Check Status</button>
-        </div>
-
         <h2 style="margin-top: 1.5rem;">Debug</h2>
         <div class="btn-group">
           <button class="secondary" (click)="toggleDebug()">Toggle Debug</button>
@@ -286,22 +279,6 @@ export class DashboardComponent {
     } catch (e) {
       this.logService.log(`Error: ${e}`, 'error');
     }
-  }
-
-  async optOut() {
-    await this.kitbase.optOut();
-    this.logService.log('Opted out of tracking', 'info');
-  }
-
-  optIn() {
-    this.kitbase.optIn();
-    this.logService.log('Opted in to tracking', 'info');
-  }
-
-  checkConsent() {
-    const opted = this.kitbase.isOptedOut();
-    const consent = this.kitbase.hasConsent();
-    this.logService.log(`Opted out: ${opted}, Has consent: ${consent}`, 'info');
   }
 
   toggleDebug() {

@@ -13,31 +13,6 @@ export type { OfflineConfig };
 export type { BotDetectionConfig };
 
 /**
- * Configuration options for privacy and consent management
- */
-export interface PrivacyConfig {
-  /**
-   * Start with tracking opted out by default.
-   * User must explicitly call optIn() to enable tracking.
-   * @default false
-   */
-  optOutByDefault?: boolean;
-
-  /**
-   * Storage key for the opt-out state.
-   * @default '_ka_opt_out'
-   */
-  optOutStorageKey?: string;
-
-  /**
-   * Whether to clear the offline queue when opting out.
-   * If true, all queued events will be deleted when optOut() is called.
-   * @default true
-   */
-  clearQueueOnOptOut?: boolean;
-}
-
-/**
  * Configuration options for the Kitbase client
  */
 export interface KitbaseConfig {
@@ -78,11 +53,6 @@ export interface KitbaseConfig {
    */
   botDetection?: BotDetectionConfig;
 
-  /**
-   * Privacy and consent management configuration.
-   * Allows users to opt out of tracking for GDPR/CCPA compliance.
-   */
-  privacy?: PrivacyConfig;
 }
 
 /**

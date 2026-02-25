@@ -70,8 +70,6 @@ Wrap your app with this provider to initialize Kitbase.
 | `useSuperProperties(props, deps?)` | Register super properties |
 | `useUserId()` | Get the identified user ID |
 | `useReset()` | Reset user identity |
-| `useOptedOut()` | Check if tracking is opted out |
-| `useConsent()` | Manage tracking consent |
 
 ### Direct Instance Access
 
@@ -172,25 +170,6 @@ function VideoPlayer() {
         // $duration automatically included
       })}
     />
-  );
-}
-```
-
-#### Consent Management
-
-```tsx
-function CookieBanner() {
-  const { optIn, optOut } = useConsent();
-  const isOptedOut = useOptedOut();
-
-  if (!isOptedOut) return null;
-
-  return (
-    <div>
-      <p>We use analytics to improve your experience</p>
-      <button onClick={optIn}>Accept</button>
-      <button onClick={optOut}>Reject</button>
-    </div>
   );
 }
 ```

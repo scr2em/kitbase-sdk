@@ -20,10 +20,6 @@ const { mockInstance } = vi.hoisted(() => {
     clearSuperProperties: fn(),
     getUserId: fn().mockReturnValue(null),
     reset: fn(),
-    optIn: fn(),
-    optOut: fn().mockResolvedValue(undefined),
-    isOptedOut: fn().mockReturnValue(false),
-    hasConsent: fn().mockReturnValue(true),
     setDebugMode: fn(),
     isDebugMode: fn().mockReturnValue(false),
     shutdown: fn(),
@@ -197,30 +193,6 @@ describe('KitbaseAnalyticsService (via provideKitbaseAnalytics)', () => {
     it('should delegate getEventDuration()', () => {
       const service = createService();
       expect(service.getEventDuration('test')).toBe(1500);
-    });
-  });
-
-  describe('Privacy & Consent', () => {
-    it('should delegate optOut()', async () => {
-      const service = createService();
-      await service.optOut();
-      expect(mockInstance.optOut).toHaveBeenCalled();
-    });
-
-    it('should delegate optIn()', () => {
-      const service = createService();
-      service.optIn();
-      expect(mockInstance.optIn).toHaveBeenCalled();
-    });
-
-    it('should delegate isOptedOut()', () => {
-      const service = createService();
-      expect(service.isOptedOut()).toBe(false);
-    });
-
-    it('should delegate hasConsent()', () => {
-      const service = createService();
-      expect(service.hasConsent()).toBe(true);
     });
   });
 

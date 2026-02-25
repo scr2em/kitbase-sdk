@@ -82,12 +82,6 @@ const kitbase = new Kitbase({
     autoDetectFrustration: true,   // detect rage clicks and dead clicks
   },
 
-  privacy: {
-    optOutByDefault: false,
-    optOutStorageKey: '_ka_opt_out',
-    clearQueueOnOptOut: true,
-  },
-
   offline: {
     enabled: true,
     maxQueueSize: 1000,
@@ -326,23 +320,7 @@ kitbase.unregister('platform');
 kitbase.clearSuperProperties();
 ```
 
-## Privacy & Consent
-
-```typescript
-// Opt out (persisted to localStorage)
-kitbase.optOut();
-
-// Opt in
-kitbase.optIn();
-
-// Check status
-kitbase.isOptedOut();  // boolean
-kitbase.hasConsent();  // boolean
-```
-
-## Bot Detection (Internal)
-
-> **Note:** Bot detection is enabled by default and runs automatically. The config and methods below are internal APIs that may change without notice. Most users do not need to interact with bot detection directly.
+## Bot Detection
 
 ```typescript
 const kitbase = new Kitbase({
@@ -442,6 +420,7 @@ Disconnects observers, flushes pending scroll depth and visibility events, and c
 | `hasConsent()` | Check if user has consented |
 
 ### Bot Detection (Internal)
+### Bot Detection
 
 | Method | Description |
 |--------|-------------|
@@ -482,7 +461,6 @@ import type {
   Tags,
   TagValue,
   OfflineConfig,
-  PrivacyConfig,
   BotDetectionConfig,
 } from '@kitbase/analytics';
 ```
