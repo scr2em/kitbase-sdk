@@ -450,6 +450,7 @@ export class KitbaseAnalytics {
   /**
    * Check if the current visitor is detected as a bot
    *
+   * @internal This is an internal API and may change without notice.
    * @returns true if bot detected, false otherwise
    *
    * @example
@@ -475,6 +476,7 @@ export class KitbaseAnalytics {
   /**
    * Get detailed bot detection result
    *
+   * @internal This is an internal API and may change without notice.
    * @returns Bot detection result with detailed checks, or null if detection not enabled
    *
    * @example
@@ -503,6 +505,7 @@ export class KitbaseAnalytics {
    * Force re-run bot detection
    * Useful if you want to check again after page state changes
    *
+   * @internal This is an internal API and may change without notice.
    * @returns Updated bot detection result
    *
    * @example
@@ -524,6 +527,7 @@ export class KitbaseAnalytics {
    * Check if bot blocking is currently active
    * When bot detection is enabled and a bot is detected, all events are blocked.
    *
+   * @internal This is an internal API and may change without notice.
    * @returns true if bots are being blocked from tracking
    */
   isBotBlockingActive(): boolean {
