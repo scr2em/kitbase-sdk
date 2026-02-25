@@ -101,11 +101,6 @@ init({
     autoDetectFrustration: true,  // detect rage clicks and dead clicks
   },
 
-  privacy: {
-    optOutByDefault: false,       // require explicit opt-in
-    clearQueueOnOptOut: true,     // delete queued events on opt-out
-  },
-
   offline: {
     enabled: true,                // queue events when offline
     maxQueueSize: 1000,
@@ -223,15 +218,6 @@ The SDK collects all 5 metrics (LCP, CLS, INP, FCP, TTFB) and sends them as a si
 | `getTimedEvents()` | List all active timed events |
 | `getEventDuration(eventName)` | Get elapsed time in ms |
 
-### Privacy & Consent
-
-| Method | Description |
-|--------|-------------|
-| `optOut()` | Opt out of tracking |
-| `optIn()` | Opt in to tracking |
-| `isOptedOut()` | Check if opted out |
-| `hasConsent()` | Check if user has consented |
-
 ### Plugin System
 
 | Method | Description |
@@ -329,36 +315,6 @@ import {
   KitbaseError,
   ValidationError,
 } from '@kitbase/analytics-angular';
-```
-
-### Consent Management
-
-```typescript
-@Component({
-  template: `
-    @if (showBanner) {
-      <div>
-        <p>We use analytics to improve your experience</p>
-        <button (click)="accept()">Accept</button>
-        <button (click)="reject()">Reject</button>
-      </div>
-    }
-  `,
-})
-export class CookieBannerComponent {
-  private kitbase = inject(KitbaseAnalyticsService);
-  showBanner = !this.kitbase.hasConsent();
-
-  accept() {
-    this.kitbase.optIn();
-    this.showBanner = false;
-  }
-
-  reject() {
-    this.kitbase.optOut();
-    this.showBanner = false;
-  }
-}
 ```
 
 ## Running the Example App

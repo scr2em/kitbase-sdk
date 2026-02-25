@@ -99,14 +99,12 @@ export class KitbaseAnalytics extends KitbaseAnalyticsBase {
   // Offline queue
   private queue: EventQueue | null = null;
   private offlineEnabled: boolean;
-  private clearQueueOnOptOut: boolean;
 
   constructor(config: KitbaseConfig) {
     super(config, createDefaultPlugins(config.analytics));
 
     // Initialize offline queue if enabled
     this.offlineEnabled = config.offline?.enabled ?? false;
-    this.clearQueueOnOptOut = config.privacy?.clearQueueOnOptOut ?? true;
 
     if (this.offlineEnabled) {
       this.queue = new EventQueue(config.offline);
@@ -139,32 +137,6 @@ export class KitbaseAnalytics extends KitbaseAnalyticsBase {
     super.setDebugMode(enabled);
     if (this.queue) {
       this.queue.setDebugMode(enabled, this.log.bind(this));
-    }
-  }
-
-  // ============================================================
-  // Privacy & Consent Override
-  // ============================================================
-
-  /**
-   * Opt out of tracking
-   * When opted out, all tracking calls will be silently ignored.
-   * The opt-out state is persisted to storage and survives page reloads.
-   *
-   * @example
-   * ```typescript
-   * // User clicks "Reject" on cookie consent banner
-   * await kitbase.optOut();
-   * ```
-   */
-  async optOut(): Promise<void> {
-    // Call base optOut first (synchronous)
-    super.optOut();
-
-    // Clear queued events if configured to do so
-    if (this.clearQueueOnOptOut && this.queue) {
-      await this.queue.clear();
-      this.log('Offline queue cleared due to opt-out');
     }
   }
 
@@ -252,12 +224,6 @@ export class KitbaseAnalytics extends KitbaseAnalyticsBase {
    */
   override async track(options: TrackOptions): Promise<TrackResponse | void> {
     this.validateTrackOptions(options);
-
-    // Check if user has opted out of tracking
-    if (this.optedOut) {
-      this.log('Event skipped - user opted out', { event: options.event });
-      return;
-    }
 
     // Check if bot blocking is active
     if (this.isBotBlockingActive()) {

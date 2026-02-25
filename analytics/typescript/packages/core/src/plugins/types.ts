@@ -12,7 +12,6 @@ export interface PluginContext {
   readonly config: Readonly<AnalyticsConfig>;
   readonly debug: boolean;
   log(message: string, data?: unknown): void;
-  isOptedOut(): boolean;
   isBotBlockingActive(): boolean;
   findClickableElement(event: MouseEvent): Element | null;
   readonly CLICKABLE_SELECTOR: string;

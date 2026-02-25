@@ -55,7 +55,6 @@ import {
   type Tags,
   type TagValue,
   type AnalyticsConfig,
-  type PrivacyConfig,
   type KitbasePlugin,
 } from '@kitbase/analytics';
 
@@ -118,12 +117,6 @@ export abstract class KitbaseAnalyticsService {
   abstract cancelTimeEvent(eventName: string): void;
   abstract getTimedEvents(): string[];
   abstract getEventDuration(eventName: string): number | null;
-
-  // Privacy & Consent
-  abstract optOut(): Promise<void>;
-  abstract optIn(): void;
-  abstract isOptedOut(): boolean;
-  abstract hasConsent(): boolean;
 
   // Debug & Utilities
   abstract setDebugMode(enabled: boolean): void;
@@ -220,23 +213,6 @@ class KitbaseAnalyticsServiceImpl extends KitbaseAnalyticsService {
 
   getEventDuration(eventName: string): number | null {
     return this.kitbase.getEventDuration(eventName);
-  }
-
-  // Privacy & Consent
-  optOut(): Promise<void> {
-    return this.kitbase.optOut();
-  }
-
-  optIn(): void {
-    this.kitbase.optIn();
-  }
-
-  isOptedOut(): boolean {
-    return this.kitbase.isOptedOut();
-  }
-
-  hasConsent(): boolean {
-    return this.kitbase.hasConsent();
   }
 
   // Debug & Utilities
