@@ -73,6 +73,7 @@ const HTTP_CLIENT_PATTERNS = [
 
 /**
  * Bot detection result
+ * @internal This is an internal API and may change without notice.
  */
 export interface BotDetectionResult {
   isBot: boolean;
@@ -92,6 +93,7 @@ export interface BotDetectionResult {
 
 /**
  * Configuration for bot detection
+ * @internal This is an internal API and may change without notice.
  */
 export interface BotDetectionConfig {
   /**
@@ -157,6 +159,7 @@ export interface BotDetectionConfig {
 
 /**
  * Default bot detection configuration
+ * @internal This is an internal API and may change without notice.
  */
 export const DEFAULT_BOT_DETECTION_CONFIG: Required<Omit<BotDetectionConfig, 'additionalBotPatterns' | 'onBotDetected'>> = {
   enabled: true,
@@ -362,6 +365,7 @@ function checkInvalidEnvironment(): boolean {
 /**
  * Detect if the current visitor is a bot
  *
+ * @internal This is an internal API and may change without notice.
  * @param config - Bot detection configuration
  * @returns Bot detection result
  *
@@ -435,6 +439,7 @@ export function detectBot(config: BotDetectionConfig = {}): BotDetectionResult {
 /**
  * Quick check if current visitor is a bot
  *
+ * @internal This is an internal API and may change without notice.
  * @param config - Bot detection configuration
  * @returns true if bot detected, false otherwise
  *
@@ -454,6 +459,7 @@ export function isBot(config: BotDetectionConfig = {}): boolean {
  * Check a custom user agent string for bot patterns
  * Useful for server-side bot detection
  *
+ * @internal This is an internal API and may change without notice.
  * @param userAgent - The user agent string to check
  * @param additionalPatterns - Additional patterns to check
  * @returns true if bot user agent detected
@@ -503,6 +509,7 @@ export function isUserAgentBot(userAgent: string, additionalPatterns?: string[])
 /**
  * Get the current user agent (browser only)
  *
+ * @internal This is an internal API and may change without notice.
  * @returns User agent string or null if not in browser
  */
 export function getUserAgent(): string | null {

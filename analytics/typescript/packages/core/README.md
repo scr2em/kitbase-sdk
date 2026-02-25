@@ -340,7 +340,9 @@ kitbase.isOptedOut();  // boolean
 kitbase.hasConsent();  // boolean
 ```
 
-## Bot Detection
+## Bot Detection (Internal)
+
+> **Note:** Bot detection is enabled by default and runs automatically. The config and methods below are internal APIs that may change without notice. Most users do not need to interact with bot detection directly.
 
 ```typescript
 const kitbase = new Kitbase({
@@ -439,7 +441,7 @@ Disconnects observers, flushes pending scroll depth and visibility events, and c
 | `isOptedOut()` | Check if opted out |
 | `hasConsent()` | Check if user has consented |
 
-### Bot Detection
+### Bot Detection (Internal)
 
 | Method | Description |
 |--------|-------------|

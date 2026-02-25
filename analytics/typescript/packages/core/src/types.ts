@@ -8,6 +8,7 @@ export type { OfflineConfig };
 
 /**
  * Configuration options for bot detection
+ * @internal This is an internal API and may change without notice.
  */
 export type { BotDetectionConfig };
 
@@ -73,6 +74,7 @@ export interface KitbaseConfig {
   /**
    * Bot detection configuration.
    * When enabled, detects automated traffic and can block tracking for bots.
+   * @internal This is an internal API and may change without notice.
    */
   botDetection?: BotDetectionConfig;
 

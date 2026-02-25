@@ -14,7 +14,7 @@ export type {
   PageViewOptions,
   RevenueOptions,
   IdentifyOptions,
-  // Bot detection types
+  // Bot detection types (@internal)
   BotDetectionConfig,
   // Privacy types
   PrivacyConfig,
@@ -23,7 +23,7 @@ export type {
 // Queue types
 export type { QueuedEvent, QueueStats } from './queue/types.js';
 
-// Bot detection utilities
+// Bot detection utilities (@internal — may change without notice)
 export {
   detectBot,
   isBot,

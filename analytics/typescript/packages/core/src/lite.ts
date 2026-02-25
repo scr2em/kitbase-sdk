@@ -10,7 +10,7 @@
  * - User identification (identify, reset)
  * - Super properties (register, registerOnce, unregister)
  * - Time events (timeEvent, cancelTimeEvent)
- * - Bot detection
+ * - Bot detection (internal)
  * - Privacy/consent management (optOut, optIn)
  *
  * Features excluded:
@@ -60,7 +60,7 @@ export type {
   PrivacyConfigLite as PrivacyConfig,
 } from './types-lite.js';
 
-// Bot detection utilities
+// Bot detection utilities (@internal — may change without notice)
 export {
   detectBot,
   isBot,
