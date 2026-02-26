@@ -67,7 +67,7 @@ import * as exports from './index.js';
 
 function wrapper({ children }: { children: ReactNode }) {
   return (
-    <KitbaseAnalyticsProvider config={{ token: 'test-token' }}>
+    <KitbaseAnalyticsProvider config={{ sdkKey: 'test-token' }}>
       {children}
     </KitbaseAnalyticsProvider>
   );

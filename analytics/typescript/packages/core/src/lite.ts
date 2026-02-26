@@ -20,7 +20,7 @@
  * ```html
  * <script>
  *   window.KITBASE_CONFIG = {
- *     token: 'your-api-key',
+ *     sdkKey: 'your-api-key',
  *     debug: true,
  *     analytics: { autoTrackPageViews: true }
  *   };
@@ -34,7 +34,7 @@
  * @example NPM import
  * ```typescript
  * import { Kitbase } from '@kitbase/analytics/lite';
- * const kitbase = new Kitbase({ token: 'your-api-key' });
+ * const kitbase = new Kitbase({ sdkKey: 'your-api-key' });
  * ```
  *
  * @packageDocumentation

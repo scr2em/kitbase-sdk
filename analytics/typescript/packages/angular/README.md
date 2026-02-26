@@ -21,7 +21,7 @@ No Angular DI needed. Call `init()` anywhere (e.g. `main.ts`, a component, a ser
 ```typescript
 import { init } from '@kitbase/analytics-angular';
 
-const kitbase = init({ token: 'your-api-key' });
+const kitbase = init({ sdkKey: 'your-api-key' });
 
 // Track events
 kitbase.track({ channel: 'ui', event: 'Button Clicked' });
@@ -51,7 +51,7 @@ import { provideKitbaseAnalytics } from '@kitbase/analytics-angular';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideKitbaseAnalytics({
-      token: 'your-api-key',
+      sdkKey: 'your-sdk-key',
       debug: true,
     }),
   ],
@@ -85,7 +85,7 @@ export class ButtonComponent {
 ```typescript
 init({
   // Required
-  token: 'your-api-key',
+  sdkKey: 'your-api-key',
 
   // Optional
   debug: true,
@@ -170,7 +170,7 @@ Track [Core Web Vitals](https://web.dev/vitals/) by enabling `autoTrackWebVitals
 
 ```typescript
 init({
-  token: 'your-api-key',
+  sdkKey: 'your-api-key',
   analytics: {
     autoTrackWebVitals: true,
   },

@@ -11,9 +11,9 @@ export type { BotDetectionConfig };
  */
 export interface KitbaseLiteConfig {
   /**
-   * Your Kitbase API key
+   * Your Kitbase SDK key (sent as the `x-sdk-key` HTTP header)
    */
-  token: string;
+  sdkKey: string;
 
   /**
    * Override the default API endpoint.

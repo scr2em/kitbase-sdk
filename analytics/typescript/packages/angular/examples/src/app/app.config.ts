@@ -7,7 +7,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
     provideKitbaseAnalytics({
-      token: 'pk_kitbase_kKQtGUA89MQxzUVMQOg8vT2J7lDBIsgV',
+      sdkKey: 'pk_kitbase_kKQtGUA89MQxzUVMQOg8vT2J7lDBIsgV',
       debug: true,
     }),
   ],

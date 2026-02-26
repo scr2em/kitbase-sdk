@@ -44,7 +44,7 @@ const ANALYTICS_CHANNEL = '__analytics';
  * import { Kitbase } from '@kitbase/analytics/lite';
  *
  * const kitbase = new Kitbase({
- *   token: '<YOUR_API_KEY>',
+ *   sdkKey: '<YOUR_API_KEY>',
  *   debug: true,
  * });
  *
@@ -60,7 +60,7 @@ const ANALYTICS_CHANNEL = '__analytics';
  * ```
  */
 export class KitbaseAnalytics {
-  protected readonly token: string;
+  protected readonly sdkKey: string;
   protected readonly baseUrl: string;
 
   // Super properties (memory-only, merged into all events)
@@ -91,11 +91,11 @@ export class KitbaseAnalytics {
   private _pluginContext: PluginContext | null = null;
 
   constructor(config: KitbaseLiteConfig, defaultPlugins?: KitbasePlugin[]) {
-    if (!config.token) {
-      throw new ValidationError('API token is required', 'token');
+    if (!config.sdkKey) {
+      throw new ValidationError('SDK key is required', 'sdkKey');
     }
 
-    this.token = config.token;
+    this.sdkKey = config.sdkKey;
     // Remove trailing slashes to prevent double-slash in URLs
     this.baseUrl = (config.baseUrl ?? DEFAULT_BASE_URL).replace(/\/+$/, '');
     this.debugMode = config.debug ?? false;
@@ -633,7 +633,7 @@ export class KitbaseAnalytics {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-sdk-key': `${this.token}`,
+          'x-sdk-key': `${this.sdkKey}`,
         },
         body: JSON.stringify(body),
         signal: controller.signal,
@@ -801,7 +801,7 @@ export class KitbaseAnalytics {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-sdk-key': this.token,
+          'x-sdk-key': this.sdkKey,
         },
         body: JSON.stringify({
           user_id: options.userId,

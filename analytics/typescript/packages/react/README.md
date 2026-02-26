@@ -19,7 +19,7 @@ import { KitbaseAnalyticsProvider, useTrack } from '@kitbase/analytics-react';
 
 function App() {
   return (
-    <KitbaseAnalyticsProvider config={{ token: 'your-api-key' }}>
+    <KitbaseAnalyticsProvider config={{ sdkKey: 'your-api-key' }}>
       <MyComponent />
     </KitbaseAnalyticsProvider>
   );
@@ -47,7 +47,7 @@ Wrap your app with this provider to initialize Kitbase.
 ```tsx
 <KitbaseAnalyticsProvider
   config={{
-    token: 'your-api-key',
+    sdkKey: 'your-api-key',
     debug: true,
     analytics: { autoTrackPageViews: true },
   }}

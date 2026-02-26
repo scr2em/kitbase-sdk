@@ -10,7 +10,7 @@
  *
  * function App() {
  *   return (
- *     <KitbaseAnalyticsProvider config={{ token: 'your-api-key' }}>
+ *     <KitbaseAnalyticsProvider config={{ sdkKey: 'your-api-key' }}>
  *       <MyComponent />
  *     </KitbaseAnalyticsProvider>
  *   );
@@ -86,7 +86,7 @@ export interface KitbaseAnalyticsProviderProps {
  *   return (
  *     <KitbaseAnalyticsProvider
  *       config={{
- *         token: 'your-api-key',
+ *         sdkKey: 'your-api-key',
  *         debug: true,
  *         analytics: { autoTrackPageViews: true },
  *       }}
