@@ -69,14 +69,14 @@ beforeEach(() => {
 
 describe('provideKitbaseAnalytics', () => {
   it('should return environment providers', () => {
-    const result = provideKitbaseAnalytics({ token: 'test-token' });
+    const result = provideKitbaseAnalytics({ sdkKey: 'test-token' });
     expect(result).toBeDefined();
   });
 });
 
 describe('KitbaseAnalyticsService (via provideKitbaseAnalytics)', () => {
   function createService(): InstanceType<typeof KitbaseAnalyticsService> {
-    const result = provideKitbaseAnalytics({ token: 'test-token' }) as any;
+    const result = provideKitbaseAnalytics({ sdkKey: 'test-token' }) as any;
     // The first provider's useValue is the service instance
     return result.providers[0].useValue;
   }

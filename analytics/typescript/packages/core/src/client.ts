@@ -19,7 +19,7 @@ import { createDefaultPlugins } from './plugins/defaults.js';
  * import { Kitbase } from '@kitbase/analytics';
  *
  * const kitbase = new Kitbase({
- *   token: '<YOUR_API_KEY>',
+ *   sdkKey: '<YOUR_API_KEY>',
  *   debug: true,
  *   offline: { enabled: true },
  * });
@@ -72,7 +72,7 @@ let _instance: KitbaseAnalytics | null = null;
  * import { init } from '@kitbase/analytics';
  *
  * init({
- *   token: '<YOUR_API_KEY>',
+ *   sdkKey: '<YOUR_API_KEY>',
  *   debug: true,
  *   offline: { enabled: true },
  * });

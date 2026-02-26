@@ -18,7 +18,7 @@ yarn add @kitbase/analytics
 import { Kitbase } from '@kitbase/analytics';
 
 const kitbase = new Kitbase({
-  token: 'your-api-key',
+  sdkKey: 'your-api-key',
   debug: true,
 });
 
@@ -37,14 +37,14 @@ For a smaller bundle without offline queue support:
 ```typescript
 import { KitbaseAnalytics } from '@kitbase/analytics/lite';
 
-const kitbase = new KitbaseAnalytics({ token: 'your-api-key' });
+const kitbase = new KitbaseAnalytics({ sdkKey: 'your-api-key' });
 ```
 
 ### Script Tag (CDN)
 
 ```html
 <script>
-  window.KITBASE_CONFIG = { token: 'your-api-key' };
+  window.KITBASE_CONFIG = { sdkKey: 'your-api-key' };
 </script>
 <script defer src="https://kitbase.dev/script.js"></script>
 ```
@@ -66,7 +66,7 @@ The script auto-initializes and exposes `window.kitbase` for tracking events:
 ```typescript
 const kitbase = new Kitbase({
   // Required
-  token: 'your-api-key',
+  sdkKey: 'your-api-key',
 
   // Optional
   debug: false,
@@ -167,7 +167,7 @@ Track [Core Web Vitals](https://web.dev/vitals/) by enabling `autoTrackWebVitals
 
 ```typescript
 const kitbase = new Kitbase({
-  token: 'your-api-key',
+  sdkKey: 'your-api-key',
   analytics: {
     autoTrackWebVitals: true,
   },
@@ -324,7 +324,7 @@ kitbase.clearSuperProperties();
 
 ```typescript
 const kitbase = new Kitbase({
-  token: 'your-api-key',
+  sdkKey: 'your-api-key',
   botDetection: { enabled: true },
 });
 
@@ -341,7 +341,7 @@ Events are queued locally when offline and synced when back online:
 
 ```typescript
 const kitbase = new Kitbase({
-  token: 'your-api-key',
+  sdkKey: 'your-api-key',
   offline: { enabled: true },
 });
 

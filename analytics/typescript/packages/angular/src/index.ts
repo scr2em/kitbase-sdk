@@ -7,7 +7,7 @@
  * ```typescript
  * import { init } from '@kitbase/analytics-angular';
  *
- * const kitbase = init({ token: 'your-api-key' });
+ * const kitbase = init({ sdkKey: 'your-api-key' });
  * kitbase.track({ channel: 'ui', event: 'Button Clicked' });
  * ```
  *
@@ -18,7 +18,7 @@
  *
  * export const appConfig = {
  *   providers: [
- *     provideKitbaseAnalytics({ token: 'your-api-key' }),
+ *     provideKitbaseAnalytics({ sdkKey: 'your-api-key' }),
  *   ],
  * };
  *
@@ -253,7 +253,7 @@ class KitbaseAnalyticsServiceImpl extends KitbaseAnalyticsService {
  * bootstrapApplication(AppComponent, {
  *   providers: [
  *     provideKitbaseAnalytics({
- *       token: 'your-api-key',
+ *       sdkKey: 'your-api-key',
  *       debug: true,
  *     }),
  *   ],
@@ -267,7 +267,7 @@ class KitbaseAnalyticsServiceImpl extends KitbaseAnalyticsService {
  * bootstrapApplication(AppComponent, {
  *   providers: [
  *     provideKitbaseAnalytics({
- *       token: 'your-api-key',
+ *       sdkKey: 'your-api-key',
  *       offline: {
  *         enabled: true,
  *         maxQueueSize: 1000,    // max events to store (default: 1000)
