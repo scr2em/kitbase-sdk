@@ -70,6 +70,10 @@ export class FrustrationPlugin implements KitbasePlugin {
       // not a DOM mutation on the current page (especially target="_blank" links).
       if (target.closest?.('a[href]')) return;
 
+      // Skip dead click detection for <select> and <option> — the browser renders
+      // native dropdowns outside the DOM, so no MutationObserver-visible change occurs.
+      if (clickedElement.tagName === 'SELECT' || target.closest?.('select')) return;
+
       // Clear any pending dead click check
       if (this.deadClickTimeout !== null) {
         clearTimeout(this.deadClickTimeout);
