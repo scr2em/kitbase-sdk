@@ -7,6 +7,7 @@ describe('KitbaseApiClient', () => {
     apiUrl: 'https://api.kitbase.io',
     apiKey: 'sk_kitbase_test123',
     projectId: 'proj_abc',
+    orgSlug: 'my-org',
   };
 
   let fetchSpy: ReturnType<typeof vi.fn>;
@@ -24,7 +25,7 @@ describe('KitbaseApiClient', () => {
     await client.request('/projects/{projectId}/events/');
 
     const calledUrl = fetchSpy.mock.calls[0][0];
-    expect(calledUrl).toContain('/projects/proj_abc/events/');
+    expect(calledUrl).toContain('/my-org/projects/proj_abc/events/');
   });
 
   it('sends X-API-Key header', async () => {
