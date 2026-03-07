@@ -2,6 +2,7 @@ export interface McpConfig {
   apiUrl: string;
   apiKey: string;
   projectId: string;
+  orgSlug: string;
   environmentId?: string;
 }
 
@@ -50,12 +51,17 @@ export async function resolveConfig(env: McpEnv): Promise<McpConfig> {
     throw new Error(`Failed to resolve API key info (${response.status}): ${text || response.statusText}`);
   }
 
-  const keyInfo = (await response.json()) as { projectId: string; environmentId?: string };
+  const keyInfo = (await response.json()) as { projectId: string; orgSlug: string; environmentId?: string };
+
+  if (!keyInfo.orgSlug) {
+    throw new Error('API key info did not return an organization slug. Please ensure your API key is valid.');
+  }
 
   return {
     apiUrl: env.apiUrl,
     apiKey: env.apiKey,
     projectId: keyInfo.projectId,
+    orgSlug: keyInfo.orgSlug,
     environmentId: keyInfo.environmentId || undefined,
   };
 }

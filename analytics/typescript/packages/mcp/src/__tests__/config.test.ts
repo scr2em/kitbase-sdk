@@ -69,7 +69,7 @@ describe('resolveConfig', () => {
   it('calls /api/v1/auth/key-info with correct headers', async () => {
     fetchSpy.mockResolvedValueOnce({
       ok: true,
-      json: () => Promise.resolve({ projectId: 'proj_abc', environmentId: 'env_prod' }),
+      json: () => Promise.resolve({ projectId: 'proj_abc', orgSlug: 'my-org', environmentId: 'env_prod' }),
     });
 
     await resolveConfig(env);
@@ -85,7 +85,7 @@ describe('resolveConfig', () => {
   it('returns config with resolved projectId and environmentId', async () => {
     fetchSpy.mockResolvedValueOnce({
       ok: true,
-      json: () => Promise.resolve({ projectId: 'proj_abc', environmentId: 'env_prod' }),
+      json: () => Promise.resolve({ projectId: 'proj_abc', orgSlug: 'my-org', environmentId: 'env_prod' }),
     });
 
     const config = await resolveConfig(env);
@@ -93,6 +93,7 @@ describe('resolveConfig', () => {
       apiUrl: 'https://api.kitbase.io',
       apiKey: 'sk_kitbase_test123',
       projectId: 'proj_abc',
+      orgSlug: 'my-org',
       environmentId: 'env_prod',
     });
   });
@@ -100,7 +101,7 @@ describe('resolveConfig', () => {
   it('sets environmentId to undefined when empty string', async () => {
     fetchSpy.mockResolvedValueOnce({
       ok: true,
-      json: () => Promise.resolve({ projectId: 'proj_abc', environmentId: '' }),
+      json: () => Promise.resolve({ projectId: 'proj_abc', orgSlug: 'my-org', environmentId: '' }),
     });
 
     const config = await resolveConfig(env);

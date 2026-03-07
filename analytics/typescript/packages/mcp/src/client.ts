@@ -13,8 +13,8 @@ export class KitbaseApiClient {
   ): Promise<T> {
     const { method = 'GET', params, body } = options;
 
-    // Build URL — path can use {projectId} placeholder
-    const resolvedPath = path.replace('{projectId}', this.config.projectId);
+    // Build URL — path can use {projectId} placeholder, prefixed with org slug
+    const resolvedPath = `/${this.config.orgSlug}${path.replace('{projectId}', this.config.projectId)}`;
     const url = new URL(resolvedPath, this.config.apiUrl);
 
     // Add query params (skip undefined)

@@ -19,6 +19,7 @@ describe('Tool registrations', () => {
       apiUrl: 'https://api.kitbase.io',
       apiKey: 'sk_kitbase_test123',
       projectId: 'proj_abc',
+      orgSlug: 'my-org',
     };
     const client = new KitbaseApiClient(config);
     vi.spyOn(client, 'request').mockResolvedValue({ data: 'mock' });
