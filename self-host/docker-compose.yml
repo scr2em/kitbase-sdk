@@ -1,0 +1,250 @@
+version: '3.8'
+
+# Self-Hosted Kitbase
+#
+# Usage:
+#   cp .env.example .env   # then edit .env
+#   docker-compose up -d
+#
+# Access (default):
+#   - Dashboard:   http://localhost
+#   - API:         http://localhost/api
+#
+# Required configuration:
+#   - JWT_SECRET (generate with: openssl rand -base64 32)
+#   - DATABASE_PASSWORD
+#   - SMTP_* variables (for email delivery)
+
+services:
+  mysql:
+    image: mysql:8.3
+    container_name: kitbase_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DATABASE_PASSWORD:-root}
+      MYSQL_DATABASE: flyway_db
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - kitbase-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "MYSQL_PWD=$$MYSQL_ROOT_PASSWORD mysqladmin ping -h localhost -u root"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.3
+    container_name: kitbase_clickhouse
+    environment:
+      CLICKHOUSE_DB: analytics
+      CLICKHOUSE_USER: ${CLICKHOUSE_USERNAME:-default}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-clickhouse123}
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    networks:
+      - kitbase-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "clickhouse-client --query 'SELECT 1'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: kitbase_redis
+    volumes:
+      - redis_data:/data
+    command: ["redis-server", "--maxmemory-policy", "noeviction"]
+    networks:
+      - kitbase-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    image: kitbase/server:latest
+    container_name: kitbase_backend
+    environment:
+      # ===================
+      # Spring
+      # ===================
+      SPRING_PROFILES_ACTIVE: prod
+
+      # ===================
+      # Database
+      # ===================
+      DATABASE_URL: ${DATABASE_URL:-jdbc:mysql://mysql:3306/flyway_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true}
+      DATABASE_USERNAME: ${DATABASE_USERNAME:-root}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-root}
+
+      # ===================
+      # ClickHouse
+      # ===================
+      CLICKHOUSE_URL: ${CLICKHOUSE_URL:-jdbc:clickhouse://clickhouse:8123/analytics}
+      CLICKHOUSE_USERNAME: ${CLICKHOUSE_USERNAME:-default}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-clickhouse123}
+
+      # ===================
+      # JWT Secret
+      # ===================
+      JWT_SECRET: ${JWT_SECRET:-CHANGE_ME_generate_with_openssl_rand_base64_32}
+
+      # ===================
+      # App Settings
+      # ===================
+      APP_DOMAIN: ${APP_DOMAIN:-localhost}
+      APP_PROTOCOL: ${APP_PROTOCOL:-http}
+      SUPPORT_EMAIL: ${SUPPORT_EMAIL:-support@localhost}
+
+      # ===================
+      # Email (SMTP)
+      # ===================
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USERNAME: ${SMTP_USERNAME:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_AUTH: ${SMTP_AUTH:-true}
+      SMTP_STARTTLS: ${SMTP_STARTTLS:-true}
+      SMTP_STARTTLS_REQUIRED: ${SMTP_STARTTLS_REQUIRED:-true}
+      SMTP_CONNECTION_TIMEOUT: ${SMTP_CONNECTION_TIMEOUT:-5000}
+      SMTP_TIMEOUT: ${SMTP_TIMEOUT:-5000}
+      SMTP_WRITE_TIMEOUT: ${SMTP_WRITE_TIMEOUT:-5000}
+      MAIL_FROM: ${MAIL_FROM:-noreply@localhost}
+      MAIL_INVITATION_SUBJECT: ${MAIL_INVITATION_SUBJECT:-You've been invited to join an organization}
+      MAIL_BASE_URL: ${MAIL_BASE_URL:-http://localhost}
+
+      # ===================
+      # SQS (disabled for self-hosted)
+      # ===================
+      SQS_ENABLED: ${SQS_ENABLED:-false}
+      SQS_REGION: ${SQS_REGION:-us-east-1}
+      SQS_QUEUE_URL: ${SQS_QUEUE_URL:-}
+      SQS_ACCESS_KEY: ${SQS_ACCESS_KEY:-}
+      SQS_SECRET_KEY: ${SQS_SECRET_KEY:-}
+      SQS_POLL_INTERVAL_MS: ${SQS_POLL_INTERVAL_MS:-5000}
+      SQS_WAIT_TIME_SECONDS: ${SQS_WAIT_TIME_SECONDS:-5}
+      SQS_VISIBILITY_TIMEOUT_SECONDS: ${SQS_VISIBILITY_TIMEOUT_SECONDS:-30}
+      SQS_MAX_MESSAGES_PER_POLL: ${SQS_MAX_MESSAGES_PER_POLL:-10}
+      SQS_BATCH_SIZE: ${SQS_BATCH_SIZE:-500}
+
+      # ===================
+      # Integration Queue (disabled for self-hosted)
+      # ===================
+      INTEGRATION_SQS_ENABLED: ${INTEGRATION_SQS_ENABLED:-false}
+      INTEGRATION_SQS_REGION: ${INTEGRATION_SQS_REGION:-us-east-1}
+      INTEGRATION_SQS_QUEUE_URL: ${INTEGRATION_SQS_QUEUE_URL:-}
+      INTEGRATION_SQS_ACCESS_KEY: ${INTEGRATION_SQS_ACCESS_KEY:-}
+      INTEGRATION_SQS_SECRET_KEY: ${INTEGRATION_SQS_SECRET_KEY:-}
+      INTEGRATION_SQS_POLL_INTERVAL_MS: ${INTEGRATION_SQS_POLL_INTERVAL_MS:-60000}
+      INTEGRATION_SQS_WAIT_TIME_SECONDS: ${INTEGRATION_SQS_WAIT_TIME_SECONDS:-5}
+      INTEGRATION_SQS_VISIBILITY_TIMEOUT_SECONDS: ${INTEGRATION_SQS_VISIBILITY_TIMEOUT_SECONDS:-30}
+      INTEGRATION_SQS_MAX_MESSAGES_PER_POLL: ${INTEGRATION_SQS_MAX_MESSAGES_PER_POLL:-10}
+      INTEGRATION_SQS_BATCH_SIZE: ${INTEGRATION_SQS_BATCH_SIZE:-50}
+
+      # ===================
+      # Error Handling
+      # ===================
+      INCLUDE_STACKTRACE: ${INCLUDE_STACKTRACE:-never}
+      ERROR_INCLUDE_STACKTRACE: ${ERROR_INCLUDE_STACKTRACE:-false}
+      ERROR_NOTIFICATION_ENABLED: ${ERROR_NOTIFICATION_ENABLED:-false}
+      ERROR_NOTIFICATION_EMAIL: ${ERROR_NOTIFICATION_EMAIL:-}
+
+      # ===================
+      # Data Retention
+      # ===================
+      DATA_RETENTION_TEST_MODE: ${DATA_RETENTION_TEST_MODE:-false}
+      DATA_RETENTION_TEST_MINUTES: ${DATA_RETENTION_TEST_MINUTES:-5}
+
+      # ===================
+      # OAuth (optional)
+      # ===================
+      OAUTH_GOOGLE_CLIENT_ID: ${OAUTH_GOOGLE_CLIENT_ID:-}
+      OAUTH_GOOGLE_CLIENT_SECRET: ${OAUTH_GOOGLE_CLIENT_SECRET:-}
+      OAUTH_GOOGLE_REDIRECT_URI: ${OAUTH_GOOGLE_REDIRECT_URI:-http://localhost/api/auth/oauth/google/callback}
+      OAUTH_GOOGLE_SCOPES: ${OAUTH_GOOGLE_SCOPES:-openid email profile}
+      OAUTH_GITHUB_CLIENT_ID: ${OAUTH_GITHUB_CLIENT_ID:-}
+      OAUTH_GITHUB_CLIENT_SECRET: ${OAUTH_GITHUB_CLIENT_SECRET:-}
+      OAUTH_GITHUB_REDIRECT_URI: ${OAUTH_GITHUB_REDIRECT_URI:-http://localhost/api/auth/oauth/github/callback}
+      OAUTH_GITHUB_SCOPES: ${OAUTH_GITHUB_SCOPES:-user:email}
+
+      # ===================
+      # Stripe (optional)
+      # ===================
+      STRIPE_API_KEY: ${STRIPE_API_KEY:-}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+      STRIPE_SUCCESS_URL: ${STRIPE_SUCCESS_URL:-http://localhost/billing/success}
+      STRIPE_CANCEL_URL: ${STRIPE_CANCEL_URL:-http://localhost/billing/cancel}
+      STRIPE_FREE_PLAN_ID: ${STRIPE_FREE_PLAN_ID:-}
+
+      # ===================
+      # Slack (optional)
+      # ===================
+      SLACK_CLIENT_ID: ${SLACK_CLIENT_ID:-}
+      SLACK_CLIENT_SECRET: ${SLACK_CLIENT_SECRET:-}
+      SLACK_REDIRECT_URI: ${SLACK_REDIRECT_URI:-http://localhost/api/integrations/slack/oauth/callback}
+
+      # ===================
+      # Storage
+      # ===================
+      STORAGE_LOCAL_ROOT_PATH: ${STORAGE_LOCAL_ROOT_PATH:-./storage}
+      STORAGE_LOCAL_BASE_URL: ${STORAGE_LOCAL_BASE_URL:-http://localhost/api/storage}
+      S3_BUCKET_NAME: ${S3_BUCKET_NAME:-}
+      S3_REGION: ${S3_REGION:-us-east-1}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY:-}
+      S3_SECRET_KEY: ${S3_SECRET_KEY:-}
+      CLOUDFRONT_DOMAIN: ${CLOUDFRONT_DOMAIN:-}
+      CLOUDFRONT_KEY_PAIR_ID: ${CLOUDFRONT_KEY_PAIR_ID:-}
+      CLOUDFRONT_PRIVATE_KEY_PATH: ${CLOUDFRONT_PRIVATE_KEY_PATH:-}
+      CLOUDFRONT_URL_EXPIRATION_MINUTES: ${CLOUDFRONT_URL_EXPIRATION_MINUTES:-1}
+
+      # ===================
+      # Redis
+      # ===================
+      REDIS_HOST: ${REDIS_HOST:-redis}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+
+      # ===================
+      # Logging
+      # ===================
+      LOG_LEVEL_JOOQ: ${LOG_LEVEL_JOOQ:-INFO}
+      LOG_LEVEL_APP: ${LOG_LEVEL_APP:-INFO}
+      LOG_LEVEL_SECURITY: ${LOG_LEVEL_SECURITY:-WARN}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      clickhouse:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - kitbase-network
+    restart: unless-stopped
+
+  dashboard:
+    image: kitbase/dashboard:latest
+    container_name: kitbase_dashboard
+    ports:
+      - "${PORT:-80}:80"
+    depends_on:
+      - backend
+    networks:
+      - kitbase-network
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+  clickhouse_data:
+  redis_data:
+
+networks:
+  kitbase-network:
+    driver: bridge
