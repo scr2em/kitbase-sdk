@@ -187,21 +187,39 @@ install_docker_compose() {
 configure() {
     # Domain
     print_step "Domain"
-    printf "  ${DIM}The URL where Kitbase will be accessible.${NC}\n"
+    printf "  ${DIM}Examples: kitbase.example.com, https://kitbase.example.com, 192.168.1.100${NC}\n"
     printf "  ${DIM}Use http://localhost for local testing.${NC}\n"
     prompt DOMAIN "Domain" "http://localhost"
 
-    # Strip trailing slash
-    DOMAIN="${DOMAIN%/}"
+    # Normalize: lowercase, strip whitespace
+    DOMAIN=$(echo "$DOMAIN" | tr '[:upper:]' '[:lower:]' | xargs)
 
-    # Extract protocol and host
+    # Extract protocol if provided
     if [[ "$DOMAIN" == https://* ]]; then
         APP_PROTOCOL="https"
         APP_DOMAIN="${DOMAIN#https://}"
-    else
+    elif [[ "$DOMAIN" == http://* ]]; then
         APP_PROTOCOL="http"
         APP_DOMAIN="${DOMAIN#http://}"
+    else
+        # No protocol provided — just a bare hostname/IP
+        APP_DOMAIN="$DOMAIN"
+        # Default: HTTPS for real domains, HTTP for IPs and localhost
+        if [[ "$APP_DOMAIN" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]] || [[ "$APP_DOMAIN" == localhost* ]]; then
+            APP_PROTOCOL="http"
+        else
+            APP_PROTOCOL="https"
+        fi
     fi
+
+    # Strip trailing slashes, paths, and port (keep just the hostname/IP)
+    APP_DOMAIN="${APP_DOMAIN%%/*}"
+    APP_DOMAIN="${APP_DOMAIN%%:*}"
+
+    # Rebuild canonical DOMAIN
+    DOMAIN="${APP_PROTOCOL}://${APP_DOMAIN}"
+
+    printf "  ${DIM}→ Using: ${DOMAIN}${NC}\n"
 
     # Security
     print_step "Security"
