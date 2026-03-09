@@ -141,6 +141,49 @@ importers:
         specifier: ^1.2.0
         version: 1.6.1(@types/node@20.19.27)(jsdom@23.2.0)
 
+  messaging/react:
+    dependencies:
+      '@kitbase/messaging':
+        specifier: workspace:*
+        version: link:../typescript
+    devDependencies:
+      '@testing-library/react':
+        specifier: ^14.1.2
+        version: 14.3.1(@types/react@18.3.27)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@types/react':
+        specifier: ^18.2.48
+        version: 18.3.27
+      jsdom:
+        specifier: ^23.2.0
+        version: 23.2.0
+      react:
+        specifier: ^18.2.0
+        version: 18.3.1
+      tsup:
+        specifier: ^8.0.1
+        version: 8.5.1(postcss@8.5.6)(typescript@5.9.3)
+      typescript:
+        specifier: ^5.3.3
+        version: 5.9.3
+      vitest:
+        specifier: ^1.2.0
+        version: 1.6.1(@types/node@20.19.27)(jsdom@23.2.0)
+
+  messaging/typescript:
+    devDependencies:
+      '@types/node':
+        specifier: ^20.11.0
+        version: 20.19.27
+      tsup:
+        specifier: ^8.0.1
+        version: 8.5.1(postcss@8.5.6)(typescript@5.9.3)
+      typescript:
+        specifier: ^5.3.3
+        version: 5.9.3
+      vitest:
+        specifier: ^1.2.0
+        version: 1.6.1(@types/node@20.19.27)(jsdom@23.2.0)
+
 packages:
 
   '@adobe/css-tools@4.4.4':
