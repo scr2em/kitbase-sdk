@@ -6,7 +6,7 @@
  * <script>
  *   window.KITBASE_MESSAGING = { sdkKey: 'your-api-key' };
  * </script>
- * <script src="https://cdn.kitbase.dev/messaging.js"></script>
+ * <script src="https://unpkg.com/@kitbase/messaging/dist/cdn.js"></script>
  * ```
  *
  * @example NPM

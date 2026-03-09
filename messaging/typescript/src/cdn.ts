@@ -9,7 +9,7 @@
  * <script>
  *   window.KITBASE_MESSAGING = { sdkKey: 'your-api-key' };
  * </script>
- * <script src="https://cdn.kitbase.dev/messaging.js"></script>
+ * <script src="https://unpkg.com/@kitbase/messaging/dist/cdn.js"></script>
  * <!-- In-app messages appear automatically! -->
  * ```
  *
@@ -25,7 +25,7 @@
  *     },
  *   };
  * </script>
- * <script src="https://cdn.kitbase.dev/messaging.js"></script>
+ * <script src="https://unpkg.com/@kitbase/messaging/dist/cdn.js"></script>
  * ```
  *
  * @example With callbacks
@@ -41,12 +41,12 @@
  *     },
  *   };
  * </script>
- * <script src="https://cdn.kitbase.dev/messaging.js"></script>
+ * <script src="https://unpkg.com/@kitbase/messaging/dist/cdn.js"></script>
  * ```
  *
  * @example Manual init
  * ```html
- * <script src="https://cdn.kitbase.dev/messaging.js"></script>
+ * <script src="https://unpkg.com/@kitbase/messaging/dist/cdn.js"></script>
  * <script>
  *   var messaging = KitbaseMessaging.init({
  *     sdkKey: 'your-api-key',

@@ -1,4 +1,10 @@
 packages:
+  # Analytics
+  - 'analytics/typescript/packages/core'
+  - 'analytics/typescript/packages/react'
+  - 'analytics/typescript/packages/angular'
+  - 'analytics/typescript/packages/mcp'
+
   # Events
   - 'customEvents/typescript'
   - 'customEvents/react'

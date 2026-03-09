@@ -1,0 +1,14 @@
+{
+  "$schema": "https://unpkg.com/@changesets/config@3.1.3/schema.json",
+  "changelog": ["@changesets/changelog-github", { "repo": "scr2em/kitbase-sdk" }],
+  "commit": false,
+  "fixed": [],
+  "linked": [
+    ["@kitbase/analytics", "@kitbase/analytics-react", "@kitbase/analytics-angular"],
+    ["@kitbase/messaging", "@kitbase/messaging-react"]
+  ],
+  "access": "public",
+  "baseBranch": "main",
+  "updateInternalDependencies": "patch",
+  "ignore": []
+}
