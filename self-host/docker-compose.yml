@@ -232,12 +232,24 @@ services:
   dashboard:
     image: scr2em/kitbase-dashboard:latest
     container_name: kitbase_dashboard
-    ports:
-      - "${PORT:-80}:80"
-    volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
       - backend
+    networks:
+      - kitbase-network
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: kitbase_caddy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - dashboard
     networks:
       - kitbase-network
     restart: unless-stopped
@@ -246,6 +258,8 @@ volumes:
   mysql_data:
   clickhouse_data:
   redis_data:
+  caddy_data:
+  caddy_config:
 
 
 networks:
