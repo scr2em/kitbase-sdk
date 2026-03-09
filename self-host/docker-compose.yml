@@ -28,7 +28,7 @@ services:
       - kitbase-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "MYSQL_PWD=$$MYSQL_ROOT_PASSWORD mysqladmin ping -h localhost -u root"]
+      test: [ "CMD-SHELL", "MYSQL_PWD=$$MYSQL_ROOT_PASSWORD mysqladmin ping -h localhost -u root" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -50,7 +50,7 @@ services:
       - kitbase-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "clickhouse-client --query 'SELECT 1'"]
+      test: [ "CMD-SHELL", "clickhouse-client --query 'SELECT 1'" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -60,18 +60,18 @@ services:
     container_name: kitbase_redis
     volumes:
       - redis_data:/data
-    command: ["redis-server", "--maxmemory-policy", "noeviction"]
+    command: [ "redis-server", "--maxmemory-policy", "noeviction" ]
     networks:
       - kitbase-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "redis-cli ping"]
+      test: [ "CMD-SHELL", "redis-cli ping" ]
       interval: 10s
       timeout: 5s
       retries: 5
 
   backend:
-    image: kitbase/server:latest
+    image: scr2em/kitbase-server:latest
     container_name: kitbase_backend
     environment:
       # ===================
@@ -230,7 +230,7 @@ services:
     restart: unless-stopped
 
   dashboard:
-    image: kitbase/dashboard:latest
+    image: scr2em/kitbase-dashboard:latest
     container_name: kitbase_dashboard
     ports:
       - "${PORT:-80}:80"
@@ -246,6 +246,7 @@ volumes:
   mysql_data:
   clickhouse_data:
   redis_data:
+
 
 networks:
   kitbase-network:
