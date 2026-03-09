@@ -203,9 +203,6 @@ configure() {
         APP_DOMAIN="${DOMAIN#http://}"
     fi
 
-    # Port
-    prompt PORT "Port" "80"
-
     # Security
     print_step "Security"
     local generated_secret
@@ -262,6 +259,39 @@ configure() {
 # Write .env file
 # =============================================================================
 
+write_caddyfile() {
+    print_step "Generating Caddyfile"
+
+    local site_address
+
+    # IPs can't get SSL certificates
+    if [[ "$APP_DOMAIN" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        site_address="http://${APP_DOMAIN}"
+    elif [ "$APP_PROTOCOL" = "https" ]; then
+        # Real domain with HTTPS: Caddy auto-provisions SSL
+        site_address="$APP_DOMAIN"
+    else
+        # HTTP only (e.g., localhost or explicit http://)
+        site_address="http://${APP_DOMAIN}"
+    fi
+
+    cat > Caddyfile << CADDYEOF
+${site_address} {
+    encode gzip
+
+    handle /api/* {
+        reverse_proxy backend:8100
+    }
+
+    handle {
+        reverse_proxy dashboard:80
+    }
+}
+CADDYEOF
+
+    print_success "Caddyfile created"
+}
+
 write_env() {
     print_step "Writing .env file"
 
@@ -277,7 +307,6 @@ DATABASE_PASSWORD=${DB_PASSWORD}
 # App
 APP_DOMAIN=${APP_DOMAIN}
 APP_PROTOCOL=${APP_PROTOCOL}
-PORT=${PORT}
 MAIL_BASE_URL=${DOMAIN}
 
 # SMTP
@@ -313,6 +342,7 @@ printf "  ${DIM}the configuration, and start Kitbase on your server.${NC}\n"
 
 check_dependencies
 configure
+write_caddyfile
 write_env
 
 # Start
