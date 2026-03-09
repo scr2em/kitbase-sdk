@@ -71,14 +71,9 @@ services:
       retries: 5
 
   backend:
-    image: scr2em/kitbase-server:latest
+    image: scr2em/kitbase-server:selfhosted
     container_name: kitbase_backend
     environment:
-      # ===================
-      # Spring
-      # ===================
-      SPRING_PROFILES_ACTIVE: prod
-
       # ===================
       # Database
       # ===================
