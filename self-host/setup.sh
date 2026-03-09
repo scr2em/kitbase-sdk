@@ -54,7 +54,7 @@ prompt() {
     fi
     read -r value
     value="${value:-$default}"
-    eval "$var_name='$value'"
+    printf -v "$var_name" '%s' "$value"
 }
 
 prompt_secret() {
@@ -71,7 +71,7 @@ prompt_secret() {
     read -rs value
     echo ""
     value="${value:-$default}"
-    eval "$var_name='$value'"
+    printf -v "$var_name" '%s' "$value"
 }
 
 prompt_yn() {
