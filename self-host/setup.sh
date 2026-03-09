@@ -54,7 +54,7 @@ prompt() {
     fi
     read -r value
     value="${value:-$default}"
-    printf -v "$var_name" '%s' "$value"
+    eval "$var_name=\"\$value\""
 }
 
 prompt_secret() {
@@ -71,7 +71,7 @@ prompt_secret() {
     read -rs value
     echo ""
     value="${value:-$default}"
-    printf -v "$var_name" '%s' "$value"
+    eval "$var_name=\"\$value\""
 }
 
 prompt_yn() {
@@ -367,6 +367,8 @@ echo "    docker compose ps             # Check status"
 echo "    docker compose pull && docker compose up -d   # Update"
 echo "    docker compose down           # Stop"
 echo "    docker compose down -v        # Stop and delete data"
+echo ""
+printf "  ${BOLD}Join our Discord:${NC} https://discord.com/invite/HWBvgH8eVN\n"
 echo ""
 echo "======================================================================"
 echo ""
