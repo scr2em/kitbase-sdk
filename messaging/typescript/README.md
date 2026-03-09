@@ -33,6 +33,14 @@ That's it — messages matching your targeting criteria will appear as modals, b
 No bundler required. Works with any page — PHP, WordPress, static HTML, etc.
 
 ```html
+<!-- unpkg -->
+<script src="https://unpkg.com/@kitbase/messaging/dist/cdn.js"></script>
+
+<!-- or jsdelivr -->
+<script src="https://cdn.jsdelivr.net/npm/@kitbase/messaging/dist/cdn.js"></script>
+```
+
+```html
 <script>
   window.KITBASE_MESSAGING = {
     sdkKey: 'your-sdk-key',
@@ -40,7 +48,7 @@ No bundler required. Works with any page — PHP, WordPress, static HTML, etc.
     metadata: { plan: 'free', country: 'US' },
   };
 </script>
-<script src="https://cdn.kitbase.dev/messaging.js"></script>
+<script src="https://unpkg.com/@kitbase/messaging/dist/cdn.js"></script>
 <!-- Messages appear automatically! -->
 ```
 
@@ -56,7 +64,7 @@ The script auto-initializes and exposes `window.kitbaseMessaging` for further co
 Or initialize manually:
 
 ```html
-<script src="https://cdn.kitbase.dev/messaging.js"></script>
+<script src="https://unpkg.com/@kitbase/messaging/dist/cdn.js"></script>
 <script>
   var messaging = KitbaseMessaging.init({ sdkKey: 'your-sdk-key' });
 
