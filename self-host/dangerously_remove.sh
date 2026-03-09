@@ -25,12 +25,8 @@ fi
 
 echo ""
 
-printf "  Stopping containers..."
-docker compose down 2>/dev/null || true
-printf " done\n"
-
-printf "  Removing volumes..."
-docker volume rm kitbase-sdk_mysql_data kitbase-sdk_clickhouse_data kitbase-sdk_redis_data kitbase-sdk_caddy_data kitbase-sdk_caddy_config 2>/dev/null || true
+printf "  Stopping containers and removing volumes..."
+docker compose down -v 2>/dev/null || true
 printf " done\n"
 
 printf "  Removing images..."
