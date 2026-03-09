@@ -11,5 +11,9 @@ packages:
   - 'flags/typescript'
   - 'flags/react'
 
+  # In-App Messaging
+  - 'messaging/typescript'
+  - 'messaging/react'
+
   # CLI Tools
   - 'ionic'
