@@ -74,6 +74,7 @@ const kitbase = new Kitbase({
 
   analytics: {
     autoTrackPageViews: true,      // track route changes automatically
+    trackBfcacheRestore: true,     // track pageview on bfcache restore (back/forward in MPAs)
     autoTrackOutboundLinks: true,  // track external link clicks
     autoTrackClicks: true,         // track button/link/input clicks + data-kb-track-click
     autoTrackScrollDepth: true,    // track max scroll depth per page
@@ -103,6 +104,7 @@ All enabled by default. The SDK automatically tracks:
 | Event | Channel | Trigger | Config |
 |-------|---------|---------|--------|
 | `screen_view` | `__analytics` | Page navigation (init, pushState, popstate) | `autoTrackPageViews` (default `true`) |
+| `screen_view` | `__analytics` | Page restored from bfcache (back/forward in MPAs) | `trackBfcacheRestore` (default `true`) |
 | `outbound_link` | `__analytics` | Click on external link | `autoTrackOutboundLinks` (default `true`) |
 | `click` | `__analytics` | Click on interactive element | `autoTrackClicks` (default `true`) |
 | `scroll_depth` | `__analytics` | Navigation / unload (max depth per page) | `autoTrackScrollDepth` (default `true`) |
@@ -110,7 +112,7 @@ All enabled by default. The SDK automatically tracks:
 | `dead_click` | `__analytics` | Click with no DOM change within 1s | `autoDetectFrustration` (default `true`) |
 | `web_vitals` | `__analytics` | Once per page load | `autoTrackWebVitals` (default `false`) |
 
-Page views, clicks, outbound links, scroll depth, and frustration signals are tracked automatically. The SDK intercepts `history.pushState`/`popstate` for SPA support — no framework router integration needed.
+Page views, clicks, outbound links, scroll depth, and frustration signals are tracked automatically. The SDK intercepts `history.pushState`/`popstate` for SPA support — no framework router integration needed. For multi-page sites, the SDK also listens for bfcache restores (`pageshow` with `persisted`) so back/forward navigation is counted even when scripts don't re-execute.
 
 ## Data Attribute Events
 
