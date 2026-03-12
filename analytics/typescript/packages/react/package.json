@@ -1,6 +1,6 @@
 {
   "name": "@kitbase/analytics-react",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "React integration for Kitbase Analytics SDK",
   "type": "module",
   "main": "./dist/index.cjs",
