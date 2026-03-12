@@ -150,6 +150,14 @@ export interface AnalyticsConfig {
   autoTrackPageViews?: boolean;
 
   /**
+   * Track pageviews on bfcache restore (browser back/forward in MPAs).
+   * When enabled, a pageview is sent when the page is restored from the
+   * browser's back-forward cache (the `pageshow` event with `persisted`).
+   * @default true
+   */
+  trackBfcacheRestore?: boolean;
+
+  /**
    * Enable automatic outbound link click tracking
    * Tracks when users click links to external domains
    * @default true

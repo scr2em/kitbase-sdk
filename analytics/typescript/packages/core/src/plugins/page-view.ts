@@ -9,6 +9,7 @@ export class PageViewPlugin implements KitbasePlugin {
   private ctx!: PluginContext;
   private active = false;
   private popstateListener: (() => void) | null = null;
+  private pageshowListener: ((e: PageTransitionEvent) => void) | null = null;
 
   setup(ctx: PluginContext): void | false {
     if (typeof window === 'undefined') return false;
@@ -45,6 +46,16 @@ export class PageViewPlugin implements KitbasePlugin {
     };
     window.addEventListener('popstate', this.popstateListener);
 
+    // Listen to pageshow (bfcache restore on back/forward in MPAs)
+    if (ctx.config.trackBfcacheRestore !== false) {
+      this.pageshowListener = (e: PageTransitionEvent) => {
+        if (e.persisted && this.active) {
+          this.trackPageView().catch((err) => ctx.log('Failed to track page view (bfcache)', err));
+        }
+      };
+      window.addEventListener('pageshow', this.pageshowListener);
+    }
+
     ctx.log('Auto page view tracking enabled');
   }
 
@@ -53,6 +64,10 @@ export class PageViewPlugin implements KitbasePlugin {
     if (this.popstateListener) {
       window.removeEventListener('popstate', this.popstateListener);
       this.popstateListener = null;
+    }
+    if (this.pageshowListener) {
+      window.removeEventListener('pageshow', this.pageshowListener);
+      this.pageshowListener = null;
     }
   }
 
