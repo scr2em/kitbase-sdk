@@ -1,6 +1,6 @@
 {
   "name": "@kitbase/analytics-angular",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Angular integration for Kitbase Analytics SDK",
   "type": "module",
   "module": "./dist/fesm2022/kitbase-analytics-angular.mjs",
