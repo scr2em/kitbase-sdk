@@ -1,5 +1,12 @@
 # @kitbase/messaging-react
 
+## 1.1.0
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @kitbase/messaging@1.1.0
+
 ## 1.0.0
 
 ### Patch Changes

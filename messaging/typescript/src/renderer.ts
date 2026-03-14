@@ -20,10 +20,10 @@ export class MessageRenderer {
   private cardContainer: HTMLElement;
   private displayed = new Map<string, { element: HTMLElement; message: InAppMessage }>();
 
-  constructor(private callbacks: RendererCallbacks) {
+  constructor(private callbacks: RendererCallbacks, container?: HTMLElement) {
     this.host = document.createElement('div');
     this.host.id = 'kitbase-messaging';
-    document.body.appendChild(this.host);
+    (container || document.body).appendChild(this.host);
 
     this.shadow = this.host.attachShadow({ mode: 'open' });
 
@@ -118,6 +118,7 @@ export class MessageRenderer {
 
     const modal = this.el('div', 'kb-modal');
     if (msg.backgroundColor) modal.style.background = msg.backgroundColor;
+    this.applyStyle(modal, msg);
 
     modal.appendChild(this.closeButton(msg));
 
@@ -149,6 +150,7 @@ export class MessageRenderer {
     if (msg.backgroundColor) {
       banner.style.background = msg.backgroundColor;
     }
+    this.applyStyle(banner, msg);
 
     const content = this.el('div', 'kb-content');
     content.appendChild(this.titleEl(msg.title));
@@ -171,6 +173,7 @@ export class MessageRenderer {
   private renderCard(msg: InAppMessage): HTMLElement {
     const card = this.el('div', 'kb-card');
     if (msg.backgroundColor) card.style.background = msg.backgroundColor;
+    this.applyStyle(card, msg);
 
     card.appendChild(this.closeButton(msg));
 
@@ -195,6 +198,7 @@ export class MessageRenderer {
     const overlay = this.el('div', 'kb-overlay');
 
     const container = this.el('div', 'kb-image-msg');
+    this.applyStyle(container, msg);
     container.appendChild(this.closeButton(msg));
 
     if (msg.imageUrl) {
@@ -233,11 +237,11 @@ export class MessageRenderer {
 
   private buttonsEl(msg: InAppMessage): HTMLElement {
     const wrap = this.el('div', 'kb-buttons');
-    if (msg.actionButton) {
-      wrap.appendChild(this.btnEl(msg, msg.actionButton, 'kb-btn-action'));
-    }
     if (msg.secondaryButton) {
       wrap.appendChild(this.btnEl(msg, msg.secondaryButton, 'kb-btn-secondary'));
+    }
+    if (msg.actionButton) {
+      wrap.appendChild(this.btnEl(msg, msg.actionButton, 'kb-btn-action'));
     }
     return wrap;
   }
@@ -327,5 +331,17 @@ export class MessageRenderer {
     const el = document.createElement(tag);
     el.className = className;
     return el;
+  }
+
+  private applyStyle(el: HTMLElement, msg: InAppMessage): void {
+    const radiusMap = { none: '0', small: '8px', medium: '16px', large: '24px' };
+    const shadowMap = {
+      none: 'none',
+      small: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.06)',
+      medium: '0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)',
+      large: '0 25px 50px -12px rgba(0,0,0,0.25)',
+    };
+    if (msg.borderRadius) el.style.borderRadius = radiusMap[msg.borderRadius] || radiusMap.medium;
+    if (msg.shadow) el.style.boxShadow = shadowMap[msg.shadow] || shadowMap.medium;
   }
 }

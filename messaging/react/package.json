@@ -1,6 +1,6 @@
 {
   "name": "@kitbase/messaging-react",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Kitbase In-App Messaging React SDK - React hooks and providers",
   "type": "module",
   "main": "./dist/index.cjs",
