@@ -1,5 +1,11 @@
 # @kitbase/messaging
 
+## 1.1.0
+
+### Minor Changes
+
+- allow chaning the border + shadow
+
 ## 1.0.0
 
 ### Major Changes

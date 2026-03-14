@@ -131,6 +131,10 @@ export interface InAppMessage {
   secondaryButton?: MessageButton;
   /** Background color (hex) */
   backgroundColor?: string;
+  /** Border radius: none, small, medium, large */
+  borderRadius?: 'none' | 'small' | 'medium' | 'large';
+  /** Shadow: none, small, medium, large */
+  shadow?: 'none' | 'small' | 'medium' | 'large';
   /** Scheduled start date (ISO-8601) */
   startDate?: string;
   /** Scheduled end date (ISO-8601) */
