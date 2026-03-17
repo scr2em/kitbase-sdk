@@ -328,6 +328,7 @@ configure() {
     # Storage
     print_step "File Storage"
     printf "  ${DIM}Where should Kitbase store uploaded files (builds, assets)?${NC}\n"
+    printf "  ${DIM}Local disk works out of the box — cloud storage is optional and can be configured later in .env.${NC}\n"
     echo ""
 
     S3_BUCKET_NAME=""
