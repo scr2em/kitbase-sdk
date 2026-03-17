@@ -25,13 +25,15 @@ fi
 
 echo ""
 
-printf "  Stopping containers and removing volumes..."
-docker compose down -v 2>/dev/null || true
-printf " done\n"
-
-printf "  Removing images..."
-docker rmi scr2em/kitbase-server:selfhosted scr2em/kitbase-dashboard:latest caddy:2-alpine mysql:8.3 clickhouse/clickhouse-server:24.3 redis:7.2-alpine 2>/dev/null || true
-printf " done\n"
+printf "  Stopping containers, removing volumes and images..."
+if docker compose down -v --rmi all 2>&1; then
+    printf " done\n"
+else
+    printf "\n"
+    printf "  ${RED}Failed. Try running with sudo:${NC}\n"
+    printf "    sudo bash dangerously_remove.sh\n"
+    exit 1
+fi
 
 printf "  Removing configuration files..."
 rm -f .env Caddyfile
