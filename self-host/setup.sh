@@ -97,6 +97,51 @@ generate_secret() {
     openssl rand -base64 32 2>/dev/null || head -c 32 /dev/urandom | base64
 }
 
+select_option() {
+    local prompt_text="$1"
+    shift
+    local options=("$@")
+    local selected=0
+    local count=${#options[@]}
+
+    printf "  ${BOLD}%s${NC}\n" "$prompt_text"
+    printf "  ${DIM}Use arrow keys to select, Enter to confirm${NC}\n"
+
+    # Hide cursor
+    tput civis 2>/dev/null
+
+    while true; do
+        # Print options
+        for i in "${!options[@]}"; do
+            if [ "$i" -eq "$selected" ]; then
+                printf "  ${CYAN}› %s${NC}\n" "${options[$i]}"
+            else
+                printf "    %s\n" "${options[$i]}"
+            fi
+        done
+
+        # Read a single keypress
+        IFS= read -rsn1 key
+        if [[ "$key" == $'\x1b' ]]; then
+            read -rsn2 key
+            case "$key" in
+                '[A') selected=$(( (selected - 1 + count) % count )) ;;  # Up
+                '[B') selected=$(( (selected + 1) % count )) ;;          # Down
+            esac
+        elif [[ "$key" == "" ]]; then
+            break  # Enter
+        fi
+
+        # Move cursor up to reprint
+        tput cuu "$count" 2>/dev/null
+    done
+
+    # Show cursor
+    tput cnorm 2>/dev/null
+
+    SELECTED_INDEX=$selected
+}
+
 # =============================================================================
 # Dependency checks
 # =============================================================================
@@ -279,6 +324,96 @@ configure() {
         prompt OAUTH_GITHUB_CLIENT_ID "  GitHub Client ID" ""
         prompt OAUTH_GITHUB_CLIENT_SECRET "  GitHub Client Secret" ""
     fi
+
+    # Storage
+    print_step "File Storage"
+    printf "  ${DIM}Where should Kitbase store uploaded files (builds, assets)?${NC}\n"
+    echo ""
+
+    S3_BUCKET_NAME=""
+    S3_REGION=""
+    S3_ACCESS_KEY=""
+    S3_SECRET_KEY=""
+    S3_ENDPOINT=""
+    S3_PUBLIC_URL=""
+
+    select_option "Storage provider:" \
+        "Local disk (default, no setup needed)" \
+        "AWS S3" \
+        "Cloudflare R2" \
+        "DigitalOcean Spaces" \
+        "MinIO (self-hosted)" \
+        "Google Cloud Storage (S3-compatible)" \
+        "Other S3-compatible provider"
+
+    case "$SELECTED_INDEX" in
+        0)
+            print_success "Using local storage"
+            ;;
+        1)
+            # AWS S3
+            echo ""
+            prompt S3_BUCKET_NAME "Bucket name" ""
+            prompt S3_REGION "Region" "us-east-1"
+            prompt S3_ACCESS_KEY "Access key" ""
+            prompt_secret S3_SECRET_KEY "Secret key" ""
+            ;;
+        2)
+            # Cloudflare R2
+            echo ""
+            printf "  ${DIM}Find your Account ID in the Cloudflare dashboard under R2.${NC}\n"
+            prompt S3_BUCKET_NAME "Bucket name" ""
+            local account_id=""
+            prompt account_id "Cloudflare Account ID" ""
+            S3_ENDPOINT="https://${account_id}.r2.cloudflarestorage.com"
+            S3_REGION="auto"
+            prompt S3_ACCESS_KEY "R2 Access key" ""
+            prompt_secret S3_SECRET_KEY "R2 Secret key" ""
+            prompt S3_PUBLIC_URL "Public URL (optional, e.g. https://files.example.com)" ""
+            ;;
+        3)
+            # DigitalOcean Spaces
+            echo ""
+            prompt S3_BUCKET_NAME "Space name" ""
+            prompt S3_REGION "Region" "nyc3"
+            S3_ENDPOINT="https://${S3_REGION}.digitaloceanspaces.com"
+            S3_PUBLIC_URL="https://${S3_BUCKET_NAME}.${S3_REGION}.digitaloceanspaces.com"
+            prompt S3_ACCESS_KEY "Spaces access key" ""
+            prompt_secret S3_SECRET_KEY "Spaces secret key" ""
+            ;;
+        4)
+            # MinIO
+            echo ""
+            prompt S3_ENDPOINT "MinIO endpoint" "http://minio:9000"
+            prompt S3_BUCKET_NAME "Bucket name" "kitbase"
+            S3_REGION="us-east-1"
+            prompt S3_ACCESS_KEY "Access key" "minioadmin"
+            prompt_secret S3_SECRET_KEY "Secret key" "minioadmin"
+            prompt S3_PUBLIC_URL "Public URL" "${S3_ENDPOINT}/${S3_BUCKET_NAME}"
+            ;;
+        5)
+            # Google Cloud Storage
+            echo ""
+            printf "  ${DIM}Using GCS S3-compatible XML API with HMAC keys.${NC}\n"
+            printf "  ${DIM}Create HMAC keys in Cloud Console → Storage → Settings → Interoperability.${NC}\n"
+            prompt S3_BUCKET_NAME "GCS bucket name" ""
+            S3_ENDPOINT="https://storage.googleapis.com"
+            S3_REGION="auto"
+            prompt S3_ACCESS_KEY "HMAC Access key" ""
+            prompt_secret S3_SECRET_KEY "HMAC Secret key" ""
+            S3_PUBLIC_URL="https://storage.googleapis.com/${S3_BUCKET_NAME}"
+            ;;
+        6)
+            # Other S3-compatible
+            echo ""
+            prompt S3_ENDPOINT "S3 API endpoint" ""
+            prompt S3_BUCKET_NAME "Bucket name" ""
+            prompt S3_REGION "Region" "us-east-1"
+            prompt S3_ACCESS_KEY "Access key" ""
+            prompt_secret S3_SECRET_KEY "Secret key" ""
+            prompt S3_PUBLIC_URL "Public URL (optional)" ""
+            ;;
+    esac
 }
 
 # =============================================================================
@@ -350,6 +485,14 @@ OAUTH_GOOGLE_CLIENT_ID=${OAUTH_GOOGLE_CLIENT_ID}
 OAUTH_GOOGLE_CLIENT_SECRET=${OAUTH_GOOGLE_CLIENT_SECRET}
 OAUTH_GITHUB_CLIENT_ID=${OAUTH_GITHUB_CLIENT_ID}
 OAUTH_GITHUB_CLIENT_SECRET=${OAUTH_GITHUB_CLIENT_SECRET}
+
+# Storage (S3-compatible)
+S3_BUCKET_NAME=${S3_BUCKET_NAME}
+S3_REGION=${S3_REGION}
+S3_ACCESS_KEY=${S3_ACCESS_KEY}
+S3_SECRET_KEY=${S3_SECRET_KEY}
+S3_ENDPOINT=${S3_ENDPOINT}
+S3_PUBLIC_URL=${S3_PUBLIC_URL}
 EOF
 
     print_success ".env file created"
@@ -375,9 +518,9 @@ write_env
 print_step "Starting Kitbase"
 
 if docker compose version &> /dev/null; then
-    docker compose up -d
+    docker compose up -d --force-recreate
 else
-    docker-compose up -d
+    docker-compose up -d --force-recreate
 fi
 
 echo ""
