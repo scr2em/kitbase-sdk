@@ -220,6 +220,7 @@ export const STYLES = /* css */ `
 .kb-buttons {
   display: flex;
   gap: 8px;
+  justify-content: flex-end;
 }
 
 .kb-btn {
