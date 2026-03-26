@@ -63,8 +63,9 @@ export function readApiUrlFromConfig(): string | null {
  * Write config file with API key and optional API URL.
  */
 export function writeConfig(apiKey: string, apiUrl?: string): void {
-	const content = apiUrl
-		? CONFIG_TEMPLATE_WITH_URL(apiKey, apiUrl)
+	const normalizedUrl = apiUrl ? stripTrailingSlash(apiUrl) : undefined;
+	const content = normalizedUrl
+		? CONFIG_TEMPLATE_WITH_URL(apiKey, normalizedUrl)
 		: CONFIG_TEMPLATE + apiKey + "\n";
 	writeFileSync(getConfigPath(), content, "utf-8");
 }
@@ -101,10 +102,13 @@ export function ensureGitignore(): { created: boolean; added: boolean } {
  * Resolve the API base URL.
  * Priority: CLI flag > env var > config file > default
  */
+function stripTrailingSlash(url: string): string {
+	return url.endsWith("/") ? url.slice(0, -1) : url;
+}
+
 export function getBaseUrl(cliBaseUrl?: string): string {
-	if (cliBaseUrl) return cliBaseUrl;
-	if (process.env.KITBASE_API_URL) return process.env.KITBASE_API_URL;
-	return readApiUrlFromConfig() ?? DEFAULT_BASE_URL;
+	const url = cliBaseUrl ?? process.env.KITBASE_API_URL ?? readApiUrlFromConfig() ?? DEFAULT_BASE_URL;
+	return stripTrailingSlash(url);
 }
 
 /**
