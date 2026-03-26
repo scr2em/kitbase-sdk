@@ -2,7 +2,7 @@
  * Configuration for the Kitbase CLI
  */
 export interface KitbaseConfig {
-	/** SDK key for authentication */
+	/** API key for authentication */
 	apiKey: string;
 	/** Base URL for the API */
 	baseUrl?: string;
