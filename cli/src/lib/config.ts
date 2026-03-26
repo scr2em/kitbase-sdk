@@ -6,6 +6,17 @@ import { inputText, confirmPrompt } from "./prompts.js";
 const CONFIG_FILE_NAME = ".kitbasecli";
 const DEFAULT_BASE_URL = "https://api.kitbase.dev";
 
+export const SECRET_KEY_PREFIX = "sk_kitbase_";
+export const PUBLIC_KEY_PREFIX = "pk_kitbase_";
+
+export function isSecretKey(key: string): boolean {
+	return key.startsWith(SECRET_KEY_PREFIX);
+}
+
+export function isPublicKey(key: string): boolean {
+	return key.startsWith(PUBLIC_KEY_PREFIX);
+}
+
 const CONFIG_TEMPLATE = `KITBASE_API_KEY=`;
 
 const CONFIG_TEMPLATE_WITH_URL = (apiKey: string, apiUrl: string) =>
