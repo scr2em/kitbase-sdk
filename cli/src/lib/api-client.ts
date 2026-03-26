@@ -1,11 +1,10 @@
 import createClient from "openapi-fetch";
 import type { paths as SdkPaths } from "../generated/sdk-api.js";
+import { getBaseUrl } from "./config.js";
 
 // Dashboard API types not yet available (broken $refs in openapi.yaml Flutter section).
 // Once fixed, run `pnpm generate:types:dashboard` and uncomment:
 // import type {paths as DashboardPaths} from '../generated/api.js';
-
-const DEFAULT_BASE_URL = process.env.KITBASE_API_URL || "https://api.kitbase.dev";
 
 /**
  * Create a type-safe client for the Kitbase Dashboard API (bearer token auth).
@@ -16,9 +15,9 @@ const DEFAULT_BASE_URL = process.env.KITBASE_API_URL || "https://api.kitbase.dev
  * const {data} = await client.GET('/{orgSlug}/api/projects');
  * ```
  */
-export function createDashboardClient<Paths extends {}>(token: string, baseUrl = DEFAULT_BASE_URL) {
+export function createDashboardClient<Paths extends {}>(token: string, baseUrl?: string) {
 	return createClient<Paths>({
-		baseUrl,
+		baseUrl: baseUrl ?? getBaseUrl(),
 		headers: { Authorization: `Bearer ${token}` },
 	});
 }
@@ -34,9 +33,9 @@ export function createDashboardClient<Paths extends {}>(token: string, baseUrl =
  * const {data} = await client.POST('/sdk/v1/ota/check', { body: { ... } });
  * ```
  */
-export function createSdkClient(apiKey: string, baseUrl = DEFAULT_BASE_URL) {
+export function createSdkClient(apiKey: string, baseUrl?: string) {
 	return createClient<SdkPaths>({
-		baseUrl,
+		baseUrl: baseUrl ?? getBaseUrl(),
 		headers: { "x-sdk-key": apiKey },
 	});
 }

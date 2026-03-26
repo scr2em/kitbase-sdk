@@ -4,7 +4,7 @@ import ora from "ora";
 
 import { BaseCommand } from "../../base-command.js";
 import { getGitInfo, isGitRepository } from "../../lib/git.js";
-import { getApiKey } from "../../lib/config.js";
+import { getApiKey, getBaseUrl } from "../../lib/config.js";
 import {
 	KitbaseError,
 	ConfigurationError,
@@ -168,7 +168,8 @@ export default class Push extends BaseCommand {
 			}
 
 			// 6. Upload
-			const client = new UploadClient({ apiKey, baseUrl: flags["base-url"] });
+			const baseUrl = getBaseUrl(flags["base-url"]);
+			const client = new UploadClient({ apiKey, baseUrl });
 			const payload = createUploadPayload(zipFilePath, gitInfo, nativeVersion);
 
 			this.log(chalk.dim("\n  Commit:  ") + chalk.white(payload.commitHash));
