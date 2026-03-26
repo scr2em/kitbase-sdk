@@ -1,10 +1,9 @@
 import { Flags } from "@oclif/core";
 import chalk from "chalk";
-import { existsSync, readFileSync, appendFileSync } from "node:fs";
-import { join } from "node:path";
 
 import { BaseCommand } from "../base-command.js";
-import { configExists, writeConfig, getConfigPath, prompt } from "../lib/config.js";
+import { configExists, writeConfig, getConfigPath, ensureGitignore } from "../lib/config.js";
+import { selectOne, inputText } from "../lib/prompts.js";
 
 export default class Init extends BaseCommand {
 	static override description = "Initialize Kitbase CLI config in the current project";
@@ -35,47 +34,42 @@ export default class Init extends BaseCommand {
 		let apiKey = flags["api-key"];
 		let baseUrl = flags["base-url"];
 
-		if (!apiKey) {
+		// If flags cover everything, skip interactive flow
+		const isNonInteractive = apiKey !== undefined;
+
+		if (!isNonInteractive) {
 			this.log("\n  Set up your Kitbase project config.\n");
-			this.log(chalk.dim("  Find your SDK key at: https://kitbase.dev/settings/api-keys\n"));
 
-			apiKey = await prompt("  Paste your SDK key: ");
+			const hosting = await selectOne("How are you running Kitbase?", [
+				{ name: "Kitbase Cloud", value: "cloud", description: "Hosted at kitbase.dev" },
+				{ name: "Self-hosted", value: "self-hosted", description: "Your own server" },
+			]);
 
-			if (!apiKey) {
-				this.error("No SDK key provided.");
+			if (hosting === "self-hosted" && !baseUrl) {
+				baseUrl = await inputText("Enter your API base URL", { required: true });
 			}
 
-			if (apiKey.length < 10) {
-				this.error("Invalid SDK key format.");
-			}
+			apiKey = await inputText("Paste your SDK key", {
+				validate: (v) => {
+					if (!v) return "SDK key is required";
+					if (v.length < 10) return "Invalid SDK key format";
+					return true;
+				},
+			});
 		}
 
-		if (!baseUrl) {
-			const customUrl = await prompt(
-				`  API base URL ${chalk.dim("(press Enter for https://api.kitbase.dev)")}: `,
-			);
-			if (customUrl) {
-				baseUrl = customUrl;
-			}
-		}
-
-		writeConfig(apiKey, baseUrl);
+		writeConfig(apiKey!, baseUrl);
 		this.log(chalk.green(`\n  Created ${getConfigPath()}`));
 
 		if (baseUrl) {
 			this.log(chalk.dim(`  API URL: ${baseUrl}`));
 		}
 
-		// Auto-add to .gitignore if it exists and doesn't already contain .kitbasecli
-		const gitignorePath = join(process.cwd(), ".gitignore");
-		if (existsSync(gitignorePath)) {
-			const content = readFileSync(gitignorePath, "utf-8");
-			if (!content.includes(".kitbasecli")) {
-				appendFileSync(gitignorePath, "\n# Kitbase CLI config\n.kitbasecli\n");
-				this.log(chalk.dim("  Added .kitbasecli to .gitignore"));
-			}
-		} else {
-			this.log(chalk.yellow("  Remember to add .kitbasecli to .gitignore!"));
+		const { created, added } = ensureGitignore();
+		if (created) {
+			this.log(chalk.dim("  Created .gitignore with .kitbasecli"));
+		} else if (added) {
+			this.log(chalk.dim("  Added .kitbasecli to .gitignore"));
 		}
 
 		this.log();
