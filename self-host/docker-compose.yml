@@ -101,8 +101,13 @@ services:
       SUPPORT_EMAIL: ${SUPPORT_EMAIL:-support@localhost}
 
       # ===================
-      # Email (SMTP)
+      # Email
       # ===================
+      MAIL_PROVIDER: ${MAIL_PROVIDER:-smtp}
+      MAIL_FROM: ${MAIL_FROM:-noreply@localhost}
+      MAIL_INVITATION_SUBJECT: ${MAIL_INVITATION_SUBJECT:-You've been invited to join an organization}
+      MAIL_BASE_URL: ${MAIL_BASE_URL:-http://localhost}
+      # SMTP (when MAIL_PROVIDER=smtp)
       SMTP_HOST: ${SMTP_HOST:-}
       SMTP_PORT: ${SMTP_PORT:-587}
       SMTP_USERNAME: ${SMTP_USERNAME:-}
@@ -113,9 +118,13 @@ services:
       SMTP_CONNECTION_TIMEOUT: ${SMTP_CONNECTION_TIMEOUT:-5000}
       SMTP_TIMEOUT: ${SMTP_TIMEOUT:-5000}
       SMTP_WRITE_TIMEOUT: ${SMTP_WRITE_TIMEOUT:-5000}
-      MAIL_FROM: ${MAIL_FROM:-noreply@localhost}
-      MAIL_INVITATION_SUBJECT: ${MAIL_INVITATION_SUBJECT:-You've been invited to join an organization}
-      MAIL_BASE_URL: ${MAIL_BASE_URL:-http://localhost}
+      # AWS SES (when MAIL_PROVIDER=ses)
+      SES_ACCESS_KEY: ${SES_ACCESS_KEY:-}
+      SES_SECRET_KEY: ${SES_SECRET_KEY:-}
+      SES_REGION: ${SES_REGION:-us-east-1}
+      SES_ENDPOINT: ${SES_ENDPOINT:-}
+      # Resend (when MAIL_PROVIDER=resend)
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
 
       # ===================
       # SQS (disabled for self-hosted)
