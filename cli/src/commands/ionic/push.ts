@@ -53,7 +53,7 @@ export default class Push extends BaseCommand {
 		}),
 		"api-key": Flags.string({
 			char: "k",
-			description: "SDK key for authentication",
+			description: "API key for authentication",
 		}),
 		"base-url": Flags.string({
 			description: "Override API base URL",
@@ -224,10 +224,10 @@ function formatError(error: unknown): string {
 		return (
 			`Authentication Error: ${error.message}\n\n` +
 			"This usually means:\n" +
-			"  - The SDK key does not exist or was deleted\n" +
-			"  - The SDK key is for a different environment\n" +
-			"  - The SDK key was copied incorrectly\n\n" +
-			"Create a new SDK key from the dashboard and try again."
+			"  - The API key does not exist or was deleted\n" +
+			"  - The API key is for a different environment\n" +
+			"  - The API key was copied incorrectly\n\n" +
+			"Create a new API key from the dashboard and try again."
 		);
 	}
 
