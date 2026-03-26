@@ -6,21 +6,26 @@ export class KitbaseError extends Error {
 }
 
 export class AuthenticationError extends KitbaseError {
-	constructor(message = "API key was rejected by the server.") {
-		super(message);
+	public readonly url?: string;
+
+	constructor(message = "API key was rejected by the server.", url?: string) {
+		super(url ? `${message} (${url})` : message);
 		this.name = "AuthenticationError";
+		this.url = url;
 	}
 }
 
 export class ApiError extends KitbaseError {
 	public readonly statusCode: number;
 	public readonly response?: unknown;
+	public readonly url?: string;
 
-	constructor(message: string, statusCode: number, response?: unknown) {
-		super(message);
+	constructor(message: string, statusCode: number, response?: unknown, url?: string) {
+		super(url ? `${message} (${url})` : message);
 		this.name = "ApiError";
 		this.statusCode = statusCode;
 		this.response = response;
+		this.url = url;
 	}
 }
 

@@ -61,7 +61,7 @@ export class UploadClient {
 							const statusCode = res.statusCode || 0;
 
 							if (statusCode === 401 || statusCode === 403) {
-								reject(new AuthenticationError());
+								reject(new AuthenticationError(undefined, url.href));
 								return;
 							}
 
@@ -77,6 +77,7 @@ export class UploadClient {
 										this.extractErrorMessage(errorBody, res.statusMessage || "Unknown error"),
 										statusCode,
 										errorBody,
+										url.href,
 									),
 								);
 								return;
@@ -84,16 +85,16 @@ export class UploadClient {
 
 							resolve(JSON.parse(responseData) as UploadResponse);
 						} catch (error) {
-							reject(new ApiError(`Failed to parse response: ${error}`, 0));
+							reject(new ApiError(`Failed to parse response: ${error}`, 0, undefined, url.href));
 						}
 					});
 				},
 			);
 
-			req.on("error", (error) => reject(new ApiError(`Upload failed: ${error.message}`, 0)));
+			req.on("error", (error) => reject(new ApiError(`Upload failed: ${error.message}`, 0, undefined, url.href)));
 			req.on("timeout", () => {
 				req.destroy();
-				reject(new ApiError("Upload timed out. Please try again.", 408));
+				reject(new ApiError("Upload timed out. Please try again.", 408, undefined, url.href));
 			});
 
 			if (options?.onProgress) {
