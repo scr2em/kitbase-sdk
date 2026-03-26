@@ -60,11 +60,6 @@ export class UploadClient {
 						try {
 							const statusCode = res.statusCode || 0;
 
-							if (statusCode === 401 || statusCode === 403) {
-								reject(new AuthenticationError(undefined, url.href));
-								return;
-							}
-
 							if (statusCode >= 400) {
 								let errorBody: unknown;
 								try {
@@ -72,9 +67,16 @@ export class UploadClient {
 								} catch {
 									errorBody = null;
 								}
+								const message = this.extractErrorMessage(errorBody, res.statusMessage || "Unknown error");
+
+								if (statusCode === 401 || statusCode === 403) {
+									reject(new AuthenticationError(message, url.href));
+									return;
+								}
+
 								reject(
 									new ApiError(
-										this.extractErrorMessage(errorBody, res.statusMessage || "Unknown error"),
+										message,
 										statusCode,
 										errorBody,
 										url.href,
