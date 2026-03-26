@@ -5,7 +5,7 @@ import { request as httpRequest } from "node:http";
 import type { KitbaseConfig } from "../lib/types.js";
 import type { KeyInfo, UploadPayload, UploadResponse } from "./types.js";
 import { ApiError, AuthenticationError, ValidationError } from "../lib/errors.js";
-import { getBaseUrl } from "../lib/config.js";
+import { getBaseUrl, isPublicKey, SECRET_KEY_PREFIX } from "../lib/config.js";
 import { createSdkClient } from "../lib/api-client.js";
 
 const TIMEOUT = 300_000; // 5 minutes
@@ -28,6 +28,13 @@ export class UploadClient {
 
 	constructor(config: KitbaseConfig) {
 		if (!config.apiKey) throw new ValidationError("API key is required", "apiKey");
+		if (isPublicKey(config.apiKey)) {
+			throw new ValidationError(
+				`Public SDK keys (pk_kitbase_*) cannot be used for build uploads.\n` +
+				`Use a secret key (${SECRET_KEY_PREFIX}*) instead.`,
+				"apiKey",
+			);
+		}
 		this.apiKey = config.apiKey;
 		this.baseUrl = config.baseUrl || getBaseUrl();
 	}

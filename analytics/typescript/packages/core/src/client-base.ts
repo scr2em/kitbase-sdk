@@ -90,6 +90,13 @@ export class KitbaseAnalytics {
 			throw new ValidationError("SDK key is required", "sdkKey");
 		}
 
+		if (config.sdkKey.startsWith("sk_kitbase_")) {
+			throw new ValidationError(
+				"Secret keys (sk_kitbase_*) must not be used in client-side code. Use a public SDK key (pk_kitbase_*) instead.",
+				"sdkKey",
+			);
+		}
+
 		this.sdkKey = config.sdkKey;
 		// Remove trailing slashes to prevent double-slash in URLs
 		this.baseUrl = (config.baseUrl ?? DEFAULT_BASE_URL).replace(/\/+$/, "");
