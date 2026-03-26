@@ -41,82 +41,82 @@
  */
 
 // Export the KitbaseAnalytics class
-export { KitbaseAnalytics } from './client-base.js';
+export { KitbaseAnalytics } from "./client-base.js";
 
 // Lite types (without offline config)
 export type {
-  KitbaseLiteConfig,
-  KitbaseLiteConfig as KitbaseConfig,
-  TrackOptions,
-  TrackResponse,
-  Tags,
-  TagValue,
-  AnalyticsConfig,
-  PageViewOptions,
-  RevenueOptions,
-  IdentifyOptions,
-} from './types-lite.js';
+	KitbaseLiteConfig,
+	KitbaseLiteConfig as KitbaseConfig,
+	TrackOptions,
+	TrackResponse,
+	Tags,
+	TagValue,
+	AnalyticsConfig,
+	PageViewOptions,
+	RevenueOptions,
+	IdentifyOptions,
+} from "./types-lite.js";
 
 // Bot detection utilities (@internal — may change without notice)
 export {
-  detectBot,
-  isBot,
-  isUserAgentBot,
-  getUserAgent,
-  DEFAULT_BOT_DETECTION_CONFIG,
-  type BotDetectionConfig,
-  type BotDetectionResult,
-} from './botDetection.js';
+	detectBot,
+	isBot,
+	isUserAgentBot,
+	getUserAgent,
+	DEFAULT_BOT_DETECTION_CONFIG,
+	type BotDetectionConfig,
+	type BotDetectionResult,
+} from "./botDetection.js";
 
 // Errors
 export {
-  KitbaseError,
-  ApiError,
-  AuthenticationError,
-  ValidationError,
-  TimeoutError,
-} from './errors.js';
+	KitbaseError,
+	ApiError,
+	AuthenticationError,
+	ValidationError,
+	TimeoutError,
+} from "./errors.js";
 
 // Plugin exports
-export type { KitbasePlugin, PluginContext } from './plugins/types.js';
-export { createDefaultPlugins } from './plugins/defaults.js';
+export type { KitbasePlugin, PluginContext } from "./plugins/types.js";
+export { createDefaultPlugins } from "./plugins/defaults.js";
 
 // Import types for window augmentation
-import type { KitbaseLiteConfig } from './types-lite.js';
-import { KitbaseAnalytics } from './client-base.js';
-import { createDefaultPlugins } from './plugins/defaults.js';
+import type { KitbaseLiteConfig } from "./types-lite.js";
+import { KitbaseAnalytics } from "./client-base.js";
+import { createDefaultPlugins } from "./plugins/defaults.js";
 
 // Window type augmentation for auto-initialization
 declare global {
-  interface Window {
-    /**
-     * Configuration object for auto-initializing KitbaseAnalytics when the script loads.
-     * Set this before loading the Kitbase lite script to automatically create
-     * a `window.kitbase` instance.
-     */
-    KITBASE_CONFIG?: KitbaseLiteConfig;
+	interface Window {
+		/**
+		 * Configuration object for auto-initializing KitbaseAnalytics when the script loads.
+		 * Set this before loading the Kitbase lite script to automatically create
+		 * a `window.kitbase` instance.
+		 */
+		KITBASE_CONFIG?: KitbaseLiteConfig;
 
-    /**
-     * The auto-initialized KitbaseAnalytics instance (if KITBASE_CONFIG was set)
-     * or manually assigned instance.
-     */
-    kitbase?: KitbaseAnalytics;
-  }
+		/**
+		 * The auto-initialized KitbaseAnalytics instance (if KITBASE_CONFIG was set)
+		 * or manually assigned instance.
+		 */
+		kitbase?: KitbaseAnalytics;
+	}
 }
 
 // Auto-initialize when script loads if KITBASE_CONFIG is set
-if (typeof window !== 'undefined' && window.KITBASE_CONFIG) {
-  try {
-    window.kitbase = new KitbaseAnalytics(
-      window.KITBASE_CONFIG,
-      createDefaultPlugins(window.KITBASE_CONFIG.analytics),
-    );
+if (typeof window !== "undefined" && window.KITBASE_CONFIG) {
+	try {
+		window.kitbase = new KitbaseAnalytics(
+			window.KITBASE_CONFIG,
+			createDefaultPlugins(window.KITBASE_CONFIG.analytics),
+		);
 
-    // Log initialization in debug mode
-    if (window.KITBASE_CONFIG.debug) {
-      console.log('[Kitbase] Auto-initialized from window.KITBASE_CONFIG');
-    }
-  } catch (error) {
-    console.error('[Kitbase] Failed to auto-initialize:', error);
-  }
+		// Log initialization in debug mode
+		if (window.KITBASE_CONFIG.debug) {
+			console.log("[Kitbase] Auto-initialized from window.KITBASE_CONFIG");
+		}
+	} catch (error) {
+		console.error("[Kitbase] Failed to auto-initialize:", error);
+	}
 }

@@ -48,25 +48,25 @@ Create an instance to start tracking events. The SDK communicates with the Kitba
 
 Send an event to Kitbase.
 
-| Parameter     | Type                    | Required | Description                        |
-|---------------|-------------------------|----------|------------------------------------|
-| `channel`     | `String`                | Yes      | Category for the event             |
-| `event`       | `String`                | Yes      | Name of the event                  |
-| `userId`      | `String?`               | No       | User identifier                    |
-| `icon`        | `String?`               | No       | Emoji or icon name                 |
-| `notify`      | `bool?`                 | No       | Whether to send a notification     |
-| `description` | `String?`               | No       | Event description                  |
-| `tags`        | `Map<String, dynamic>?` | No       | Key-value metadata for the event   |
+| Parameter     | Type                    | Required | Description                      |
+| ------------- | ----------------------- | -------- | -------------------------------- |
+| `channel`     | `String`                | Yes      | Category for the event           |
+| `event`       | `String`                | Yes      | Name of the event                |
+| `userId`      | `String?`               | No       | User identifier                  |
+| `icon`        | `String?`               | No       | Emoji or icon name               |
+| `notify`      | `bool?`                 | No       | Whether to send a notification   |
+| `description` | `String?`               | No       | Event description                |
+| `tags`        | `Map<String, dynamic>?` | No       | Key-value metadata for the event |
 
 ### Response
 
 `track()` returns a `Future<TrackResponse>` with the following fields:
 
-| Field       | Type     | Description              |
-|-------------|----------|--------------------------|
-| `id`        | `String` | Unique event identifier  |
-| `event`     | `String` | Name of the tracked event|
-| `timestamp` | `String` | ISO 8601 timestamp       |
+| Field       | Type     | Description               |
+| ----------- | -------- | ------------------------- |
+| `id`        | `String` | Unique event identifier   |
+| `event`     | `String` | Name of the tracked event |
+| `timestamp` | `String` | ISO 8601 timestamp        |
 
 ## Error Handling
 
@@ -102,13 +102,13 @@ try {
 
 ### Exception Types
 
-| Exception                        | Description                          | Properties              |
-|----------------------------------|--------------------------------------|-------------------------|
-| `KitbaseValidationException`     | Required field missing or invalid    | `field`                 |
-| `KitbaseAuthenticationException` | Invalid or missing API key           | --                      |
-| `KitbaseApiException`            | API returned an error response       | `statusCode`, `response`|
-| `KitbaseConnectionException`     | Network connectivity error           | --                      |
-| `KitbaseTimeoutException`        | Request exceeded the time limit      | --                      |
+| Exception                        | Description                       | Properties               |
+| -------------------------------- | --------------------------------- | ------------------------ |
+| `KitbaseValidationException`     | Required field missing or invalid | `field`                  |
+| `KitbaseAuthenticationException` | Invalid or missing API key        | --                       |
+| `KitbaseApiException`            | API returned an error response    | `statusCode`, `response` |
+| `KitbaseConnectionException`     | Network connectivity error        | --                       |
+| `KitbaseTimeoutException`        | Request exceeded the time limit   | --                       |
 
 ## Requirements
 

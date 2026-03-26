@@ -18,10 +18,10 @@ npx -y @kitbase/analytics-mcp
 
 The server is configured via environment variables:
 
-| Variable | Required | Description |
-|---|---|---|
-| `KITBASE_API_KEY` | Yes | Private API key (must start with `sk_kitbase_`) |
-| `KITBASE_API_URL` | No | Kitbase API base URL (default: `https://api.kitbase.dev`) |
+| Variable          | Required | Description                                               |
+| ----------------- | -------- | --------------------------------------------------------- |
+| `KITBASE_API_KEY` | Yes      | Private API key (must start with `sk_kitbase_`)           |
+| `KITBASE_API_URL` | No       | Kitbase API base URL (default: `https://api.kitbase.dev`) |
 
 The project and environment are automatically resolved from the API key — no need to specify them manually.
 
@@ -39,15 +39,15 @@ Or add it manually to your MCP settings:
 
 ```json
 {
-  "mcpServers": {
-    "kitbase-analytics": {
-      "command": "npx",
-      "args": ["@kitbase/analytics-mcp"],
-      "env": {
-        "KITBASE_API_KEY": "sk_kitbase_your_key_here"
-      }
-    }
-  }
+	"mcpServers": {
+		"kitbase-analytics": {
+			"command": "npx",
+			"args": ["@kitbase/analytics-mcp"],
+			"env": {
+				"KITBASE_API_KEY": "sk_kitbase_your_key_here"
+			}
+		}
+	}
 }
 ```
 
@@ -59,52 +59,52 @@ Use the same JSON configuration format. The server communicates over stdio using
 
 ### Web Analytics
 
-| Tool | Description |
-|---|---|
-| `get_web_summary` | Get summary KPIs (visitors, pageviews, bounce rate, etc.) with percentage changes vs previous period |
-| `get_web_timeline` | Get metrics over time (timeseries data for charting trends) |
-| `get_web_breakdown` | Break down metrics by dimension (pages, countries, browsers, referrers, etc.) |
-| `compare_periods` | Compare web analytics between two time periods — shows which dimension values changed the most |
+| Tool                | Description                                                                                          |
+| ------------------- | ---------------------------------------------------------------------------------------------------- |
+| `get_web_summary`   | Get summary KPIs (visitors, pageviews, bounce rate, etc.) with percentage changes vs previous period |
+| `get_web_timeline`  | Get metrics over time (timeseries data for charting trends)                                          |
+| `get_web_breakdown` | Break down metrics by dimension (pages, countries, browsers, referrers, etc.)                        |
+| `compare_periods`   | Compare web analytics between two time periods — shows which dimension values changed the most       |
 
 ### Events
 
-| Tool | Description |
-|---|---|
-| `list_events` | List tracked events with optional filtering by name, user, or date range |
+| Tool              | Description                                                                   |
+| ----------------- | ----------------------------------------------------------------------------- |
+| `list_events`     | List tracked events with optional filtering by name, user, or date range      |
 | `get_event_stats` | Get aggregated event statistics with timeline and optional property breakdown |
 
 ### Users
 
-| Tool | Description |
-|---|---|
-| `list_users` | List or search users in the project |
-| `get_user_summary` | Get comprehensive analytics summary for a specific user (total events, first/last seen, top events, etc.) |
-| `get_user_activity` | Get daily activity heatmap data for a specific user over the last N months |
-| `get_user_events` | List paginated events for a specific user |
+| Tool                | Description                                                                                               |
+| ------------------- | --------------------------------------------------------------------------------------------------------- |
+| `list_users`        | List or search users in the project                                                                       |
+| `get_user_summary`  | Get comprehensive analytics summary for a specific user (total events, first/last seen, top events, etc.) |
+| `get_user_activity` | Get daily activity heatmap data for a specific user over the last N months                                |
+| `get_user_events`   | List paginated events for a specific user                                                                 |
 
 ### Sessions
 
-| Tool | Description |
-|---|---|
-| `list_sessions` | List sessions with optional filtering |
+| Tool                 | Description                                                   |
+| -------------------- | ------------------------------------------------------------- |
+| `list_sessions`      | List sessions with optional filtering                         |
 | `get_session_detail` | Get detailed session info including all events in the session |
 
 ### Funnels
 
-| Tool | Description |
-|---|---|
+| Tool             | Description                                                                             |
+| ---------------- | --------------------------------------------------------------------------------------- |
 | `analyze_funnel` | Analyze conversion funnel with ordered steps and get conversion rates between each step |
 
 ### Journeys
 
-| Tool | Description |
-|---|---|
+| Tool               | Description                                                                 |
+| ------------------ | --------------------------------------------------------------------------- |
 | `analyze_journeys` | Analyze user navigation paths showing common routes through pages or events |
 
 ### Frustration Signals
 
-| Tool | Description |
-|---|---|
+| Tool                     | Description                                                                                      |
+| ------------------------ | ------------------------------------------------------------------------------------------------ |
 | `get_frustration_report` | Get frustration signals report (rage clicks, dead clicks) with top frustrated pages and elements |
 
 ## Common Parameters

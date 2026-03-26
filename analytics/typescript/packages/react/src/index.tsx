@@ -31,27 +31,27 @@
  */
 
 import {
-  createContext,
-  useContext,
-  useEffect,
-  useRef,
-  useMemo,
-  useCallback,
-  type ReactNode,
-} from 'react';
+	createContext,
+	useContext,
+	useEffect,
+	useRef,
+	useMemo,
+	useCallback,
+	type ReactNode,
+} from "react";
 import {
-  KitbaseAnalytics,
-  type KitbaseConfig,
-  type TrackOptions,
-  type TrackResponse,
-  type PageViewOptions,
-  type RevenueOptions,
-  type IdentifyOptions,
-  type Tags,
-} from '@kitbase/analytics';
+	KitbaseAnalytics,
+	type KitbaseConfig,
+	type TrackOptions,
+	type TrackResponse,
+	type PageViewOptions,
+	type RevenueOptions,
+	type IdentifyOptions,
+	type Tags,
+} from "@kitbase/analytics";
 
 // Re-export everything from core
-export * from '@kitbase/analytics';
+export * from "@kitbase/analytics";
 
 // ============================================================
 // Context
@@ -63,15 +63,15 @@ const KitbaseAnalyticsContext = createContext<KitbaseAnalytics | null>(null);
  * Props for the KitbaseAnalyticsProvider component
  */
 export interface KitbaseAnalyticsProviderProps {
-  /**
-   * KitbaseAnalytics configuration options
-   */
-  config: KitbaseConfig;
+	/**
+	 * KitbaseAnalytics configuration options
+	 */
+	config: KitbaseConfig;
 
-  /**
-   * React children to render
-   */
-  children: ReactNode;
+	/**
+	 * React children to render
+	 */
+	children: ReactNode;
 }
 
 /**
@@ -98,25 +98,25 @@ export interface KitbaseAnalyticsProviderProps {
  * ```
  */
 export function KitbaseAnalyticsProvider({ config, children }: KitbaseAnalyticsProviderProps) {
-  const kitbaseRef = useRef<KitbaseAnalytics | null>(null);
+	const kitbaseRef = useRef<KitbaseAnalytics | null>(null);
 
-  // Initialize KitbaseAnalytics instance once
-  if (!kitbaseRef.current) {
-    kitbaseRef.current = new KitbaseAnalytics(config);
-  }
+	// Initialize KitbaseAnalytics instance once
+	if (!kitbaseRef.current) {
+		kitbaseRef.current = new KitbaseAnalytics(config);
+	}
 
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      kitbaseRef.current?.shutdown();
-    };
-  }, []);
+	// Cleanup on unmount
+	useEffect(() => {
+		return () => {
+			kitbaseRef.current?.shutdown();
+		};
+	}, []);
 
-  return (
-    <KitbaseAnalyticsContext.Provider value={kitbaseRef.current}>
-      {children}
-    </KitbaseAnalyticsContext.Provider>
-  );
+	return (
+		<KitbaseAnalyticsContext.Provider value={kitbaseRef.current}>
+			{children}
+		</KitbaseAnalyticsContext.Provider>
+	);
 }
 
 // ============================================================
@@ -143,13 +143,13 @@ export function KitbaseAnalyticsProvider({ config, children }: KitbaseAnalyticsP
  * ```
  */
 export function useKitbaseAnalytics(): KitbaseAnalytics {
-  const context = useContext(KitbaseAnalyticsContext);
+	const context = useContext(KitbaseAnalyticsContext);
 
-  if (!context) {
-    throw new Error('useKitbaseAnalytics must be used within a KitbaseAnalyticsProvider');
-  }
+	if (!context) {
+		throw new Error("useKitbaseAnalytics must be used within a KitbaseAnalyticsProvider");
+	}
 
-  return context;
+	return context;
 }
 
 /**
@@ -175,14 +175,14 @@ export function useKitbaseAnalytics(): KitbaseAnalytics {
  * ```
  */
 export function useTrack() {
-  const kitbase = useKitbaseAnalytics();
+	const kitbase = useKitbaseAnalytics();
 
-  return useCallback(
-    (options: TrackOptions): Promise<TrackResponse | void> => {
-      return kitbase.track(options);
-    },
-    [kitbase]
-  );
+	return useCallback(
+		(options: TrackOptions): Promise<TrackResponse | void> => {
+			return kitbase.track(options);
+		},
+		[kitbase],
+	);
 }
 
 /**
@@ -207,14 +207,14 @@ export function useTrack() {
  * ```
  */
 export function useIdentify() {
-  const kitbase = useKitbaseAnalytics();
+	const kitbase = useKitbaseAnalytics();
 
-  return useCallback(
-    (options: IdentifyOptions): Promise<void> => {
-      return kitbase.identify(options);
-    },
-    [kitbase]
-  );
+	return useCallback(
+		(options: IdentifyOptions): Promise<void> => {
+			return kitbase.identify(options);
+		},
+		[kitbase],
+	);
 }
 
 /**
@@ -236,14 +236,14 @@ export function useIdentify() {
  * ```
  */
 export function usePageView() {
-  const kitbase = useKitbaseAnalytics();
+	const kitbase = useKitbaseAnalytics();
 
-  return useCallback(
-    (options?: PageViewOptions): Promise<TrackResponse | void> => {
-      return kitbase.trackPageView(options);
-    },
-    [kitbase]
-  );
+	return useCallback(
+		(options?: PageViewOptions): Promise<TrackResponse | void> => {
+			return kitbase.trackPageView(options);
+		},
+		[kitbase],
+	);
 }
 
 /**
@@ -266,16 +266,13 @@ export function usePageView() {
  * }
  * ```
  */
-export function useAutoPageView(
-  options?: PageViewOptions,
-  deps: React.DependencyList = []
-) {
-  const kitbase = useKitbaseAnalytics();
+export function useAutoPageView(options?: PageViewOptions, deps: React.DependencyList = []) {
+	const kitbase = useKitbaseAnalytics();
 
-  useEffect(() => {
-    kitbase.trackPageView(options);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, deps);
+	useEffect(() => {
+		kitbase.trackPageView(options);
+	
+	}, deps);
 }
 
 /**
@@ -301,14 +298,14 @@ export function useAutoPageView(
  * ```
  */
 export function useRevenue() {
-  const kitbase = useKitbaseAnalytics();
+	const kitbase = useKitbaseAnalytics();
 
-  return useCallback(
-    (options: RevenueOptions): Promise<TrackResponse | void> => {
-      return kitbase.trackRevenue(options);
-    },
-    [kitbase]
-  );
+	return useCallback(
+		(options: RevenueOptions): Promise<TrackResponse | void> => {
+			return kitbase.trackRevenue(options);
+		},
+		[kitbase],
+	);
 }
 
 /**
@@ -342,16 +339,16 @@ export function useRevenue() {
  * ```
  */
 export function useTimeEvent(eventName: string) {
-  const kitbase = useKitbaseAnalytics();
+	const kitbase = useKitbaseAnalytics();
 
-  return useMemo(
-    () => ({
-      start: () => kitbase.timeEvent(eventName),
-      stop: () => kitbase.cancelTimeEvent(eventName),
-      getDuration: () => kitbase.getEventDuration(eventName),
-    }),
-    [kitbase, eventName]
-  );
+	return useMemo(
+		() => ({
+			start: () => kitbase.timeEvent(eventName),
+			stop: () => kitbase.cancelTimeEvent(eventName),
+			getDuration: () => kitbase.getEventDuration(eventName),
+		}),
+		[kitbase, eventName],
+	);
 }
 
 /**
@@ -373,16 +370,13 @@ export function useTimeEvent(eventName: string) {
  * }
  * ```
  */
-export function useSuperProperties(
-  properties: Tags,
-  deps: React.DependencyList = []
-) {
-  const kitbase = useKitbaseAnalytics();
+export function useSuperProperties(properties: Tags, deps: React.DependencyList = []) {
+	const kitbase = useKitbaseAnalytics();
 
-  useEffect(() => {
-    kitbase.register(properties);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, deps);
+	useEffect(() => {
+		kitbase.register(properties);
+	
+	}, deps);
 }
 
 /**
@@ -400,8 +394,8 @@ export function useSuperProperties(
  * ```
  */
 export function useUserId(): string | null {
-  const kitbase = useKitbaseAnalytics();
-  return kitbase.getUserId();
+	const kitbase = useKitbaseAnalytics();
+	return kitbase.getUserId();
 }
 
 /**
@@ -424,10 +418,9 @@ export function useUserId(): string | null {
  * ```
  */
 export function useReset() {
-  const kitbase = useKitbaseAnalytics();
+	const kitbase = useKitbaseAnalytics();
 
-  return useCallback(() => {
-    kitbase.reset();
-  }, [kitbase]);
+	return useCallback(() => {
+		kitbase.reset();
+	}, [kitbase]);
 }
-

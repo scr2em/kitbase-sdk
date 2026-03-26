@@ -4,7 +4,7 @@ version: 0.1.0
 repository: https://github.com/scr2em/kitbase-sdk/tree/main/analytics/dart
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
   http: ^1.2.0

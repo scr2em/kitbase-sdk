@@ -37,29 +37,25 @@
  * @packageDocumentation
  */
 
+import { Provider, makeEnvironmentProviders, EnvironmentProviders } from "@angular/core";
 import {
-  Provider,
-  makeEnvironmentProviders,
-  EnvironmentProviders,
-} from '@angular/core';
-import {
-  init,
-  getInstance,
-  type KitbaseAnalytics,
-  type KitbaseConfig,
-  type TrackOptions,
-  type TrackResponse,
-  type PageViewOptions,
-  type RevenueOptions,
-  type IdentifyOptions,
-  type Tags,
-  type TagValue,
-  type AnalyticsConfig,
-  type KitbasePlugin,
-} from '@kitbase/analytics';
+	init,
+	getInstance,
+	type KitbaseAnalytics,
+	type KitbaseConfig,
+	type TrackOptions,
+	type TrackResponse,
+	type PageViewOptions,
+	type RevenueOptions,
+	type IdentifyOptions,
+	type Tags,
+	type TagValue,
+	type AnalyticsConfig,
+	type KitbasePlugin,
+} from "@kitbase/analytics";
 
 // Re-export everything from core
-export * from '@kitbase/analytics';
+export * from "@kitbase/analytics";
 
 /**
  * KitbaseAnalytics service for Angular applications.
@@ -87,151 +83,154 @@ export * from '@kitbase/analytics';
  * ```
  */
 export abstract class KitbaseAnalyticsService {
-  /** Get the underlying KitbaseAnalytics instance for advanced usage */
-  abstract getInstance(): KitbaseAnalytics;
+	/** Get the underlying KitbaseAnalytics instance for advanced usage */
+	abstract getInstance(): KitbaseAnalytics;
 
-  /** Shutdown the client and cleanup resources */
-  abstract shutdown(): void;
+	/** Shutdown the client and cleanup resources */
+	abstract shutdown(): void;
 
-  // Event Tracking
-  abstract track(options: TrackOptions): Promise<TrackResponse | void>;
-  abstract trackPageView(options?: PageViewOptions): Promise<TrackResponse | void>;
-  abstract trackRevenue(options: RevenueOptions): Promise<TrackResponse | void>;
-  abstract trackOutboundLink(options: { url: string; text?: string }): Promise<TrackResponse | void>;
-  abstract trackClick(tags: Tags): Promise<TrackResponse | void>;
+	// Event Tracking
+	abstract track(options: TrackOptions): Promise<TrackResponse | void>;
+	abstract trackPageView(options?: PageViewOptions): Promise<TrackResponse | void>;
+	abstract trackRevenue(options: RevenueOptions): Promise<TrackResponse | void>;
+	abstract trackOutboundLink(options: {
+		url: string;
+		text?: string;
+	}): Promise<TrackResponse | void>;
+	abstract trackClick(tags: Tags): Promise<TrackResponse | void>;
 
-  // User Identification
-  abstract identify(options: IdentifyOptions): Promise<void>;
-  abstract getUserId(): string | null;
-  abstract reset(): void;
+	// User Identification
+	abstract identify(options: IdentifyOptions): Promise<void>;
+	abstract getUserId(): string | null;
+	abstract reset(): void;
 
-  // Super Properties
-  abstract register(properties: Tags): void;
-  abstract registerOnce(properties: Tags): void;
-  abstract unregister(key: string): void;
-  abstract getSuperProperties(): Tags;
-  abstract clearSuperProperties(): void;
+	// Super Properties
+	abstract register(properties: Tags): void;
+	abstract registerOnce(properties: Tags): void;
+	abstract unregister(key: string): void;
+	abstract getSuperProperties(): Tags;
+	abstract clearSuperProperties(): void;
 
-  // Time Events
-  abstract timeEvent(eventName: string): void;
-  abstract cancelTimeEvent(eventName: string): void;
-  abstract getTimedEvents(): string[];
-  abstract getEventDuration(eventName: string): number | null;
+	// Time Events
+	abstract timeEvent(eventName: string): void;
+	abstract cancelTimeEvent(eventName: string): void;
+	abstract getTimedEvents(): string[];
+	abstract getEventDuration(eventName: string): number | null;
 
-  // Debug & Utilities
-  abstract setDebugMode(enabled: boolean): void;
-  abstract isDebugMode(): boolean;
+	// Debug & Utilities
+	abstract setDebugMode(enabled: boolean): void;
+	abstract isDebugMode(): boolean;
 
-  // Plugin System
-  abstract use(plugin: KitbasePlugin): void;
-  abstract getPlugins(): string[];
+	// Plugin System
+	abstract use(plugin: KitbasePlugin): void;
+	abstract getPlugins(): string[];
 }
 
 class KitbaseAnalyticsServiceImpl extends KitbaseAnalyticsService {
-  private kitbase: KitbaseAnalytics;
+	private kitbase: KitbaseAnalytics;
 
-  constructor(config: KitbaseConfig) {
-    super();
-    this.kitbase = init(config);
-  }
+	constructor(config: KitbaseConfig) {
+		super();
+		this.kitbase = init(config);
+	}
 
-  getInstance(): KitbaseAnalytics {
-    return this.kitbase;
-  }
+	getInstance(): KitbaseAnalytics {
+		return this.kitbase;
+	}
 
-  shutdown(): void {
-    this.kitbase.shutdown();
-  }
+	shutdown(): void {
+		this.kitbase.shutdown();
+	}
 
-  // Event Tracking
-  track(options: TrackOptions): Promise<TrackResponse | void> {
-    return this.kitbase.track(options);
-  }
+	// Event Tracking
+	track(options: TrackOptions): Promise<TrackResponse | void> {
+		return this.kitbase.track(options);
+	}
 
-  trackPageView(options?: PageViewOptions): Promise<TrackResponse | void> {
-    return this.kitbase.trackPageView(options);
-  }
+	trackPageView(options?: PageViewOptions): Promise<TrackResponse | void> {
+		return this.kitbase.trackPageView(options);
+	}
 
-  trackRevenue(options: RevenueOptions): Promise<TrackResponse | void> {
-    return this.kitbase.trackRevenue(options);
-  }
+	trackRevenue(options: RevenueOptions): Promise<TrackResponse | void> {
+		return this.kitbase.trackRevenue(options);
+	}
 
-  trackOutboundLink(options: { url: string; text?: string }): Promise<TrackResponse | void> {
-    return this.kitbase.trackOutboundLink(options);
-  }
+	trackOutboundLink(options: { url: string; text?: string }): Promise<TrackResponse | void> {
+		return this.kitbase.trackOutboundLink(options);
+	}
 
-  trackClick(tags: Tags): Promise<TrackResponse | void> {
-    return this.kitbase.trackClick(tags);
-  }
+	trackClick(tags: Tags): Promise<TrackResponse | void> {
+		return this.kitbase.trackClick(tags);
+	}
 
-  // User Identification
-  identify(options: IdentifyOptions): Promise<void> {
-    return this.kitbase.identify(options);
-  }
+	// User Identification
+	identify(options: IdentifyOptions): Promise<void> {
+		return this.kitbase.identify(options);
+	}
 
-  getUserId(): string | null {
-    return this.kitbase.getUserId();
-  }
+	getUserId(): string | null {
+		return this.kitbase.getUserId();
+	}
 
-  reset(): void {
-    this.kitbase.reset();
-  }
+	reset(): void {
+		this.kitbase.reset();
+	}
 
-  // Super Properties
-  register(properties: Tags): void {
-    this.kitbase.register(properties);
-  }
+	// Super Properties
+	register(properties: Tags): void {
+		this.kitbase.register(properties);
+	}
 
-  registerOnce(properties: Tags): void {
-    this.kitbase.registerOnce(properties);
-  }
+	registerOnce(properties: Tags): void {
+		this.kitbase.registerOnce(properties);
+	}
 
-  unregister(key: string): void {
-    this.kitbase.unregister(key);
-  }
+	unregister(key: string): void {
+		this.kitbase.unregister(key);
+	}
 
-  getSuperProperties(): Tags {
-    return this.kitbase.getSuperProperties();
-  }
+	getSuperProperties(): Tags {
+		return this.kitbase.getSuperProperties();
+	}
 
-  clearSuperProperties(): void {
-    this.kitbase.clearSuperProperties();
-  }
+	clearSuperProperties(): void {
+		this.kitbase.clearSuperProperties();
+	}
 
-  // Time Events
-  timeEvent(eventName: string): void {
-    this.kitbase.timeEvent(eventName);
-  }
+	// Time Events
+	timeEvent(eventName: string): void {
+		this.kitbase.timeEvent(eventName);
+	}
 
-  cancelTimeEvent(eventName: string): void {
-    this.kitbase.cancelTimeEvent(eventName);
-  }
+	cancelTimeEvent(eventName: string): void {
+		this.kitbase.cancelTimeEvent(eventName);
+	}
 
-  getTimedEvents(): string[] {
-    return this.kitbase.getTimedEvents();
-  }
+	getTimedEvents(): string[] {
+		return this.kitbase.getTimedEvents();
+	}
 
-  getEventDuration(eventName: string): number | null {
-    return this.kitbase.getEventDuration(eventName);
-  }
+	getEventDuration(eventName: string): number | null {
+		return this.kitbase.getEventDuration(eventName);
+	}
 
-  // Debug & Utilities
-  setDebugMode(enabled: boolean): void {
-    this.kitbase.setDebugMode(enabled);
-  }
+	// Debug & Utilities
+	setDebugMode(enabled: boolean): void {
+		this.kitbase.setDebugMode(enabled);
+	}
 
-  isDebugMode(): boolean {
-    return this.kitbase.isDebugMode();
-  }
+	isDebugMode(): boolean {
+		return this.kitbase.isDebugMode();
+	}
 
-  // Plugin System
-  use(plugin: KitbasePlugin): void {
-    this.kitbase.use(plugin);
-  }
+	// Plugin System
+	use(plugin: KitbasePlugin): void {
+		this.kitbase.use(plugin);
+	}
 
-  getPlugins(): string[] {
-    return this.kitbase.getPlugins();
-  }
+	getPlugins(): string[] {
+		return this.kitbase.getPlugins();
+	}
 }
 
 // ============================================================
@@ -281,16 +280,16 @@ class KitbaseAnalyticsServiceImpl extends KitbaseAnalyticsService {
  * ```
  */
 export function provideKitbaseAnalytics(config: KitbaseConfig): EnvironmentProviders {
-  // Create the instance eagerly so auto-tracking (clicks, page views,
-  // scroll depth, outbound links) is set up at bootstrap time.
-  const instance = new KitbaseAnalyticsServiceImpl(config);
+	// Create the instance eagerly so auto-tracking (clicks, page views,
+	// scroll depth, outbound links) is set up at bootstrap time.
+	const instance = new KitbaseAnalyticsServiceImpl(config);
 
-  const providers: Provider[] = [
-    {
-      provide: KitbaseAnalyticsService,
-      useValue: instance,
-    },
-  ];
+	const providers: Provider[] = [
+		{
+			provide: KitbaseAnalyticsService,
+			useValue: instance,
+		},
+	];
 
-  return makeEnvironmentProviders(providers);
+	return makeEnvironmentProviders(providers);
 }

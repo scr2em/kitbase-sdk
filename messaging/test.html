@@ -1,191 +1,344 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kitbase In-App Messaging — Test Page</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8f9fa; color: #1a1a1a; }
-    .page-header { background: #fff; border-bottom: 1px solid #e5e7eb; padding: 16px 24px; }
-    .page-header h1 { font-size: 18px; }
-    .page-header p { font-size: 13px; color: #666; margin-top: 4px; }
-    .container { max-width: 600px; margin: 24px auto; padding: 0 16px; }
-    .card { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
-    .card h2 { font-size: 15px; margin-bottom: 12px; }
-    label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: #555; text-transform: uppercase; letter-spacing: 0.5px; }
-    input { width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; margin-bottom: 12px; }
-    input:focus { outline: none; border-color: #4F46E5; box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
-    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
-    button { padding: 8px 16px; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: opacity 150ms; }
-    button:hover { opacity: 0.9; }
-    .btn-primary { background: #4F46E5; color: #fff; }
-    .btn-green { background: #10b981; color: #fff; }
-    .btn-red { background: #ef4444; color: #fff; }
-    .btn-gray { background: #e5e7eb; color: #333; }
-    .log { background: #111827; color: #d1d5db; border-radius: 12px; padding: 16px; font-family: 'SF Mono', Menlo, monospace; font-size: 12px; max-height: 240px; overflow-y: auto; white-space: pre-wrap; line-height: 1.6; }
-    .log .time { color: #6b7280; }
-    .log .event { color: #34d399; }
-    .log .error { color: #f87171; }
-    .hint { font-size: 12px; color: #999; margin-top: 8px; }
-    .sample-content { background: #f9fafb; padding: 16px; border-radius: 8px; margin-top: 12px; }
-    .sample-content h3 { font-size: 13px; margin-bottom: 8px; color: #555; }
-    .sample-content p { font-size: 12px; color: #888; line-height: 1.5; }
-  </style>
-</head>
-<body>
-  <div class="page-header">
-    <h1>Kitbase In-App Messaging Test</h1>
-    <p>Messages will render automatically — modals, banners, cards, and images.</p>
-  </div>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Kitbase In-App Messaging — Test Page</title>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+			body {
+				font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+				background: #f8f9fa;
+				color: #1a1a1a;
+			}
+			.page-header {
+				background: #fff;
+				border-bottom: 1px solid #e5e7eb;
+				padding: 16px 24px;
+			}
+			.page-header h1 {
+				font-size: 18px;
+			}
+			.page-header p {
+				font-size: 13px;
+				color: #666;
+				margin-top: 4px;
+			}
+			.container {
+				max-width: 600px;
+				margin: 24px auto;
+				padding: 0 16px;
+			}
+			.card {
+				background: #fff;
+				border-radius: 12px;
+				padding: 20px;
+				margin-bottom: 16px;
+				box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+			}
+			.card h2 {
+				font-size: 15px;
+				margin-bottom: 12px;
+			}
+			label {
+				display: block;
+				font-size: 12px;
+				font-weight: 600;
+				margin-bottom: 4px;
+				color: #555;
+				text-transform: uppercase;
+				letter-spacing: 0.5px;
+			}
+			input {
+				width: 100%;
+				padding: 8px 12px;
+				border: 1px solid #ddd;
+				border-radius: 8px;
+				font-size: 14px;
+				margin-bottom: 12px;
+			}
+			input:focus {
+				outline: none;
+				border-color: #4f46e5;
+				box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+			}
+			.btn-row {
+				display: flex;
+				gap: 8px;
+				flex-wrap: wrap;
+			}
+			button {
+				padding: 8px 16px;
+				border: none;
+				border-radius: 8px;
+				font-size: 13px;
+				font-weight: 600;
+				cursor: pointer;
+				transition: opacity 150ms;
+			}
+			button:hover {
+				opacity: 0.9;
+			}
+			.btn-primary {
+				background: #4f46e5;
+				color: #fff;
+			}
+			.btn-green {
+				background: #10b981;
+				color: #fff;
+			}
+			.btn-red {
+				background: #ef4444;
+				color: #fff;
+			}
+			.btn-gray {
+				background: #e5e7eb;
+				color: #333;
+			}
+			.log {
+				background: #111827;
+				color: #d1d5db;
+				border-radius: 12px;
+				padding: 16px;
+				font-family: "SF Mono", Menlo, monospace;
+				font-size: 12px;
+				max-height: 240px;
+				overflow-y: auto;
+				white-space: pre-wrap;
+				line-height: 1.6;
+			}
+			.log .time {
+				color: #6b7280;
+			}
+			.log .event {
+				color: #34d399;
+			}
+			.log .error {
+				color: #f87171;
+			}
+			.hint {
+				font-size: 12px;
+				color: #999;
+				margin-top: 8px;
+			}
+			.sample-content {
+				background: #f9fafb;
+				padding: 16px;
+				border-radius: 8px;
+				margin-top: 12px;
+			}
+			.sample-content h3 {
+				font-size: 13px;
+				margin-bottom: 8px;
+				color: #555;
+			}
+			.sample-content p {
+				font-size: 12px;
+				color: #888;
+				line-height: 1.5;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="page-header">
+			<h1>Kitbase In-App Messaging Test</h1>
+			<p>Messages will render automatically — modals, banners, cards, and images.</p>
+		</div>
 
-  <div class="container">
-    <!-- Setup -->
-    <div class="card">
-      <h2>Configuration</h2>
-      <label>SDK Key</label>
-      <input type="text" id="sdkKey" placeholder="your-sdk-key">
-      <label>Base URL</label>
-      <input type="text" id="baseUrl" placeholder="https://api.kitbase.dev" value="https://api.kitbase.dev">
-      <label>User ID (optional)</label>
-      <input type="text" id="userId" placeholder="user_123" value="test-user-1">
-      <label>Metadata (JSON, optional)</label>
-      <input type="text" id="metadata" placeholder='{"plan":"free","country":"US"}'>
+		<div class="container">
+			<!-- Setup -->
+			<div class="card">
+				<h2>Configuration</h2>
+				<label>SDK Key</label>
+				<input type="text" id="sdkKey" placeholder="your-sdk-key" />
+				<label>Base URL</label>
+				<input
+					type="text"
+					id="baseUrl"
+					placeholder="https://api.kitbase.dev"
+					value="https://api.kitbase.dev"
+				/>
+				<label>User ID (optional)</label>
+				<input type="text" id="userId" placeholder="user_123" value="test-user-1" />
+				<label>Metadata (JSON, optional)</label>
+				<input type="text" id="metadata" placeholder='{"plan":"free","country":"US"}' />
 
-      <div class="btn-row">
-        <button class="btn-primary" onclick="initMessaging()">Initialize</button>
-        <button class="btn-gray" onclick="closeMessaging()">Close</button>
-      </div>
-      <p class="hint" id="status">Not initialized</p>
-    </div>
+				<div class="btn-row">
+					<button class="btn-primary" onclick="initMessaging()">Initialize</button>
+					<button class="btn-gray" onclick="closeMessaging()">Close</button>
+				</div>
+				<p class="hint" id="status">Not initialized</p>
+			</div>
 
-    <!-- Actions -->
-    <div class="card">
-      <h2>Actions</h2>
-      <div class="btn-row">
-        <button class="btn-green" onclick="identifyUser()">Identify User</button>
-        <button class="btn-red" onclick="resetUser()">Reset (Logout)</button>
-        <button class="btn-gray" onclick="fetchOnly()">Fetch (data-only)</button>
-      </div>
-    </div>
+			<!-- Actions -->
+			<div class="card">
+				<h2>Actions</h2>
+				<div class="btn-row">
+					<button class="btn-green" onclick="identifyUser()">Identify User</button>
+					<button class="btn-red" onclick="resetUser()">Reset (Logout)</button>
+					<button class="btn-gray" onclick="fetchOnly()">Fetch (data-only)</button>
+				</div>
+			</div>
 
-    <!-- Log -->
-    <div class="card">
-      <h2>Event Log</h2>
-      <div class="log" id="log">Waiting for init...</div>
-    </div>
+			<!-- Log -->
+			<div class="card">
+				<h2>Event Log</h2>
+				<div class="log" id="log">Waiting for init...</div>
+			</div>
 
-    <!-- Sample page content to show messages render over -->
-    <div class="card">
-      <div class="sample-content">
-        <h3>Sample Page Content</h3>
-        <p>This simulates a real page. In-app messages (banners, modals, cards) will render on top of this content using the SDK's built-in renderer with shadow DOM isolation.</p>
-        <p>Try creating messages of different types in the Kitbase dashboard and they'll appear here automatically.</p>
-      </div>
-    </div>
-  </div>
+			<!-- Sample page content to show messages render over -->
+			<div class="card">
+				<div class="sample-content">
+					<h3>Sample Page Content</h3>
+					<p>
+						This simulates a real page. In-app messages (banners, modals, cards) will render on top
+						of this content using the SDK's built-in renderer with shadow DOM isolation.
+					</p>
+					<p>
+						Try creating messages of different types in the Kitbase dashboard and they'll appear
+						here automatically.
+					</p>
+				</div>
+			</div>
+		</div>
 
-  <!-- Load the CDN build -->
-  <script src="typescript/dist/cdn.js"></script>
-  <script>
-    var messaging = null;
+		<!-- Load the CDN build -->
+		<script src="typescript/dist/cdn.js"></script>
+		<script>
+			var messaging = null;
 
-    function log(text, type) {
-      var el = document.getElementById('log');
-      var time = new Date().toLocaleTimeString();
-      var cls = type === 'event' ? 'event' : type === 'error' ? 'error' : '';
-      var line = '<span class="time">[' + time + ']</span> <span class="' + cls + '">' + escapeHtml(text) + '</span>\n';
-      el.innerHTML = line + el.innerHTML;
-    }
+			function log(text, type) {
+				var el = document.getElementById("log");
+				var time = new Date().toLocaleTimeString();
+				var cls = type === "event" ? "event" : type === "error" ? "error" : "";
+				var line =
+					'<span class="time">[' +
+					time +
+					']</span> <span class="' +
+					cls +
+					'">' +
+					escapeHtml(text) +
+					"</span>\n";
+				el.innerHTML = line + el.innerHTML;
+			}
 
-    function escapeHtml(s) {
-      return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    }
+			function escapeHtml(s) {
+				return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+			}
 
-    function status(text) {
-      document.getElementById('status').textContent = text;
-    }
+			function status(text) {
+				document.getElementById("status").textContent = text;
+			}
 
-    function initMessaging() {
-      var sdkKey = document.getElementById('sdkKey').value.trim();
-      if (!sdkKey) { status('Enter an SDK key first'); return; }
+			function initMessaging() {
+				var sdkKey = document.getElementById("sdkKey").value.trim();
+				if (!sdkKey) {
+					status("Enter an SDK key first");
+					return;
+				}
 
-      if (messaging) {
-        messaging.close();
-        log('Previous instance closed');
-      }
+				if (messaging) {
+					messaging.close();
+					log("Previous instance closed");
+				}
 
-      var userId = document.getElementById('userId').value.trim();
-      var metadataStr = document.getElementById('metadata').value.trim();
-      var metadata;
-      if (metadataStr) {
-        try { metadata = JSON.parse(metadataStr); }
-        catch (e) { log('Invalid metadata JSON: ' + e.message, 'error'); return; }
-      }
+				var userId = document.getElementById("userId").value.trim();
+				var metadataStr = document.getElementById("metadata").value.trim();
+				var metadata;
+				if (metadataStr) {
+					try {
+						metadata = JSON.parse(metadataStr);
+					} catch (e) {
+						log("Invalid metadata JSON: " + e.message, "error");
+						return;
+					}
+				}
 
-      var baseUrl = document.getElementById('baseUrl').value.trim();
+				var baseUrl = document.getElementById("baseUrl").value.trim();
 
-      messaging = KitbaseMessaging.init({
-        sdkKey: sdkKey,
-        baseUrl: baseUrl || undefined,
-        userId: userId || undefined,
-        metadata: metadata,
-        pollInterval: 30000,
-        onShow: function(msg) {
-          log('SHOW: [' + msg.type + '] "' + msg.title + '" (id: ' + msg.id + ')', 'event');
-        },
-        onDismiss: function(msg) {
-          log('DISMISS: "' + msg.title + '" (id: ' + msg.id + ')', 'event');
-        },
-        onAction: function(msg, btn) {
-          log('ACTION: "' + btn.text + '" -> ' + (btn.url || 'no url') + ' on "' + msg.title + '"', 'event');
-        },
-      });
+				messaging = KitbaseMessaging.init({
+					sdkKey: sdkKey,
+					baseUrl: baseUrl || undefined,
+					userId: userId || undefined,
+					metadata: metadata,
+					pollInterval: 30000,
+					onShow: function (msg) {
+						log("SHOW: [" + msg.type + '] "' + msg.title + '" (id: ' + msg.id + ")", "event");
+					},
+					onDismiss: function (msg) {
+						log('DISMISS: "' + msg.title + '" (id: ' + msg.id + ")", "event");
+					},
+					onAction: function (msg, btn) {
+						log(
+							'ACTION: "' + btn.text + '" -> ' + (btn.url || "no url") + ' on "' + msg.title + '"',
+							"event",
+						);
+					},
+				});
 
-      status('Initialized — polling every 30s');
-      log('Messaging initialized (userId: ' + (userId || 'none') + ', poll: 30s)', 'event');
-    }
+				status("Initialized — polling every 30s");
+				log("Messaging initialized (userId: " + (userId || "none") + ", poll: 30s)", "event");
+			}
 
-    function identifyUser() {
-      if (!messaging) { status('Initialize first'); return; }
-      var userId = document.getElementById('userId').value.trim();
-      if (!userId) { status('Enter a User ID'); return; }
-      messaging.identify(userId);
-      log('identify("' + userId + '") — refetching...', 'event');
-      status('Identified as ' + userId);
-    }
+			function identifyUser() {
+				if (!messaging) {
+					status("Initialize first");
+					return;
+				}
+				var userId = document.getElementById("userId").value.trim();
+				if (!userId) {
+					status("Enter a User ID");
+					return;
+				}
+				messaging.identify(userId);
+				log('identify("' + userId + '") — refetching...', "event");
+				status("Identified as " + userId);
+			}
 
-    function resetUser() {
-      if (!messaging) { status('Initialize first'); return; }
-      messaging.reset();
-      log('reset() — cleared user + dismissed messages', 'event');
-      status('User reset');
-    }
+			function resetUser() {
+				if (!messaging) {
+					status("Initialize first");
+					return;
+				}
+				messaging.reset();
+				log("reset() — cleared user + dismissed messages", "event");
+				status("User reset");
+			}
 
-    function fetchOnly() {
-      if (!messaging) { status('Initialize first'); return; }
-      log('getMessages() — fetching data-only...');
+			function fetchOnly() {
+				if (!messaging) {
+					status("Initialize first");
+					return;
+				}
+				log("getMessages() — fetching data-only...");
 
-      messaging.getMessages().then(function(msgs) {
-        log('Fetched ' + msgs.length + ' message(s):', 'event');
-        msgs.forEach(function(m) {
-          log('  [' + m.type + '] "' + m.title + '" (showOnce: ' + m.showOnce + ')');
-        });
-      }).catch(function(err) {
-        log('Fetch error: ' + err.message, 'error');
-      });
-    }
+				messaging
+					.getMessages()
+					.then(function (msgs) {
+						log("Fetched " + msgs.length + " message(s):", "event");
+						msgs.forEach(function (m) {
+							log("  [" + m.type + '] "' + m.title + '" (showOnce: ' + m.showOnce + ")");
+						});
+					})
+					.catch(function (err) {
+						log("Fetch error: " + err.message, "error");
+					});
+			}
 
-    function closeMessaging() {
-      if (messaging) {
-        messaging.close();
-        messaging = null;
-        log('Messaging closed', 'event');
-        status('Not initialized');
-      }
-    }
+			function closeMessaging() {
+				if (messaging) {
+					messaging.close();
+					messaging = null;
+					log("Messaging closed", "event");
+					status("Not initialized");
+				}
+			}
 
-    log('CDN script loaded (' + typeof KitbaseMessaging + ')');
-  </script>
-</body>
+			log("CDN script loaded (" + typeof KitbaseMessaging + ")");
+		</script>
+	</body>
 </html>

@@ -66,42 +66,42 @@
  * @packageDocumentation
  */
 
-export { Messaging, init, getInstance } from './client.js';
+export { Messaging, init, getInstance } from "./client.js";
 export type {
-  MessagingConfig,
-  InAppMessage,
-  MessageType,
-  MessageButton,
-  GetMessagesOptions,
-  SubscribeOptions,
-} from './types.js';
+	MessagingConfig,
+	InAppMessage,
+	MessageType,
+	MessageButton,
+	GetMessagesOptions,
+	SubscribeOptions,
+} from "./types.js";
 export {
-  MessagingError,
-  ApiError,
-  AuthenticationError,
-  ValidationError,
-  TimeoutError,
-} from './errors.js';
+	MessagingError,
+	ApiError,
+	AuthenticationError,
+	ValidationError,
+	TimeoutError,
+} from "./errors.js";
 
 // ── Auto-init ───────────────────────────────────────────────────
 
-import type { MessagingConfig } from './types.js';
-import { init } from './client.js';
-import type { Messaging } from './client.js';
+import type { MessagingConfig } from "./types.js";
+import { init } from "./client.js";
+import type { Messaging } from "./client.js";
 
 declare global {
-  interface Window {
-    /** Set before loading the script to auto-initialize. */
-    KITBASE_MESSAGING?: MessagingConfig;
-    /** The auto-initialized Messaging instance. */
-    kitbaseMessaging?: Messaging;
-  }
+	interface Window {
+		/** Set before loading the script to auto-initialize. */
+		KITBASE_MESSAGING?: MessagingConfig;
+		/** The auto-initialized Messaging instance. */
+		kitbaseMessaging?: Messaging;
+	}
 }
 
-if (typeof window !== 'undefined' && window.KITBASE_MESSAGING) {
-  try {
-    window.kitbaseMessaging = init(window.KITBASE_MESSAGING);
-  } catch (error) {
-    console.error('[KitbaseMessaging] Failed to auto-initialize:', error);
-  }
+if (typeof window !== "undefined" && window.KITBASE_MESSAGING) {
+	try {
+		window.kitbaseMessaging = init(window.KITBASE_MESSAGING);
+	} catch (error) {
+		console.error("[KitbaseMessaging] Failed to auto-initialize:", error);
+	}
 }

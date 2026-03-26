@@ -1,10 +1,10 @@
-import { useMemo, type ReactNode } from 'react';
-import { FlagsClient, FlagsConfig } from '@kitbase/flags';
-import { FlagsContext } from './context.js';
+import { useMemo, type ReactNode } from "react";
+import { FlagsClient, FlagsConfig } from "@kitbase/flags";
+import { FlagsContext } from "./context.js";
 
 export type FlagsProviderProps = {
-  children: ReactNode;
-  config: FlagsConfig
+	children: ReactNode;
+	config: FlagsConfig;
 };
 
 /**
@@ -24,9 +24,7 @@ export type FlagsProviderProps = {
  * ```
  */
 export function FlagsProvider({ children, config }: FlagsProviderProps) {
-  const client = useMemo(() => new FlagsClient(config), [config]);
+	const client = useMemo(() => new FlagsClient(config), [config]);
 
-  return (
-    <FlagsContext.Provider value={client}>{children}</FlagsContext.Provider>
-  );
+	return <FlagsContext.Provider value={client}>{children}</FlagsContext.Provider>;
 }

@@ -1,12 +1,12 @@
-import { defineConfig } from 'tsup';
+import { defineConfig } from "tsup";
 
 export default defineConfig({
-  entry: ['src/index.ts'],
-  format: ['cjs', 'esm'],
-  dts: true,
-  sourcemap: true,
-  clean: true,
-  target: 'es2022',
-  external: ['react', '@kitbase/messaging'],
-  splitting: false,
+	entry: ["src/index.ts"],
+	format: ["cjs", "esm"],
+	dts: true,
+	sourcemap: true,
+	clean: true,
+	target: "es2022",
+	external: ["react", "@kitbase/messaging"],
+	splitting: false,
 });

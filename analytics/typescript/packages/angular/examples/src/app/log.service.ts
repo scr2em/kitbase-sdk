@@ -1,21 +1,21 @@
-import { Injectable } from '@angular/core';
+import { Injectable } from "@angular/core";
 
 export interface LogEntry {
-  time: string;
-  message: string;
-  type: 'success' | 'error' | 'info';
+	time: string;
+	message: string;
+	type: "success" | "error" | "info";
 }
 
-@Injectable({ providedIn: 'root' })
+@Injectable({ providedIn: "root" })
 export class LogService {
-  entries: LogEntry[] = [];
+	entries: LogEntry[] = [];
 
-  log(message: string, type: LogEntry['type'] = 'info') {
-    const time = new Date().toLocaleTimeString();
-    this.entries.unshift({ time, message, type });
-  }
+	log(message: string, type: LogEntry["type"] = "info") {
+		const time = new Date().toLocaleTimeString();
+		this.entries.unshift({ time, message, type });
+	}
 
-  clear() {
-    this.entries = [];
-  }
+	clear() {
+		this.entries = [];
+	}
 }
