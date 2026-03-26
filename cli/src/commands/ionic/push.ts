@@ -167,9 +167,15 @@ export default class Push extends BaseCommand {
 				);
 			}
 
-			// 6. Upload
+			// 6. Resolve key info
 			const baseUrl = getBaseUrl(flags["base-url"]);
 			const client = new UploadClient({ apiKey, baseUrl });
+
+			spinner.start("Resolving project info...");
+			const keyInfo = await client.fetchKeyInfo();
+			spinner.succeed(`Project: ${chalk.dim(keyInfo.orgSlug)} / ${chalk.dim(keyInfo.projectId)}`);
+
+			// 7. Upload
 			const payload = createUploadPayload(zipFilePath, gitInfo, nativeVersion);
 
 			this.log(chalk.dim("\n  Commit:  ") + chalk.white(payload.commitHash));
@@ -183,7 +189,7 @@ export default class Push extends BaseCommand {
 
 			spinner.start("Uploading to Kitbase... 0%");
 
-			const response = await client.upload(payload, {
+			const response = await client.upload(payload, keyInfo, {
 				onProgress(progress) {
 					const bar = progressBar(progress.percent);
 					spinner.text = `Uploading to Kitbase... ${bar} ${progress.percent}% (${formatSize(progress.uploaded)}/${formatSize(progress.total)})`;

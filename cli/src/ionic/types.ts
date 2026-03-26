@@ -28,3 +28,8 @@ export interface UploadResponse {
 	buildId?: string;
 	message?: string;
 }
+
+/**
+ * Response from /api/v1/auth/key-info
+ */
+export type KeyInfo = import("../generated/sdk-api.js").components["schemas"]["KeyInfoResponse"];
