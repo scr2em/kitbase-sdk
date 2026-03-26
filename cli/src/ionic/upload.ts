@@ -3,9 +3,11 @@ import { basename } from "node:path";
 import { request as httpsRequest } from "node:https";
 import { request as httpRequest } from "node:http";
 import type { KitbaseConfig } from "../lib/types.js";
-import type { UploadPayload, UploadResponse } from "./types.js";
+import type { KeyInfo, UploadPayload, UploadResponse } from "./types.js";
 import { ApiError, AuthenticationError, ValidationError } from "../lib/errors.js";
 import { getBaseUrl } from "../lib/config.js";
+import { createSdkClient } from "../lib/api-client.js";
+
 const TIMEOUT = 300_000; // 5 minutes
 
 export interface UploadProgress {
@@ -30,11 +32,29 @@ export class UploadClient {
 		this.baseUrl = config.baseUrl || getBaseUrl();
 	}
 
-	async upload(payload: UploadPayload, options?: UploadOptions): Promise<UploadResponse> {
+	async fetchKeyInfo(): Promise<KeyInfo> {
+		const client = createSdkClient(this.apiKey, this.baseUrl);
+		const { data, error, response } = await client.GET("/api/v1/auth/key-info", {
+			params: { header: { "X-API-Key": this.apiKey } },
+		});
+
+		if (error) {
+			const status = response.status;
+			const message = this.extractErrorMessage(error, "Failed to fetch key info");
+			if (status === 401 || status === 403) {
+				throw new AuthenticationError(message, `${this.baseUrl}/api/v1/auth/key-info`);
+			}
+			throw new ApiError(message, status, error, `${this.baseUrl}/api/v1/auth/key-info`);
+		}
+
+		return data as KeyInfo;
+	}
+
+	async upload(payload: UploadPayload, keyInfo: KeyInfo, options?: UploadOptions): Promise<UploadResponse> {
 		this.validatePayload(payload);
 
 		const { body, boundary } = this.createMultipartBody(payload);
-		const url = new URL(`${this.baseUrl}/sdk/v1/builds`);
+		const url = new URL(`${this.baseUrl}/${keyInfo.orgSlug}/projects/${keyInfo.projectId}/environments/${keyInfo.environmentId}/builds`);
 
 		return new Promise((resolve, reject) => {
 			const isHttps = url.protocol === "https:";
