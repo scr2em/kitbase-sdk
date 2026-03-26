@@ -520,6 +520,12 @@ write_env() {
 # Security
 JWT_SECRET="${JWT_SECRET}"
 
+# Authentication
+# Access token lifetime in milliseconds (default: 1 hour)
+JWT_EXPIRATION=3600000
+# Refresh token lifetime in milliseconds (default: 7 days)
+JWT_REFRESH_EXPIRATION=604800000
+
 # Database
 DATABASE_PASSWORD=${DB_PASSWORD}
 
