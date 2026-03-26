@@ -1,7 +1,7 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { createInterface } from "node:readline";
 import chalk from "chalk";
+import { inputText, confirmPrompt } from "./prompts.js";
 
 const CONFIG_FILE_NAME = ".kitbasecli";
 const DEFAULT_BASE_URL = "https://api.kitbase.dev";
@@ -87,41 +87,26 @@ export function writeApiKeyToConfig(apiKey: string): void {
 	writeConfig(apiKey, existingUrl ?? undefined);
 }
 
-export function prompt(question: string): Promise<string> {
-	const rl = createInterface({ input: process.stdin, output: process.stdout });
-	return new Promise((resolve) => {
-		rl.question(question, (answer) => {
-			rl.close();
-			resolve(answer.trim());
-		});
-	});
-}
+/**
+ * Ensure .kitbasecli is in .gitignore. Creates .gitignore if it doesn't exist.
+ */
+export function ensureGitignore(): { created: boolean; added: boolean } {
+	const gitignorePath = join(process.cwd(), ".gitignore");
+	const entry = ".kitbasecli";
 
-async function promptForApiKey(): Promise<string | null> {
-	console.log("\nNo API key found. Let's set one up!\n");
-	console.log("You can find your API key at: https://kitbase.dev/settings/api-keys\n");
+	if (existsSync(gitignorePath)) {
+		const content = readFileSync(gitignorePath, "utf-8");
+		if (content.includes(entry)) {
+			return { created: false, added: false };
+		}
 
-	const apiKey = await prompt("Paste your API key: ");
-	if (!apiKey) {
-		console.log("\nNo API key provided.\n");
-		return null;
+		const separator = content.endsWith("\n") ? "" : "\n";
+		writeFileSync(gitignorePath, content + `${separator}\n# Kitbase CLI config\n${entry}\n`, "utf-8");
+		return { created: false, added: true };
 	}
-	if (apiKey.length < 10) {
-		console.log("\nInvalid API key format.\n");
-		return null;
-	}
-	return apiKey;
-}
 
-async function promptToSaveApiKey(apiKey: string): Promise<void> {
-	if (!process.stdin.isTTY) return;
-
-	const save = await prompt("Save API key to .kitbasecli for future use? (Y/n): ");
-	if (save.toLowerCase() !== "n") {
-		writeApiKeyToConfig(apiKey);
-		console.log("\nAPI key saved to .kitbasecli");
-		console.log(chalk.yellow("Remember to add .kitbasecli to .gitignore!\n"));
-	}
+	writeFileSync(gitignorePath, `# Kitbase CLI config\n${entry}\n`, "utf-8");
+	return { created: true, added: true };
 }
 
 /**
@@ -145,7 +130,14 @@ export async function getApiKey(options?: {
 	if (options?.cliApiKey) {
 		const existing = readApiKeyFromConfig();
 		if (!existing || existing !== options.cliApiKey) {
-			await promptToSaveApiKey(options.cliApiKey);
+			if (process.stdin.isTTY) {
+				const save = await confirmPrompt("Save API key to .kitbasecli for future use?");
+				if (save) {
+					writeApiKeyToConfig(options.cliApiKey);
+					ensureGitignore();
+					console.log(chalk.dim("  Saved to .kitbasecli"));
+				}
+			}
 		}
 		return options.cliApiKey;
 	}
@@ -157,9 +149,24 @@ export async function getApiKey(options?: {
 	if (configKey) return configKey;
 
 	if (options?.interactive !== false && process.stdin.isTTY) {
-		const apiKey = await promptForApiKey();
+		console.log("\nNo API key found. Let's set one up!\n");
+		console.log("Find your API key at: https://kitbase.dev/settings/api-keys\n");
+
+		const apiKey = await inputText("Paste your API key", {
+			validate: (v) => {
+				if (!v) return "API key is required";
+				if (v.length < 10) return "Invalid API key format";
+				return true;
+			},
+		});
+
 		if (apiKey) {
-			await promptToSaveApiKey(apiKey);
+			const save = await confirmPrompt("Save API key to .kitbasecli for future use?");
+			if (save) {
+				writeApiKeyToConfig(apiKey);
+				ensureGitignore();
+				console.log(chalk.dim("  Saved to .kitbasecli"));
+			}
 			return apiKey;
 		}
 	}
