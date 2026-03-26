@@ -49,7 +49,7 @@ export class UploadClient {
 					headers: {
 						"Content-Type": `multipart/form-data; boundary=${boundary}`,
 						"Content-Length": body.length,
-						"x-sdk-key": this.apiKey,
+						"X-API-Key": this.apiKey,
 					},
 					timeout: TIMEOUT,
 				},

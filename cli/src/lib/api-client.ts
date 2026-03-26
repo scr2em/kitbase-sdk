@@ -23,7 +23,7 @@ export function createDashboardClient<Paths extends {}>(token: string, baseUrl?:
 }
 
 /**
- * Type-safe client for the Kitbase SDK API (x-sdk-key auth).
+ * Type-safe client for the Kitbase SDK API (X-API-Key auth).
  *
  * For standard JSON endpoints. The push command uses the custom
  * UploadClient for multipart uploads with progress tracking.
@@ -36,6 +36,6 @@ export function createDashboardClient<Paths extends {}>(token: string, baseUrl?:
 export function createSdkClient(apiKey: string, baseUrl?: string) {
 	return createClient<SdkPaths>({
 		baseUrl: baseUrl ?? getBaseUrl(),
-		headers: { "x-sdk-key": apiKey },
+		headers: { "X-API-Key": apiKey },
 	});
 }
