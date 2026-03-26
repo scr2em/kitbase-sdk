@@ -10,6 +10,7 @@ export default class Init extends BaseCommand {
 
 	static override examples = [
 		"<%= config.bin %> init",
+		"<%= config.bin %> init --local",
 		"<%= config.bin %> init --api-key sk_live_xxx",
 		"<%= config.bin %> init --api-key sk_live_xxx --base-url https://api.mycompany.com",
 	];
@@ -18,6 +19,11 @@ export default class Init extends BaseCommand {
 		"api-key": Flags.string({ char: "k", description: "API key to save" }),
 		"base-url": Flags.string({
 			description: "API base URL (for self-hosted instances)",
+		}),
+		local: Flags.boolean({
+			char: "l",
+			description: "Use a local backend API (prompts for URL)",
+			default: false,
 		}),
 		force: Flags.boolean({ description: "Overwrite existing .kitbasecli", default: false }),
 	};
@@ -40,13 +46,22 @@ export default class Init extends BaseCommand {
 		if (!isNonInteractive) {
 			this.log("\n  Set up your Kitbase project config.\n");
 
-			const hosting = await selectOne("How are you running Kitbase?", [
-				{ name: "Kitbase Cloud", value: "cloud", description: "Hosted at kitbase.dev" },
-				{ name: "Self-hosted", value: "self-hosted", description: "Your own server" },
-			]);
+			if (flags.local) {
+				if (!baseUrl) {
+					baseUrl = await inputText("Enter your local API base URL", {
+						default: "http://localhost:8080",
+						required: true,
+					});
+				}
+			} else {
+				const hosting = await selectOne("How are you running Kitbase?", [
+					{ name: "Kitbase Cloud", value: "cloud", description: "Hosted at kitbase.dev" },
+					{ name: "Self-hosted", value: "self-hosted", description: "Your own server" },
+				]);
 
-			if (hosting === "self-hosted" && !baseUrl) {
-				baseUrl = await inputText("Enter your API base URL", { required: true });
+				if (hosting === "self-hosted" && !baseUrl) {
+					baseUrl = await inputText("Enter your API base URL", { required: true });
+				}
 			}
 
 			apiKey = await inputText("Paste your API key", {
