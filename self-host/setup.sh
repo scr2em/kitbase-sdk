@@ -287,23 +287,61 @@ configure() {
     prompt_secret DB_PASSWORD "Database password" "kitbase"
 
     # Email
-    print_step "Email (SMTP)"
+    print_step "Email"
     printf "  ${DIM}Required for invitations and password resets.${NC}\n"
-    prompt_yn CONFIGURE_SMTP "Configure SMTP now?" "n"
+    printf "  ${DIM}You can configure this later in .env if you prefer.${NC}\n"
+    echo ""
 
+    MAIL_PROVIDER="smtp"
     SMTP_HOST=""
     SMTP_PORT="587"
     SMTP_USERNAME=""
     SMTP_PASSWORD=""
+    SES_ACCESS_KEY=""
+    SES_SECRET_KEY=""
+    SES_REGION="us-east-1"
+    RESEND_API_KEY=""
     MAIL_FROM="noreply@${APP_DOMAIN}"
 
-    if [ "$CONFIGURE_SMTP" = true ]; then
-        prompt SMTP_HOST "SMTP host" ""
-        prompt SMTP_PORT "SMTP port" "587"
-        prompt SMTP_USERNAME "SMTP username" ""
-        prompt_secret SMTP_PASSWORD "SMTP password" ""
-        prompt MAIL_FROM "From email" "noreply@${APP_DOMAIN}"
-    fi
+    select_option "Email provider:" \
+        "Skip for now" \
+        "SMTP" \
+        "AWS SES" \
+        "Resend"
+
+    case "$SELECTED_INDEX" in
+        0)
+            print_warn "Skipping email setup (emails will not be sent)"
+            ;;
+        1)
+            # SMTP
+            MAIL_PROVIDER="smtp"
+            echo ""
+            prompt SMTP_HOST "SMTP host" ""
+            prompt SMTP_PORT "SMTP port" "587"
+            prompt SMTP_USERNAME "SMTP username" ""
+            prompt_secret SMTP_PASSWORD "SMTP password" ""
+            prompt MAIL_FROM "From email" "noreply@${APP_DOMAIN}"
+            ;;
+        2)
+            # AWS SES
+            MAIL_PROVIDER="ses"
+            echo ""
+            printf "  ${DIM}The sender email must be verified in your AWS SES account.${NC}\n"
+            prompt SES_ACCESS_KEY "AWS access key" ""
+            prompt_secret SES_SECRET_KEY "AWS secret key" ""
+            prompt SES_REGION "AWS region" "us-east-1"
+            prompt MAIL_FROM "From email (must be SES-verified)" "noreply@${APP_DOMAIN}"
+            ;;
+        3)
+            # Resend
+            MAIL_PROVIDER="resend"
+            echo ""
+            printf "  ${DIM}Get your API key from https://resend.com/api-keys${NC}\n"
+            prompt_secret RESEND_API_KEY "Resend API key" ""
+            prompt MAIL_FROM "From email (must use a verified Resend domain)" "noreply@${APP_DOMAIN}"
+            ;;
+    esac
 
     # OAuth
     print_step "OAuth (optional)"
@@ -327,7 +365,7 @@ configure() {
 
     # Storage
     print_step "File Storage"
-    printf "  ${DIM}Where should Kitbase store uploaded files (builds, assets)?${NC}\n"
+    printf "  ${DIM}Used for OTA update files. If you're not using OTA updates, feel free to skip.${NC}\n"
     printf "  ${DIM}Local disk works out of the box — cloud storage is optional and can be configured later in .env.${NC}\n"
     echo ""
 
@@ -474,12 +512,23 @@ APP_DOMAIN=${APP_DOMAIN}
 APP_PROTOCOL=${APP_PROTOCOL}
 MAIL_BASE_URL=${DOMAIN}
 
-# SMTP
+# Email
+MAIL_PROVIDER=${MAIL_PROVIDER}
+MAIL_FROM=${MAIL_FROM}
+
+# SMTP (when MAIL_PROVIDER=smtp)
 SMTP_HOST=${SMTP_HOST}
 SMTP_PORT=${SMTP_PORT}
 SMTP_USERNAME=${SMTP_USERNAME}
 SMTP_PASSWORD=${SMTP_PASSWORD}
-MAIL_FROM=${MAIL_FROM}
+
+# AWS SES (when MAIL_PROVIDER=ses)
+SES_ACCESS_KEY=${SES_ACCESS_KEY}
+SES_SECRET_KEY=${SES_SECRET_KEY}
+SES_REGION=${SES_REGION}
+
+# Resend (when MAIL_PROVIDER=resend)
+RESEND_API_KEY=${RESEND_API_KEY}
 
 # OAuth
 OAUTH_GOOGLE_CLIENT_ID=${OAUTH_GOOGLE_CLIENT_ID}
