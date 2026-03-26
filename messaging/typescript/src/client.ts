@@ -1,12 +1,12 @@
 import type {
-  MessagingConfig,
-  InAppMessage,
-  GetMessagesOptions,
-  SubscribeOptions,
-} from './types.js';
-import { ValidationError } from './errors.js';
-import { MessagingApi } from './api.js';
-import { MessageRenderer } from './renderer.js';
+	MessagingConfig,
+	InAppMessage,
+	GetMessagesOptions,
+	SubscribeOptions,
+} from "./types.js";
+import { ValidationError } from "./errors.js";
+import { MessagingApi } from "./api.js";
+import { MessageRenderer } from "./renderer.js";
 
 const DEFAULT_POLL_INTERVAL = 60000;
 
@@ -36,11 +36,11 @@ let _instance: Messaging | null = null;
  * ```
  */
 export function init(config: MessagingConfig): Messaging {
-  if (_instance) {
-    _instance.close();
-  }
-  _instance = new Messaging(config);
-  return _instance;
+	if (_instance) {
+		_instance.close();
+	}
+	_instance = new Messaging(config);
+	return _instance;
 }
 
 /**
@@ -49,7 +49,7 @@ export function init(config: MessagingConfig): Messaging {
  * @returns The instance, or null if `init()` has not been called
  */
 export function getInstance(): Messaging | null {
-  return _instance;
+	return _instance;
 }
 
 /**
@@ -96,221 +96,218 @@ export function getInstance(): Messaging | null {
  * ```
  */
 export class Messaging {
-  private api: MessagingApi;
-  private renderer: MessageRenderer | null = null;
-  private config: MessagingConfig;
-  private pollTimer: ReturnType<typeof setInterval> | null = null;
-  private dismissed = new Set<string>();
-  private subscriptionTimers = new Set<ReturnType<typeof setInterval>>();
-  private pendingPoll = false;
-  private visibilityHandler: (() => void) | null = null;
+	private api: MessagingApi;
+	private renderer: MessageRenderer | null = null;
+	private config: MessagingConfig;
+	private pollTimer: ReturnType<typeof setInterval> | null = null;
+	private dismissed = new Set<string>();
+	private subscriptionTimers = new Set<ReturnType<typeof setInterval>>();
+	private pendingPoll = false;
+	private visibilityHandler: (() => void) | null = null;
 
-  private userId: string | undefined;
+	private userId: string | undefined;
 
-  constructor(config: MessagingConfig) {
-    if (!config.sdkKey) {
-      throw new ValidationError('SDK key is required', 'sdkKey');
-    }
+	constructor(config: MessagingConfig) {
+		if (!config.sdkKey) {
+			throw new ValidationError("SDK key is required", "sdkKey");
+		}
 
-    this.config = config;
-    this.userId = config.userId;
-    this.api = new MessagingApi(config.sdkKey, config.baseUrl);
+		this.config = config;
+		this.userId = config.userId;
+		this.api = new MessagingApi(config.sdkKey, config.baseUrl);
 
-    if (config.autoShow !== false && typeof window !== 'undefined') {
-      this.start();
-    }
-  }
+		if (config.autoShow !== false && typeof window !== "undefined") {
+			this.start();
+		}
+	}
 
-  // ── Lifecycle ─────────────────────────────────────────────────
+	// ── Lifecycle ─────────────────────────────────────────────────
 
-  /**
-   * Start fetching and rendering messages.
-   * Called automatically unless `autoShow: false`.
-   */
-  start(): void {
-    if (typeof window === 'undefined') return;
-    if (this.renderer) return; // already started
+	/**
+	 * Start fetching and rendering messages.
+	 * Called automatically unless `autoShow: false`.
+	 */
+	start(): void {
+		if (typeof window === "undefined") return;
+		if (this.renderer) return; // already started
 
-    this.renderer = new MessageRenderer({
-      onShow: (msg) => {
-        this.config.onShow?.(msg);
-      },
-      onDismiss: (msg) => {
-        this.dismissed.add(msg.id);
-        this.config.onDismiss?.(msg);
-      },
-      onAction: (msg, btn) => {
-        return this.config.onAction?.(msg, btn);
-      },
-    });
+		this.renderer = new MessageRenderer({
+			onShow: (msg) => {
+				this.config.onShow?.(msg);
+			},
+			onDismiss: (msg) => {
+				this.dismissed.add(msg.id);
+				this.config.onDismiss?.(msg);
+			},
+			onAction: (msg, btn) => {
+				return this.config.onAction?.(msg, btn);
+			},
+		});
 
-    // Fetch immediately
-    this.poll();
+		// Fetch immediately
+		this.poll();
 
-    // Set up polling
-    const interval = this.config.pollInterval ?? DEFAULT_POLL_INTERVAL;
-    if (interval > 0) {
-      this.pollTimer = setInterval(() => this.poll(), interval);
-    }
+		// Set up polling
+		const interval = this.config.pollInterval ?? DEFAULT_POLL_INTERVAL;
+		if (interval > 0) {
+			this.pollTimer = setInterval(() => this.poll(), interval);
+		}
 
-    // Pause polling when tab is hidden, resume when visible
-    this.visibilityHandler = () => {
-      if (document.visibilityState === 'visible' && this.pendingPoll) {
-        this.pendingPoll = false;
-        this.poll();
-      }
-    };
-    document.addEventListener('visibilitychange', this.visibilityHandler);
-  }
+		// Pause polling when tab is hidden, resume when visible
+		this.visibilityHandler = () => {
+			if (document.visibilityState === "visible" && this.pendingPoll) {
+				this.pendingPoll = false;
+				this.poll();
+			}
+		};
+		document.addEventListener("visibilitychange", this.visibilityHandler);
+	}
 
-  /**
-   * Stop polling and remove all rendered messages.
-   */
-  stop(): void {
-    if (this.pollTimer) {
-      clearInterval(this.pollTimer);
-      this.pollTimer = null;
-    }
-    if (this.visibilityHandler) {
-      document.removeEventListener('visibilitychange', this.visibilityHandler);
-      this.visibilityHandler = null;
-    }
-    this.pendingPoll = false;
-    this.renderer?.destroy();
-    this.renderer = null;
-  }
+	/**
+	 * Stop polling and remove all rendered messages.
+	 */
+	stop(): void {
+		if (this.pollTimer) {
+			clearInterval(this.pollTimer);
+			this.pollTimer = null;
+		}
+		if (this.visibilityHandler) {
+			document.removeEventListener("visibilitychange", this.visibilityHandler);
+			this.visibilityHandler = null;
+		}
+		this.pendingPoll = false;
+		this.renderer?.destroy();
+		this.renderer = null;
+	}
 
-  /**
-   * Stop everything and remove all rendered UI.
-   */
-  close(): void {
-    this.stop();
-    for (const tid of this.subscriptionTimers) {
-      clearInterval(tid);
-    }
-    this.subscriptionTimers.clear();
-    this.dismissed.clear();
-  }
+	/**
+	 * Stop everything and remove all rendered UI.
+	 */
+	close(): void {
+		this.stop();
+		for (const tid of this.subscriptionTimers) {
+			clearInterval(tid);
+		}
+		this.subscriptionTimers.clear();
+		this.dismissed.clear();
+	}
 
-  // ── User identity ────────────────────────────────────────────
+	// ── User identity ────────────────────────────────────────────
 
-  /**
-   * Set the current user ID.
-   * Triggers an immediate re-fetch so show-once messages that the user
-   * has already viewed are filtered out.
-   */
-  identify(userId: string): void {
-    this.userId = userId;
-    this.poll();
-  }
+	/**
+	 * Set the current user ID.
+	 * Triggers an immediate re-fetch so show-once messages that the user
+	 * has already viewed are filtered out.
+	 */
+	identify(userId: string): void {
+		this.userId = userId;
+		this.poll();
+	}
 
-  /**
-   * Clear the current user ID and reset dismissed messages.
-   * Call this on logout.
-   */
-  reset(): void {
-    this.userId = undefined;
-    this.dismissed.clear();
-    this.poll();
-  }
+	/**
+	 * Clear the current user ID and reset dismissed messages.
+	 * Call this on logout.
+	 */
+	reset(): void {
+		this.userId = undefined;
+		this.dismissed.clear();
+		this.poll();
+	}
 
-  /**
-   * Record that the current user has viewed a message.
-   * The message is optimistically removed from the UI.
-   *
-   * @throws {ValidationError} When no user ID has been set
-   * @throws {ApiError} When the API returns an error
-   */
-  async markViewed(messageId: string): Promise<void> {
-    if (!this.userId) {
-      throw new ValidationError(
-        'User ID is required to mark a message as viewed. Call identify() first.',
-        'userId',
-      );
-    }
-    this.dismissed.add(messageId);
-    this.renderer?.dismiss(messageId);
-    await this.api.markViewed(messageId, this.userId);
-  }
+	/**
+	 * Record that the current user has viewed a message.
+	 * The message is optimistically removed from the UI.
+	 *
+	 * @throws {ValidationError} When no user ID has been set
+	 * @throws {ApiError} When the API returns an error
+	 */
+	async markViewed(messageId: string): Promise<void> {
+		if (!this.userId) {
+			throw new ValidationError(
+				"User ID is required to mark a message as viewed. Call identify() first.",
+				"userId",
+			);
+		}
+		this.dismissed.add(messageId);
+		this.renderer?.dismiss(messageId);
+		await this.api.markViewed(messageId, this.userId);
+	}
 
-  // ── Data-only methods ─────────────────────────────────────────
+	// ── Data-only methods ─────────────────────────────────────────
 
-  /**
-   * Fetch active messages without rendering.
-   * Use this when `autoShow: false` or for custom rendering.
-   *
-   * @param options - Metadata for targeting evaluation
-   * @throws {AuthenticationError} When the API key is invalid
-   * @throws {ApiError} When the API returns an error
-   * @throws {TimeoutError} When the request times out
-   */
-  async getMessages(options?: GetMessagesOptions): Promise<InAppMessage[]> {
-    return this.api.getMessages(options);
-  }
+	/**
+	 * Fetch active messages without rendering.
+	 * Use this when `autoShow: false` or for custom rendering.
+	 *
+	 * @param options - Metadata for targeting evaluation
+	 * @throws {AuthenticationError} When the API key is invalid
+	 * @throws {ApiError} When the API returns an error
+	 * @throws {TimeoutError} When the request times out
+	 */
+	async getMessages(options?: GetMessagesOptions): Promise<InAppMessage[]> {
+		return this.api.getMessages(options);
+	}
 
-  /**
-   * Subscribe to messages with polling (data-only, no rendering).
-   * Returns an unsubscribe function.
-   *
-   * @example
-   * ```typescript
-   * const unsub = messaging.subscribe(
-   *   (messages) => renderMyUI(messages),
-   *   { pollInterval: 30_000 },
-   * );
-   *
-   * // Later
-   * unsub();
-   * ```
-   */
-  subscribe(
-    callback: (messages: InAppMessage[]) => void,
-    options?: SubscribeOptions,
-  ): () => void {
-    const interval = options?.pollInterval ?? DEFAULT_POLL_INTERVAL;
-    let active = true;
+	/**
+	 * Subscribe to messages with polling (data-only, no rendering).
+	 * Returns an unsubscribe function.
+	 *
+	 * @example
+	 * ```typescript
+	 * const unsub = messaging.subscribe(
+	 *   (messages) => renderMyUI(messages),
+	 *   { pollInterval: 30_000 },
+	 * );
+	 *
+	 * // Later
+	 * unsub();
+	 * ```
+	 */
+	subscribe(callback: (messages: InAppMessage[]) => void, options?: SubscribeOptions): () => void {
+		const interval = options?.pollInterval ?? DEFAULT_POLL_INTERVAL;
+		let active = true;
 
-    const run = async () => {
-      if (!active) return;
-      try {
-        const msgs = await this.api.getMessages(options);
-        if (active) callback(msgs);
-      } catch {
-        /* skip failed polls */
-      }
-    };
+		const run = async () => {
+			if (!active) return;
+			try {
+				const msgs = await this.api.getMessages(options);
+				if (active) callback(msgs);
+			} catch {
+				/* skip failed polls */
+			}
+		};
 
-    run();
-    const tid = setInterval(run, interval);
-    this.subscriptionTimers.add(tid);
+		run();
+		const tid = setInterval(run, interval);
+		this.subscriptionTimers.add(tid);
 
-    return () => {
-      active = false;
-      clearInterval(tid);
-      this.subscriptionTimers.delete(tid);
-    };
-  }
+		return () => {
+			active = false;
+			clearInterval(tid);
+			this.subscriptionTimers.delete(tid);
+		};
+	}
 
-  // ── Internal ──────────────────────────────────────────────────
+	// ── Internal ──────────────────────────────────────────────────
 
-  private async poll(): Promise<void> {
-    if (typeof document !== 'undefined' && document.visibilityState === 'hidden') {
-      this.pendingPoll = true;
-      return;
-    }
+	private async poll(): Promise<void> {
+		if (typeof document !== "undefined" && document.visibilityState === "hidden") {
+			this.pendingPoll = true;
+			return;
+		}
 
-    try {
-      const messages = await this.api.getMessages({
-        userId: this.userId,
-        metadata: this.config.metadata,
-      });
+		try {
+			const messages = await this.api.getMessages({
+				userId: this.userId,
+				metadata: this.config.metadata,
+			});
 
-      // Filter out messages dismissed in this session
-      const visible = messages.filter((m) => !this.dismissed.has(m.id));
+			// Filter out messages dismissed in this session
+			const visible = messages.filter((m) => !this.dismissed.has(m.id));
 
-      this.renderer?.update(visible);
-    } catch {
-      /* silently skip failed polls */
-    }
-  }
+			this.renderer?.update(visible);
+		} catch {
+			/* silently skip failed polls */
+		}
+	}
 }

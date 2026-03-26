@@ -1,32 +1,32 @@
-import { useState, useCallback } from 'react';
-import type { TrackOptions, TrackResponse } from '@kitbase/sdk/events';
-import { useEventsContext } from './context.js';
+import { useState, useCallback } from "react";
+import type { TrackOptions, TrackResponse } from "@kitbase/sdk/events";
+import { useEventsContext } from "./context.js";
 
 export interface UseTrackResult {
-  /**
-   * Track an event
-   */
-  track: (options: TrackOptions) => Promise<TrackResponse | undefined>;
+	/**
+	 * Track an event
+	 */
+	track: (options: TrackOptions) => Promise<TrackResponse | undefined>;
 
-  /**
-   * Whether a tracking request is in progress
-   */
-  isLoading: boolean;
+	/**
+	 * Whether a tracking request is in progress
+	 */
+	isLoading: boolean;
 
-  /**
-   * Any error that occurred during the last track call
-   */
-  error: Error | null;
+	/**
+	 * Any error that occurred during the last track call
+	 */
+	error: Error | null;
 
-  /**
-   * The response from the last successful track call
-   */
-  data: TrackResponse | undefined;
+	/**
+	 * The response from the last successful track call
+	 */
+	data: TrackResponse | undefined;
 
-  /**
-   * Reset the state (clear data and error)
-   */
-  reset: () => void;
+	/**
+	 * Reset the state (clear data and error)
+	 */
+	reset: () => void;
 }
 
 /**
@@ -61,43 +61,43 @@ export interface UseTrackResult {
  * ```
  */
 export function useTrack(): UseTrackResult {
-  const events = useEventsContext();
-  const [data, setData] = useState<TrackResponse | undefined>(undefined);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+	const events = useEventsContext();
+	const [data, setData] = useState<TrackResponse | undefined>(undefined);
+	const [isLoading, setIsLoading] = useState(false);
+	const [error, setError] = useState<Error | null>(null);
 
-  const track = useCallback(
-    async (options: TrackOptions) => {
-      setIsLoading(true);
-      setError(null);
+	const track = useCallback(
+		async (options: TrackOptions) => {
+			setIsLoading(true);
+			setError(null);
 
-      try {
-        const response = await events.track(options);
-        setData(response);
-        return response;
-      } catch (err) {
-        const error = err instanceof Error ? err : new Error(String(err));
-        setError(error);
-        return undefined;
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [events],
-  );
+			try {
+				const response = await events.track(options);
+				setData(response);
+				return response;
+			} catch (err) {
+				const error = err instanceof Error ? err : new Error(String(err));
+				setError(error);
+				return undefined;
+			} finally {
+				setIsLoading(false);
+			}
+		},
+		[events],
+	);
 
-  const reset = useCallback(() => {
-    setData(undefined);
-    setError(null);
-  }, []);
+	const reset = useCallback(() => {
+		setData(undefined);
+		setError(null);
+	}, []);
 
-  return {
-    track,
-    isLoading,
-    error,
-    data,
-    reset,
-  };
+	return {
+		track,
+		isLoading,
+		error,
+		data,
+		reset,
+	};
 }
 
 /**
@@ -125,28 +125,26 @@ export function useTrack(): UseTrackResult {
  * ```
  */
 export function useTrackChannel(channel: string): {
-  trackChannel: (
-    options: Omit<TrackOptions, 'channel'>,
-  ) => Promise<TrackResponse | undefined>;
-  isLoading: boolean;
-  error: Error | null;
-  data: TrackResponse | undefined;
-  reset: () => void;
+	trackChannel: (options: Omit<TrackOptions, "channel">) => Promise<TrackResponse | undefined>;
+	isLoading: boolean;
+	error: Error | null;
+	data: TrackResponse | undefined;
+	reset: () => void;
 } {
-  const { track, isLoading, error, data, reset } = useTrack();
+	const { track, isLoading, error, data, reset } = useTrack();
 
-  const trackChannel = useCallback(
-    async (options: Omit<TrackOptions, 'channel'>) => {
-      return track({ ...options, channel });
-    },
-    [track, channel],
-  );
+	const trackChannel = useCallback(
+		async (options: Omit<TrackOptions, "channel">) => {
+			return track({ ...options, channel });
+		},
+		[track, channel],
+	);
 
-  return {
-    trackChannel,
-    isLoading,
-    error,
-    data,
-    reset,
-  };
+	return {
+		trackChannel,
+		isLoading,
+		error,
+		data,
+		reset,
+	};
 }

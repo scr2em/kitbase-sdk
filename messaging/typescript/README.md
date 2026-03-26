@@ -15,12 +15,12 @@ yarn add @kitbase/messaging
 ## Quick Start
 
 ```typescript
-import { init } from '@kitbase/messaging';
+import { init } from "@kitbase/messaging";
 
 const messaging = init({
-  sdkKey: 'your-sdk-key',
-  userId: currentUser.id,
-  metadata: { plan: 'pro' },
+	sdkKey: "your-sdk-key",
+	userId: currentUser.id,
+	metadata: { plan: "pro" },
 });
 
 // Messages are fetched and rendered automatically!
@@ -42,11 +42,11 @@ No bundler required. Works with any page — PHP, WordPress, static HTML, etc.
 
 ```html
 <script>
-  window.KITBASE_MESSAGING = {
-    sdkKey: 'your-sdk-key',
-    userId: 'user_123',
-    metadata: { plan: 'free', country: 'US' },
-  };
+	window.KITBASE_MESSAGING = {
+		sdkKey: "your-sdk-key",
+		userId: "user_123",
+		metadata: { plan: "free", country: "US" },
+	};
 </script>
 <script src="https://unpkg.com/@kitbase/messaging/dist/cdn.js"></script>
 <!-- Messages appear automatically! -->
@@ -56,8 +56,8 @@ The script auto-initializes and exposes `window.kitbaseMessaging` for further co
 
 ```html
 <script>
-  // After user logs in
-  window.kitbaseMessaging.identify('user_456');
+	// After user logs in
+	window.kitbaseMessaging.identify("user_456");
 </script>
 ```
 
@@ -66,26 +66,26 @@ Or initialize manually:
 ```html
 <script src="https://unpkg.com/@kitbase/messaging/dist/cdn.js"></script>
 <script>
-  var messaging = KitbaseMessaging.init({ sdkKey: 'your-sdk-key' });
+	var messaging = KitbaseMessaging.init({ sdkKey: "your-sdk-key" });
 
-  messaging.identify('user_123');
-  messaging.close(); // clean up
+	messaging.identify("user_123");
+	messaging.close(); // clean up
 </script>
 ```
 
 ## Configuration
 
-| Option | Type | Default | Description |
-|---|---|---|---|
-| `sdkKey` | `string` | **(required)** | Your Kitbase SDK key |
-| `baseUrl` | `string` | `'https://api.kitbase.dev'` | API base URL (for self-hosted instances) |
-| `userId` | `string` | — | Current user ID. Filters out already-viewed show-once messages |
-| `metadata` | `Record<string, string>` | — | Key-value pairs for targeting evaluation |
-| `pollInterval` | `number` | `60000` | Polling interval in ms. Set to `0` to fetch once only |
-| `autoShow` | `boolean` | `true` | Automatically render messages in the page |
-| `onShow` | `(message) => void` | — | Called when a message is displayed |
-| `onDismiss` | `(message) => void` | — | Called when a message is dismissed |
-| `onAction` | `(message, button) => void \| false` | — | Called on button click. Return `false` to prevent navigation |
+| Option         | Type                                 | Default                     | Description                                                    |
+| -------------- | ------------------------------------ | --------------------------- | -------------------------------------------------------------- |
+| `sdkKey`       | `string`                             | **(required)**              | Your Kitbase SDK key                                           |
+| `baseUrl`      | `string`                             | `'https://api.kitbase.dev'` | API base URL (for self-hosted instances)                       |
+| `userId`       | `string`                             | —                           | Current user ID. Filters out already-viewed show-once messages |
+| `metadata`     | `Record<string, string>`             | —                           | Key-value pairs for targeting evaluation                       |
+| `pollInterval` | `number`                             | `60000`                     | Polling interval in ms. Set to `0` to fetch once only          |
+| `autoShow`     | `boolean`                            | `true`                      | Automatically render messages in the page                      |
+| `onShow`       | `(message) => void`                  | —                           | Called when a message is displayed                             |
+| `onDismiss`    | `(message) => void`                  | —                           | Called when a message is dismissed                             |
+| `onAction`     | `(message, button) => void \| false` | —                           | Called on button click. Return `false` to prevent navigation   |
 
 ## API
 
@@ -94,9 +94,9 @@ Or initialize manually:
 Initialize the SDK. Creates a singleton instance.
 
 ```typescript
-import { init } from '@kitbase/messaging';
+import { init } from "@kitbase/messaging";
 
-const messaging = init({ sdkKey: 'your-sdk-key' });
+const messaging = init({ sdkKey: "your-sdk-key" });
 ```
 
 ### `getInstance(): Messaging | null`
@@ -104,7 +104,7 @@ const messaging = init({ sdkKey: 'your-sdk-key' });
 Get the current singleton instance.
 
 ```typescript
-import { getInstance } from '@kitbase/messaging';
+import { getInstance } from "@kitbase/messaging";
 
 const messaging = getInstance();
 ```
@@ -114,7 +114,7 @@ const messaging = getInstance();
 Set the current user. Triggers an immediate re-fetch to filter out already-viewed show-once messages.
 
 ```typescript
-messaging.identify('user_123');
+messaging.identify("user_123");
 ```
 
 ### `messaging.reset()`
@@ -130,7 +130,7 @@ messaging.reset();
 Record that the user has viewed a message. The message is removed from the UI immediately and the view is recorded on the server. Requires `identify()` to have been called first.
 
 ```typescript
-messaging.markViewed('msg_abc');
+messaging.markViewed("msg_abc");
 ```
 
 ### `messaging.getMessages(options?)`
@@ -138,7 +138,7 @@ messaging.markViewed('msg_abc');
 Fetch messages without rendering (data-only). Useful with `autoShow: false`.
 
 ```typescript
-const messaging = init({ sdkKey: '...', autoShow: false });
+const messaging = init({ sdkKey: "...", autoShow: false });
 const messages = await messaging.getMessages();
 ```
 
@@ -147,10 +147,7 @@ const messages = await messaging.getMessages();
 Subscribe to messages with polling. Returns an unsubscribe function.
 
 ```typescript
-const unsub = messaging.subscribe(
-  (messages) => renderMyUI(messages),
-  { pollInterval: 30_000 },
-);
+const unsub = messaging.subscribe((messages) => renderMyUI(messages), { pollInterval: 30_000 });
 
 // Later
 unsub();
@@ -164,12 +161,12 @@ Stop polling, remove all rendered UI, and clean up.
 
 The SDK renders four message types, each with automatic stacking:
 
-| Type | Behavior |
-|---|---|
-| `modal` | Centered overlay with backdrop |
-| `banner` | Fixed to top, stacks vertically |
-| `card` | Fixed to bottom-right, stacks vertically |
-| `image` | Full-screen image overlay |
+| Type     | Behavior                                 |
+| -------- | ---------------------------------------- |
+| `modal`  | Centered overlay with backdrop           |
+| `banner` | Fixed to top, stacks vertically          |
+| `card`   | Fixed to bottom-right, stacks vertically |
+| `image`  | Full-screen image overlay                |
 
 All rendering uses shadow DOM for complete style isolation from your page.
 
@@ -183,25 +180,25 @@ All rendering uses shadow DOM for complete style isolation from your page.
 
 ```typescript
 import type {
-  MessagingConfig,
-  InAppMessage,
-  MessageType,
-  MessageButton,
-  GetMessagesOptions,
-  SubscribeOptions,
-} from '@kitbase/messaging';
+	MessagingConfig,
+	InAppMessage,
+	MessageType,
+	MessageButton,
+	GetMessagesOptions,
+	SubscribeOptions,
+} from "@kitbase/messaging";
 ```
 
 ## Error Types
 
 ```typescript
 import {
-  MessagingError,      // Base error
-  AuthenticationError,  // Invalid SDK key (401)
-  ApiError,             // API error (non-2xx)
-  ValidationError,      // Invalid config or missing params
-  TimeoutError,         // Request timed out
-} from '@kitbase/messaging';
+	MessagingError, // Base error
+	AuthenticationError, // Invalid SDK key (401)
+	ApiError, // API error (non-2xx)
+	ValidationError, // Invalid config or missing params
+	TimeoutError, // Request timed out
+} from "@kitbase/messaging";
 ```
 
 ## License

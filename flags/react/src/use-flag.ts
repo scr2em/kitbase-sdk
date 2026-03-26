@@ -1,21 +1,15 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import type {
-  EvaluationContext,
-  JsonValue,
-} from '@kitbase/flags';
-import { useFlagsContext } from './context.js';
-import type { UseFlagOptions, UseFlagResult } from './types.js';
+import { useState, useEffect, useCallback, useRef } from "react";
+import type { EvaluationContext, JsonValue } from "@kitbase/flags";
+import { useFlagsContext } from "./context.js";
+import type { UseFlagOptions, UseFlagResult } from "./types.js";
 
 /**
  * Deep equality check for context objects
  */
-function contextEqual(
-  a: EvaluationContext | undefined,
-  b: EvaluationContext | undefined,
-): boolean {
-  if (a === b) return true;
-  if (!a || !b) return false;
-  return JSON.stringify(a) === JSON.stringify(b);
+function contextEqual(a: EvaluationContext | undefined, b: EvaluationContext | undefined): boolean {
+	if (a === b) return true;
+	if (!a || !b) return false;
+	return JSON.stringify(a) === JSON.stringify(b);
 }
 
 /**
@@ -37,11 +31,8 @@ function contextEqual(
  * }
  * ```
  */
-export function useBooleanFlag(
-  flagKey: string,
-  options?: UseFlagOptions,
-): UseFlagResult<boolean> {
-  return useTypedFlag(flagKey, 'boolean', options);
+export function useBooleanFlag(flagKey: string, options?: UseFlagOptions): UseFlagResult<boolean> {
+	return useTypedFlag(flagKey, "boolean", options);
 }
 
 /**
@@ -62,11 +53,8 @@ export function useBooleanFlag(
  * }
  * ```
  */
-export function useStringFlag(
-  flagKey: string,
-  options?: UseFlagOptions,
-): UseFlagResult<string> {
-  return useTypedFlag(flagKey, 'string', options);
+export function useStringFlag(flagKey: string, options?: UseFlagOptions): UseFlagResult<string> {
+	return useTypedFlag(flagKey, "string", options);
 }
 
 /**
@@ -87,11 +75,8 @@ export function useStringFlag(
  * }
  * ```
  */
-export function useNumberFlag(
-  flagKey: string,
-  options?: UseFlagOptions,
-): UseFlagResult<number> {
-  return useTypedFlag(flagKey, 'number', options);
+export function useNumberFlag(flagKey: string, options?: UseFlagOptions): UseFlagResult<number> {
+	return useTypedFlag(flagKey, "number", options);
 }
 
 /**
@@ -120,113 +105,96 @@ export function useNumberFlag(
  * ```
  */
 export function useJsonFlag<T extends JsonValue = JsonValue>(
-  flagKey: string,
-  options?: UseFlagOptions,
+	flagKey: string,
+	options?: UseFlagOptions,
 ): UseFlagResult<T> {
-  return useTypedFlag(flagKey, 'json', options);
+	return useTypedFlag(flagKey, "json", options);
 }
 
 /**
  * Internal hook for typed flag values
  */
 function useTypedFlag<T extends boolean | string | number | JsonValue>(
-  flagKey: string,
-  type: 'boolean' | 'string' | 'number' | 'json',
-  options?: UseFlagOptions,
+	flagKey: string,
+	type: "boolean" | "string" | "number" | "json",
+	options?: UseFlagOptions,
 ): UseFlagResult<T> {
-  const flags = useFlagsContext();
-  const [data, setData] = useState<T | undefined>(undefined);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+	const flags = useFlagsContext();
+	const [data, setData] = useState<T | undefined>(undefined);
+	const [isLoading, setIsLoading] = useState(true);
+	const [error, setError] = useState<Error | null>(null);
 
-  const contextRef = useRef(options?.context);
-  const refetchOnContextChange = options?.refetchOnContextChange ?? true;
+	const contextRef = useRef(options?.context);
+	const refetchOnContextChange = options?.refetchOnContextChange ?? true;
 
-  const fetchFlag = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
+	const fetchFlag = useCallback(async () => {
+		setIsLoading(true);
+		setError(null);
 
-    try {
-      let value: T;
+		try {
+			let value: T;
 
-      switch (type) {
-        case 'boolean':
-          value = (await flags.getBooleanValue(
-            flagKey,
-            options?.context,
-          )) as T;
-          break;
-        case 'string':
-          value = (await flags.getStringValue(
-            flagKey,
-            options?.context,
-          )) as T;
-          break;
-        case 'number':
-          value = (await flags.getNumberValue(
-            flagKey,
-            options?.context,
-          )) as T;
-          break;
-        case 'json':
-          value = (await flags.getJsonValue(
-            flagKey,
-            options?.context,
-          )) as T;
-          break;
-      }
+			switch (type) {
+				case "boolean":
+					value = (await flags.getBooleanValue(flagKey, options?.context)) as T;
+					break;
+				case "string":
+					value = (await flags.getStringValue(flagKey, options?.context)) as T;
+					break;
+				case "number":
+					value = (await flags.getNumberValue(flagKey, options?.context)) as T;
+					break;
+				case "json":
+					value = (await flags.getJsonValue(flagKey, options?.context)) as T;
+					break;
+			}
 
-      setData(value);
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error(String(err)));
-    } finally {
-      setIsLoading(false);
-    }
-  }, [flags, flagKey, type, options?.context]);
+			setData(value);
+		} catch (err) {
+			setError(err instanceof Error ? err : new Error(String(err)));
+		} finally {
+			setIsLoading(false);
+		}
+	}, [flags, flagKey, type, options?.context]);
 
-  useEffect(() => {
-    // Check if context changed
-    if (
-      refetchOnContextChange &&
-      !contextEqual(contextRef.current, options?.context)
-    ) {
-      contextRef.current = options?.context;
-      fetchFlag();
-    }
-  }, [options?.context, refetchOnContextChange, fetchFlag]);
+	useEffect(() => {
+		// Check if context changed
+		if (refetchOnContextChange && !contextEqual(contextRef.current, options?.context)) {
+			contextRef.current = options?.context;
+			fetchFlag();
+		}
+	}, [options?.context, refetchOnContextChange, fetchFlag]);
 
+	useEffect(() => {
+		// If client is already ready, fetch immediately
+		if (flags.isReady()) {
+			fetchFlag();
+		}
 
+		// Listen for ready event (initial load)
+		const unsubscribeReady = flags.on((event) => {
+			if (event.type === "ready") {
+				fetchFlag();
+			}
+		});
 
-  useEffect(() => {
-    // If client is already ready, fetch immediately
-    if (flags.isReady()) {
-      fetchFlag();
-    }
+		// Listen for flag changes - only refetch when this specific flag changes
+		const { unsubscribe: unsubscribeFlagChange } = flags.onFlagChange((changedFlags) => {
+			if (flagKey in changedFlags) {
+				fetchFlag();
+			}
+		});
 
-    // Listen for ready event (initial load)
-    const unsubscribeReady = flags.on((event) => {
-      if (event.type === 'ready') {
-        fetchFlag();
-      }
-    });
+		return () => {
+			unsubscribeReady();
+			unsubscribeFlagChange();
+		};
+	}, [flags, flagKey, fetchFlag]);
 
-    // Listen for flag changes - only refetch when this specific flag changes
-    const { unsubscribe: unsubscribeFlagChange } = flags.onFlagChange((changedFlags) => {
-      if (flagKey in changedFlags) {
-        fetchFlag();
-      }
-    });
-
-    return () => {
-      unsubscribeReady();
-      unsubscribeFlagChange();
-    };
-  }, [flags, flagKey, fetchFlag]);
-
-  return {
-    data,
-    isLoading,
-    error,
-    refetch: fetchFlag,
-  };
+	return {
+		data,
+		isLoading,
+		error,
+		refetch: fetchFlag,
+	};
 }

@@ -1,57 +1,57 @@
 {
-  "name": "@kitbase/analytics-angular",
-  "version": "0.1.7",
-  "description": "Angular integration for Kitbase Analytics SDK",
-  "type": "module",
-  "module": "./dist/fesm2022/kitbase-analytics-angular.mjs",
-  "typings": "./dist/index.d.ts",
-  "exports": {
-    "./package.json": {
-      "default": "./package.json"
-    },
-    ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/fesm2022/kitbase-analytics-angular.mjs"
-    }
-  },
-  "files": [
-    "dist"
-  ],
-  "sideEffects": false,
-  "scripts": {
-    "build": "ng-packagr -p ng-package.json",
-    "test": "vitest run",
-    "lint": "eslint src",
-    "clean": "rm -rf dist"
-  },
-  "keywords": [
-    "kitbase",
-    "analytics",
-    "tracking",
-    "angular",
-    "service"
-  ],
-  "author": "",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/scr2em/kitbase-sdk.git",
-    "directory": "customEvents/typescript/packages/angular"
-  },
-  "peerDependencies": {
-    "@angular/common": ">=17.0.0",
-    "@angular/core": ">=17.0.0"
-  },
-  "dependencies": {
-    "@kitbase/analytics": "workspace:*"
-  },
-  "devDependencies": {
-    "@angular/common": "^20.0.0",
-    "@angular/compiler": "^20.0.0",
-    "@angular/compiler-cli": "^20.0.0",
-    "@angular/core": "^20.0.0",
-    "ng-packagr": "^20.0.0",
-    "typescript": "^5.8.0",
-    "vitest": "^1.2.0"
-  }
+	"name": "@kitbase/analytics-angular",
+	"version": "0.1.7",
+	"description": "Angular integration for Kitbase Analytics SDK",
+	"keywords": [
+		"analytics",
+		"angular",
+		"kitbase",
+		"service",
+		"tracking"
+	],
+	"license": "MIT",
+	"author": "",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/scr2em/kitbase-sdk.git",
+		"directory": "customEvents/typescript/packages/angular"
+	},
+	"files": [
+		"dist"
+	],
+	"type": "module",
+	"sideEffects": false,
+	"module": "./dist/fesm2022/kitbase-analytics-angular.mjs",
+	"typings": "./dist/index.d.ts",
+	"exports": {
+		"./package.json": {
+			"default": "./package.json"
+		},
+		".": {
+			"types": "./dist/index.d.ts",
+			"default": "./dist/fesm2022/kitbase-analytics-angular.mjs"
+		}
+	},
+	"scripts": {
+		"build": "ng-packagr -p ng-package.json",
+		"test": "vitest run",
+		"lint": "oxlint src",
+		"clean": "rm -rf dist"
+	},
+	"dependencies": {
+		"@kitbase/analytics": "workspace:*"
+	},
+	"devDependencies": {
+		"@angular/common": "^20.0.0",
+		"@angular/compiler": "^20.0.0",
+		"@angular/compiler-cli": "^20.0.0",
+		"@angular/core": "^20.0.0",
+		"ng-packagr": "^20.0.0",
+		"typescript": "^5.8.0",
+		"vitest": "^1.2.0"
+	},
+	"peerDependencies": {
+		"@angular/common": ">=17.0.0",
+		"@angular/core": ">=17.0.0"
+	}
 }

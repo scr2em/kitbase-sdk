@@ -1,7 +1,7 @@
-import { makeEnvironmentProviders, type EnvironmentProviders } from '@angular/core';
-import type { FlagsConfig } from '@kitbase/flags';
-import { FLAGS_CONFIG } from './types.js';
-import { FlagsService } from './flags.service.js';
+import { makeEnvironmentProviders, type EnvironmentProviders } from "@angular/core";
+import type { FlagsConfig } from "@kitbase/flags";
+import { FLAGS_CONFIG } from "./types.js";
+import { FlagsService } from "./flags.service.js";
 
 /**
  * Provides the Kitbase Feature Flags service for Angular standalone applications.
@@ -49,11 +49,11 @@ import { FlagsService } from './flags.service.js';
  * ```
  */
 export function provideFlags(config: FlagsConfig): EnvironmentProviders {
-  return makeEnvironmentProviders([
-    {
-      provide: FLAGS_CONFIG,
-      useValue: config,
-    },
-    FlagsService,
-  ]);
+	return makeEnvironmentProviders([
+		{
+			provide: FLAGS_CONFIG,
+			useValue: config,
+		},
+		FlagsService,
+	]);
 }

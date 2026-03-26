@@ -15,18 +15,18 @@ yarn add @kitbase/analytics
 ## Quick Start
 
 ```typescript
-import { Kitbase } from '@kitbase/analytics';
+import { Kitbase } from "@kitbase/analytics";
 
 const kitbase = new Kitbase({
-  sdkKey: 'your-api-key',
-  debug: true,
+	sdkKey: "your-api-key",
+	debug: true,
 });
 
 // Track a custom event
 await kitbase.track({
-  channel: 'payments',
-  event: 'Purchase Completed',
-  tags: { product_id: 'prod_123', amount: 4999 },
+	channel: "payments",
+	event: "Purchase Completed",
+	tags: { product_id: "prod_123", amount: 4999 },
 });
 ```
 
@@ -35,16 +35,16 @@ await kitbase.track({
 For a smaller bundle without offline queue support:
 
 ```typescript
-import { KitbaseAnalytics } from '@kitbase/analytics/lite';
+import { KitbaseAnalytics } from "@kitbase/analytics/lite";
 
-const kitbase = new KitbaseAnalytics({ sdkKey: 'your-api-key' });
+const kitbase = new KitbaseAnalytics({ sdkKey: "your-api-key" });
 ```
 
 ### Script Tag (CDN)
 
 ```html
 <script>
-  window.KITBASE_CONFIG = { sdkKey: 'your-api-key' };
+	window.KITBASE_CONFIG = { sdkKey: "your-api-key" };
 </script>
 <script defer src="https://kitbase.dev/script.js"></script>
 ```
@@ -53,11 +53,11 @@ The script auto-initializes and exposes `window.kitbase` for tracking events:
 
 ```html
 <script>
-  window.kitbase.track({
-    channel: 'web',
-    event: 'Button Clicked',
-    tags: { button_id: 'signup' },
-  });
+	window.kitbase.track({
+		channel: "web",
+		event: "Button Clicked",
+		tags: { button_id: "signup" },
+	});
 </script>
 ```
 
@@ -65,35 +65,35 @@ The script auto-initializes and exposes `window.kitbase` for tracking events:
 
 ```typescript
 const kitbase = new Kitbase({
-  // Required
-  sdkKey: 'your-api-key',
+	// Required
+	sdkKey: "your-api-key",
 
-  // Optional
-  debug: false,
-  baseUrl: 'https://api.kitbase.dev',
+	// Optional
+	debug: false,
+	baseUrl: "https://api.kitbase.dev",
 
-  analytics: {
-    autoTrackPageViews: true,      // track route changes automatically
-    trackBfcacheRestore: true,     // track pageview on bfcache restore (back/forward in MPAs)
-    autoTrackOutboundLinks: true,  // track external link clicks
-    autoTrackClicks: true,         // track button/link/input clicks + data-kb-track-click
-    autoTrackScrollDepth: true,    // track max scroll depth per page
-    autoTrackVisibility: true,     // track visibility duration via data attributes
-    autoTrackWebVitals: false,     // track Core Web Vitals (LCP, CLS, INP, FCP, TTFB)
-    autoDetectFrustration: true,   // detect rage clicks and dead clicks
-  },
+	analytics: {
+		autoTrackPageViews: true, // track route changes automatically
+		trackBfcacheRestore: true, // track pageview on bfcache restore (back/forward in MPAs)
+		autoTrackOutboundLinks: true, // track external link clicks
+		autoTrackClicks: true, // track button/link/input clicks + data-kb-track-click
+		autoTrackScrollDepth: true, // track max scroll depth per page
+		autoTrackVisibility: true, // track visibility duration via data attributes
+		autoTrackWebVitals: false, // track Core Web Vitals (LCP, CLS, INP, FCP, TTFB)
+		autoDetectFrustration: true, // detect rage clicks and dead clicks
+	},
 
-  offline: {
-    enabled: true,
-    maxQueueSize: 1000,
-    flushInterval: 30000,
-    flushBatchSize: 50,
-    maxRetries: 3,
-  },
+	offline: {
+		enabled: true,
+		maxQueueSize: 1000,
+		flushInterval: 30000,
+		flushBatchSize: 50,
+		maxRetries: 3,
+	},
 
-  botDetection: {
-    enabled: false,
-  },
+	botDetection: {
+		enabled: false,
+	},
 });
 ```
 
@@ -101,16 +101,16 @@ const kitbase = new Kitbase({
 
 All enabled by default. The SDK automatically tracks:
 
-| Event | Channel | Trigger | Config |
-|-------|---------|---------|--------|
-| `screen_view` | `__analytics` | Page navigation (init, pushState, popstate) | `autoTrackPageViews` (default `true`) |
-| `screen_view` | `__analytics` | Page restored from bfcache (back/forward in MPAs) | `trackBfcacheRestore` (default `true`) |
-| `outbound_link` | `__analytics` | Click on external link | `autoTrackOutboundLinks` (default `true`) |
-| `click` | `__analytics` | Click on interactive element | `autoTrackClicks` (default `true`) |
-| `scroll_depth` | `__analytics` | Navigation / unload (max depth per page) | `autoTrackScrollDepth` (default `true`) |
-| `rage_click` | `__analytics` | 3+ clicks within 1s in same area | `autoDetectFrustration` (default `true`) |
-| `dead_click` | `__analytics` | Click with no DOM change within 1s | `autoDetectFrustration` (default `true`) |
-| `web_vitals` | `__analytics` | Once per page load | `autoTrackWebVitals` (default `false`) |
+| Event           | Channel       | Trigger                                           | Config                                    |
+| --------------- | ------------- | ------------------------------------------------- | ----------------------------------------- |
+| `screen_view`   | `__analytics` | Page navigation (init, pushState, popstate)       | `autoTrackPageViews` (default `true`)     |
+| `screen_view`   | `__analytics` | Page restored from bfcache (back/forward in MPAs) | `trackBfcacheRestore` (default `true`)    |
+| `outbound_link` | `__analytics` | Click on external link                            | `autoTrackOutboundLinks` (default `true`) |
+| `click`         | `__analytics` | Click on interactive element                      | `autoTrackClicks` (default `true`)        |
+| `scroll_depth`  | `__analytics` | Navigation / unload (max depth per page)          | `autoTrackScrollDepth` (default `true`)   |
+| `rage_click`    | `__analytics` | 3+ clicks within 1s in same area                  | `autoDetectFrustration` (default `true`)  |
+| `dead_click`    | `__analytics` | Click with no DOM change within 1s                | `autoDetectFrustration` (default `true`)  |
+| `web_vitals`    | `__analytics` | Once per page load                                | `autoTrackWebVitals` (default `false`)    |
 
 Page views, clicks, outbound links, scroll depth, and frustration signals are tracked automatically. The SDK intercepts `history.pushState`/`popstate` for SPA support — no framework router integration needed. For multi-page sites, the SDK also listens for bfcache restores (`pageshow` with `persisted`) so back/forward navigation is counted even when scripts don't re-execute.
 
@@ -127,15 +127,13 @@ Fire a named event when a user clicks an element:
 <button data-kb-track-click="CTA Clicked">Sign Up Now</button>
 
 <!-- With custom channel -->
-<button data-kb-track-click="Add to Cart" data-kb-click-channel="ecommerce">
-  Add to Cart
-</button>
+<button data-kb-track-click="Add to Cart" data-kb-click-channel="ecommerce">Add to Cart</button>
 ```
 
-| Attribute | Required | Default | Description |
-|-----------|----------|---------|-------------|
-| `data-kb-track-click` | Yes | — | Event name to fire |
-| `data-kb-click-channel` | No | `'engagement'` | Channel for the event |
+| Attribute               | Required | Default        | Description           |
+| ----------------------- | -------- | -------------- | --------------------- |
+| `data-kb-track-click`   | Yes      | —              | Event name to fire    |
+| `data-kb-click-channel` | No       | `'engagement'` | Channel for the event |
 
 Elements with `data-kb-track-click` skip the generic auto-click tracking to avoid double-counting. Disable with `autoTrackClicks: false`.
 
@@ -149,17 +147,19 @@ Track how long elements are visible in the viewport:
 
 <!-- With optional channel and threshold -->
 <div
-  data-kb-track-visibility="Hero Banner Viewed"
-  data-kb-visibility-channel="marketing"
-  data-kb-visibility-threshold="0.5"
->...</div>
+	data-kb-track-visibility="Hero Banner Viewed"
+	data-kb-visibility-channel="marketing"
+	data-kb-visibility-threshold="0.5"
+>
+	...
+</div>
 ```
 
-| Attribute | Required | Default | Description |
-|-----------|----------|---------|-------------|
-| `data-kb-track-visibility` | Yes | — | Event name to fire |
-| `data-kb-visibility-channel` | No | `'engagement'` | Channel for the event |
-| `data-kb-visibility-threshold` | No | `0.5` | IntersectionObserver threshold (0–1) |
+| Attribute                      | Required | Default        | Description                          |
+| ------------------------------ | -------- | -------------- | ------------------------------------ |
+| `data-kb-track-visibility`     | Yes      | —              | Event name to fire                   |
+| `data-kb-visibility-channel`   | No       | `'engagement'` | Channel for the event                |
+| `data-kb-visibility-threshold` | No       | `0.5`          | IntersectionObserver threshold (0–1) |
 
 Fires an event with `duration_seconds` and `duration_ms` tags when the element leaves the viewport, is removed from the DOM, or the user navigates away. Dynamically added elements are picked up via MutationObserver. Disable with `autoTrackVisibility: false`.
 
@@ -169,22 +169,22 @@ Track [Core Web Vitals](https://web.dev/vitals/) by enabling `autoTrackWebVitals
 
 ```typescript
 const kitbase = new Kitbase({
-  sdkKey: 'your-api-key',
-  analytics: {
-    autoTrackWebVitals: true,
-  },
+	sdkKey: "your-api-key",
+	analytics: {
+		autoTrackWebVitals: true,
+	},
 });
 ```
 
 The SDK collects all 5 metrics and sends them as a single `web_vitals` event on the `__analytics` channel:
 
-| Tag | Metric | Description |
-|-----|--------|-------------|
-| `__lcp` | Largest Contentful Paint | Loading performance (ms) |
-| `__cls` | Cumulative Layout Shift | Visual stability (score) |
-| `__inp` | Interaction to Next Paint | Interactivity (ms) |
-| `__fcp` | First Contentful Paint | First render (ms) |
-| `__ttfb` | Time to First Byte | Server response time (ms) |
+| Tag      | Metric                    | Description               |
+| -------- | ------------------------- | ------------------------- |
+| `__lcp`  | Largest Contentful Paint  | Loading performance (ms)  |
+| `__cls`  | Cumulative Layout Shift   | Visual stability (score)  |
+| `__inp`  | Interaction to Next Paint | Interactivity (ms)        |
+| `__fcp`  | First Contentful Paint    | First render (ms)         |
+| `__ttfb` | Time to First Byte        | Server response time (ms) |
 
 Metrics are sent once per page load. A 30-second timeout ensures data is sent even if some metrics never fire (e.g., INP requires user interaction). Only collected metrics are included in the event tags.
 
@@ -196,28 +196,28 @@ The SDK automatically detects two types of user frustration. Enabled by default 
 
 Fired when 3+ clicks occur within 1 second in the same area (30px radius). Indicates the user is clicking repeatedly out of frustration.
 
-| Tag | Type | Description |
-|-----|------|-------------|
-| `__selector` | `string` | CSS selector of the element |
-| `__tag` | `string` | HTML tag name |
-| `__id` | `string` | Element `id` attribute |
-| `__class` | `string` | Element `className` |
-| `__text` | `string` | Text content (first 100 chars) |
+| Tag             | Type     | Description                     |
+| --------------- | -------- | ------------------------------- |
+| `__selector`    | `string` | CSS selector of the element     |
+| `__tag`         | `string` | HTML tag name                   |
+| `__id`          | `string` | Element `id` attribute          |
+| `__class`       | `string` | Element `className`             |
+| `__text`        | `string` | Text content (first 100 chars)  |
 | `__click_count` | `number` | Number of rapid clicks detected |
-| `__path` | `string` | Current page path |
+| `__path`        | `string` | Current page path               |
 
 ### Dead Click
 
 Fired when a click on an interactive element produces no DOM change within 1 second. Indicates the user clicked something that looked interactive but had no effect.
 
-| Tag | Type | Description |
-|-----|------|-------------|
-| `__selector` | `string` | CSS selector of the element |
-| `__tag` | `string` | HTML tag name |
-| `__id` | `string` | Element `id` attribute |
-| `__class` | `string` | Element `className` |
-| `__text` | `string` | Text content (first 100 chars) |
-| `__path` | `string` | Current page path |
+| Tag          | Type     | Description                    |
+| ------------ | -------- | ------------------------------ |
+| `__selector` | `string` | CSS selector of the element    |
+| `__tag`      | `string` | HTML tag name                  |
+| `__id`       | `string` | Element `id` attribute         |
+| `__class`    | `string` | Element `className`            |
+| `__text`     | `string` | Text content (first 100 chars) |
+| `__path`     | `string` | Current page path              |
 
 Dead click detection uses a `MutationObserver` to watch for any DOM change (child nodes, attributes, character data) after a click. If nothing changes within 1 second, the event fires.
 
@@ -227,8 +227,8 @@ Dead click detection uses a `MutationObserver` to watch for any DOM change (chil
 
 ```typescript
 await kitbase.track({
-  channel: 'engagement',
-  event: 'Button Clicked',
+	channel: "engagement",
+	event: "Button Clicked",
 });
 ```
 
@@ -236,17 +236,17 @@ await kitbase.track({
 
 ```typescript
 await kitbase.track({
-  channel: 'payments',
-  event: 'Subscription Started',
-  user_id: 'user_123',
-  icon: '💰',
-  notify: true,
-  description: 'New premium subscription',
-  tags: {
-    plan: 'premium',
-    interval: 'monthly',
-    amount: 1999,
-  },
+	channel: "payments",
+	event: "Subscription Started",
+	user_id: "user_123",
+	icon: "💰",
+	notify: true,
+	description: "New premium subscription",
+	tags: {
+		plan: "premium",
+		interval: "monthly",
+		amount: 1999,
+	},
 });
 ```
 
@@ -254,15 +254,15 @@ await kitbase.track({
 
 ```typescript
 // Start timing
-kitbase.timeEvent('Video Watched');
+kitbase.timeEvent("Video Watched");
 
 // ... user watches video ...
 
 // Track with automatic duration — $duration tag included automatically
 await kitbase.track({
-  channel: 'engagement',
-  event: 'Video Watched',
-  tags: { video_id: '123' },
+	channel: "engagement",
+	event: "Video Watched",
+	tags: { video_id: "123" },
 });
 ```
 
@@ -276,8 +276,8 @@ await kitbase.trackPageView();
 
 // With custom path/title
 await kitbase.trackPageView({
-  path: '/products/123',
-  title: 'Product Details',
+	path: "/products/123",
+	title: "Product Details",
 });
 
 // Enable automatic tracking on route changes
@@ -288,9 +288,9 @@ kitbase.enableAutoPageViews();
 
 ```typescript
 await kitbase.trackRevenue({
-  amount: 4999,
-  currency: 'USD',
-  tags: { product_id: 'prod_123', coupon: 'SAVE20' },
+	amount: 4999,
+	currency: "USD",
+	tags: { product_id: "prod_123", coupon: "SAVE20" },
 });
 ```
 
@@ -299,8 +299,8 @@ await kitbase.trackRevenue({
 ```typescript
 // Identify a user
 await kitbase.identify({
-  userId: 'user_123',
-  traits: { email: 'user@example.com', plan: 'premium' },
+	userId: "user_123",
+	traits: { email: "user@example.com", plan: "premium" },
 });
 
 // Reset on logout
@@ -312,13 +312,13 @@ kitbase.reset();
 Properties included with every event:
 
 ```typescript
-kitbase.register({ app_version: '2.1.0', platform: 'web' });
+kitbase.register({ app_version: "2.1.0", platform: "web" });
 
 // Set only if not already set
 kitbase.registerOnce({ first_visit: new Date().toISOString() });
 
 // Remove / clear
-kitbase.unregister('platform');
+kitbase.unregister("platform");
 kitbase.clearSuperProperties();
 ```
 
@@ -326,13 +326,13 @@ kitbase.clearSuperProperties();
 
 ```typescript
 const kitbase = new Kitbase({
-  sdkKey: 'your-api-key',
-  botDetection: { enabled: true },
+	sdkKey: "your-api-key",
+	botDetection: { enabled: true },
 });
 
-kitbase.isBot();                // boolean
+kitbase.isBot(); // boolean
 kitbase.getBotDetectionResult(); // detailed result
-kitbase.redetectBot();          // force re-run
+kitbase.redetectBot(); // force re-run
 ```
 
 When bot detection is enabled and a bot is detected, all tracking calls are silently blocked.
@@ -343,8 +343,8 @@ Events are queued locally when offline and synced when back online:
 
 ```typescript
 const kitbase = new Kitbase({
-  sdkKey: 'your-api-key',
-  offline: { enabled: true },
+	sdkKey: "your-api-key",
+	offline: { enabled: true },
 });
 
 // Check queue status
@@ -377,75 +377,76 @@ Disconnects observers, flushes pending scroll depth and visibility events, and c
 
 ### Event Tracking
 
-| Method | Description |
-|--------|-------------|
-| `track(options)` | Track a custom event |
-| `trackPageView(options?)` | Track a page view |
-| `trackRevenue(options)` | Track a revenue event |
+| Method                       | Description                  |
+| ---------------------------- | ---------------------------- |
+| `track(options)`             | Track a custom event         |
+| `trackPageView(options?)`    | Track a page view            |
+| `trackRevenue(options)`      | Track a revenue event        |
 | `trackOutboundLink(options)` | Track an outbound link click |
-| `trackClick(tags)` | Track a click event |
+| `trackClick(tags)`           | Track a click event          |
 
 ### User Identification
 
-| Method | Description |
-|--------|-------------|
-| `identify(options)` | Identify a user with traits |
-| `getUserId()` | Get the identified user ID |
-| `reset()` | Reset user identity and session |
+| Method              | Description                     |
+| ------------------- | ------------------------------- |
+| `identify(options)` | Identify a user with traits     |
+| `getUserId()`       | Get the identified user ID      |
+| `reset()`           | Reset user identity and session |
 
 ### Super Properties
 
-| Method | Description |
-|--------|-------------|
-| `register(properties)` | Set properties included in all events |
+| Method                     | Description                            |
+| -------------------------- | -------------------------------------- |
+| `register(properties)`     | Set properties included in all events  |
 | `registerOnce(properties)` | Set properties only if not already set |
-| `unregister(key)` | Remove a super property |
-| `getSuperProperties()` | Get all super properties |
-| `clearSuperProperties()` | Clear all super properties |
+| `unregister(key)`          | Remove a super property                |
+| `getSuperProperties()`     | Get all super properties               |
+| `clearSuperProperties()`   | Clear all super properties             |
 
 ### Time Events
 
-| Method | Description |
-|--------|-------------|
-| `timeEvent(eventName)` | Start timing an event |
-| `cancelTimeEvent(eventName)` | Cancel timing an event |
-| `getTimedEvents()` | List all active timed events |
+| Method                        | Description                       |
+| ----------------------------- | --------------------------------- |
+| `timeEvent(eventName)`        | Start timing an event             |
+| `cancelTimeEvent(eventName)`  | Cancel timing an event            |
+| `getTimedEvents()`            | List all active timed events      |
 | `getEventDuration(eventName)` | Get elapsed time without stopping |
 
 ### Privacy & Consent
 
-| Method | Description |
-|--------|-------------|
-| `optOut()` | Opt out of tracking |
-| `optIn()` | Opt in to tracking |
-| `isOptedOut()` | Check if opted out |
+| Method         | Description                 |
+| -------------- | --------------------------- |
+| `optOut()`     | Opt out of tracking         |
+| `optIn()`      | Opt in to tracking          |
+| `isOptedOut()` | Check if opted out          |
 | `hasConsent()` | Check if user has consented |
 
 ### Bot Detection (Internal)
+
 ### Bot Detection
 
-| Method | Description |
-|--------|-------------|
-| `isBot()` | Check if current visitor is a bot |
-| `getBotDetectionResult()` | Get detailed detection result |
-| `redetectBot()` | Force re-run detection |
+| Method                    | Description                       |
+| ------------------------- | --------------------------------- |
+| `isBot()`                 | Check if current visitor is a bot |
+| `getBotDetectionResult()` | Get detailed detection result     |
+| `redetectBot()`           | Force re-run detection            |
 
 ### Debug & Lifecycle
 
-| Method | Description |
-|--------|-------------|
-| `setDebugMode(enabled)` | Toggle debug logging |
-| `isDebugMode()` | Check if debug mode is on |
-| `enableAutoPageViews()` | Enable automatic pageview tracking |
-| `shutdown()` | Flush pending events and cleanup resources |
+| Method                  | Description                                |
+| ----------------------- | ------------------------------------------ |
+| `setDebugMode(enabled)` | Toggle debug logging                       |
+| `isDebugMode()`         | Check if debug mode is on                  |
+| `enableAutoPageViews()` | Enable automatic pageview tracking         |
+| `shutdown()`            | Flush pending events and cleanup resources |
 
 ### Offline Queue (full build only)
 
-| Method | Description |
-|--------|-------------|
+| Method            | Description               |
+| ----------------- | ------------------------- |
 | `getQueueStats()` | Get queue size and status |
-| `flushQueue()` | Manually flush the queue |
-| `clearQueue()` | Clear all queued events |
+| `flushQueue()`    | Manually flush the queue  |
+| `clearQueue()`    | Clear all queued events   |
 
 ## TypeScript Support
 
@@ -453,18 +454,18 @@ Full TypeScript support with exported types:
 
 ```typescript
 import type {
-  KitbaseConfig,
-  TrackOptions,
-  TrackResponse,
-  PageViewOptions,
-  RevenueOptions,
-  IdentifyOptions,
-  AnalyticsConfig,
-  Tags,
-  TagValue,
-  OfflineConfig,
-  BotDetectionConfig,
-} from '@kitbase/analytics';
+	KitbaseConfig,
+	TrackOptions,
+	TrackResponse,
+	PageViewOptions,
+	RevenueOptions,
+	IdentifyOptions,
+	AnalyticsConfig,
+	Tags,
+	TagValue,
+	OfflineConfig,
+	BotDetectionConfig,
+} from "@kitbase/analytics";
 ```
 
 ## Browser Support

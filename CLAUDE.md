@@ -16,20 +16,20 @@ Whenever you modify the SDK, you **must** update the matching documentation page
 
 ### Documentation Pages to Update
 
-| What Changed | Docs to Update |
-|---|---|
-| Auto-tracking behavior (events, tags, channels, triggers) | `docs/autocapture.md` and `docs/features/events/auto-events.md` |
-| Public methods (track, identify, revenue, etc.) | `docs/sdks/javascript.md` and `docs/track-events.md` |
-| Config options (KitbaseConfig, AnalyticsConfig, PrivacyConfig, OfflineConfig) | `docs/sdks/javascript.md` and `docs/tracking-script.md` |
-| Identify behavior | `docs/identify-users.md` |
-| Data attributes (data-kb-track-click, data-kb-track-visibility) | `docs/autocapture.md` |
-| React wrapper | `docs/sdks/react.md` |
-| Angular wrapper | `docs/sdks/angular.md` |
-| Error types or handling | `docs/sdks/javascript.md` (Error Types section) |
-| Offline queue behavior | `docs/sdks/javascript.md` (Offline Support section) |
-| Privacy/consent behavior | `docs/sdks/javascript.md` (Privacy & Consent section) |
-| Session management | `docs/sdks/javascript.md` and `docs/guide/sessions.md` |
-| TypeScript types (interfaces, enums) | `docs/sdks/javascript.md` (TypeScript Types section) |
+| What Changed                                                                  | Docs to Update                                                  |
+| ----------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| Auto-tracking behavior (events, tags, channels, triggers)                     | `docs/autocapture.md` and `docs/features/events/auto-events.md` |
+| Public methods (track, identify, revenue, etc.)                               | `docs/sdks/javascript.md` and `docs/track-events.md`            |
+| Config options (KitbaseConfig, AnalyticsConfig, PrivacyConfig, OfflineConfig) | `docs/sdks/javascript.md` and `docs/tracking-script.md`         |
+| Identify behavior                                                             | `docs/identify-users.md`                                        |
+| Data attributes (data-kb-track-click, data-kb-track-visibility)               | `docs/autocapture.md`                                           |
+| React wrapper                                                                 | `docs/sdks/react.md`                                            |
+| Angular wrapper                                                               | `docs/sdks/angular.md`                                          |
+| Error types or handling                                                       | `docs/sdks/javascript.md` (Error Types section)                 |
+| Offline queue behavior                                                        | `docs/sdks/javascript.md` (Offline Support section)             |
+| Privacy/consent behavior                                                      | `docs/sdks/javascript.md` (Privacy & Consent section)           |
+| Session management                                                            | `docs/sdks/javascript.md` and `docs/guide/sessions.md`          |
+| TypeScript types (interfaces, enums)                                          | `docs/sdks/javascript.md` (TypeScript Types section)            |
 
 All doc paths are relative to `/Users/mohamed/private/kitbase-mono/`.
 
@@ -42,6 +42,7 @@ Whenever you modify the core SDK implementation (public API, config options, fea
 - **Angular:** `analytics/typescript/packages/angular/README.md`
 
 This includes changes to:
+
 - Public methods (adding, removing, or changing signatures)
 - Config options (`KitbaseConfig`, `AnalyticsConfig`, `PrivacyConfig`, etc.)
 - Auto-tracked events or data attributes

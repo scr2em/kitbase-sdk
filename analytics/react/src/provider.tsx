@@ -1,17 +1,17 @@
-import { useMemo, type ReactNode } from 'react';
-import { Kitbase } from '@kitbase/sdk/events';
-import { EventsContext } from './context.js';
+import { useMemo, type ReactNode } from "react";
+import { Kitbase } from "@kitbase/sdk/events";
+import { EventsContext } from "./context.js";
 
 export interface EventsProviderProps {
-  /**
-   * Your Kitbase API token
-   */
-  token: string;
-  /**
-   * Override the default API endpoint
-   */
-  baseUrl?: string;
-  children: ReactNode;
+	/**
+	 * Your Kitbase API token
+	 */
+	token: string;
+	/**
+	 * Override the default API endpoint
+	 */
+	baseUrl?: string;
+	children: ReactNode;
 }
 
 /**
@@ -31,13 +31,7 @@ export interface EventsProviderProps {
  * ```
  */
 export function EventsProvider({ token, baseUrl, children }: EventsProviderProps) {
-  const client = useMemo(() => new Kitbase({ token, baseUrl }), [token, baseUrl]);
+	const client = useMemo(() => new Kitbase({ token, baseUrl }), [token, baseUrl]);
 
-  return (
-    <EventsContext.Provider value={client}>{children}</EventsContext.Provider>
-  );
+	return <EventsContext.Provider value={client}>{children}</EventsContext.Provider>;
 }
-
-
-
-

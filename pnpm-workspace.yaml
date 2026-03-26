@@ -1,25 +1,25 @@
 packages:
   # Analytics
-  - 'analytics/typescript/packages/core'
-  - 'analytics/typescript/packages/react'
-  - 'analytics/typescript/packages/angular'
-  - 'analytics/typescript/packages/mcp'
+  - "analytics/typescript/packages/core"
+  - "analytics/typescript/packages/react"
+  - "analytics/typescript/packages/angular"
+  - "analytics/typescript/packages/mcp"
 
   # Events
-  - 'customEvents/typescript'
-  - 'customEvents/react'
+  - "customEvents/typescript"
+  - "customEvents/react"
 
   # Changelogs
-  - 'changelogs/typescript'
-  - 'changelogs/react'
+  - "changelogs/typescript"
+  - "changelogs/react"
 
   # Feature Flags
-  - 'flags/typescript'
-  - 'flags/react'
+  - "flags/typescript"
+  - "flags/react"
 
   # In-App Messaging
-  - 'messaging/typescript'
-  - 'messaging/react'
+  - "messaging/typescript"
+  - "messaging/react"
 
   # CLI Tools
-  - 'cli'
+  - "cli"
