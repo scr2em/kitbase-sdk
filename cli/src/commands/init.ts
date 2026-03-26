@@ -15,7 +15,7 @@ export default class Init extends BaseCommand {
 	];
 
 	static override flags = {
-		"api-key": Flags.string({ char: "k", description: "SDK key to save" }),
+		"api-key": Flags.string({ char: "k", description: "API key to save" }),
 		"base-url": Flags.string({
 			description: "API base URL (for self-hosted instances)",
 		}),
@@ -49,10 +49,10 @@ export default class Init extends BaseCommand {
 				baseUrl = await inputText("Enter your API base URL", { required: true });
 			}
 
-			apiKey = await inputText("Paste your SDK key", {
+			apiKey = await inputText("Paste your API key", {
 				validate: (v) => {
-					if (!v) return "SDK key is required";
-					if (v.length < 10) return "Invalid SDK key format";
+					if (!v) return "API key is required";
+					if (v.length < 10) return "Invalid API key format";
 					return true;
 				},
 			});
