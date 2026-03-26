@@ -6,22 +6,10 @@ import { inputText, confirmPrompt } from "./prompts.js";
 const CONFIG_FILE_NAME = ".kitbasecli";
 const DEFAULT_BASE_URL = "https://api.kitbase.dev";
 
-const CONFIG_TEMPLATE = `# Kitbase CLI Configuration
-# WARNING: Add this file to .gitignore to keep your API key secret!
-#
-# To add to .gitignore, run:
-#   echo ".kitbasecli" >> .gitignore
-
-KITBASE_API_KEY=`;
+const CONFIG_TEMPLATE = `KITBASE_API_KEY=`;
 
 const CONFIG_TEMPLATE_WITH_URL = (apiKey: string, apiUrl: string) =>
-	`# Kitbase CLI Configuration
-# WARNING: Add this file to .gitignore to keep your API key secret!
-#
-# To add to .gitignore, run:
-#   echo ".kitbasecli" >> .gitignore
-
-KITBASE_API_KEY=${apiKey}
+	`KITBASE_API_KEY=${apiKey}
 KITBASE_API_URL=${apiUrl}
 `;
 
