@@ -52,3 +52,7 @@ This includes changes to:
 ### Full Doc Structure Reference
 
 See `/Users/mohamed/private/kitbase-mono/CLAUDE.md` for the complete documentation structure and cross-project sync rules.
+
+## Code Rules
+
+- **Always normalize URLs.** Strip trailing slashes from base URLs before storing, reading, or concatenating. Never assume URL input is clean.
