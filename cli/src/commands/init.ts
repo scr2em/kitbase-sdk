@@ -4,7 +4,7 @@ import { existsSync, readFileSync, appendFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { BaseCommand } from "../base-command.js";
-import { configExists, writeApiKeyToConfig, getConfigPath, prompt } from "../lib/config.js";
+import { configExists, writeConfig, getConfigPath, prompt } from "../lib/config.js";
 
 export default class Init extends BaseCommand {
 	static override description = "Initialize Kitbase CLI config in the current project";
@@ -12,10 +12,14 @@ export default class Init extends BaseCommand {
 	static override examples = [
 		"<%= config.bin %> init",
 		"<%= config.bin %> init --api-key sk_live_xxx",
+		"<%= config.bin %> init --api-key sk_live_xxx --base-url https://api.mycompany.com",
 	];
 
 	static override flags = {
 		"api-key": Flags.string({ char: "k", description: "SDK key to save" }),
+		"base-url": Flags.string({
+			description: "API base URL (for self-hosted instances)",
+		}),
 		force: Flags.boolean({ description: "Overwrite existing .kitbasecli", default: false }),
 	};
 
@@ -29,6 +33,7 @@ export default class Init extends BaseCommand {
 		}
 
 		let apiKey = flags["api-key"];
+		let baseUrl = flags["base-url"];
 
 		if (!apiKey) {
 			this.log("\n  Set up your Kitbase project config.\n");
@@ -45,8 +50,21 @@ export default class Init extends BaseCommand {
 			}
 		}
 
-		writeApiKeyToConfig(apiKey);
+		if (!baseUrl) {
+			const customUrl = await prompt(
+				`  API base URL ${chalk.dim("(press Enter for https://api.kitbase.dev)")}: `,
+			);
+			if (customUrl) {
+				baseUrl = customUrl;
+			}
+		}
+
+		writeConfig(apiKey, baseUrl);
 		this.log(chalk.green(`\n  Created ${getConfigPath()}`));
+
+		if (baseUrl) {
+			this.log(chalk.dim(`  API URL: ${baseUrl}`));
+		}
 
 		// Auto-add to .gitignore if it exists and doesn't already contain .kitbasecli
 		const gitignorePath = join(process.cwd(), ".gitignore");

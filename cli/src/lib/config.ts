@@ -4,6 +4,7 @@ import { createInterface } from "node:readline";
 import chalk from "chalk";
 
 const CONFIG_FILE_NAME = ".kitbasecli";
+const DEFAULT_BASE_URL = "https://api.kitbase.dev";
 
 const CONFIG_TEMPLATE = `# Kitbase CLI Configuration
 # WARNING: Add this file to .gitignore to keep your API key secret!
@@ -13,6 +14,17 @@ const CONFIG_TEMPLATE = `# Kitbase CLI Configuration
 
 KITBASE_API_KEY=`;
 
+const CONFIG_TEMPLATE_WITH_URL = (apiKey: string, apiUrl: string) =>
+	`# Kitbase CLI Configuration
+# WARNING: Add this file to .gitignore to keep your API key secret!
+#
+# To add to .gitignore, run:
+#   echo ".kitbasecli" >> .gitignore
+
+KITBASE_API_KEY=${apiKey}
+KITBASE_API_URL=${apiUrl}
+`;
+
 export function getConfigPath(): string {
 	return join(process.cwd(), CONFIG_FILE_NAME);
 }
@@ -21,7 +33,10 @@ export function configExists(): boolean {
 	return existsSync(getConfigPath());
 }
 
-export function readApiKeyFromConfig(): string | null {
+/**
+ * Read a value from the .kitbasecli config file by key name.
+ */
+function readConfigValue(key: string): string | null {
 	const configPath = getConfigPath();
 	if (!existsSync(configPath)) return null;
 
@@ -31,8 +46,8 @@ export function readApiKeyFromConfig(): string | null {
 			const trimmed = line.trim();
 			if (trimmed.startsWith("#") || trimmed === "") continue;
 
-			if (trimmed.startsWith("KITBASE_API_KEY=")) {
-				const value = trimmed.substring("KITBASE_API_KEY=".length).trim();
+			if (trimmed.startsWith(`${key}=`)) {
+				const value = trimmed.substring(key.length + 1).trim();
 				if (
 					(value.startsWith('"') && value.endsWith('"')) ||
 					(value.startsWith("'") && value.endsWith("'"))
@@ -48,8 +63,28 @@ export function readApiKeyFromConfig(): string | null {
 	}
 }
 
+export function readApiKeyFromConfig(): string | null {
+	return readConfigValue("KITBASE_API_KEY");
+}
+
+export function readApiUrlFromConfig(): string | null {
+	return readConfigValue("KITBASE_API_URL");
+}
+
+/**
+ * Write config file with API key and optional API URL.
+ */
+export function writeConfig(apiKey: string, apiUrl?: string): void {
+	const content = apiUrl
+		? CONFIG_TEMPLATE_WITH_URL(apiKey, apiUrl)
+		: CONFIG_TEMPLATE + apiKey + "\n";
+	writeFileSync(getConfigPath(), content, "utf-8");
+}
+
+// Keep backward compat alias
 export function writeApiKeyToConfig(apiKey: string): void {
-	writeFileSync(getConfigPath(), CONFIG_TEMPLATE + apiKey + "\n", "utf-8");
+	const existingUrl = readApiUrlFromConfig();
+	writeConfig(apiKey, existingUrl ?? undefined);
 }
 
 export function prompt(question: string): Promise<string> {
@@ -87,6 +122,16 @@ async function promptToSaveApiKey(apiKey: string): Promise<void> {
 		console.log("\nAPI key saved to .kitbasecli");
 		console.log(chalk.yellow("Remember to add .kitbasecli to .gitignore!\n"));
 	}
+}
+
+/**
+ * Resolve the API base URL.
+ * Priority: CLI flag > env var > config file > default
+ */
+export function getBaseUrl(cliBaseUrl?: string): string {
+	if (cliBaseUrl) return cliBaseUrl;
+	if (process.env.KITBASE_API_URL) return process.env.KITBASE_API_URL;
+	return readApiUrlFromConfig() ?? DEFAULT_BASE_URL;
 }
 
 /**

@@ -5,8 +5,7 @@ import { request as httpRequest } from "node:http";
 import type { KitbaseConfig } from "../lib/types.js";
 import type { UploadPayload, UploadResponse } from "./types.js";
 import { ApiError, AuthenticationError, ValidationError } from "../lib/errors.js";
-
-const DEFAULT_BASE_URL = process.env.KITBASE_API_URL || "https://api.kitbase.dev";
+import { getBaseUrl } from "../lib/config.js";
 const TIMEOUT = 300_000; // 5 minutes
 
 export interface UploadProgress {
@@ -28,7 +27,7 @@ export class UploadClient {
 	constructor(config: KitbaseConfig) {
 		if (!config.apiKey) throw new ValidationError("API key is required", "apiKey");
 		this.apiKey = config.apiKey;
-		this.baseUrl = config.baseUrl || DEFAULT_BASE_URL;
+		this.baseUrl = config.baseUrl || getBaseUrl();
 	}
 
 	async upload(payload: UploadPayload, options?: UploadOptions): Promise<UploadResponse> {
