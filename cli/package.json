@@ -1,0 +1,46 @@
+{
+  "name": "@kitbase/cli",
+  "version": "0.1.0",
+  "description": "Kitbase CLI — manage your Kitbase projects from the terminal",
+  "type": "module",
+  "bin": {
+    "kitbase": "./bin/run.js"
+  },
+  "exports": "./dist/index.js",
+  "files": [
+    "dist",
+    "bin"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "generate:types": "openapi-typescript ../../Flyway/openapi-sdk.yaml -o src/generated/sdk-api.ts",
+    "generate:types:dashboard": "openapi-typescript ../../Flyway/openapi.yaml -o src/generated/api.ts",
+    "lint": "eslint src",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run build"
+  },
+  "oclif": {
+    "bin": "kitbase",
+    "dirname": "kitbase",
+    "commands": "./dist/commands",
+    "topicSeparator": " "
+  },
+  "dependencies": {
+    "@oclif/core": "^4",
+    "archiver": "^7.0.1",
+    "chalk": "^5.3.0",
+    "dotenv": "^16.4.5",
+    "openapi-fetch": "^0.13.0",
+    "ora": "^8.0.1"
+  },
+  "devDependencies": {
+    "@types/archiver": "^6.0.2",
+    "@types/node": "^22",
+    "openapi-typescript": "^7",
+    "typescript": "^5.7.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

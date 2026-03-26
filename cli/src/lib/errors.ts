@@ -1,6 +1,3 @@
-/**
- * Base error class for Kitbase Ionic CLI errors
- */
 export class KitbaseError extends Error {
   constructor(message: string) {
     super(message);
@@ -8,9 +5,6 @@ export class KitbaseError extends Error {
   }
 }
 
-/**
- * Error thrown when API authentication fails
- */
 export class AuthenticationError extends KitbaseError {
   constructor(message = 'API key was rejected by the server.') {
     super(message);
@@ -18,9 +12,6 @@ export class AuthenticationError extends KitbaseError {
   }
 }
 
-/**
- * Error thrown when API request fails
- */
 export class ApiError extends KitbaseError {
   public readonly statusCode: number;
   public readonly response?: unknown;
@@ -33,9 +24,6 @@ export class ApiError extends KitbaseError {
   }
 }
 
-/**
- * Error thrown when validation fails
- */
 export class ValidationError extends KitbaseError {
   public readonly field?: string;
 
@@ -46,9 +34,6 @@ export class ValidationError extends KitbaseError {
   }
 }
 
-/**
- * Error thrown when build process fails
- */
 export class BuildError extends KitbaseError {
   public readonly exitCode?: number;
 
@@ -59,9 +44,6 @@ export class BuildError extends KitbaseError {
   }
 }
 
-/**
- * Error thrown when git operations fail
- */
 export class GitError extends KitbaseError {
   constructor(message: string) {
     super(message);
@@ -69,19 +51,9 @@ export class GitError extends KitbaseError {
   }
 }
 
-/**
- * Error thrown when required configuration is missing
- */
 export class ConfigurationError extends KitbaseError {
   constructor(message: string) {
     super(message);
     this.name = 'ConfigurationError';
   }
 }
-
-
-
-
-
-
-
