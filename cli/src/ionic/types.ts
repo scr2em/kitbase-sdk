@@ -33,8 +33,3 @@ export interface UploadResponse {
  * Response from /api/v1/auth/key-info
  */
 export type KeyInfo = import("../generated/cli-api.js").components["schemas"]["KeyInfoResponse"];
-
-/**
- * Environment item from /api/v1/auth/environments
- */
-export type EnvironmentListItem = import("../generated/cli-api.js").components["schemas"]["EnvironmentListItem"];
