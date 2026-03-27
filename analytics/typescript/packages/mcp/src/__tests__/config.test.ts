@@ -42,12 +42,29 @@ describe("loadEnv", () => {
 	it("returns correct env when all vars present", () => {
 		process.env.KITBASE_API_URL = "https://api.kitbase.io";
 		process.env.KITBASE_API_KEY = "sk_kitbase_test123";
+		process.env.KITBASE_ENVIRONMENT_ID = "env_prod";
 
 		const env = loadEnv();
 		expect(env).toEqual({
 			apiUrl: "https://api.kitbase.io",
 			apiKey: "sk_kitbase_test123",
+			environmentId: "env_prod",
 		});
+	});
+
+	it("sets environmentId to undefined when not provided", () => {
+		process.env.KITBASE_API_KEY = "sk_kitbase_test123";
+
+		const env = loadEnv();
+		expect(env.environmentId).toBeUndefined();
+	});
+
+	it("sets environmentId to undefined when empty string", () => {
+		process.env.KITBASE_API_KEY = "sk_kitbase_test123";
+		process.env.KITBASE_ENVIRONMENT_ID = "";
+
+		const env = loadEnv();
+		expect(env.environmentId).toBeUndefined();
 	});
 });
 
@@ -71,8 +88,7 @@ describe("resolveConfig", () => {
 	it("calls /api/v1/auth/key-info with correct headers", async () => {
 		fetchSpy.mockResolvedValueOnce({
 			ok: true,
-			json: () =>
-				Promise.resolve({ projectId: "proj_abc", orgSlug: "my-org", environmentId: "env_prod" }),
+			json: () => Promise.resolve({ projectId: "proj_abc", orgSlug: "my-org" }),
 		});
 
 		await resolveConfig(env);
@@ -85,14 +101,13 @@ describe("resolveConfig", () => {
 		});
 	});
 
-	it("returns config with resolved projectId and environmentId", async () => {
+	it("returns config with resolved projectId and environmentId from env", async () => {
 		fetchSpy.mockResolvedValueOnce({
 			ok: true,
-			json: () =>
-				Promise.resolve({ projectId: "proj_abc", orgSlug: "my-org", environmentId: "env_prod" }),
+			json: () => Promise.resolve({ projectId: "proj_abc", orgSlug: "my-org" }),
 		});
 
-		const config = await resolveConfig(env);
+		const config = await resolveConfig({ ...env, environmentId: "env_prod" });
 		expect(config).toEqual({
 			apiUrl: "https://api.kitbase.io",
 			apiKey: "sk_kitbase_test123",
@@ -102,10 +117,10 @@ describe("resolveConfig", () => {
 		});
 	});
 
-	it("sets environmentId to undefined when empty string", async () => {
+	it("sets environmentId to undefined when not provided in env", async () => {
 		fetchSpy.mockResolvedValueOnce({
 			ok: true,
-			json: () => Promise.resolve({ projectId: "proj_abc", orgSlug: "my-org", environmentId: "" }),
+			json: () => Promise.resolve({ projectId: "proj_abc", orgSlug: "my-org" }),
 		});
 
 		const config = await resolveConfig(env);
