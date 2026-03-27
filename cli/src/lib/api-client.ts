@@ -1,5 +1,6 @@
 import createClient from "openapi-fetch";
 import type { paths as SdkPaths } from "../generated/sdk-api.js";
+import type { paths as CliPaths } from "../generated/cli-api.js";
 import { getBaseUrl } from "./config.js";
 
 // Dashboard API types not yet available (broken $refs in openapi.yaml Flutter section).
@@ -25,8 +26,7 @@ export function createDashboardClient<Paths extends {}>(token: string, baseUrl?:
 /**
  * Type-safe client for the Kitbase SDK API (X-API-Key auth).
  *
- * For standard JSON endpoints. The push command uses the custom
- * UploadClient for multipart uploads with progress tracking.
+ * For standard JSON endpoints used by mobile/web SDKs.
  *
  * ```ts
  * const client = createSdkClient(apiKey);
@@ -35,6 +35,23 @@ export function createDashboardClient<Paths extends {}>(token: string, baseUrl?:
  */
 export function createSdkClient(apiKey: string, baseUrl?: string) {
 	return createClient<SdkPaths>({
+		baseUrl: baseUrl ?? getBaseUrl(),
+		headers: { "X-API-Key": apiKey },
+	});
+}
+
+/**
+ * Type-safe client for the Kitbase CLI API (X-API-Key auth).
+ *
+ * For CLI-specific endpoints: key-info, environments, build uploads.
+ *
+ * ```ts
+ * const client = createCliClient(apiKey);
+ * const {data} = await client.GET('/api/v1/auth/environments');
+ * ```
+ */
+export function createCliClient(apiKey: string, baseUrl?: string) {
+	return createClient<CliPaths>({
 		baseUrl: baseUrl ?? getBaseUrl(),
 		headers: { "X-API-Key": apiKey },
 	});

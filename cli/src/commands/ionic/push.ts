@@ -5,6 +5,7 @@ import ora from "ora";
 import { BaseCommand } from "../../base-command.js";
 import { getGitInfo, isGitRepository } from "../../lib/git.js";
 import { getApiKey, getBaseUrl } from "../../lib/config.js";
+import { selectOne } from "../../lib/prompts.js";
 import {
 	KitbaseError,
 	ConfigurationError,
@@ -22,15 +23,17 @@ import {
 	isIonicProject,
 } from "../../ionic/build.js";
 import { UploadClient, createUploadPayload } from "../../ionic/upload.js";
+import type { EnvironmentListItem } from "../../ionic/types.js";
 
 export default class Push extends BaseCommand {
 	static override description = "Build and upload your web app to Kitbase for OTA updates";
 
 	static override examples = [
-		"<%= config.bin %> push",
-		"<%= config.bin %> push --skip-build",
-		"<%= config.bin %> push --file ./build.zip --version 1.0.0",
-		"<%= config.bin %> push --api-key sk_live_xxx --skip-build",
+		"<%= config.bin %> ionic push",
+		"<%= config.bin %> ionic push --env production",
+		"<%= config.bin %> ionic push --skip-build",
+		"<%= config.bin %> ionic push --file ./build.zip --version 1.0.0",
+		"<%= config.bin %> ionic push --api-key sk_live_xxx --skip-build",
 	];
 
 	static override flags = {
@@ -66,6 +69,10 @@ export default class Push extends BaseCommand {
 		}),
 		message: Flags.string({
 			description: "Override git commit message",
+		}),
+		env: Flags.string({
+			char: "e",
+			description: "Target environment name (interactive prompt if not specified)",
 		}),
 	};
 
@@ -176,12 +183,48 @@ export default class Push extends BaseCommand {
 			const keyInfo = await client.fetchKeyInfo();
 			spinner.succeed(`Project: ${chalk.dim(keyInfo.orgSlug)} / ${chalk.dim(keyInfo.projectId)}`);
 
-			// 7. Upload
-			const payload = createUploadPayload(zipFilePath, gitInfo, nativeVersion);
+			// 7. Resolve environment
+			spinner.start("Loading environments...");
+			const environments = await client.fetchEnvironments();
+			spinner.stop();
+
+			if (environments.length === 0) {
+				throw new ConfigurationError(
+					"No environments found for this project. Create one in the dashboard first.",
+				);
+			}
+
+			let selectedEnv: EnvironmentListItem;
+
+			if (flags.env) {
+				const match = environments.find(
+					(e) => e.name.toLowerCase() === flags.env!.toLowerCase(),
+				);
+				if (!match) {
+					const available = environments.map((e) => e.name).join(", ");
+					throw new ValidationError(
+						`Environment "${flags.env}" not found. Available: ${available}`,
+					);
+				}
+				selectedEnv = match;
+			} else if (environments.length === 1) {
+				selectedEnv = environments[0];
+			} else {
+				selectedEnv = await selectOne(
+					"Select target environment",
+					environments.map((e) => ({ name: e.name, value: e })),
+				);
+			}
+
+			spinner.succeed(`Environment: ${chalk.dim(selectedEnv.name)}`);
+
+			// 8. Upload
+			const payload = createUploadPayload(zipFilePath, gitInfo, nativeVersion, selectedEnv.id);
 
 			this.log(chalk.dim("\n  Commit:  ") + chalk.white(payload.commitHash));
 			this.log(chalk.dim("  Branch:  ") + chalk.white(payload.branchName));
 			this.log(chalk.dim("  Version: ") + chalk.white(payload.nativeVersion));
+			this.log(chalk.dim("  Env:     ") + chalk.white(selectedEnv.name));
 			this.log(
 				chalk.dim("  File:    ") +
 					chalk.white(`${payload.fileName} (${formatSize(payload.file.length)})`),
