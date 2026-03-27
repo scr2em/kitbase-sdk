@@ -3,10 +3,10 @@ import { basename } from "node:path";
 import { request as httpsRequest } from "node:https";
 import { request as httpRequest } from "node:http";
 import type { KitbaseConfig } from "../lib/types.js";
-import type { KeyInfo, UploadPayload, UploadResponse } from "./types.js";
+import type { KeyInfo, UploadPayload, UploadResponse, EnvironmentListItem } from "./types.js";
 import { ApiError, AuthenticationError, ValidationError } from "../lib/errors.js";
 import { getBaseUrl, isPublicKey, SECRET_KEY_PREFIX } from "../lib/config.js";
-import { createSdkClient } from "../lib/api-client.js";
+import { createCliClient } from "../lib/api-client.js";
 
 const TIMEOUT = 300_000; // 5 minutes
 
@@ -40,7 +40,7 @@ export class UploadClient {
 	}
 
 	async fetchKeyInfo(): Promise<KeyInfo> {
-		const client = createSdkClient(this.apiKey, this.baseUrl);
+		const client = createCliClient(this.apiKey, this.baseUrl);
 		const { data, error, response } = await client.GET("/api/v1/auth/key-info", {
 			params: { header: { "X-API-Key": this.apiKey } },
 		});
@@ -55,6 +55,24 @@ export class UploadClient {
 		}
 
 		return data as KeyInfo;
+	}
+
+	async fetchEnvironments(): Promise<EnvironmentListItem[]> {
+		const client = createCliClient(this.apiKey, this.baseUrl);
+		const { data, error, response } = await client.GET("/api/v1/auth/environments", {
+			params: { header: { "X-API-Key": this.apiKey } },
+		});
+
+		if (error) {
+			const status = response.status;
+			const message = this.extractErrorMessage(error, "Failed to fetch environments");
+			if (status === 401 || status === 403) {
+				throw new AuthenticationError(message, `${this.baseUrl}/api/v1/auth/environments`);
+			}
+			throw new ApiError(message, status, error, `${this.baseUrl}/api/v1/auth/environments`);
+		}
+
+		return data.environments;
 	}
 
 	async upload(payload: UploadPayload, keyInfo: KeyInfo, options?: UploadOptions): Promise<UploadResponse> {
@@ -177,6 +195,7 @@ export class UploadClient {
 			nativeVersion: payload.nativeVersion,
 		};
 		if (payload.commitMessage) textFields.commitMessage = payload.commitMessage;
+		if (payload.environmentId) textFields.environmentId = payload.environmentId;
 
 		for (const [name, value] of Object.entries(textFields)) {
 			parts.push(
@@ -213,12 +232,14 @@ export function createUploadPayload(
 	filePath: string,
 	gitInfo: { commitHash: string; branchName: string; commitMessage?: string },
 	nativeVersion: string,
+	environmentId?: string,
 ): UploadPayload {
 	return {
 		commitHash: gitInfo.commitHash,
 		branchName: gitInfo.branchName,
 		commitMessage: gitInfo.commitMessage,
 		nativeVersion,
+		environmentId,
 		file: readFileSync(filePath),
 		fileName: basename(filePath),
 	};
