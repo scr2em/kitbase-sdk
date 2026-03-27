@@ -153,7 +153,8 @@ export async function getApiKey(options?: {
 
 	if (options?.interactive !== false && process.stdin.isTTY) {
 		console.log("\nNo API key found. Let's set one up!\n");
-		console.log("Find your API key at: https://kitbase.dev/settings/api-keys\n");
+		console.log("You need a secret key (sk_kitbase_*) — these are per-project, not per-environment.");
+		console.log("Find your API key in your project settings at: https://kitbase.dev\n");
 
 		const apiKey = await inputText("Paste your API key", {
 			validate: (v) => {
