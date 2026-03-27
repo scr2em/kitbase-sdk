@@ -14,8 +14,7 @@
 	"scripts": {
 		"build": "tsc",
 		"dev": "tsc --watch",
-		"generate:types": "openapi-typescript ../../Flyway/openapi-sdk.yaml -o src/generated/sdk-api.ts",
-		"generate:types:cli": "openapi-typescript ../../Flyway/openapi-cli.yaml -o src/generated/cli-api.ts",
+		"generate:types": "openapi-typescript ../../Flyway/openapi-cli.yaml -o src/generated/cli-api.ts",
 		"generate:types:dashboard": "openapi-typescript ../../Flyway/openapi.yaml -o src/generated/api.ts",
 		"lint": "oxlint src",
 		"clean": "rm -rf dist",
