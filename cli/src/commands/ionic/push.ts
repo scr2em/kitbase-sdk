@@ -30,7 +30,7 @@ export default class Push extends BaseCommand {
 
 	static override examples = [
 		"<%= config.bin %> ionic push",
-		"<%= config.bin %> ionic push --env production",
+		"<%= config.bin %> ionic push --envName production",
 		"<%= config.bin %> ionic push --skip-build",
 		"<%= config.bin %> ionic push --file ./build.zip --version 1.0.0",
 		"<%= config.bin %> ionic push --api-key sk_live_xxx --skip-build",
@@ -70,7 +70,7 @@ export default class Push extends BaseCommand {
 		message: Flags.string({
 			description: "Override git commit message",
 		}),
-		env: Flags.string({
+		envName: Flags.string({
 			char: "e",
 			description: "Target environment name (interactive prompt if not specified)",
 		}),
@@ -117,14 +117,14 @@ export default class Push extends BaseCommand {
 
 			let selectedEnv: EnvironmentListItem;
 
-			if (flags.env) {
+			if (flags.envName) {
 				const match = environments.find(
-					(e) => e.name.toLowerCase() === flags.env!.toLowerCase(),
+					(e) => e.name.toLowerCase() === flags.envName!.toLowerCase(),
 				);
 				if (!match) {
 					const available = environments.map((e) => e.name).join(", ");
 					throw new ValidationError(
-						`Environment "${flags.env}" not found. Available: ${available}`,
+						`Environment "${flags.envName}" not found. Available: ${available}`,
 					);
 				}
 				selectedEnv = match;
