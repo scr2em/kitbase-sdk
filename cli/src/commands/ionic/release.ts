@@ -19,12 +19,16 @@ import type { components } from "../../generated/api.js";
 type BuildResponse = components["schemas"]["BuildResponse"];
 type EnvironmentResponse = components["schemas"]["EnvironmentResponse"];
 
+const UPDATE_MODES = ["force", "silent", "prompt"] as const;
+const TARGET_PLATFORMS = ["ios", "android", "both"] as const;
+
 export default class Release extends BaseCommand {
 	static override description = "Create an OTA update from an existing build";
 
 	static override examples = [
 		"<%= config.bin %> ionic release",
 		"<%= config.bin %> ionic release --api-key sk_kitbase_xxx",
+		'<%= config.bin %> ionic release --build-id abc123 --env production --name "v1.2.0 hotfix" --version 1.2.0 --min-version 1.0.0 --update-mode force --platform both',
 	];
 
 	static override flags = {
@@ -34,6 +38,35 @@ export default class Release extends BaseCommand {
 		}),
 		"base-url": Flags.string({
 			description: "Override API base URL",
+		}),
+		"build-id": Flags.string({
+			char: "b",
+			description: "Build ID to release (skips build selection prompt)",
+		}),
+		env: Flags.string({
+			char: "e",
+			description: "Target environment name (skips environment selection prompt)",
+		}),
+		name: Flags.string({
+			char: "n",
+			description: "Release name",
+		}),
+		version: Flags.string({
+			char: "v",
+			description: "Version string (e.g., 1.2.0)",
+		}),
+		"min-version": Flags.string({
+			description: "Minimum native version required (e.g., 1.0.0)",
+		}),
+		"update-mode": Flags.string({
+			char: "m",
+			description: "Update mode: force, silent, or prompt",
+			options: [...UPDATE_MODES],
+		}),
+		platform: Flags.string({
+			char: "p",
+			description: "Target platform: ios, android, or both",
+			options: [...TARGET_PLATFORMS],
 		}),
 	};
 
@@ -68,44 +101,62 @@ export default class Release extends BaseCommand {
 
 			const pathParams = { orgSlug: keyInfo.orgSlug, projectId: keyInfo.projectId };
 
-			// 3. Fetch latest builds
-			spinner.start("Loading builds...");
-			const { data: buildsData, error: buildsError } = await api.GET(
-				"/{orgSlug}/projects/{projectId}/builds",
-				{ params: { path: pathParams, query: { size: 10, sort: "desc" } } },
-			);
+			// 3. Resolve build
+			let selectedBuild: BuildResponse;
 
-			if (buildsError || !buildsData) {
-				spinner.fail("Failed to load builds");
-				throw new ApiError("Failed to fetch builds", 0);
-			}
-			spinner.stop();
-
-			if (buildsData.data.length === 0) {
-				throw new ConfigurationError(
-					"No builds found for this project. Push a build first with: kitbase ionic push",
+			if (flags["build-id"]) {
+				// Use build ID directly — still fetch to validate it exists and get metadata
+				spinner.start("Validating build...");
+				const { data: buildsData, error: buildsError } = await api.GET(
+					"/{orgSlug}/projects/{projectId}/builds",
+					{ params: { path: pathParams, query: { size: 100, sort: "desc" } } },
 				);
+				if (buildsError || !buildsData) {
+					spinner.fail("Failed to load builds");
+					throw new ApiError("Failed to fetch builds", 0);
+				}
+				const match = buildsData.data.find((b) => b.id === flags["build-id"]);
+				if (!match) {
+					spinner.fail("Build not found");
+					throw new ValidationError(`Build "${flags["build-id"]}" not found in this project`);
+				}
+				selectedBuild = match;
+				spinner.succeed(`Build: ${chalk.dim(`${selectedBuild.commitHash.substring(0, 7)} — v${selectedBuild.nativeVersion}`)}`);
+			} else {
+				spinner.start("Loading builds...");
+				const { data: buildsData, error: buildsError } = await api.GET(
+					"/{orgSlug}/projects/{projectId}/builds",
+					{ params: { path: pathParams, query: { size: 10, sort: "desc" } } },
+				);
+				if (buildsError || !buildsData) {
+					spinner.fail("Failed to load builds");
+					throw new ApiError("Failed to fetch builds", 0);
+				}
+				spinner.stop();
+
+				if (buildsData.data.length === 0) {
+					throw new ConfigurationError(
+						"No builds found for this project. Push a build first with: kitbase ionic push",
+					);
+				}
+
+				selectedBuild = await selectOne<BuildResponse>(
+					"Select a build",
+					buildsData.data.map((b) => ({
+						name: `${b.branchName} @ ${b.commitHash.substring(0, 7)} — v${b.nativeVersion} (${formatDate(b.createdAt)})`,
+						value: b,
+						description: b.commitMessage || undefined,
+					})),
+				);
+				this.log(chalk.green("  Build: ") + chalk.dim(`${selectedBuild.commitHash.substring(0, 7)} — v${selectedBuild.nativeVersion}`));
 			}
 
-			// 4. Select a build
-			const selectedBuild = await selectOne<BuildResponse>(
-				"Select a build",
-				buildsData.data.map((b) => ({
-					name: `${b.branchName} @ ${b.commitHash.substring(0, 7)} — v${b.nativeVersion} (${formatDate(b.createdAt)})`,
-					value: b,
-					description: b.commitMessage || undefined,
-				})),
-			);
-
-			this.log(chalk.green("  Build: ") + chalk.dim(`${selectedBuild.commitHash.substring(0, 7)} — v${selectedBuild.nativeVersion}`));
-
-			// 5. Fetch environments
+			// 4. Resolve environment
 			spinner.start("Loading environments...");
 			const { data: envsData, error: envsError } = await api.GET(
 				"/{orgSlug}/projects/{projectId}/environments",
 				{ params: { path: pathParams } },
 			);
-
 			if (envsError || !envsData) {
 				spinner.fail("Failed to load environments");
 				throw new ApiError("Failed to fetch environments", 0);
@@ -118,10 +169,20 @@ export default class Release extends BaseCommand {
 				);
 			}
 
-			// 6. Select environment
 			let selectedEnv: EnvironmentResponse;
 
-			if (envsData.data.length === 1) {
+			if (flags.env) {
+				const match = envsData.data.find(
+					(e) => e.name.toLowerCase() === flags.env!.toLowerCase(),
+				);
+				if (!match) {
+					const available = envsData.data.map((e) => e.name).join(", ");
+					throw new ValidationError(
+						`Environment "${flags.env}" not found. Available: ${available}`,
+					);
+				}
+				selectedEnv = match;
+			} else if (envsData.data.length === 1) {
 				selectedEnv = envsData.data[0];
 			} else {
 				selectedEnv = await selectOne<EnvironmentResponse>(
@@ -132,20 +193,20 @@ export default class Release extends BaseCommand {
 
 			this.log(chalk.green("  Environment: ") + chalk.dim(selectedEnv.name));
 
-			// 7. Prompt for release details
-			const name = await inputText("Release name", { required: true });
+			// 5. Resolve release details (flags or prompts)
+			const name = flags.name ?? await inputText("Release name", { required: true });
 
-			const version = await inputText("Version", {
+			const version = flags.version ?? await inputText("Version", {
 				default: selectedBuild.nativeVersion,
 				required: true,
 			});
 
-			const minNativeVersion = await inputText("Minimum native version", {
+			const minNativeVersion = flags["min-version"] ?? await inputText("Minimum native version", {
 				default: selectedBuild.nativeVersion,
 				required: true,
 			});
 
-			const updateMode = await selectOne<"force" | "silent" | "prompt">(
+			const updateMode = (flags["update-mode"] as typeof UPDATE_MODES[number]) ?? await selectOne<"force" | "silent" | "prompt">(
 				"Update mode",
 				[
 					{ name: "Force — applied immediately, user cannot skip", value: "force" as const },
@@ -154,7 +215,7 @@ export default class Release extends BaseCommand {
 				],
 			);
 
-			const targetPlatform = await selectOne<"ios" | "android" | "both">(
+			const targetPlatform = (flags.platform as typeof TARGET_PLATFORMS[number]) ?? await selectOne<"ios" | "android" | "both">(
 				"Target platform",
 				[
 					{ name: "Both (iOS & Android)", value: "both" as const },
@@ -163,7 +224,7 @@ export default class Release extends BaseCommand {
 				],
 			);
 
-			// 8. Confirm and create
+			// 6. Confirm and create
 			this.log(chalk.dim("\n  ── Summary ──────────────────────────"));
 			this.log(chalk.dim("  Name:        ") + chalk.white(name));
 			this.log(chalk.dim("  Version:     ") + chalk.white(version));
