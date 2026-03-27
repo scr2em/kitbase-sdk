@@ -5,7 +5,6 @@ import ora from "ora";
 import { BaseCommand } from "../../base-command.js";
 import { getGitInfo, isGitRepository } from "../../lib/git.js";
 import { getApiKey, getBaseUrl } from "../../lib/config.js";
-import { selectOne } from "../../lib/prompts.js";
 import {
 	KitbaseError,
 	ConfigurationError,
@@ -23,8 +22,6 @@ import {
 	isIonicProject,
 } from "../../ionic/build.js";
 import { UploadClient, createUploadPayload } from "../../ionic/upload.js";
-import type { EnvironmentListItem } from "../../ionic/types.js";
-
 export default class Push extends BaseCommand {
 	static override description = "Build and upload your web app to Kitbase for OTA updates";
 
@@ -70,10 +67,6 @@ export default class Push extends BaseCommand {
 		message: Flags.string({
 			description: "Override git commit message",
 		}),
-		envName: Flags.string({
-			char: "e",
-			description: "Target environment name (interactive prompt if not specified)",
-		}),
 	};
 
 	async run(): Promise<void> {
@@ -104,40 +97,6 @@ export default class Push extends BaseCommand {
 			spinner.start("Resolving project info...");
 			const keyInfo = await client.fetchKeyInfo();
 			spinner.succeed(`Project: ${chalk.dim(keyInfo.orgSlug)} / ${chalk.dim(keyInfo.projectId)}`);
-
-			spinner.start("Loading environments...");
-			const environments = await client.fetchEnvironments();
-			spinner.stop();
-
-			if (environments.length === 0) {
-				throw new ConfigurationError(
-					"No environments found for this project. Create one in the dashboard first.",
-				);
-			}
-
-			let selectedEnv: EnvironmentListItem;
-
-			if (flags.envName) {
-				const match = environments.find(
-					(e) => e.name.toLowerCase() === flags.envName!.toLowerCase(),
-				);
-				if (!match) {
-					const available = environments.map((e) => e.name).join(", ");
-					throw new ValidationError(
-						`Environment "${flags.envName}" not found. Available: ${available}`,
-					);
-				}
-				selectedEnv = match;
-			} else if (environments.length === 1) {
-				selectedEnv = environments[0];
-			} else {
-				selectedEnv = await selectOne(
-					"Select target environment",
-					environments.map((e) => ({ name: e.name, value: e })),
-				);
-			}
-
-			spinner.succeed(`Environment: ${chalk.dim(selectedEnv.name)}`);
 
 			// 3. Warn if not an Ionic project
 			if (!flags.file && !isIonicProject()) {
@@ -218,12 +177,11 @@ export default class Push extends BaseCommand {
 			}
 
 			// 7. Upload
-			const payload = createUploadPayload(zipFilePath, gitInfo, nativeVersion, selectedEnv.id);
+			const payload = createUploadPayload(zipFilePath, gitInfo, nativeVersion);
 
 			this.log(chalk.dim("\n  Commit:  ") + chalk.white(payload.commitHash));
 			this.log(chalk.dim("  Branch:  ") + chalk.white(payload.branchName));
 			this.log(chalk.dim("  Version: ") + chalk.white(payload.nativeVersion));
-			this.log(chalk.dim("  Env:     ") + chalk.white(selectedEnv.name));
 			this.log(
 				chalk.dim("  File:    ") +
 					chalk.white(`${payload.fileName} (${formatSize(payload.file.length)})`),

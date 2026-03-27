@@ -16,7 +16,6 @@ export interface UploadPayload {
 	branchName: string;
 	commitMessage?: string;
 	nativeVersion: string;
-	environmentId?: string;
 	file: Buffer;
 	fileName: string;
 }
