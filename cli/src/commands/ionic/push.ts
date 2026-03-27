@@ -97,85 +97,7 @@ export default class Push extends BaseCommand {
 				);
 			}
 
-			// 2. Warn if not an Ionic project
-			if (!flags.file && !isIonicProject()) {
-				this.log(chalk.yellow("  Warning: This does not appear to be an Ionic project.\n"));
-			}
-
-			// 3. Collect git info
-			spinner.start("Collecting git information...");
-
-			let gitInfo: { commitHash: string; branchName: string; commitMessage?: string };
-
-			if (flags.commit && flags.branch) {
-				gitInfo = {
-					commitHash: flags.commit,
-					branchName: flags.branch,
-					commitMessage: flags.message,
-				};
-			} else {
-				if (!isGitRepository()) {
-					spinner.fail("Not a git repository");
-					throw new GitError(
-						"Not a git repository. Run from a git repo or provide --commit and --branch.",
-					);
-				}
-
-				const collected = getGitInfo();
-				gitInfo = {
-					commitHash: flags.commit || collected.commitHash,
-					branchName: flags.branch || collected.branchName,
-					commitMessage: flags.message || collected.commitMessage,
-				};
-			}
-
-			spinner.succeed(
-				`Git: ${chalk.dim(gitInfo.branchName)} @ ${chalk.dim(gitInfo.commitHash.substring(0, 7))}`,
-			);
-
-			// 4. Resolve version
-			spinner.start("Getting version...");
-			let nativeVersion: string;
-			try {
-				nativeVersion = flags.version || getNativeVersion();
-			} catch {
-				if (flags.version) {
-					nativeVersion = flags.version;
-				} else {
-					spinner.fail("Could not determine version");
-					throw new ValidationError("Could not determine version. Use --version flag.");
-				}
-			}
-
-			spinner.succeed(`Version: ${chalk.dim(nativeVersion)}`);
-
-			// 5. Build or use existing zip
-			let zipFilePath: string;
-			let zipSize: number;
-
-			if (flags.file) {
-				spinner.start("Validating zip file...");
-				validateZipFile(flags.file);
-				const { statSync } = await import("node:fs");
-				zipSize = statSync(flags.file).size;
-				zipFilePath = flags.file;
-				spinner.succeed(
-					`Using zip: ${chalk.dim(zipFilePath)} ${chalk.cyan(`(${formatSize(zipSize)})`)}`,
-				);
-			} else {
-				spinner.stop();
-				const result = await buildAndZip({
-					skipBuild: flags["skip-build"],
-					outputDir: flags["output-dir"],
-				});
-				zipFilePath = result.zipPath;
-				zipSize = result.zipSize;
-				spinner.succeed(
-					`Build zipped: ${chalk.dim(zipFilePath)} ${chalk.cyan(`(${formatSize(zipSize)})`)}`,
-				);
-			}
-
-			// 6. Resolve key info
+			// 2. Resolve project & environment (before building)
 			const baseUrl = getBaseUrl(flags["base-url"]);
 			const client = new UploadClient({ apiKey, baseUrl });
 
@@ -183,7 +105,6 @@ export default class Push extends BaseCommand {
 			const keyInfo = await client.fetchKeyInfo();
 			spinner.succeed(`Project: ${chalk.dim(keyInfo.orgSlug)} / ${chalk.dim(keyInfo.projectId)}`);
 
-			// 7. Resolve environment
 			spinner.start("Loading environments...");
 			const environments = await client.fetchEnvironments();
 			spinner.stop();
@@ -218,7 +139,85 @@ export default class Push extends BaseCommand {
 
 			spinner.succeed(`Environment: ${chalk.dim(selectedEnv.name)}`);
 
-			// 8. Upload
+			// 3. Warn if not an Ionic project
+			if (!flags.file && !isIonicProject()) {
+				this.log(chalk.yellow("  Warning: This does not appear to be an Ionic project.\n"));
+			}
+
+			// 4. Collect git info
+			spinner.start("Collecting git information...");
+
+			let gitInfo: { commitHash: string; branchName: string; commitMessage?: string };
+
+			if (flags.commit && flags.branch) {
+				gitInfo = {
+					commitHash: flags.commit,
+					branchName: flags.branch,
+					commitMessage: flags.message,
+				};
+			} else {
+				if (!isGitRepository()) {
+					spinner.fail("Not a git repository");
+					throw new GitError(
+						"Not a git repository. Run from a git repo or provide --commit and --branch.",
+					);
+				}
+
+				const collected = getGitInfo();
+				gitInfo = {
+					commitHash: flags.commit || collected.commitHash,
+					branchName: flags.branch || collected.branchName,
+					commitMessage: flags.message || collected.commitMessage,
+				};
+			}
+
+			spinner.succeed(
+				`Git: ${chalk.dim(gitInfo.branchName)} @ ${chalk.dim(gitInfo.commitHash.substring(0, 7))}`,
+			);
+
+			// 5. Resolve version
+			spinner.start("Getting version...");
+			let nativeVersion: string;
+			try {
+				nativeVersion = flags.version || getNativeVersion();
+			} catch {
+				if (flags.version) {
+					nativeVersion = flags.version;
+				} else {
+					spinner.fail("Could not determine version");
+					throw new ValidationError("Could not determine version. Use --version flag.");
+				}
+			}
+
+			spinner.succeed(`Version: ${chalk.dim(nativeVersion)}`);
+
+			// 6. Build or use existing zip
+			let zipFilePath: string;
+			let zipSize: number;
+
+			if (flags.file) {
+				spinner.start("Validating zip file...");
+				validateZipFile(flags.file);
+				const { statSync } = await import("node:fs");
+				zipSize = statSync(flags.file).size;
+				zipFilePath = flags.file;
+				spinner.succeed(
+					`Using zip: ${chalk.dim(zipFilePath)} ${chalk.cyan(`(${formatSize(zipSize)})`)}`,
+				);
+			} else {
+				spinner.stop();
+				const result = await buildAndZip({
+					skipBuild: flags["skip-build"],
+					outputDir: flags["output-dir"],
+				});
+				zipFilePath = result.zipPath;
+				zipSize = result.zipSize;
+				spinner.succeed(
+					`Build zipped: ${chalk.dim(zipFilePath)} ${chalk.cyan(`(${formatSize(zipSize)})`)}`,
+				);
+			}
+
+			// 7. Upload
 			const payload = createUploadPayload(zipFilePath, gitInfo, nativeVersion, selectedEnv.id);
 
 			this.log(chalk.dim("\n  Commit:  ") + chalk.white(payload.commitHash));
