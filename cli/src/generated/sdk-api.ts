@@ -25,7 +25,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/{orgSlug}/projects/{projectId}/environments/{environmentId}/builds": {
+    "/{orgSlug}/projects/{projectId}/builds": {
         parameters: {
             query?: never;
             header?: never;
@@ -37,6 +37,7 @@ export interface paths {
         /**
          * Upload a new build
          * @description Upload a build using API key authentication. Designed for CI/CD pipelines.
+         *     Builds are project-scoped (not environment-specific).
          *     Requires X-API-Key header. Use /api/v1/auth/key-info to resolve path parameters.
          */
         post: operations["uploadBuild"];
@@ -729,14 +730,12 @@ export interface components {
             messageId: string;
             userId: string;
         };
-        /** @description API key context information */
+        /** @description API key context information (secret keys are project-scoped) */
         KeyInfoResponse: {
             /** @description Project ID associated with the API key */
             projectId: string;
             /** @description Organization ID associated with the API key */
             organizationId: string;
-            /** @description Environment ID associated with the API key */
-            environmentId: string;
             /** @description Organization slug for URL construction */
             orgSlug: string;
         };
@@ -831,8 +830,6 @@ export interface operations {
                 orgSlug: string;
                 /** @description Project ID */
                 projectId: string;
-                /** @description Environment ID */
-                environmentId: string;
             };
             cookie?: never;
         };

@@ -76,11 +76,12 @@ export default class Push extends BaseCommand {
 		try {
 			this.log(chalk.bold.cyan("\n  Kitbase Push\n"));
 
-			// 1. Resolve API key
+			// 1. Resolve API key (secret keys are per-project, not per-environment)
 			const apiKey = await getApiKey({ interactive: true, cliApiKey: flags["api-key"] });
 			if (!apiKey) {
 				throw new ConfigurationError(
-					"API key is required.\n" +
+					"A secret API key (sk_kitbase_*) is required.\n" +
+						"Secret keys are per-project and work across all environments.\n" +
 						"Set it via:\n" +
 						"  1. --api-key flag\n" +
 						"  2. .kitbasecli file with KITBASE_API_KEY=your_key\n" +
