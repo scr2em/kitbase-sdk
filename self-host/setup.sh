@@ -352,8 +352,9 @@ configure() {
     esac
 
     # OAuth
-    print_step "OAuth (optional)"
-    prompt_yn CONFIGURE_OAUTH "Configure OAuth providers?" "n"
+    print_step "Social Login (optional)"
+    printf "  ${DIM}Allow users to sign in with Google or GitHub. You can set this up later in .env.${NC}\n"
+    prompt_yn CONFIGURE_OAUTH "Enable social login?" "n"
 
     OAUTH_GOOGLE_CLIENT_ID=""
     OAUTH_GOOGLE_CLIENT_SECRET=""
