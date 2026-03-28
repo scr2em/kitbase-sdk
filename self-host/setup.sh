@@ -241,7 +241,7 @@ configure() {
     # Domain
     print_step "Domain"
     printf "  ${DIM}Examples: kitbase.example.com, https://kitbase.example.com, 192.168.1.100${NC}\n"
-    printf "  ${DIM}Use http://localhost for local testing.${NC}\n"
+    printf "  ${DIM}For local testing, just press Enter to use http://localhost.${NC}\n"
     prompt DOMAIN "Domain" "http://localhost"
 
     # Normalize: lowercase, strip whitespace
@@ -628,6 +628,9 @@ else
     echo ""
     printf "  ${BOLD}Dashboard:${NC}  ${DOMAIN}\n"
     printf "  ${BOLD}API:${NC}        ${DOMAIN}/api\n"
+    if [ "$APP_DOMAIN" != "localhost" ]; then
+        printf "  ${BOLD}Local:${NC}      http://localhost ${DIM}(from this machine)${NC}\n"
+    fi
     echo ""
     echo "  Useful commands:"
     echo "    docker compose logs -f        # View logs"
