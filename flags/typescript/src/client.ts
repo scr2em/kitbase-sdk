@@ -134,6 +134,9 @@ export class FlagsClient {
 	// Flag change listeners
 	private flagChangeListeners: Set<FlagChangeCallback> = new Set();
 
+	// Persistent identity context (set via identify())
+	private identityContext: EvaluationContext | null = null;
+
 	constructor(config: FlagsConfig) {
 		if (!config.sdkKey) {
 			throw new ValidationError("SDK key is required", "sdkKey");
@@ -365,6 +368,56 @@ export class FlagsClient {
 		this.flagChangeListeners.clear();
 	}
 
+	// ==================== Identity ====================
+
+	/**
+	 * Identify the current user. Sets a persistent context that is merged
+	 * into every flag evaluation. Per-call context overrides these values.
+	 *
+	 * Call this after the user logs in so that targeting rules and
+	 * percentage rollouts work correctly.
+	 *
+	 * @param targetingKey - Unique user/device identifier
+	 * @param traits - Optional attributes for targeting rules
+	 *
+	 * @example
+	 * ```typescript
+	 * flags.identify('user-123', { plan: 'premium', country: 'US' });
+	 * ```
+	 */
+	identify(targetingKey: string, traits?: Record<string, unknown>): void {
+		this.identityContext = { targetingKey, ...traits };
+		// Clear cache so subsequent evaluations use the new identity
+		this.clearCache();
+	}
+
+	/**
+	 * Clear the current identity. Call this on logout.
+	 * Clears cached flag values so subsequent evaluations are anonymous.
+	 */
+	resetIdentity(): void {
+		this.identityContext = null;
+		this.clearCache();
+	}
+
+	/**
+	 * Get the current identified targeting key, or null if not identified.
+	 */
+	getTargetingKey(): string | null {
+		return this.identityContext?.targetingKey ?? null;
+	}
+
+	/**
+	 * Merge the persistent identity context with a per-call context.
+	 * Per-call values override identity values.
+	 */
+	private mergeContext(callContext?: EvaluationContext): EvaluationContext | undefined {
+		if (!this.identityContext && !callContext) return undefined;
+		if (!this.identityContext) return callContext;
+		if (!callContext) return this.identityContext;
+		return { ...this.identityContext, ...callContext };
+	}
+
 	/**
 	 * Manually refresh the configuration (local evaluation mode only).
 	 *
@@ -389,13 +442,15 @@ export class FlagsClient {
 	 * Returns null if not cached or expired
 	 */
 	getCachedSnapshotSync(context?: EvaluationContext): FlagSnapshot | null {
+		const merged = this.mergeContext(context);
+
 		if (this.enableLocalEvaluation) {
 			// For local evaluation, we can generate snapshot synchronously
 			if (!this.evaluator?.isReady()) {
 				return null;
 			}
 			const config = this.evaluator.getConfiguration()!;
-			const flags = this.evaluator.evaluateAll(context);
+			const flags = this.evaluator.evaluateAll(merged);
 			return {
 				projectId: "",
 				environmentId: config.environmentId,
@@ -405,7 +460,7 @@ export class FlagsClient {
 		}
 
 		// For remote evaluation, check cache
-		const cacheKey = this.getSnapshotCacheKey(context);
+		const cacheKey = this.getSnapshotCacheKey(merged);
 		return this.getCachedValue<FlagSnapshot>(cacheKey);
 	}
 
@@ -421,10 +476,12 @@ export class FlagsClient {
 	 * @throws {TimeoutError} When the request times out
 	 */
 	async getSnapshot(options?: EvaluateOptions): Promise<FlagSnapshot> {
+		const context = this.mergeContext(options?.context);
+
 		if (this.enableLocalEvaluation) {
 			await this.ensureLocalReady();
 			const config = this.evaluator!.getConfiguration()!;
-			const flags = this.evaluator!.evaluateAll(options?.context);
+			const flags = this.evaluator!.evaluateAll(context);
 			return {
 				projectId: "",
 				environmentId: config.environmentId,
@@ -434,13 +491,13 @@ export class FlagsClient {
 		}
 
 		// Check cache for remote evaluation
-		const cacheKey = this.getSnapshotCacheKey(options?.context);
+		const cacheKey = this.getSnapshotCacheKey(context);
 		const cached = this.getCachedValue<FlagSnapshot>(cacheKey);
 		if (cached) {
 			return cached;
 		}
 
-		const payload = this.buildSnapshotPayload(options?.context);
+		const payload = this.buildSnapshotPayload(context);
 		const snapshot = await this.request<FlagSnapshot>("/sdk/v1/feature-flags/snapshot", payload);
 
 		// Cache the result
@@ -465,13 +522,15 @@ export class FlagsClient {
 			throw new ValidationError("Flag key is required", "flagKey");
 		}
 
+		const context = this.mergeContext(options?.context);
+
 		if (this.enableLocalEvaluation) {
 			await this.ensureLocalReady();
-			return this.evaluator!.evaluate(flagKey, options?.context);
+			return this.evaluator!.evaluate(flagKey, context);
 		}
 
 		// Check cache for remote evaluation
-		const cacheKey = this.getEvaluateFlagCacheKey(flagKey, options?.context);
+		const cacheKey = this.getEvaluateFlagCacheKey(flagKey, context);
 		const cached = this.getCachedValue<EvaluatedFlag>(cacheKey);
 		if (cached) {
 			return cached;
@@ -484,7 +543,8 @@ export class FlagsClient {
 		}
 
 		// Create and track the evaluation promise
-		const evaluationPromise = this.doEvaluateFlag(flagKey, cacheKey, options);
+		const mergedOptions = { ...options, context };
+		const evaluationPromise = this.doEvaluateFlag(flagKey, cacheKey, mergedOptions);
 		this.pendingEvaluations.set(cacheKey, evaluationPromise);
 
 		try {
