@@ -217,6 +217,10 @@ check_dependencies() {
 
 install_docker() {
     echo ""
+    if ! command -v curl &> /dev/null; then
+        print_warn "Installing curl..."
+        sudo apt-get update -qq && sudo apt-get install -y -qq curl
+    fi
     print_warn "Installing Docker..."
     curl -fsSL https://get.docker.com | sh
     sudo systemctl enable docker
