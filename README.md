@@ -2,16 +2,40 @@
 
 Official SDKs for [Kitbase](https://kitbase.io).
 
+**[Full Documentation](https://docs.kitbase.dev)**
+
 ## SDKs
 
-| SDK                    | Package                      | Docs                                                        |
-| ---------------------- | ---------------------------- | ----------------------------------------------------------- |
-| Analytics (TypeScript) | `@kitbase/analytics`         | [README](./analytics/typescript/packages/core/README.md)    |
-| Analytics (React)      | `@kitbase/analytics-react`   | [README](./analytics/typescript/packages/react/README.md)   |
-| Analytics (Angular)    | `@kitbase/analytics-angular` | [README](./analytics/typescript/packages/angular/README.md) |
-| Analytics (Dart)       | `kitbase_analytics`          | [README](./analytics/dart/README.md)                        |
-| Feature Flags          | `@kitbase/flags`             | [README](./flags/README.md)                                 |
-| Ionic CLI              | `@kitbase/ionic`             | [README](./ionic/README.md)                                 |
+### Analytics
+
+| SDK | Package | Docs |
+| --- | ------- | ---- |
+| JavaScript / TypeScript | `@kitbase/analytics` | [Documentation](https://docs.kitbase.dev/sdks/javascript) |
+| React | `@kitbase/analytics-react` | [Documentation](https://docs.kitbase.dev/sdks/react) |
+| Angular | `@kitbase/analytics-angular` | [Documentation](https://docs.kitbase.dev/sdks/angular) |
+| Dart / Flutter | `kitbase_analytics` | [Documentation](https://docs.kitbase.dev/sdks/dart) |
+| MCP Server | `@kitbase/analytics-mcp` | [Documentation](https://docs.kitbase.dev/sdks/mcp) |
+
+### Feature Flags
+
+| SDK | Package | Docs |
+| --- | ------- | ---- |
+| Core | `@kitbase/flags` | [Documentation](https://docs.kitbase.dev/features/flags) |
+| React | `@kitbase/flags-react` | [Documentation](https://docs.kitbase.dev/features/flags) |
+| Angular | `@kitbase/flags-angular` | [Documentation](https://docs.kitbase.dev/features/flags) |
+
+### In-App Messaging
+
+| SDK | Package | Docs |
+| --- | ------- | ---- |
+| JavaScript / TypeScript | `@kitbase/messaging` | [Documentation](https://docs.kitbase.dev/sdks/messaging) |
+| React | `@kitbase/messaging-react` | [Documentation](https://docs.kitbase.dev/sdks/messaging-react) |
+
+### CLI
+
+| Tool | Package | Docs |
+| ---- | ------- | ---- |
+| CLI | `@kitbase/cli` | [Documentation](https://docs.kitbase.dev/cli) |
 
 ## License
 
