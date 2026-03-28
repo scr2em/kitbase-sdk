@@ -367,6 +367,9 @@ configure() {
 
     if [ "$CONFIGURE_OAUTH" = true ]; then
         echo ""
+        printf "  ${DIM}Google: Create an OAuth app at https://console.cloud.google.com/apis/credentials${NC}\n"
+        printf "  ${DIM}GitHub: Create an OAuth app at https://github.com/settings/developers${NC}\n"
+        echo ""
         printf "  ${DIM}Google OAuth:${NC}\n"
         prompt OAUTH_GOOGLE_CLIENT_ID "  Google Client ID" ""
         prompt OAUTH_GOOGLE_CLIENT_SECRET "  Google Client Secret" ""
