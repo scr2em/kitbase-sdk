@@ -109,45 +109,25 @@ select_option() {
     local prompt_text="$1"
     shift
     local options=("$@")
-    local selected=0
     local count=${#options[@]}
 
     printf "  ${BOLD}%s${NC}\n" "$prompt_text"
-    printf "  ${DIM}Use arrow keys to select, Enter to confirm${NC}\n"
-
-    # Hide cursor
-    tput civis 2>/dev/null
-
-    while true; do
-        # Print options
-        for i in "${!options[@]}"; do
-            if [ "$i" -eq "$selected" ]; then
-                printf "  ${CYAN}› %s${NC}\n" "${options[$i]}"
-            else
-                printf "    %s\n" "${options[$i]}"
-            fi
-        done
-
-        # Read a single keypress
-        IFS= read -rsn1 key
-        if [[ "$key" == $'\x1b' ]]; then
-            read -rsn2 key
-            case "$key" in
-                '[A') selected=$(( (selected - 1 + count) % count )) ;;  # Up
-                '[B') selected=$(( (selected + 1) % count )) ;;          # Down
-            esac
-        elif [[ "$key" == "" ]]; then
-            break  # Enter
-        fi
-
-        # Move cursor up to reprint
-        tput cuu "$count" 2>/dev/null
+    for i in "${!options[@]}"; do
+        printf "    ${CYAN}%d)${NC} %s\n" "$((i + 1))" "${options[$i]}"
     done
 
-    # Show cursor
-    tput cnorm 2>/dev/null
+    local choice=""
+    while true; do
+        printf "  ${BOLD}Choose [1-%d]${NC} ${DIM}(default: 1)${NC}: " "$count"
+        read -r choice
+        choice="${choice:-1}"
+        if [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -ge 1 ] && [ "$choice" -le "$count" ]; then
+            break
+        fi
+        print_warn "Please enter a number between 1 and $count"
+    done
 
-    SELECTED_INDEX=$selected
+    SELECTED_INDEX=$((choice - 1))
 }
 
 # =============================================================================
