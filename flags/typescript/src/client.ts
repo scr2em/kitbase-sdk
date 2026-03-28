@@ -34,6 +34,31 @@ import {
 
 const BASE_URL = "https://api.kitbase.dev";
 const TIMEOUT = 30000;
+const ANONYMOUS_ID_KEY = "kitbase_anonymous_id";
+
+/**
+ * Generate a UUID v4, matching the analytics SDK's technique.
+ */
+function generateUUID(): string {
+	if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+		return crypto.randomUUID();
+	}
+	// Fallback using crypto.getRandomValues (wider browser/WebView support)
+	if (typeof crypto !== "undefined" && typeof crypto.getRandomValues === "function") {
+		const bytes = new Uint8Array(16);
+		crypto.getRandomValues(bytes);
+		bytes[6] = (bytes[6]! & 0x0f) | 0x40;
+		bytes[8] = (bytes[8]! & 0x3f) | 0x80;
+		const hex = Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+		return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+	}
+	// Last resort (Math.random — not cryptographically secure but functional)
+	return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+		const r = (Math.random() * 16) | 0;
+		const v = c === "x" ? r : (r & 0x3) | 0x8;
+		return v.toString(16);
+	});
+}
 
 /**
  * Event types emitted by the FlagsClient (local evaluation mode only)
@@ -137,6 +162,9 @@ export class FlagsClient {
 	// Persistent identity context (set via identify())
 	private identityContext: EvaluationContext | null = null;
 
+	// Anonymous ID for rollout bucketing (persisted to localStorage)
+	private anonymousId: string;
+
 	constructor(config: FlagsConfig) {
 		if (!config.sdkKey) {
 			throw new ValidationError("SDK key is required", "sdkKey");
@@ -164,6 +192,9 @@ export class FlagsClient {
 
 		// Defaults
 		this.defaultValues = config.defaultValues ?? {};
+
+		// Anonymous ID — load from localStorage or generate a new one
+		this.anonymousId = this.loadOrCreateAnonymousId();
 
 		// Initialize evaluator for local evaluation mode
 		if (this.enableLocalEvaluation) {
@@ -408,14 +439,41 @@ export class FlagsClient {
 	}
 
 	/**
-	 * Merge the persistent identity context with a per-call context.
-	 * Per-call values override identity values.
+	 * Get the anonymous ID. Persists across sessions via localStorage.
 	 */
-	private mergeContext(callContext?: EvaluationContext): EvaluationContext | undefined {
-		if (!this.identityContext && !callContext) return undefined;
-		if (!this.identityContext) return callContext;
-		if (!callContext) return this.identityContext;
-		return { ...this.identityContext, ...callContext };
+	getAnonymousId(): string {
+		return this.anonymousId;
+	}
+
+	/**
+	 * Merge the persistent identity context with a per-call context.
+	 * Priority: per-call context > identity context > anonymous targetingKey
+	 */
+	private mergeContext(callContext?: EvaluationContext): EvaluationContext {
+		const base: EvaluationContext = { targetingKey: this.anonymousId };
+		if (this.identityContext) {
+			Object.assign(base, this.identityContext);
+		}
+		if (callContext) {
+			Object.assign(base, callContext);
+		}
+		return base;
+	}
+
+	private loadOrCreateAnonymousId(): string {
+		if (this.isLocalStorageAvailable()) {
+			try {
+				const stored = window.localStorage.getItem(ANONYMOUS_ID_KEY);
+				if (stored) return stored;
+				const id = generateUUID();
+				window.localStorage.setItem(ANONYMOUS_ID_KEY, id);
+				return id;
+			} catch {
+				// localStorage not accessible, fall through
+			}
+		}
+		// No localStorage (Node.js, SSR) — generate a per-instance ID
+		return generateUUID();
 	}
 
 	/**
