@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+cd "$(dirname "$0")"
+
 RED='\033[0;31m'
 BOLD='\033[1m'
 DIM='\033[2m'
@@ -26,7 +28,17 @@ fi
 echo ""
 
 printf "  Stopping containers, removing volumes and images..."
-if docker compose down -v --rmi all 2>&1; then
+if docker compose version &> /dev/null; then
+    COMPOSE_CMD="docker compose"
+elif command -v docker-compose &> /dev/null; then
+    COMPOSE_CMD="docker-compose"
+else
+    printf "\n"
+    printf "  ${RED}Docker Compose not found.${NC}\n"
+    exit 1
+fi
+
+if $COMPOSE_CMD down -v --rmi all 2>&1; then
     printf " done\n"
 else
     printf "\n"

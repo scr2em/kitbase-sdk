@@ -24,6 +24,10 @@ export class FrustrationPlugin implements KitbasePlugin {
 			const target = event.target as Element | null;
 			if (!target) return;
 
+			// Skip multi-click sequences (double/triple-click for text selection).
+			// Only independent single clicks (detail === 1) indicate frustration.
+			if (event.detail > 1) return;
+
 			const now = Date.now();
 
 			// --- Rage Click Detection ---
