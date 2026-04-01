@@ -1,6 +1,6 @@
 {
 	"name": "@kitbase/analytics",
-	"version": "0.1.7",
+	"version": "0.1.8",
 	"description": "Kitbase Analytics SDK for TypeScript and JavaScript",
 	"keywords": [
 		"analytics",
