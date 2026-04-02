@@ -271,7 +271,15 @@ configure() {
     local generated_secret
     generated_secret=$(generate_secret)
     printf "  ${DIM}JWT secret for signing auth tokens.${NC}\n"
-    prompt JWT_SECRET "JWT secret" "$generated_secret"
+    printf "  ${DIM}Must be at least 32 characters (256 bits).${NC}\n"
+    while true; do
+        prompt JWT_SECRET "JWT secret" "$generated_secret"
+        local key_len=${#JWT_SECRET}
+        if [ "$key_len" -ge 32 ]; then
+            break
+        fi
+        print_error "JWT secret is too short (${key_len} chars). Must be at least 32 characters."
+    done
 
     # Database
     print_step "Database"
