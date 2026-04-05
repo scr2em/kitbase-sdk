@@ -23,6 +23,7 @@ import {
 	isSameRootDomain,
 	getUtmParams,
 } from "./plugins/utils.js";
+import { SDK_VERSION } from "./version.js";
 
 const DEFAULT_BASE_URL = "https://api.kitbase.dev";
 const TIMEOUT = 30000;
@@ -601,6 +602,7 @@ export class KitbaseAnalytics {
 			event: options.event,
 			client_timestamp: Date.now(),
 			client_session_id: this.getClientSessionId(),
+			sdk_version: SDK_VERSION,
 			...(options.user_id && { user_id: options.user_id }),
 			...(options.icon && { icon: options.icon }),
 			...(options.notify !== undefined && { notify: options.notify }),

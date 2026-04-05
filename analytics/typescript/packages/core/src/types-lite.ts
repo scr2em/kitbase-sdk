@@ -131,6 +131,11 @@ export interface LogPayload {
 	 * Added by the offline queue for accurate timing of queued events.
 	 */
 	client_timestamp?: number;
+	/**
+	 * Version of the Kitbase SDK package that produced this event.
+	 * Injected at build time from the core package's package.json.
+	 */
+	sdk_version?: string;
 }
 
 // ============================================================

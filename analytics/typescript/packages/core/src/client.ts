@@ -4,6 +4,7 @@ import { KitbaseAnalytics as KitbaseAnalyticsBase } from "./client-base.js";
 import { EventQueue } from "./queue/index.js";
 import type { QueuedEvent, QueueStats } from "./queue/types.js";
 import { createDefaultPlugins } from "./plugins/defaults.js";
+import { SDK_VERSION } from "./version.js";
 
 /**
  * Kitbase client for tracking events with full offline queue support
@@ -246,6 +247,7 @@ export class KitbaseAnalytics extends KitbaseAnalyticsBase {
 			event: options.event,
 			client_timestamp: Date.now(),
 			client_session_id: this.getClientSessionId(),
+			sdk_version: SDK_VERSION,
 			...(options.user_id && { user_id: options.user_id }),
 			...(options.icon && { icon: options.icon }),
 			...(options.notify !== undefined && { notify: options.notify }),

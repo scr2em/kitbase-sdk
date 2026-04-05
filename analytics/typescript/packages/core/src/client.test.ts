@@ -102,6 +102,8 @@ describe("KitbaseAnalytics", () => {
 			});
 			expect(body.client_timestamp).toEqual(expect.any(Number));
 			expect(body.client_session_id).toEqual(expect.any(String));
+			expect(body.sdk_version).toEqual(expect.any(String));
+			expect(body.sdk_version).not.toEqual("");
 		});
 
 		it("should throw AuthenticationError on 401", async () => {

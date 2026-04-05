@@ -149,6 +149,11 @@ export interface LogPayload {
 	 * Used by the server for offline session reconstruction.
 	 */
 	client_session_id: string;
+	/**
+	 * Version of the Kitbase SDK package that produced this event.
+	 * Injected at build time from the core package's package.json.
+	 */
+	sdk_version: string;
 }
 
 // ============================================================
