@@ -247,12 +247,14 @@ export class KitbaseAnalytics extends KitbaseAnalyticsBase {
 			event: options.event,
 			client_timestamp: Date.now(),
 			client_session_id: this.getClientSessionId(),
-			sdk_version: SDK_VERSION,
 			...(options.user_id && { user_id: options.user_id }),
 			...(options.icon && { icon: options.icon }),
 			...(options.notify !== undefined && { notify: options.notify }),
 			...(options.description && { description: options.description }),
 			...(Object.keys(mergedTags).length > 0 && { tags: mergedTags }),
+			// sdk_version is always set by the SDK itself and must not be
+			// overridable by callers or super properties — keep it last.
+			sdk_version: SDK_VERSION,
 		};
 
 		this.log("Track", { event: options.event, payload });
