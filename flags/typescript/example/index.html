@@ -55,13 +55,37 @@
 			}
 			.layout {
 				display: grid;
-				grid-template-columns: 1fr 1fr;
+				grid-template-columns: minmax(0, 1fr) minmax(340px, 460px);
 				gap: 16px;
 				padding: 16px;
+				align-items: start;
+			}
+			.left-col {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 16px;
+			}
+			.log-col {
+				position: sticky;
+				top: 16px;
+				max-height: calc(100vh - 32px);
+				display: flex;
+				flex-direction: column;
+			}
+			.log-col .log {
+				flex: 1;
+				max-height: none;
 			}
 			@media (max-width: 1100px) {
 				.layout {
 					grid-template-columns: 1fr;
+				}
+				.left-col {
+					grid-template-columns: 1fr;
+				}
+				.log-col {
+					position: static;
+					max-height: 480px;
 				}
 			}
 			section {
@@ -219,9 +243,6 @@
 				padding: 1px 6px;
 				border-radius: 3px;
 			}
-			.full-row {
-				grid-column: 1 / -1;
-			}
 		</style>
 	</head>
 	<body>
@@ -236,6 +257,7 @@
 		</header>
 
 		<div class="layout">
+			<div class="left-col">
 			<!-- ============== SETUP ============== -->
 			<section>
 				<h2>1 · Setup</h2>
@@ -419,8 +441,9 @@
 				</div>
 			</section>
 
+			</div>
 			<!-- ============== LOG ============== -->
-			<section class="full-row">
+			<section class="log-col">
 				<h2>
 					Activity Log
 					<button id="btn-clear-log" class="secondary" style="float: right; margin: 0; padding: 4px 8px; font-size: 11px">Clear</button>
