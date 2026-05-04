@@ -1,6 +1,6 @@
 {
 	"name": "@kitbase/flags",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"description": "Kitbase Feature Flags SDK for TypeScript and JavaScript",
 	"keywords": [
 		"feature-flags",

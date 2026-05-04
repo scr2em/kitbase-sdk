@@ -1,6 +1,6 @@
 {
 	"name": "@kitbase/flags-react",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"description": "Kitbase Feature Flags React SDK - React hooks and providers",
 	"keywords": [
 		"feature-flags",
