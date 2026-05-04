@@ -1,0 +1,827 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Kitbase Flags · Local Evaluation · QA</title>
+		<style>
+			* {
+				box-sizing: border-box;
+			}
+			body {
+				font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+				margin: 0;
+				background: #0f172a;
+				color: #e2e8f0;
+				min-height: 100vh;
+			}
+			header {
+				padding: 16px 24px;
+				background: #020617;
+				border-bottom: 1px solid #1e293b;
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				flex-wrap: wrap;
+				gap: 12px;
+			}
+			header h1 {
+				margin: 0;
+				font-size: 18px;
+				font-weight: 600;
+			}
+			header h1 a {
+				color: #94a3b8;
+				text-decoration: none;
+				font-size: 14px;
+				margin-right: 8px;
+			}
+			header h1 a:hover {
+				color: #e2e8f0;
+			}
+			header .status {
+				font-size: 13px;
+				display: flex;
+				gap: 16px;
+				flex-wrap: wrap;
+			}
+			header .status span {
+				padding: 2px 8px;
+				border-radius: 4px;
+				background: #1e293b;
+			}
+			header .status .ok {
+				background: #14532d;
+				color: #bbf7d0;
+			}
+			header .status .err {
+				background: #7f1d1d;
+				color: #fecaca;
+			}
+			header .status .warn {
+				background: #713f12;
+				color: #fde68a;
+			}
+			.layout {
+				display: grid;
+				grid-template-columns: minmax(0, 1fr) minmax(340px, 460px);
+				gap: 16px;
+				padding: 16px;
+				align-items: start;
+			}
+			.left-col {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 16px;
+			}
+			.log-col {
+				position: sticky;
+				top: 16px;
+				max-height: calc(100vh - 32px);
+				display: flex;
+				flex-direction: column;
+			}
+			.log-col .log {
+				flex: 1;
+				max-height: none;
+			}
+			@media (max-width: 1100px) {
+				.layout {
+					grid-template-columns: 1fr;
+				}
+				.left-col {
+					grid-template-columns: 1fr;
+				}
+				.log-col {
+					position: static;
+					max-height: 480px;
+				}
+			}
+			section {
+				background: #1e293b;
+				border: 1px solid #334155;
+				border-radius: 8px;
+				padding: 16px;
+			}
+			section h2 {
+				margin: 0 0 12px;
+				font-size: 14px;
+				text-transform: uppercase;
+				letter-spacing: 0.05em;
+				color: #94a3b8;
+			}
+			label {
+				display: block;
+				font-size: 12px;
+				color: #94a3b8;
+				margin-bottom: 4px;
+				margin-top: 10px;
+			}
+			input,
+			select,
+			textarea {
+				width: 100%;
+				padding: 8px 10px;
+				background: #0f172a;
+				border: 1px solid #334155;
+				border-radius: 4px;
+				color: #e2e8f0;
+				font-family: ui-monospace, monospace;
+				font-size: 13px;
+			}
+			textarea {
+				resize: vertical;
+				min-height: 60px;
+			}
+			input:focus,
+			select:focus,
+			textarea:focus {
+				outline: none;
+				border-color: #3b82f6;
+			}
+			.row {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 8px;
+			}
+			.row3 {
+				display: grid;
+				grid-template-columns: 1fr 1fr 1fr;
+				gap: 8px;
+			}
+			button {
+				padding: 8px 12px;
+				background: #3b82f6;
+				border: none;
+				border-radius: 4px;
+				color: #fff;
+				font-size: 13px;
+				font-weight: 500;
+				cursor: pointer;
+				margin-top: 10px;
+				margin-right: 6px;
+			}
+			button:hover {
+				background: #2563eb;
+			}
+			button:disabled {
+				background: #475569;
+				cursor: not-allowed;
+			}
+			button.danger {
+				background: #dc2626;
+			}
+			button.danger:hover {
+				background: #b91c1c;
+			}
+			button.secondary {
+				background: #475569;
+			}
+			button.secondary:hover {
+				background: #334155;
+			}
+			.btn-group {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 4px;
+				margin-top: 8px;
+			}
+			.btn-group button {
+				margin: 0;
+			}
+			.checkbox {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				margin-top: 10px;
+				font-size: 13px;
+			}
+			.checkbox input {
+				width: auto;
+			}
+			.log {
+				background: #020617;
+				border: 1px solid #1e293b;
+				border-radius: 4px;
+				padding: 10px;
+				font-family: ui-monospace, monospace;
+				font-size: 12px;
+				max-height: 360px;
+				overflow-y: auto;
+				white-space: pre-wrap;
+				word-break: break-word;
+			}
+			.log .entry {
+				padding: 4px 0;
+				border-bottom: 1px solid #1e293b;
+			}
+			.log .entry:last-child {
+				border-bottom: none;
+			}
+			.log .ts {
+				color: #64748b;
+			}
+			.log .label {
+				color: #93c5fd;
+				font-weight: 600;
+				margin-right: 6px;
+			}
+			.log .ok {
+				color: #86efac;
+			}
+			.log .err {
+				color: #fca5a5;
+			}
+			.log .info {
+				color: #fde68a;
+			}
+			.log .ev {
+				color: #c4b5fd;
+			}
+			.kv {
+				display: flex;
+				gap: 12px;
+				font-size: 12px;
+				margin-top: 8px;
+				color: #94a3b8;
+				flex-wrap: wrap;
+			}
+			.kv code {
+				background: #0f172a;
+				color: #e2e8f0;
+				padding: 1px 6px;
+				border-radius: 3px;
+			}
+			.note {
+				background: #1e3a8a33;
+				border-left: 3px solid #3b82f6;
+				padding: 8px 12px;
+				font-size: 12px;
+				color: #bfdbfe;
+				margin-top: 8px;
+				border-radius: 0 4px 4px 0;
+			}
+		</style>
+	</head>
+	<body>
+		<header>
+			<h1><a href="index.html">←</a> Kitbase Flags · Local Evaluation</h1>
+			<div class="status">
+				<span id="bundle-status">bundle: loading…</span>
+				<span id="client-status">client: not initialized</span>
+				<span id="ready-status">ready: —</span>
+				<span id="of-status">openfeature: not registered</span>
+			</div>
+		</header>
+
+		<div class="layout">
+			<div class="left-col">
+				<!-- ============== SETUP ============== -->
+				<section>
+					<h2>1 · Setup</h2>
+					<div class="note">In local mode, configuration is fetched once and refreshed periodically. Flag evaluations resolve in-memory without network calls.</div>
+					<label>SDK Key</label>
+					<input id="cfg-sdk-key" placeholder="kbf_xxx" />
+
+					<div class="row">
+						<div>
+							<label>Base URL</label>
+							<input id="cfg-base-url" placeholder="https://api.kitbase.dev" />
+						</div>
+						<div>
+							<label>Refresh interval (s)</label>
+							<input id="cfg-refresh" type="number" value="60" />
+						</div>
+					</div>
+
+					<label class="checkbox"><input type="checkbox" id="cfg-persistent" checked /> Persist configuration to localStorage</label>
+
+					<label>Default values (JSON)</label>
+					<textarea id="cfg-defaults" placeholder='{"dark-mode": false, "max-items": 10}'></textarea>
+
+					<label>Initial configuration (FlagConfiguration JSON, optional)</label>
+					<textarea id="cfg-initial" placeholder='{"flags":{...},"segments":{...}}'></textarea>
+
+					<div class="btn-group">
+						<button id="btn-create">Create client</button>
+						<button id="btn-initialize" class="secondary">initialize()</button>
+						<button id="btn-wait-ready" class="secondary">waitUntilReady()</button>
+						<button id="btn-isready" class="secondary">isReady()</button>
+						<button id="btn-close" class="danger">close()</button>
+					</div>
+				</section>
+
+				<!-- ============== IDENTITY ============== -->
+				<section>
+					<h2>2 · Identity</h2>
+					<div class="row">
+						<div>
+							<label>Targeting key</label>
+							<input id="id-key" placeholder="user-123" />
+						</div>
+						<div>
+							<label>Traits (JSON)</label>
+							<input id="id-traits" placeholder='{"plan":"premium"}' />
+						</div>
+					</div>
+					<div class="btn-group">
+						<button id="btn-identify">identify()</button>
+						<button id="btn-reset-identity" class="danger">resetIdentity()</button>
+						<button id="btn-get-key" class="secondary">getTargetingKey()</button>
+						<button id="btn-get-anon" class="secondary">getAnonymousId()</button>
+					</div>
+					<div class="kv">
+						<span>targetingKey: <code id="dsp-key">—</code></span>
+						<span>anonymousId: <code id="dsp-anon">—</code></span>
+					</div>
+				</section>
+
+				<!-- ============== EVALUATION ============== -->
+				<section>
+					<h2>3 · Evaluate Flag</h2>
+					<div class="row3">
+						<div>
+							<label>Flag key</label>
+							<input id="ev-key" placeholder="dark-mode" />
+						</div>
+						<div>
+							<label>Type</label>
+							<select id="ev-type">
+								<option value="boolean">boolean</option>
+								<option value="string">string</option>
+								<option value="number">number</option>
+								<option value="json">json</option>
+							</select>
+						</div>
+						<div>
+							<label>Default (JSON)</label>
+							<input id="ev-default" placeholder="false" />
+						</div>
+					</div>
+					<label>Per-call context (JSON, optional)</label>
+					<textarea id="ev-context" placeholder='{"targetingKey":"user-1","country":"US"}'></textarea>
+					<div class="btn-group">
+						<button id="btn-eval-value">getXValue()</button>
+						<button id="btn-eval-flag">evaluateFlag() — full details</button>
+					</div>
+				</section>
+
+				<!-- ============== SNAPSHOT / CACHE ============== -->
+				<section>
+					<h2>4 · Snapshots &amp; Cache</h2>
+					<label>Context for snapshot (JSON, optional)</label>
+					<textarea id="snap-context" placeholder='{"targetingKey":"user-1"}'></textarea>
+					<div class="btn-group">
+						<button id="btn-snapshot">getSnapshot()</button>
+						<button id="btn-snapshot-sync" class="secondary">getCachedSnapshotSync()</button>
+						<button id="btn-clear-cache" class="danger">clearCache()</button>
+					</div>
+				</section>
+
+				<!-- ============== LOCAL CONFIG ============== -->
+				<section>
+					<h2>5 · Local Configuration</h2>
+					<div class="btn-group">
+						<button id="btn-get-config">getConfiguration()</button>
+						<button id="btn-flag-keys" class="secondary">getFlagKeys()</button>
+						<button id="btn-refresh" class="secondary">refresh()</button>
+					</div>
+					<label>Has flag (key)</label>
+					<div class="row">
+						<input id="has-flag-key" placeholder="dark-mode" />
+						<button id="btn-has-flag" style="margin-top: 0">hasFlag()</button>
+					</div>
+				</section>
+
+				<!-- ============== EVENTS ============== -->
+				<section>
+					<h2>6 · Events &amp; Subscriptions</h2>
+					<div class="btn-group">
+						<button id="btn-subscribe-on">on() lifecycle events</button>
+						<button id="btn-subscribe-flag-change">onFlagChange()</button>
+						<button id="btn-unsubscribe-all" class="danger">Unsubscribe all</button>
+					</div>
+					<div class="kv">
+						<span>lifecycle: <code id="dsp-listener">off</code></span>
+						<span>flag-change: <code id="dsp-flag-listener">off</code></span>
+					</div>
+				</section>
+
+				<!-- ============== OPENFEATURE ============== -->
+				<section>
+					<h2>7 · OpenFeature Integration</h2>
+					<div class="btn-group">
+						<button id="btn-of-register">setProvider(KitbaseProvider)</button>
+						<button id="btn-of-clear" class="danger">clearProviders()</button>
+					</div>
+					<label>Targeting key</label>
+					<input id="of-key" placeholder="user-456" />
+					<label>Traits (JSON)</label>
+					<input id="of-traits" placeholder='{"plan":"pro"}' />
+					<div class="btn-group">
+						<button id="btn-of-set-context" class="secondary">setContext()</button>
+					</div>
+					<div class="row3">
+						<div>
+							<label>Flag key</label>
+							<input id="of-flag-key" placeholder="dark-mode" />
+						</div>
+						<div>
+							<label>Type</label>
+							<select id="of-type">
+								<option value="boolean">boolean</option>
+								<option value="string">string</option>
+								<option value="number">number</option>
+								<option value="object">object</option>
+							</select>
+						</div>
+						<div>
+							<label>Default (JSON)</label>
+							<input id="of-default" placeholder="false" />
+						</div>
+					</div>
+					<div class="btn-group">
+						<button id="btn-of-eval">getXValue() via OF client</button>
+						<button id="btn-of-eval-details" class="secondary">getXDetails() via OF client</button>
+					</div>
+				</section>
+			</div>
+
+			<!-- ============== LOG ============== -->
+			<section class="log-col">
+				<h2>
+					Activity Log
+					<button id="btn-clear-log" class="secondary" style="float: right; margin: 0; padding: 4px 8px; font-size: 11px">Clear</button>
+				</h2>
+				<div id="log" class="log"></div>
+			</section>
+		</div>
+
+		<script src="https://unpkg.com/@kitbase/flags"></script>
+
+		<script>
+			(function () {
+				const $ = (id) => document.getElementById(id);
+				const log = $("log");
+
+				function entry(label, payload, kind) {
+					const time = new Date().toISOString().split("T")[1].replace("Z", "");
+					const div = document.createElement("div");
+					div.className = "entry";
+					const ts = document.createElement("span");
+					ts.className = "ts";
+					ts.textContent = time + "  ";
+					const lbl = document.createElement("span");
+					lbl.className = "label " + (kind || "");
+					lbl.textContent = label;
+					div.appendChild(ts);
+					div.appendChild(lbl);
+					if (payload !== undefined) {
+						const body = document.createElement("span");
+						body.className = kind || "";
+						body.textContent = typeof payload === "string" ? payload : JSON.stringify(payload, null, 2);
+						div.appendChild(body);
+					}
+					log.insertBefore(div, log.firstChild);
+				}
+
+				$("btn-clear-log").onclick = () => {
+					log.innerHTML = "";
+				};
+
+				if (typeof KitbaseFlags === "undefined") {
+					$("bundle-status").textContent = "bundle: NOT LOADED";
+					$("bundle-status").className = "err";
+					entry("BUNDLE", "KitbaseFlags global is missing", "err");
+					return;
+				}
+				$("bundle-status").textContent = "bundle: loaded";
+				$("bundle-status").className = "ok";
+				entry("BUNDLE", `Loaded keys: ${Object.keys(KitbaseFlags).join(", ")}`, "info");
+
+				const { FlagsClient, KitbaseProvider, OpenFeature } = KitbaseFlags;
+				let client = null;
+				let lifecycleUnsub = null;
+				let flagChangeSub = null;
+
+				function setStatus() {
+					$("client-status").textContent = client ? "client: active" : "client: not initialized";
+					$("client-status").className = client ? "ok" : "";
+					try {
+						const ready = client ? client.isReady() : false;
+						$("ready-status").textContent = "ready: " + (client ? ready : "—");
+						$("ready-status").className = ready ? "ok" : "warn";
+					} catch {
+						$("ready-status").textContent = "ready: error";
+					}
+					if (client) {
+						$("dsp-key").textContent = client.getTargetingKey() ?? "(anonymous)";
+						$("dsp-anon").textContent = client.getAnonymousId();
+					} else {
+						$("dsp-key").textContent = "—";
+						$("dsp-anon").textContent = "—";
+					}
+				}
+
+				function parseJson(value, fallback) {
+					if (!value || !value.trim()) return fallback;
+					try {
+						return JSON.parse(value);
+					} catch (e) {
+						entry("PARSE", "Invalid JSON: " + e.message, "err");
+						throw e;
+					}
+				}
+
+				$("btn-create").onclick = () => {
+					try {
+						if (client) {
+							try {
+								client.close();
+							} catch {}
+						}
+						client = new FlagsClient({
+							sdkKey: $("cfg-sdk-key").value.trim(),
+							baseUrl: $("cfg-base-url").value.trim() || undefined,
+							defaultValues: parseJson($("cfg-defaults").value, undefined),
+							remoteEvaluationCache: {
+								persistent: $("cfg-persistent").checked,
+							},
+							localEvaluation: {
+								enabled: true,
+								refreshIntervalSeconds: Number($("cfg-refresh").value),
+								initialConfiguration: parseJson($("cfg-initial").value, undefined),
+							},
+							onConfigurationChange: (cfg) => entry("onConfigurationChange", cfg, "ev"),
+							onError: (err) => entry("onError", err.message, "err"),
+						});
+						entry("new FlagsClient()", "ok (auto-init in progress)", "ok");
+					} catch (e) {
+						entry("new FlagsClient()", e.message, "err");
+					}
+					setStatus();
+				};
+
+				$("btn-initialize").onclick = async () => {
+					if (!client) return entry("initialize()", "create client first", "err");
+					try {
+						await client.initialize();
+						entry("initialize()", "resolved", "ok");
+					} catch (e) {
+						entry("initialize()", e.message, "err");
+					}
+					setStatus();
+				};
+
+				$("btn-wait-ready").onclick = async () => {
+					if (!client) return entry("waitUntilReady()", "create client first", "err");
+					try {
+						await client.waitUntilReady();
+						entry("waitUntilReady()", "ready", "ok");
+					} catch (e) {
+						entry("waitUntilReady()", e.message, "err");
+					}
+					setStatus();
+				};
+
+				$("btn-isready").onclick = () => {
+					if (!client) return entry("isReady()", "create client first", "err");
+					entry("isReady()", client.isReady(), "ok");
+				};
+
+				$("btn-close").onclick = () => {
+					if (!client) return;
+					try {
+						client.close();
+						entry("close()", "client closed", "ok");
+					} catch (e) {
+						entry("close()", e.message, "err");
+					}
+					client = null;
+					lifecycleUnsub = null;
+					flagChangeSub = null;
+					$("dsp-listener").textContent = "off";
+					$("dsp-flag-listener").textContent = "off";
+					setStatus();
+				};
+
+				$("btn-identify").onclick = () => {
+					if (!client) return entry("identify()", "create client first", "err");
+					try {
+						const traits = parseJson($("id-traits").value, undefined);
+						client.identify($("id-key").value.trim(), traits);
+						entry("identify()", { targetingKey: $("id-key").value.trim(), traits }, "ok");
+					} catch (e) {
+						entry("identify()", e.message, "err");
+					}
+					setStatus();
+				};
+
+				$("btn-reset-identity").onclick = () => {
+					if (!client) return;
+					client.resetIdentity();
+					entry("resetIdentity()", "ok", "ok");
+					setStatus();
+				};
+
+				$("btn-get-key").onclick = () => {
+					if (!client) return;
+					entry("getTargetingKey()", client.getTargetingKey(), "ok");
+				};
+
+				$("btn-get-anon").onclick = () => {
+					if (!client) return;
+					entry("getAnonymousId()", client.getAnonymousId(), "ok");
+				};
+
+				$("btn-eval-value").onclick = async () => {
+					if (!client) return entry("evaluate", "create client first", "err");
+					const key = $("ev-key").value.trim();
+					const type = $("ev-type").value;
+					const ctx = parseJson($("ev-context").value, undefined);
+					try {
+						let value;
+						if (type === "boolean") value = await client.getBooleanValue(key, ctx);
+						else if (type === "string") value = await client.getStringValue(key, ctx);
+						else if (type === "number") value = await client.getNumberValue(key, ctx);
+						else if (type === "json") value = await client.getJsonValue(key, ctx);
+						entry(`get${type[0].toUpperCase() + type.slice(1)}Value(${JSON.stringify(key)})`, value, "ok");
+					} catch (e) {
+						entry("evaluate", `${e.name}: ${e.message}`, "err");
+					}
+				};
+
+				$("btn-eval-flag").onclick = async () => {
+					if (!client) return entry("evaluateFlag()", "create client first", "err");
+					const key = $("ev-key").value.trim();
+					const ctx = parseJson($("ev-context").value, undefined);
+					const def = parseJson($("ev-default").value, undefined);
+					try {
+						const result = await client.evaluateFlag(key, { context: ctx, defaultValue: def });
+						entry("evaluateFlag()", result, "ok");
+					} catch (e) {
+						entry("evaluateFlag()", `${e.name}: ${e.message}`, "err");
+					}
+				};
+
+				$("btn-snapshot").onclick = async () => {
+					if (!client) return;
+					try {
+						const ctx = parseJson($("snap-context").value, undefined);
+						entry("getSnapshot()", await client.getSnapshot({ context: ctx }), "ok");
+					} catch (e) {
+						entry("getSnapshot()", `${e.name}: ${e.message}`, "err");
+					}
+				};
+
+				$("btn-snapshot-sync").onclick = () => {
+					if (!client) return;
+					try {
+						const ctx = parseJson($("snap-context").value, undefined);
+						entry("getCachedSnapshotSync()", client.getCachedSnapshotSync(ctx), "ok");
+					} catch (e) {
+						entry("getCachedSnapshotSync()", e.message, "err");
+					}
+				};
+
+				$("btn-clear-cache").onclick = () => {
+					if (!client) return;
+					client.clearCache();
+					entry("clearCache()", "ok", "ok");
+				};
+
+				$("btn-get-config").onclick = () => {
+					if (!client) return;
+					entry("getConfiguration()", client.getConfiguration(), "ok");
+				};
+
+				$("btn-flag-keys").onclick = () => {
+					if (!client) return;
+					entry("getFlagKeys()", client.getFlagKeys(), "ok");
+				};
+
+				$("btn-refresh").onclick = async () => {
+					if (!client) return;
+					try {
+						await client.refresh();
+						entry("refresh()", "ok", "ok");
+					} catch (e) {
+						entry("refresh()", e.message, "err");
+					}
+				};
+
+				$("btn-has-flag").onclick = () => {
+					if (!client) return;
+					entry("hasFlag()", client.hasFlag($("has-flag-key").value.trim()), "ok");
+				};
+
+				$("btn-subscribe-on").onclick = () => {
+					if (!client) return entry("on()", "create client first", "err");
+					if (lifecycleUnsub) {
+						entry("on()", "already subscribed", "info");
+						return;
+					}
+					lifecycleUnsub = client.on((event) => entry("event:" + event.type, event, "ev"));
+					$("dsp-listener").textContent = "on";
+					entry("on()", "subscribed to lifecycle events", "ok");
+				};
+
+				$("btn-subscribe-flag-change").onclick = () => {
+					if (!client) return entry("onFlagChange()", "create client first", "err");
+					if (flagChangeSub) {
+						entry("onFlagChange()", "already subscribed", "info");
+						return;
+					}
+					flagChangeSub = client.onFlagChange((changed) => entry("flagChange", changed, "ev"));
+					$("dsp-flag-listener").textContent = "on";
+					entry("onFlagChange()", "subscribed", "ok");
+				};
+
+				$("btn-unsubscribe-all").onclick = () => {
+					if (lifecycleUnsub) {
+						lifecycleUnsub();
+						lifecycleUnsub = null;
+						$("dsp-listener").textContent = "off";
+					}
+					if (flagChangeSub) {
+						flagChangeSub.unsubscribe();
+						flagChangeSub = null;
+						$("dsp-flag-listener").textContent = "off";
+					}
+					entry("unsubscribe", "all", "ok");
+				};
+
+				$("btn-of-register").onclick = async () => {
+					if (!client) return entry("OpenFeature.setProvider", "create client first", "err");
+					try {
+						await OpenFeature.setProviderAndWait(new KitbaseProvider(client));
+						$("of-status").textContent = "openfeature: registered";
+						$("of-status").className = "ok";
+						entry("OpenFeature.setProvider()", "registered KitbaseProvider", "ok");
+					} catch (e) {
+						entry("OpenFeature.setProvider()", e.message, "err");
+					}
+				};
+
+				$("btn-of-clear").onclick = async () => {
+					try {
+						await OpenFeature.clearProviders();
+						$("of-status").textContent = "openfeature: not registered";
+						$("of-status").className = "";
+						entry("OpenFeature.clearProviders()", "ok", "ok");
+					} catch (e) {
+						entry("OpenFeature.clearProviders()", e.message, "err");
+					}
+				};
+
+				$("btn-of-set-context").onclick = async () => {
+					try {
+						const traits = parseJson($("of-traits").value, {});
+						const ctx = { targetingKey: $("of-key").value.trim(), ...traits };
+						await OpenFeature.setContext(ctx);
+						entry("OpenFeature.setContext()", ctx, "ok");
+					} catch (e) {
+						entry("OpenFeature.setContext()", e.message, "err");
+					}
+				};
+
+				$("btn-of-eval").onclick = () => {
+					try {
+						const ofClient = OpenFeature.getClient();
+						const key = $("of-flag-key").value.trim();
+						const type = $("of-type").value;
+						const def = parseJson($("of-default").value, type === "boolean" ? false : type === "number" ? 0 : type === "object" ? {} : "");
+						let value;
+						if (type === "boolean") value = ofClient.getBooleanValue(key, def);
+						else if (type === "string") value = ofClient.getStringValue(key, def);
+						else if (type === "number") value = ofClient.getNumberValue(key, def);
+						else if (type === "object") value = ofClient.getObjectValue(key, def);
+						entry(`OF.get${type[0].toUpperCase() + type.slice(1)}Value(${JSON.stringify(key)})`, value, "ok");
+					} catch (e) {
+						entry("OF eval", `${e.name}: ${e.message}`, "err");
+					}
+				};
+
+				$("btn-of-eval-details").onclick = () => {
+					try {
+						const ofClient = OpenFeature.getClient();
+						const key = $("of-flag-key").value.trim();
+						const type = $("of-type").value;
+						const def = parseJson($("of-default").value, type === "boolean" ? false : type === "number" ? 0 : type === "object" ? {} : "");
+						let details;
+						if (type === "boolean") details = ofClient.getBooleanDetails(key, def);
+						else if (type === "string") details = ofClient.getStringDetails(key, def);
+						else if (type === "number") details = ofClient.getNumberDetails(key, def);
+						else if (type === "object") details = ofClient.getObjectDetails(key, def);
+						entry(`OF.get${type[0].toUpperCase() + type.slice(1)}Details(${JSON.stringify(key)})`, details, "ok");
+					} catch (e) {
+						entry("OF details", `${e.name}: ${e.message}`, "err");
+					}
+				};
+
+				setStatus();
+				setInterval(setStatus, 2000);
+			})();
+		</script>
+	</body>
+</html>
