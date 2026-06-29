@@ -25,7 +25,7 @@ import {
 } from "./plugins/utils.js";
 import { SDK_VERSION } from "./version.js";
 
-const DEFAULT_BASE_URL = "https://api.kitbase.dev";
+const DEFAULT_BASE_URL = "https://ingest.kitbase.dev";
 const TIMEOUT = 30000;
 const ANALYTICS_CHANNEL = "__analytics";
 

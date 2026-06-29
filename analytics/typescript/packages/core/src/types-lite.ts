@@ -17,7 +17,7 @@ export interface KitbaseLiteConfig {
 
 	/**
 	 * Override the default API endpoint.
-	 * @default 'https://api.kitbase.dev'
+	 * @default 'https://ingest.kitbase.dev'
 	 */
 	baseUrl?: string;
 

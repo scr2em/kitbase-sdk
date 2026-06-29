@@ -44,7 +44,7 @@ use Ramsey\Uuid\Uuid;
  */
 class Kitbase
 {
-    private const DEFAULT_BASE_URL = 'https://api.kitbase.dev';
+    private const DEFAULT_BASE_URL = 'https://ingest.kitbase.dev';
     private const TIMEOUT = 30;
 
     private readonly string $token;
