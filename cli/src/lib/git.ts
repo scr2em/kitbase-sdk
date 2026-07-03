@@ -1,6 +1,11 @@
 import { execSync } from "node:child_process";
-import type { GitInfo } from "./types.js";
 import { GitError } from "./errors.js";
+
+export interface GitInfo {
+	commitHash: string;
+	branchName: string;
+	commitMessage: string;
+}
 
 function execGit(command: string): string {
 	try {
