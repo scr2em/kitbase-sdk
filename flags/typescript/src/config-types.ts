@@ -128,11 +128,6 @@ export interface FlagDefinition {
  */
 export interface FlagConfiguration {
 	/**
-	 * Environment ID this configuration belongs to
-	 */
-	environmentId: string;
-
-	/**
 	 * Schema version for SDK compatibility (e.g., "1.0")
 	 */
 	schemaVersion: string;

@@ -19,8 +19,10 @@ import { FlagsService } from "./flags.service.js";
  *   providers: [
  *     provideFlags({
  *       sdkKey: 'YOUR_SDK_KEY',
- *       enableLocalEvaluation: true,
- *       environmentRefreshIntervalSeconds: 60,
+ *       localEvaluation: {
+ *         enabled: true,
+ *         refreshIntervalSeconds: 60,
+ *       },
  *     }),
  *   ],
  * };

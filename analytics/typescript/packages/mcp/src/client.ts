@@ -26,11 +26,6 @@ export class KitbaseApiClient {
 			}
 		}
 
-		// Add environment filter if configured
-		if (this.config.environmentId) {
-			url.searchParams.set("environmentId", this.config.environmentId);
-		}
-
 		const response = await fetch(url.toString(), {
 			method,
 			headers: {

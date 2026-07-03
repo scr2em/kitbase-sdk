@@ -56,25 +56,6 @@ describe("KitbaseApiClient", () => {
 		expect(calledUrl).not.toContain("baz");
 	});
 
-	it("adds environmentId if configured", async () => {
-		const client = new KitbaseApiClient({
-			...baseConfig,
-			environmentId: "env_prod",
-		});
-		await client.request("/test");
-
-		const calledUrl = fetchSpy.mock.calls[0][0];
-		expect(calledUrl).toContain("environmentId=env_prod");
-	});
-
-	it("does not add environmentId if not configured", async () => {
-		const client = new KitbaseApiClient(baseConfig);
-		await client.request("/test");
-
-		const calledUrl = fetchSpy.mock.calls[0][0];
-		expect(calledUrl).not.toContain("environmentId");
-	});
-
 	it("defaults to GET method", async () => {
 		const client = new KitbaseApiClient(baseConfig);
 		await client.request("/test");

@@ -3,13 +3,11 @@ export interface McpConfig {
 	apiKey: string;
 	projectId: string;
 	orgSlug: string;
-	environmentId?: string;
 }
 
 export interface McpEnv {
 	apiUrl: string;
 	apiKey: string;
-	environmentId?: string;
 }
 
 const DEFAULT_API_URL = "https://api.kitbase.dev";
@@ -17,7 +15,6 @@ const DEFAULT_API_URL = "https://api.kitbase.dev";
 export function loadEnv(): McpEnv {
 	const apiUrl = process.env.KITBASE_API_URL || DEFAULT_API_URL;
 	const apiKey = process.env.KITBASE_API_KEY;
-	const environmentId = process.env.KITBASE_ENVIRONMENT_ID;
 
 	if (!apiKey) throw new Error("KITBASE_API_KEY environment variable is required");
 
@@ -28,7 +25,6 @@ export function loadEnv(): McpEnv {
 	return {
 		apiUrl: apiUrl.replace(/\/+$/, ""), // strip trailing slash
 		apiKey,
-		environmentId: environmentId || undefined,
 	};
 }
 
@@ -72,6 +68,5 @@ export async function resolveConfig(env: McpEnv): Promise<McpConfig> {
 		apiKey: env.apiKey,
 		projectId: keyInfo.projectId,
 		orgSlug: keyInfo.orgSlug,
-		environmentId: env.environmentId,
 	};
 }

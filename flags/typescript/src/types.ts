@@ -32,7 +32,7 @@ export interface LocalEvaluationConfig {
 	enabled?: boolean;
 
 	/**
-	 * How often to refresh the environment configuration in seconds.
+	 * How often to refresh the flag configuration in seconds.
 	 * Set to 0 to disable automatic refresh.
 	 * @default 60
 	 */
@@ -254,11 +254,6 @@ export interface FlagSnapshot {
 	 * Project ID the flags belong to
 	 */
 	projectId: string;
-
-	/**
-	 * Environment ID the flags were evaluated for
-	 */
-	environmentId: string;
 
 	/**
 	 * Timestamp when the evaluation was performed
