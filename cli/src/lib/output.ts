@@ -45,8 +45,33 @@ function pickColumns(rows: Record<string, unknown>[]): string[] {
 	return [...preferred, ...rest].slice(0, MAX_COLUMNS);
 }
 
+function isArrayOfObjects(value: unknown): value is Record<string, unknown>[] {
+	return Array.isArray(value) && value.length > 0 && value.every((v) => isPlainObject(v));
+}
+
+/**
+ * Finds the property holding "the" primary collection in a wrapper object, for responses that
+ * bundle metadata alongside one main array field under an endpoint-specific name — not every
+ * list-shaped response uses the paginated `data` envelope (e.g. a time-series endpoint might
+ * return `{ points: [...], provider: "ALL" }`). Picks the largest array-of-objects field, if any.
+ */
+function findPrimaryArrayField(obj: Record<string, unknown>): string | null {
+	let best: string | null = null;
+	let bestLength = 0;
+	for (const [key, value] of Object.entries(obj)) {
+		if (isArrayOfObjects(value) && value.length > bestLength) {
+			best = key;
+			bestLength = value.length;
+		}
+	}
+	return best;
+}
+
 function formatCell(value: unknown): string {
 	if (value === null || value === undefined) return "";
+	if (Array.isArray(value) && value.every((v) => !isPlainObject(v) && !Array.isArray(v))) {
+		return value.map((v) => formatCell(v)).join(", ");
+	}
 	if (typeof value === "object") return JSON.stringify(value);
 	return String(value);
 }
@@ -106,6 +131,20 @@ export function printResult(data: unknown, options: { json: boolean }): void {
 	}
 
 	if (isPlainObject(data)) {
+		const primaryField = findPrimaryArrayField(data);
+		if (primaryField) {
+			const items = data[primaryField] as Record<string, unknown>[];
+			const meta = Object.entries(data).filter(
+				([key, value]) => key !== primaryField && !isPlainObject(value) && !Array.isArray(value),
+			);
+			if (meta.length > 0) {
+				console.log(meta.map(([key, value]) => `${chalk.dim(key)}: ${formatCell(value)}`).join("  "));
+				console.log("");
+			}
+			printTable(items);
+			return;
+		}
+
 		printSingleObject(data);
 		return;
 	}
