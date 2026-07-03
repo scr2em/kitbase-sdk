@@ -1218,141 +1218,6 @@
         "visibility.js"
       ]
     },
-    "audit-logs:list": {
-      "aliases": [],
-      "args": {},
-      "description": "Get audit logs for an organization",
-      "flags": {
-        "json": {
-          "description": "Output raw JSON instead of a formatted table.",
-          "name": "json",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "base-url": {
-          "description": "Override the API base URL.",
-          "helpGroup": "GLOBAL",
-          "name": "base-url",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "local": {
-          "description": "Shorthand for --base-url http://localhost:8100/api.",
-          "helpGroup": "GLOBAL",
-          "name": "local",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "api-key": {
-          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
-          "helpGroup": "GLOBAL",
-          "name": "api-key",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "org": {
-          "description": "Organization slug to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "org",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "project": {
-          "description": "Project id to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "project",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "data": {
-          "char": "d",
-          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
-          "name": "data",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "action": {
-          "description": "Filter by action (e.g., PROJECT_CREATED)",
-          "name": "action",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "resourceType": {
-          "description": "Filter by resource type (e.g., PROJECT)",
-          "name": "resourceType",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "userId": {
-          "description": "Filter by user ID",
-          "name": "userId",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "startDate": {
-          "description": "Filter by start date",
-          "name": "startDate",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "endDate": {
-          "description": "Filter by end date",
-          "name": "endDate",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "page": {
-          "description": "Page number (0-indexed)",
-          "name": "page",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "size": {
-          "description": "Page size",
-          "name": "size",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "sort": {
-          "description": "Sort order by created date",
-          "name": "sort",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "options": [
-            "asc",
-            "desc"
-          ],
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "audit-logs:list",
-      "pluginAlias": "@kitbase/cli",
-      "pluginName": "@kitbase/cli",
-      "pluginType": "core",
-      "strict": true,
-      "enableJsonFlag": false,
-      "isESM": true,
-      "relativePath": [
-        "dist",
-        "commands",
-        "audit-logs",
-        "list.js"
-      ]
-    },
     "analytics:list": {
       "aliases": [],
       "args": {},
@@ -1595,6 +1460,141 @@
         "commands",
         "analytics",
         "users.js"
+      ]
+    },
+    "audit-logs:list": {
+      "aliases": [],
+      "args": {},
+      "description": "Get audit logs for an organization",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "action": {
+          "description": "Filter by action (e.g., PROJECT_CREATED)",
+          "name": "action",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "resourceType": {
+          "description": "Filter by resource type (e.g., PROJECT)",
+          "name": "resourceType",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "userId": {
+          "description": "Filter by user ID",
+          "name": "userId",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "startDate": {
+          "description": "Filter by start date",
+          "name": "startDate",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "endDate": {
+          "description": "Filter by end date",
+          "name": "endDate",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "page": {
+          "description": "Page number (0-indexed)",
+          "name": "page",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "size": {
+          "description": "Page size",
+          "name": "size",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "sort": {
+          "description": "Sort order by created date",
+          "name": "sort",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "asc",
+            "desc"
+          ],
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "audit-logs:list",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "audit-logs",
+        "list.js"
       ]
     },
     "bots:list": {
@@ -3342,1612 +3342,6 @@
         "update.js"
       ]
     },
-    "feedback:create": {
-      "aliases": [],
-      "args": {},
-      "description": "Submit feedback",
-      "flags": {
-        "json": {
-          "description": "Output raw JSON instead of a formatted table.",
-          "name": "json",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "base-url": {
-          "description": "Override the API base URL.",
-          "helpGroup": "GLOBAL",
-          "name": "base-url",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "local": {
-          "description": "Shorthand for --base-url http://localhost:8100/api.",
-          "helpGroup": "GLOBAL",
-          "name": "local",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "api-key": {
-          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
-          "helpGroup": "GLOBAL",
-          "name": "api-key",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "org": {
-          "description": "Organization slug to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "org",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "project": {
-          "description": "Project id to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "project",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "data": {
-          "char": "d",
-          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
-          "name": "data",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "message": {
-          "description": "The feedback message content",
-          "name": "message",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "page": {
-          "description": "The page (route/path) the user was on when submitting feedback",
-          "name": "page",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "feedback:create",
-      "pluginAlias": "@kitbase/cli",
-      "pluginName": "@kitbase/cli",
-      "pluginType": "core",
-      "strict": true,
-      "enableJsonFlag": false,
-      "isESM": true,
-      "relativePath": [
-        "dist",
-        "commands",
-        "feedback",
-        "create.js"
-      ]
-    },
-    "funnels:analyze": {
-      "aliases": [],
-      "args": {},
-      "description": "Analyze a funnel",
-      "flags": {
-        "json": {
-          "description": "Output raw JSON instead of a formatted table.",
-          "name": "json",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "base-url": {
-          "description": "Override the API base URL.",
-          "helpGroup": "GLOBAL",
-          "name": "base-url",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "local": {
-          "description": "Shorthand for --base-url http://localhost:8100/api.",
-          "helpGroup": "GLOBAL",
-          "name": "local",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "api-key": {
-          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
-          "helpGroup": "GLOBAL",
-          "name": "api-key",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "org": {
-          "description": "Organization slug to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "org",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "project": {
-          "description": "Project id to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "project",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "data": {
-          "char": "d",
-          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
-          "name": "data",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "preset": {
-          "description": "Predefined date range preset. When provided, overrides from/to parameters.",
-          "name": "preset",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "options": [
-            "last_30_minutes",
-            "last_hour",
-            "today",
-            "yesterday",
-            "last_7_days",
-            "last_30_days",
-            "this_month",
-            "this_year"
-          ],
-          "type": "option"
-        },
-        "from": {
-          "description": "Start date filter (inclusive, YYYY-MM-DD)",
-          "name": "from",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "to": {
-          "description": "End date filter (inclusive, YYYY-MM-DD)",
-          "name": "to",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "timezone": {
-          "description": "Client timezone (e.g. \"Africa/Cairo\", \"America/New_York\"). Used to convert date boundaries to UTC. Defaults to UTC if omitted.",
-          "name": "timezone",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "analysisMode": {
-          "description": "Funnel analysis grouping mode:\n- session: steps must occur within the same session (all visitors)\n- user: steps can span multiple sessions (identified users only, requires user_id)\n",
-          "name": "analysisMode",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "options": [
-            "session",
-            "user"
-          ],
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "funnels:analyze",
-      "pluginAlias": "@kitbase/cli",
-      "pluginName": "@kitbase/cli",
-      "pluginType": "core",
-      "strict": true,
-      "enableJsonFlag": false,
-      "isESM": true,
-      "relativePath": [
-        "dist",
-        "commands",
-        "funnels",
-        "analyze.js"
-      ]
-    },
-    "funnels:create": {
-      "aliases": [],
-      "args": {},
-      "description": "Create a funnel",
-      "flags": {
-        "json": {
-          "description": "Output raw JSON instead of a formatted table.",
-          "name": "json",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "base-url": {
-          "description": "Override the API base URL.",
-          "helpGroup": "GLOBAL",
-          "name": "base-url",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "local": {
-          "description": "Shorthand for --base-url http://localhost:8100/api.",
-          "helpGroup": "GLOBAL",
-          "name": "local",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "api-key": {
-          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
-          "helpGroup": "GLOBAL",
-          "name": "api-key",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "org": {
-          "description": "Organization slug to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "org",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "project": {
-          "description": "Project id to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "project",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "data": {
-          "char": "d",
-          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
-          "name": "data",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "name": {
-          "description": "Funnel display name",
-          "name": "name",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "analysisMode": {
-          "description": "Funnel analysis grouping mode:\n- session: steps must occur within the same session (all visitors)\n- user: steps can span multiple sessions (identified users only, requires user_id)\n",
-          "name": "analysisMode",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "options": [
-            "session",
-            "user"
-          ],
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "funnels:create",
-      "pluginAlias": "@kitbase/cli",
-      "pluginName": "@kitbase/cli",
-      "pluginType": "core",
-      "strict": true,
-      "enableJsonFlag": false,
-      "isESM": true,
-      "relativePath": [
-        "dist",
-        "commands",
-        "funnels",
-        "create.js"
-      ]
-    },
-    "funnels:delete": {
-      "aliases": [],
-      "args": {
-        "funnelId": {
-          "description": "Funnel ID",
-          "name": "funnelId",
-          "required": true
-        }
-      },
-      "description": "Delete a funnel",
-      "flags": {
-        "json": {
-          "description": "Output raw JSON instead of a formatted table.",
-          "name": "json",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "base-url": {
-          "description": "Override the API base URL.",
-          "helpGroup": "GLOBAL",
-          "name": "base-url",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "local": {
-          "description": "Shorthand for --base-url http://localhost:8100/api.",
-          "helpGroup": "GLOBAL",
-          "name": "local",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "api-key": {
-          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
-          "helpGroup": "GLOBAL",
-          "name": "api-key",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "org": {
-          "description": "Organization slug to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "org",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "project": {
-          "description": "Project id to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "project",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "data": {
-          "char": "d",
-          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
-          "name": "data",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "funnels:delete",
-      "pluginAlias": "@kitbase/cli",
-      "pluginName": "@kitbase/cli",
-      "pluginType": "core",
-      "strict": true,
-      "enableJsonFlag": false,
-      "isESM": true,
-      "relativePath": [
-        "dist",
-        "commands",
-        "funnels",
-        "delete.js"
-      ]
-    },
-    "funnels:list": {
-      "aliases": [],
-      "args": {},
-      "description": "List saved funnels",
-      "flags": {
-        "json": {
-          "description": "Output raw JSON instead of a formatted table.",
-          "name": "json",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "base-url": {
-          "description": "Override the API base URL.",
-          "helpGroup": "GLOBAL",
-          "name": "base-url",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "local": {
-          "description": "Shorthand for --base-url http://localhost:8100/api.",
-          "helpGroup": "GLOBAL",
-          "name": "local",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "api-key": {
-          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
-          "helpGroup": "GLOBAL",
-          "name": "api-key",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "org": {
-          "description": "Organization slug to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "org",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "project": {
-          "description": "Project id to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "project",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "data": {
-          "char": "d",
-          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
-          "name": "data",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "search": {
-          "description": "Optional search term to filter funnels by name (case-insensitive)",
-          "name": "search",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "funnels:list",
-      "pluginAlias": "@kitbase/cli",
-      "pluginName": "@kitbase/cli",
-      "pluginType": "core",
-      "strict": true,
-      "enableJsonFlag": false,
-      "isESM": true,
-      "relativePath": [
-        "dist",
-        "commands",
-        "funnels",
-        "list.js"
-      ]
-    },
-    "funnels:update": {
-      "aliases": [],
-      "args": {
-        "funnelId": {
-          "description": "Funnel ID",
-          "name": "funnelId",
-          "required": true
-        }
-      },
-      "description": "Update a funnel",
-      "flags": {
-        "json": {
-          "description": "Output raw JSON instead of a formatted table.",
-          "name": "json",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "base-url": {
-          "description": "Override the API base URL.",
-          "helpGroup": "GLOBAL",
-          "name": "base-url",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "local": {
-          "description": "Shorthand for --base-url http://localhost:8100/api.",
-          "helpGroup": "GLOBAL",
-          "name": "local",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "api-key": {
-          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
-          "helpGroup": "GLOBAL",
-          "name": "api-key",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "org": {
-          "description": "Organization slug to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "org",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "project": {
-          "description": "Project id to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "project",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "data": {
-          "char": "d",
-          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
-          "name": "data",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "name": {
-          "description": "Funnel display name",
-          "name": "name",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "analysisMode": {
-          "description": "Funnel analysis grouping mode:\n- session: steps must occur within the same session (all visitors)\n- user: steps can span multiple sessions (identified users only, requires user_id)\n",
-          "name": "analysisMode",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "options": [
-            "session",
-            "user"
-          ],
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "funnels:update",
-      "pluginAlias": "@kitbase/cli",
-      "pluginName": "@kitbase/cli",
-      "pluginType": "core",
-      "strict": true,
-      "enableJsonFlag": false,
-      "isESM": true,
-      "relativePath": [
-        "dist",
-        "commands",
-        "funnels",
-        "update.js"
-      ]
-    },
-    "in-app-messages:create": {
-      "aliases": [],
-      "args": {},
-      "description": "Create in-app message",
-      "flags": {
-        "json": {
-          "description": "Output raw JSON instead of a formatted table.",
-          "name": "json",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "base-url": {
-          "description": "Override the API base URL.",
-          "helpGroup": "GLOBAL",
-          "name": "base-url",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "local": {
-          "description": "Shorthand for --base-url http://localhost:8100/api.",
-          "helpGroup": "GLOBAL",
-          "name": "local",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "api-key": {
-          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
-          "helpGroup": "GLOBAL",
-          "name": "api-key",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "org": {
-          "description": "Organization slug to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "org",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "project": {
-          "description": "Project id to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "project",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "data": {
-          "char": "d",
-          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
-          "name": "data",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "name": {
-          "name": "name",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "title": {
-          "name": "title",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "message": {
-          "description": "Markdown content",
-          "name": "message",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "showOnce": {
-          "name": "showOnce",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "messageType": {
-          "name": "messageType",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "options": [
-            "modal",
-            "banner",
-            "card",
-            "image"
-          ],
-          "type": "option"
-        },
-        "isActive": {
-          "name": "isActive",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "imageUrl": {
-          "name": "imageUrl",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "actionButtonText": {
-          "name": "actionButtonText",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "actionButtonUrl": {
-          "name": "actionButtonUrl",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "secondaryButtonText": {
-          "name": "secondaryButtonText",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "secondaryButtonUrl": {
-          "name": "secondaryButtonUrl",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "backgroundColor": {
-          "name": "backgroundColor",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "actionButtonColor": {
-          "name": "actionButtonColor",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "actionButtonTextColor": {
-          "name": "actionButtonTextColor",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "secondaryButtonColor": {
-          "name": "secondaryButtonColor",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "secondaryButtonTextColor": {
-          "name": "secondaryButtonTextColor",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "borderRadius": {
-          "name": "borderRadius",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "options": [
-            "none",
-            "small",
-            "medium",
-            "large"
-          ],
-          "type": "option"
-        },
-        "shadow": {
-          "name": "shadow",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "options": [
-            "none",
-            "small",
-            "medium",
-            "large"
-          ],
-          "type": "option"
-        },
-        "startDate": {
-          "name": "startDate",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "endDate": {
-          "name": "endDate",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "in-app-messages:create",
-      "pluginAlias": "@kitbase/cli",
-      "pluginName": "@kitbase/cli",
-      "pluginType": "core",
-      "strict": true,
-      "enableJsonFlag": false,
-      "isESM": true,
-      "relativePath": [
-        "dist",
-        "commands",
-        "in-app-messages",
-        "create.js"
-      ]
-    },
-    "in-app-messages:delete": {
-      "aliases": [],
-      "args": {
-        "messageId": {
-          "description": "messageId",
-          "name": "messageId",
-          "required": true
-        }
-      },
-      "description": "Delete in-app message",
-      "flags": {
-        "json": {
-          "description": "Output raw JSON instead of a formatted table.",
-          "name": "json",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "base-url": {
-          "description": "Override the API base URL.",
-          "helpGroup": "GLOBAL",
-          "name": "base-url",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "local": {
-          "description": "Shorthand for --base-url http://localhost:8100/api.",
-          "helpGroup": "GLOBAL",
-          "name": "local",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "api-key": {
-          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
-          "helpGroup": "GLOBAL",
-          "name": "api-key",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "org": {
-          "description": "Organization slug to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "org",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "project": {
-          "description": "Project id to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "project",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "data": {
-          "char": "d",
-          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
-          "name": "data",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "in-app-messages:delete",
-      "pluginAlias": "@kitbase/cli",
-      "pluginName": "@kitbase/cli",
-      "pluginType": "core",
-      "strict": true,
-      "enableJsonFlag": false,
-      "isESM": true,
-      "relativePath": [
-        "dist",
-        "commands",
-        "in-app-messages",
-        "delete.js"
-      ]
-    },
-    "in-app-messages:get": {
-      "aliases": [],
-      "args": {
-        "messageId": {
-          "description": "messageId",
-          "name": "messageId",
-          "required": true
-        }
-      },
-      "description": "Get in-app message",
-      "flags": {
-        "json": {
-          "description": "Output raw JSON instead of a formatted table.",
-          "name": "json",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "base-url": {
-          "description": "Override the API base URL.",
-          "helpGroup": "GLOBAL",
-          "name": "base-url",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "local": {
-          "description": "Shorthand for --base-url http://localhost:8100/api.",
-          "helpGroup": "GLOBAL",
-          "name": "local",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "api-key": {
-          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
-          "helpGroup": "GLOBAL",
-          "name": "api-key",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "org": {
-          "description": "Organization slug to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "org",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "project": {
-          "description": "Project id to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "project",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "data": {
-          "char": "d",
-          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
-          "name": "data",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "in-app-messages:get",
-      "pluginAlias": "@kitbase/cli",
-      "pluginName": "@kitbase/cli",
-      "pluginType": "core",
-      "strict": true,
-      "enableJsonFlag": false,
-      "isESM": true,
-      "relativePath": [
-        "dist",
-        "commands",
-        "in-app-messages",
-        "get.js"
-      ]
-    },
-    "in-app-messages:list": {
-      "aliases": [],
-      "args": {},
-      "description": "List in-app messages",
-      "flags": {
-        "json": {
-          "description": "Output raw JSON instead of a formatted table.",
-          "name": "json",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "base-url": {
-          "description": "Override the API base URL.",
-          "helpGroup": "GLOBAL",
-          "name": "base-url",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "local": {
-          "description": "Shorthand for --base-url http://localhost:8100/api.",
-          "helpGroup": "GLOBAL",
-          "name": "local",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "api-key": {
-          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
-          "helpGroup": "GLOBAL",
-          "name": "api-key",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "org": {
-          "description": "Organization slug to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "org",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "project": {
-          "description": "Project id to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "project",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "data": {
-          "char": "d",
-          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
-          "name": "data",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "page": {
-          "name": "page",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "size": {
-          "name": "size",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "sort": {
-          "name": "sort",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "options": [
-            "asc",
-            "desc"
-          ],
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "in-app-messages:list",
-      "pluginAlias": "@kitbase/cli",
-      "pluginName": "@kitbase/cli",
-      "pluginType": "core",
-      "strict": true,
-      "enableJsonFlag": false,
-      "isESM": true,
-      "relativePath": [
-        "dist",
-        "commands",
-        "in-app-messages",
-        "list.js"
-      ]
-    },
-    "in-app-messages:update": {
-      "aliases": [],
-      "args": {
-        "messageId": {
-          "description": "messageId",
-          "name": "messageId",
-          "required": true
-        }
-      },
-      "description": "Update in-app message",
-      "flags": {
-        "json": {
-          "description": "Output raw JSON instead of a formatted table.",
-          "name": "json",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "base-url": {
-          "description": "Override the API base URL.",
-          "helpGroup": "GLOBAL",
-          "name": "base-url",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "local": {
-          "description": "Shorthand for --base-url http://localhost:8100/api.",
-          "helpGroup": "GLOBAL",
-          "name": "local",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "api-key": {
-          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
-          "helpGroup": "GLOBAL",
-          "name": "api-key",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "org": {
-          "description": "Organization slug to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "org",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "project": {
-          "description": "Project id to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "project",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "data": {
-          "char": "d",
-          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
-          "name": "data",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "name": {
-          "name": "name",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "title": {
-          "name": "title",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "message": {
-          "name": "message",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "showOnce": {
-          "name": "showOnce",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "messageType": {
-          "name": "messageType",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "options": [
-            "modal",
-            "banner",
-            "card",
-            "image"
-          ],
-          "type": "option"
-        },
-        "isActive": {
-          "name": "isActive",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "imageUrl": {
-          "name": "imageUrl",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "actionButtonText": {
-          "name": "actionButtonText",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "actionButtonUrl": {
-          "name": "actionButtonUrl",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "secondaryButtonText": {
-          "name": "secondaryButtonText",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "secondaryButtonUrl": {
-          "name": "secondaryButtonUrl",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "backgroundColor": {
-          "name": "backgroundColor",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "actionButtonColor": {
-          "name": "actionButtonColor",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "actionButtonTextColor": {
-          "name": "actionButtonTextColor",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "secondaryButtonColor": {
-          "name": "secondaryButtonColor",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "secondaryButtonTextColor": {
-          "name": "secondaryButtonTextColor",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "borderRadius": {
-          "name": "borderRadius",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "options": [
-            "none",
-            "small",
-            "medium",
-            "large"
-          ],
-          "type": "option"
-        },
-        "shadow": {
-          "name": "shadow",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "options": [
-            "none",
-            "small",
-            "medium",
-            "large"
-          ],
-          "type": "option"
-        },
-        "startDate": {
-          "name": "startDate",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "endDate": {
-          "name": "endDate",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "in-app-messages:update",
-      "pluginAlias": "@kitbase/cli",
-      "pluginName": "@kitbase/cli",
-      "pluginType": "core",
-      "strict": true,
-      "enableJsonFlag": false,
-      "isESM": true,
-      "relativePath": [
-        "dist",
-        "commands",
-        "in-app-messages",
-        "update.js"
-      ]
-    },
-    "integrations:delete": {
-      "aliases": [],
-      "args": {
-        "provider": {
-          "description": "Integration provider",
-          "name": "provider",
-          "required": true
-        }
-      },
-      "description": "Disconnect integration",
-      "flags": {
-        "json": {
-          "description": "Output raw JSON instead of a formatted table.",
-          "name": "json",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "base-url": {
-          "description": "Override the API base URL.",
-          "helpGroup": "GLOBAL",
-          "name": "base-url",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "local": {
-          "description": "Shorthand for --base-url http://localhost:8100/api.",
-          "helpGroup": "GLOBAL",
-          "name": "local",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "api-key": {
-          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
-          "helpGroup": "GLOBAL",
-          "name": "api-key",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "org": {
-          "description": "Organization slug to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "org",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "project": {
-          "description": "Project id to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "project",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "data": {
-          "char": "d",
-          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
-          "name": "data",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "integrations:delete",
-      "pluginAlias": "@kitbase/cli",
-      "pluginName": "@kitbase/cli",
-      "pluginType": "core",
-      "strict": true,
-      "enableJsonFlag": false,
-      "isESM": true,
-      "relativePath": [
-        "dist",
-        "commands",
-        "integrations",
-        "delete.js"
-      ]
-    },
-    "integrations:get": {
-      "aliases": [],
-      "args": {
-        "provider": {
-          "description": "Integration provider (e.g., slack)",
-          "name": "provider",
-          "required": true
-        }
-      },
-      "description": "Get integration by provider",
-      "flags": {
-        "json": {
-          "description": "Output raw JSON instead of a formatted table.",
-          "name": "json",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "base-url": {
-          "description": "Override the API base URL.",
-          "helpGroup": "GLOBAL",
-          "name": "base-url",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "local": {
-          "description": "Shorthand for --base-url http://localhost:8100/api.",
-          "helpGroup": "GLOBAL",
-          "name": "local",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "api-key": {
-          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
-          "helpGroup": "GLOBAL",
-          "name": "api-key",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "org": {
-          "description": "Organization slug to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "org",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "project": {
-          "description": "Project id to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "project",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "data": {
-          "char": "d",
-          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
-          "name": "data",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "integrations:get",
-      "pluginAlias": "@kitbase/cli",
-      "pluginName": "@kitbase/cli",
-      "pluginType": "core",
-      "strict": true,
-      "enableJsonFlag": false,
-      "isESM": true,
-      "relativePath": [
-        "dist",
-        "commands",
-        "integrations",
-        "get.js"
-      ]
-    },
-    "integrations:list-subscriptions": {
-      "aliases": [],
-      "args": {
-        "provider": {
-          "description": "provider",
-          "name": "provider",
-          "required": true
-        }
-      },
-      "description": "List all subscriptions for an integration",
-      "flags": {
-        "json": {
-          "description": "Output raw JSON instead of a formatted table.",
-          "name": "json",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "base-url": {
-          "description": "Override the API base URL.",
-          "helpGroup": "GLOBAL",
-          "name": "base-url",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "local": {
-          "description": "Shorthand for --base-url http://localhost:8100/api.",
-          "helpGroup": "GLOBAL",
-          "name": "local",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "api-key": {
-          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
-          "helpGroup": "GLOBAL",
-          "name": "api-key",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "org": {
-          "description": "Organization slug to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "org",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "project": {
-          "description": "Project id to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "project",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "data": {
-          "char": "d",
-          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
-          "name": "data",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "projectId": {
-          "description": "Filter by project ID",
-          "name": "projectId",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "featureType": {
-          "description": "Filter by feature type",
-          "name": "featureType",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "options": [
-            "custom_events",
-            "feature_flags",
-            "ota_updates",
-            "builds"
-          ],
-          "type": "option"
-        },
-        "page": {
-          "name": "page",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "size": {
-          "name": "size",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "integrations:list-subscriptions",
-      "pluginAlias": "@kitbase/cli",
-      "pluginName": "@kitbase/cli",
-      "pluginType": "core",
-      "strict": true,
-      "enableJsonFlag": false,
-      "isESM": true,
-      "relativePath": [
-        "dist",
-        "commands",
-        "integrations",
-        "list-subscriptions.js"
-      ]
-    },
-    "integrations:list": {
-      "aliases": [],
-      "args": {},
-      "description": "List organization integrations",
-      "flags": {
-        "json": {
-          "description": "Output raw JSON instead of a formatted table.",
-          "name": "json",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "base-url": {
-          "description": "Override the API base URL.",
-          "helpGroup": "GLOBAL",
-          "name": "base-url",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "local": {
-          "description": "Shorthand for --base-url http://localhost:8100/api.",
-          "helpGroup": "GLOBAL",
-          "name": "local",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "api-key": {
-          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
-          "helpGroup": "GLOBAL",
-          "name": "api-key",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "org": {
-          "description": "Organization slug to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "org",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "project": {
-          "description": "Project id to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "project",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "data": {
-          "char": "d",
-          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
-          "name": "data",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "integrations:list",
-      "pluginAlias": "@kitbase/cli",
-      "pluginName": "@kitbase/cli",
-      "pluginType": "core",
-      "strict": true,
-      "enableJsonFlag": false,
-      "isESM": true,
-      "relativePath": [
-        "dist",
-        "commands",
-        "integrations",
-        "list.js"
-      ]
-    },
     "feature-flags:create": {
       "aliases": [],
       "args": {},
@@ -5536,6 +3930,1034 @@
         "commands",
         "feature-flags",
         "usage.js"
+      ]
+    },
+    "feedback:create": {
+      "aliases": [],
+      "args": {},
+      "description": "Submit feedback",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "message": {
+          "description": "The feedback message content",
+          "name": "message",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "page": {
+          "description": "The page (route/path) the user was on when submitting feedback",
+          "name": "page",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "feedback:create",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "feedback",
+        "create.js"
+      ]
+    },
+    "funnels:analyze": {
+      "aliases": [],
+      "args": {},
+      "description": "Analyze a funnel",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "preset": {
+          "description": "Predefined date range preset. When provided, overrides from/to parameters.",
+          "name": "preset",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "last_30_minutes",
+            "last_hour",
+            "today",
+            "yesterday",
+            "last_7_days",
+            "last_30_days",
+            "this_month",
+            "this_year"
+          ],
+          "type": "option"
+        },
+        "from": {
+          "description": "Start date filter (inclusive, YYYY-MM-DD)",
+          "name": "from",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "to": {
+          "description": "End date filter (inclusive, YYYY-MM-DD)",
+          "name": "to",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "timezone": {
+          "description": "Client timezone (e.g. \"Africa/Cairo\", \"America/New_York\"). Used to convert date boundaries to UTC. Defaults to UTC if omitted.",
+          "name": "timezone",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "analysisMode": {
+          "description": "Funnel analysis grouping mode:\n- session: steps must occur within the same session (all visitors)\n- user: steps can span multiple sessions (identified users only, requires user_id)\n",
+          "name": "analysisMode",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "session",
+            "user"
+          ],
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "funnels:analyze",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "funnels",
+        "analyze.js"
+      ]
+    },
+    "funnels:create": {
+      "aliases": [],
+      "args": {},
+      "description": "Create a funnel",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "name": {
+          "description": "Funnel display name",
+          "name": "name",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "analysisMode": {
+          "description": "Funnel analysis grouping mode:\n- session: steps must occur within the same session (all visitors)\n- user: steps can span multiple sessions (identified users only, requires user_id)\n",
+          "name": "analysisMode",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "session",
+            "user"
+          ],
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "funnels:create",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "funnels",
+        "create.js"
+      ]
+    },
+    "funnels:delete": {
+      "aliases": [],
+      "args": {
+        "funnelId": {
+          "description": "Funnel ID",
+          "name": "funnelId",
+          "required": true
+        }
+      },
+      "description": "Delete a funnel",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "funnels:delete",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "funnels",
+        "delete.js"
+      ]
+    },
+    "funnels:list": {
+      "aliases": [],
+      "args": {},
+      "description": "List saved funnels",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "search": {
+          "description": "Optional search term to filter funnels by name (case-insensitive)",
+          "name": "search",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "funnels:list",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "funnels",
+        "list.js"
+      ]
+    },
+    "funnels:update": {
+      "aliases": [],
+      "args": {
+        "funnelId": {
+          "description": "Funnel ID",
+          "name": "funnelId",
+          "required": true
+        }
+      },
+      "description": "Update a funnel",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "name": {
+          "description": "Funnel display name",
+          "name": "name",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "analysisMode": {
+          "description": "Funnel analysis grouping mode:\n- session: steps must occur within the same session (all visitors)\n- user: steps can span multiple sessions (identified users only, requires user_id)\n",
+          "name": "analysisMode",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "session",
+            "user"
+          ],
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "funnels:update",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "funnels",
+        "update.js"
+      ]
+    },
+    "integrations:delete": {
+      "aliases": [],
+      "args": {
+        "provider": {
+          "description": "Integration provider",
+          "name": "provider",
+          "required": true
+        }
+      },
+      "description": "Disconnect integration",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "integrations:delete",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "integrations",
+        "delete.js"
+      ]
+    },
+    "integrations:get": {
+      "aliases": [],
+      "args": {
+        "provider": {
+          "description": "Integration provider (e.g., slack)",
+          "name": "provider",
+          "required": true
+        }
+      },
+      "description": "Get integration by provider",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "integrations:get",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "integrations",
+        "get.js"
+      ]
+    },
+    "integrations:list-subscriptions": {
+      "aliases": [],
+      "args": {
+        "provider": {
+          "description": "provider",
+          "name": "provider",
+          "required": true
+        }
+      },
+      "description": "List all subscriptions for an integration",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "projectId": {
+          "description": "Filter by project ID",
+          "name": "projectId",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "featureType": {
+          "description": "Filter by feature type",
+          "name": "featureType",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "custom_events",
+            "feature_flags",
+            "ota_updates",
+            "builds"
+          ],
+          "type": "option"
+        },
+        "page": {
+          "name": "page",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "size": {
+          "name": "size",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "integrations:list-subscriptions",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "integrations",
+        "list-subscriptions.js"
+      ]
+    },
+    "integrations:list": {
+      "aliases": [],
+      "args": {},
+      "description": "List organization integrations",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "integrations:list",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "integrations",
+        "list.js"
+      ]
+    },
+    "journeys:analyze": {
+      "aliases": [],
+      "args": {},
+      "description": "Analyze user journeys",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "from": {
+          "description": "Start date filter (inclusive, YYYY-MM-DD)",
+          "name": "from",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "to": {
+          "description": "End date filter (inclusive, YYYY-MM-DD)",
+          "name": "to",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "timezone": {
+          "description": "Client timezone (e.g. \"Africa/Cairo\", \"America/New_York\"). Used to convert date boundaries to UTC. Defaults to UTC if omitted.",
+          "name": "timezone",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "steps": {
+          "description": "Maximum number of steps per journey path",
+          "name": "steps",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "limit": {
+          "description": "Maximum number of journey paths to return",
+          "name": "limit",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "journeys:analyze",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "journeys",
+        "analyze.js"
       ]
     },
     "invitations:accept-by-token": {
@@ -6287,116 +5709,6 @@
         "update.js"
       ]
     },
-    "journeys:analyze": {
-      "aliases": [],
-      "args": {},
-      "description": "Analyze user journeys",
-      "flags": {
-        "json": {
-          "description": "Output raw JSON instead of a formatted table.",
-          "name": "json",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "base-url": {
-          "description": "Override the API base URL.",
-          "helpGroup": "GLOBAL",
-          "name": "base-url",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "local": {
-          "description": "Shorthand for --base-url http://localhost:8100/api.",
-          "helpGroup": "GLOBAL",
-          "name": "local",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "api-key": {
-          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
-          "helpGroup": "GLOBAL",
-          "name": "api-key",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "org": {
-          "description": "Organization slug to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "org",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "project": {
-          "description": "Project id to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "project",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "data": {
-          "char": "d",
-          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
-          "name": "data",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "from": {
-          "description": "Start date filter (inclusive, YYYY-MM-DD)",
-          "name": "from",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "to": {
-          "description": "End date filter (inclusive, YYYY-MM-DD)",
-          "name": "to",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "timezone": {
-          "description": "Client timezone (e.g. \"Africa/Cairo\", \"America/New_York\"). Used to convert date boundaries to UTC. Defaults to UTC if omitted.",
-          "name": "timezone",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "steps": {
-          "description": "Maximum number of steps per journey path",
-          "name": "steps",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "limit": {
-          "description": "Maximum number of journey paths to return",
-          "name": "limit",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "journeys:analyze",
-      "pluginAlias": "@kitbase/cli",
-      "pluginName": "@kitbase/cli",
-      "pluginType": "core",
-      "strict": true,
-      "enableJsonFlag": false,
-      "isESM": true,
-      "relativePath": [
-        "dist",
-        "commands",
-        "journeys",
-        "analyze.js"
-      ]
-    },
     "members:delete": {
       "aliases": [],
       "args": {
@@ -6653,6 +5965,184 @@
         "commands",
         "members",
         "update.js"
+      ]
+    },
+    "organizations:create": {
+      "aliases": [],
+      "args": {},
+      "description": "Create a new organization",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "name": {
+          "description": "Organization name",
+          "name": "name",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "orgSlug": {
+          "description": "Organization slug (unique identifier used in URLs)",
+          "name": "orgSlug",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "description": {
+          "description": "Organization description",
+          "name": "description",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "logoUrl": {
+          "description": "URL to the organization logo image",
+          "name": "logoUrl",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "organizations:create",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "organizations",
+        "create.js"
+      ]
+    },
+    "organizations:list": {
+      "aliases": [],
+      "args": {},
+      "description": "List user's organizations",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "organizations:list",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "organizations",
+        "list.js"
       ]
     },
     "notifications:list": {
@@ -6985,184 +6475,6 @@
         "commands",
         "notifications",
         "unread.js"
-      ]
-    },
-    "organizations:create": {
-      "aliases": [],
-      "args": {},
-      "description": "Create a new organization",
-      "flags": {
-        "json": {
-          "description": "Output raw JSON instead of a formatted table.",
-          "name": "json",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "base-url": {
-          "description": "Override the API base URL.",
-          "helpGroup": "GLOBAL",
-          "name": "base-url",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "local": {
-          "description": "Shorthand for --base-url http://localhost:8100/api.",
-          "helpGroup": "GLOBAL",
-          "name": "local",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "api-key": {
-          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
-          "helpGroup": "GLOBAL",
-          "name": "api-key",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "org": {
-          "description": "Organization slug to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "org",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "project": {
-          "description": "Project id to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "project",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "data": {
-          "char": "d",
-          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
-          "name": "data",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "name": {
-          "description": "Organization name",
-          "name": "name",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "orgSlug": {
-          "description": "Organization slug (unique identifier used in URLs)",
-          "name": "orgSlug",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "description": {
-          "description": "Organization description",
-          "name": "description",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "logoUrl": {
-          "description": "URL to the organization logo image",
-          "name": "logoUrl",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "organizations:create",
-      "pluginAlias": "@kitbase/cli",
-      "pluginName": "@kitbase/cli",
-      "pluginType": "core",
-      "strict": true,
-      "enableJsonFlag": false,
-      "isESM": true,
-      "relativePath": [
-        "dist",
-        "commands",
-        "organizations",
-        "create.js"
-      ]
-    },
-    "organizations:list": {
-      "aliases": [],
-      "args": {},
-      "description": "List user's organizations",
-      "flags": {
-        "json": {
-          "description": "Output raw JSON instead of a formatted table.",
-          "name": "json",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "base-url": {
-          "description": "Override the API base URL.",
-          "helpGroup": "GLOBAL",
-          "name": "base-url",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "local": {
-          "description": "Shorthand for --base-url http://localhost:8100/api.",
-          "helpGroup": "GLOBAL",
-          "name": "local",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "api-key": {
-          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
-          "helpGroup": "GLOBAL",
-          "name": "api-key",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "org": {
-          "description": "Organization slug to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "org",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "project": {
-          "description": "Project id to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "project",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "data": {
-          "char": "d",
-          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
-          "name": "data",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "organizations:list",
-      "pluginAlias": "@kitbase/cli",
-      "pluginName": "@kitbase/cli",
-      "pluginType": "core",
-      "strict": true,
-      "enableJsonFlag": false,
-      "isESM": true,
-      "relativePath": [
-        "dist",
-        "commands",
-        "organizations",
-        "list.js"
       ]
     },
     "passkeys:delete": {
@@ -7670,6 +6982,694 @@
         "commands",
         "private-api-keys",
         "list.js"
+      ]
+    },
+    "in-app-messages:create": {
+      "aliases": [],
+      "args": {},
+      "description": "Create in-app message",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "name": {
+          "name": "name",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "title": {
+          "name": "title",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "message": {
+          "description": "Markdown content",
+          "name": "message",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "showOnce": {
+          "name": "showOnce",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "messageType": {
+          "name": "messageType",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "modal",
+            "banner",
+            "card",
+            "image"
+          ],
+          "type": "option"
+        },
+        "isActive": {
+          "name": "isActive",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "imageUrl": {
+          "name": "imageUrl",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "actionButtonText": {
+          "name": "actionButtonText",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "actionButtonUrl": {
+          "name": "actionButtonUrl",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "secondaryButtonText": {
+          "name": "secondaryButtonText",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "secondaryButtonUrl": {
+          "name": "secondaryButtonUrl",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "backgroundColor": {
+          "name": "backgroundColor",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "actionButtonColor": {
+          "name": "actionButtonColor",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "actionButtonTextColor": {
+          "name": "actionButtonTextColor",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "secondaryButtonColor": {
+          "name": "secondaryButtonColor",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "secondaryButtonTextColor": {
+          "name": "secondaryButtonTextColor",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "borderRadius": {
+          "name": "borderRadius",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "none",
+            "small",
+            "medium",
+            "large"
+          ],
+          "type": "option"
+        },
+        "shadow": {
+          "name": "shadow",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "none",
+            "small",
+            "medium",
+            "large"
+          ],
+          "type": "option"
+        },
+        "startDate": {
+          "name": "startDate",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "endDate": {
+          "name": "endDate",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "in-app-messages:create",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "in-app-messages",
+        "create.js"
+      ]
+    },
+    "in-app-messages:delete": {
+      "aliases": [],
+      "args": {
+        "messageId": {
+          "description": "messageId",
+          "name": "messageId",
+          "required": true
+        }
+      },
+      "description": "Delete in-app message",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "in-app-messages:delete",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "in-app-messages",
+        "delete.js"
+      ]
+    },
+    "in-app-messages:get": {
+      "aliases": [],
+      "args": {
+        "messageId": {
+          "description": "messageId",
+          "name": "messageId",
+          "required": true
+        }
+      },
+      "description": "Get in-app message",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "in-app-messages:get",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "in-app-messages",
+        "get.js"
+      ]
+    },
+    "in-app-messages:list": {
+      "aliases": [],
+      "args": {},
+      "description": "List in-app messages",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "page": {
+          "name": "page",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "size": {
+          "name": "size",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "sort": {
+          "name": "sort",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "asc",
+            "desc"
+          ],
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "in-app-messages:list",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "in-app-messages",
+        "list.js"
+      ]
+    },
+    "in-app-messages:update": {
+      "aliases": [],
+      "args": {
+        "messageId": {
+          "description": "messageId",
+          "name": "messageId",
+          "required": true
+        }
+      },
+      "description": "Update in-app message",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "name": {
+          "name": "name",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "title": {
+          "name": "title",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "message": {
+          "name": "message",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "showOnce": {
+          "name": "showOnce",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "messageType": {
+          "name": "messageType",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "modal",
+            "banner",
+            "card",
+            "image"
+          ],
+          "type": "option"
+        },
+        "isActive": {
+          "name": "isActive",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "imageUrl": {
+          "name": "imageUrl",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "actionButtonText": {
+          "name": "actionButtonText",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "actionButtonUrl": {
+          "name": "actionButtonUrl",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "secondaryButtonText": {
+          "name": "secondaryButtonText",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "secondaryButtonUrl": {
+          "name": "secondaryButtonUrl",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "backgroundColor": {
+          "name": "backgroundColor",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "actionButtonColor": {
+          "name": "actionButtonColor",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "actionButtonTextColor": {
+          "name": "actionButtonTextColor",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "secondaryButtonColor": {
+          "name": "secondaryButtonColor",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "secondaryButtonTextColor": {
+          "name": "secondaryButtonTextColor",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "borderRadius": {
+          "name": "borderRadius",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "none",
+            "small",
+            "medium",
+            "large"
+          ],
+          "type": "option"
+        },
+        "shadow": {
+          "name": "shadow",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "none",
+            "small",
+            "medium",
+            "large"
+          ],
+          "type": "option"
+        },
+        "startDate": {
+          "name": "startDate",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "endDate": {
+          "name": "endDate",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "in-app-messages:update",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "in-app-messages",
+        "update.js"
       ]
     },
     "projects:create": {
@@ -8528,6 +8528,196 @@
         "list.js"
       ]
     },
+    "settings:get": {
+      "aliases": [],
+      "args": {},
+      "description": "Get project settings",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "settings:get",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "settings",
+        "get.js"
+      ]
+    },
+    "settings:update": {
+      "aliases": [],
+      "args": {},
+      "description": "Update project settings",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "eventsEnabled": {
+          "name": "eventsEnabled",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "ipLoggingEnabled": {
+          "name": "ipLoggingEnabled",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "botDetectionEnabled": {
+          "name": "botDetectionEnabled",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "autoTrackPageViews": {
+          "name": "autoTrackPageViews",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "autoTrackOutboundLinks": {
+          "name": "autoTrackOutboundLinks",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "autoTrackClicks": {
+          "name": "autoTrackClicks",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "autoTrackScrollDepth": {
+          "name": "autoTrackScrollDepth",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "autoTrackVisibility": {
+          "name": "autoTrackVisibility",
+          "allowNo": false,
+          "type": "boolean"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "settings:update",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "settings",
+        "update.js"
+      ]
+    },
     "sessions:events": {
       "aliases": [],
       "args": {
@@ -8843,196 +9033,6 @@
         "commands",
         "sessions",
         "list.js"
-      ]
-    },
-    "settings:get": {
-      "aliases": [],
-      "args": {},
-      "description": "Get project settings",
-      "flags": {
-        "json": {
-          "description": "Output raw JSON instead of a formatted table.",
-          "name": "json",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "base-url": {
-          "description": "Override the API base URL.",
-          "helpGroup": "GLOBAL",
-          "name": "base-url",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "local": {
-          "description": "Shorthand for --base-url http://localhost:8100/api.",
-          "helpGroup": "GLOBAL",
-          "name": "local",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "api-key": {
-          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
-          "helpGroup": "GLOBAL",
-          "name": "api-key",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "org": {
-          "description": "Organization slug to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "org",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "project": {
-          "description": "Project id to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "project",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "data": {
-          "char": "d",
-          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
-          "name": "data",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "settings:get",
-      "pluginAlias": "@kitbase/cli",
-      "pluginName": "@kitbase/cli",
-      "pluginType": "core",
-      "strict": true,
-      "enableJsonFlag": false,
-      "isESM": true,
-      "relativePath": [
-        "dist",
-        "commands",
-        "settings",
-        "get.js"
-      ]
-    },
-    "settings:update": {
-      "aliases": [],
-      "args": {},
-      "description": "Update project settings",
-      "flags": {
-        "json": {
-          "description": "Output raw JSON instead of a formatted table.",
-          "name": "json",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "base-url": {
-          "description": "Override the API base URL.",
-          "helpGroup": "GLOBAL",
-          "name": "base-url",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "local": {
-          "description": "Shorthand for --base-url http://localhost:8100/api.",
-          "helpGroup": "GLOBAL",
-          "name": "local",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "api-key": {
-          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
-          "helpGroup": "GLOBAL",
-          "name": "api-key",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "org": {
-          "description": "Organization slug to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "org",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "project": {
-          "description": "Project id to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "project",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "data": {
-          "char": "d",
-          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
-          "name": "data",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "eventsEnabled": {
-          "name": "eventsEnabled",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "ipLoggingEnabled": {
-          "name": "ipLoggingEnabled",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "botDetectionEnabled": {
-          "name": "botDetectionEnabled",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "autoTrackPageViews": {
-          "name": "autoTrackPageViews",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "autoTrackOutboundLinks": {
-          "name": "autoTrackOutboundLinks",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "autoTrackClicks": {
-          "name": "autoTrackClicks",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "autoTrackScrollDepth": {
-          "name": "autoTrackScrollDepth",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "autoTrackVisibility": {
-          "name": "autoTrackVisibility",
-          "allowNo": false,
-          "type": "boolean"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "settings:update",
-      "pluginAlias": "@kitbase/cli",
-      "pluginName": "@kitbase/cli",
-      "pluginType": "core",
-      "strict": true,
-      "enableJsonFlag": false,
-      "isESM": true,
-      "relativePath": [
-        "dist",
-        "commands",
-        "settings",
-        "update.js"
       ]
     },
     "two-factor:disable": {
@@ -13391,88 +13391,6 @@
         "top.js"
       ]
     },
-    "billing:entitlements:get": {
-      "aliases": [],
-      "args": {
-        "featureCode": {
-          "description": "Feature code to check",
-          "name": "featureCode",
-          "required": true
-        }
-      },
-      "description": "Check feature entitlement",
-      "flags": {
-        "json": {
-          "description": "Output raw JSON instead of a formatted table.",
-          "name": "json",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "base-url": {
-          "description": "Override the API base URL.",
-          "helpGroup": "GLOBAL",
-          "name": "base-url",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "local": {
-          "description": "Shorthand for --base-url http://localhost:8100/api.",
-          "helpGroup": "GLOBAL",
-          "name": "local",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "api-key": {
-          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
-          "helpGroup": "GLOBAL",
-          "name": "api-key",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "org": {
-          "description": "Organization slug to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "org",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "project": {
-          "description": "Project id to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "project",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "data": {
-          "char": "d",
-          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
-          "name": "data",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "billing:entitlements:get",
-      "pluginAlias": "@kitbase/cli",
-      "pluginName": "@kitbase/cli",
-      "pluginType": "core",
-      "strict": true,
-      "enableJsonFlag": false,
-      "isESM": true,
-      "relativePath": [
-        "dist",
-        "commands",
-        "billing",
-        "entitlements",
-        "get.js"
-      ]
-    },
     "billing:scheduled-change:cancel": {
       "aliases": [],
       "args": {},
@@ -13623,6 +13541,88 @@
         "billing",
         "subscription",
         "reactivate.js"
+      ]
+    },
+    "billing:entitlements:get": {
+      "aliases": [],
+      "args": {
+        "featureCode": {
+          "description": "Feature code to check",
+          "name": "featureCode",
+          "required": true
+        }
+      },
+      "description": "Check feature entitlement",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "billing:entitlements:get",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "billing",
+        "entitlements",
+        "get.js"
       ]
     },
     "dashboard:events:by-project": {
@@ -14018,6 +14018,111 @@
         "dashboard",
         "users",
         "top.js"
+      ]
+    },
+    "feature-flags:usage:timeline": {
+      "aliases": [],
+      "args": {},
+      "description": "Get feature flag usage timeline",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "projectId": {
+          "description": "Optional project key to filter usage by a specific project. If not provided, returns organization-wide usage.",
+          "name": "projectId",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "fromDate": {
+          "description": "Start date for the timeline period (inclusive, YYYY-MM-DD). Defaults to 30 days ago if not provided.",
+          "name": "fromDate",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "toDate": {
+          "description": "End date for the timeline period (inclusive, YYYY-MM-DD). Defaults to today if not provided.",
+          "name": "toDate",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "timezone": {
+          "description": "Client timezone (e.g. \"Africa/Cairo\", \"America/New_York\"). Used to convert date boundaries to UTC.",
+          "name": "timezone",
+          "required": true,
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "feature-flags:usage:timeline",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "feature-flags",
+        "usage",
+        "timeline.js"
       ]
     },
     "events:users:details": {
@@ -14942,269 +15047,6 @@
         "sessions.js"
       ]
     },
-    "in-app-messages:views:clear": {
-      "aliases": [],
-      "args": {
-        "messageId": {
-          "description": "messageId",
-          "name": "messageId",
-          "required": true
-        }
-      },
-      "description": "Clear all views for a message",
-      "flags": {
-        "json": {
-          "description": "Output raw JSON instead of a formatted table.",
-          "name": "json",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "base-url": {
-          "description": "Override the API base URL.",
-          "helpGroup": "GLOBAL",
-          "name": "base-url",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "local": {
-          "description": "Shorthand for --base-url http://localhost:8100/api.",
-          "helpGroup": "GLOBAL",
-          "name": "local",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "api-key": {
-          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
-          "helpGroup": "GLOBAL",
-          "name": "api-key",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "org": {
-          "description": "Organization slug to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "org",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "project": {
-          "description": "Project id to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "project",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "data": {
-          "char": "d",
-          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
-          "name": "data",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "in-app-messages:views:clear",
-      "pluginAlias": "@kitbase/cli",
-      "pluginName": "@kitbase/cli",
-      "pluginType": "core",
-      "strict": true,
-      "enableJsonFlag": false,
-      "isESM": true,
-      "relativePath": [
-        "dist",
-        "commands",
-        "in-app-messages",
-        "views",
-        "clear.js"
-      ]
-    },
-    "in-app-messages:views:delete": {
-      "aliases": [],
-      "args": {
-        "messageId": {
-          "description": "messageId",
-          "name": "messageId",
-          "required": true
-        },
-        "viewId": {
-          "description": "viewId",
-          "name": "viewId",
-          "required": true
-        }
-      },
-      "description": "Delete a single message view",
-      "flags": {
-        "json": {
-          "description": "Output raw JSON instead of a formatted table.",
-          "name": "json",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "base-url": {
-          "description": "Override the API base URL.",
-          "helpGroup": "GLOBAL",
-          "name": "base-url",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "local": {
-          "description": "Shorthand for --base-url http://localhost:8100/api.",
-          "helpGroup": "GLOBAL",
-          "name": "local",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "api-key": {
-          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
-          "helpGroup": "GLOBAL",
-          "name": "api-key",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "org": {
-          "description": "Organization slug to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "org",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "project": {
-          "description": "Project id to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "project",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "data": {
-          "char": "d",
-          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
-          "name": "data",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "in-app-messages:views:delete",
-      "pluginAlias": "@kitbase/cli",
-      "pluginName": "@kitbase/cli",
-      "pluginType": "core",
-      "strict": true,
-      "enableJsonFlag": false,
-      "isESM": true,
-      "relativePath": [
-        "dist",
-        "commands",
-        "in-app-messages",
-        "views",
-        "delete.js"
-      ]
-    },
-    "in-app-messages:views:list": {
-      "aliases": [],
-      "args": {
-        "messageId": {
-          "description": "messageId",
-          "name": "messageId",
-          "required": true
-        }
-      },
-      "description": "List message views",
-      "flags": {
-        "json": {
-          "description": "Output raw JSON instead of a formatted table.",
-          "name": "json",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "base-url": {
-          "description": "Override the API base URL.",
-          "helpGroup": "GLOBAL",
-          "name": "base-url",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "local": {
-          "description": "Shorthand for --base-url http://localhost:8100/api.",
-          "helpGroup": "GLOBAL",
-          "name": "local",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "api-key": {
-          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
-          "helpGroup": "GLOBAL",
-          "name": "api-key",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "org": {
-          "description": "Organization slug to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "org",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "project": {
-          "description": "Project id to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "project",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "data": {
-          "char": "d",
-          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
-          "name": "data",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "page": {
-          "name": "page",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "size": {
-          "name": "size",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "in-app-messages:views:list",
-      "pluginAlias": "@kitbase/cli",
-      "pluginName": "@kitbase/cli",
-      "pluginType": "core",
-      "strict": true,
-      "enableJsonFlag": false,
-      "isESM": true,
-      "relativePath": [
-        "dist",
-        "commands",
-        "in-app-messages",
-        "views",
-        "list.js"
-      ]
-    },
     "integrations:slack:channels": {
       "aliases": [],
       "args": {},
@@ -15969,111 +15811,6 @@
         "update.js"
       ]
     },
-    "feature-flags:usage:timeline": {
-      "aliases": [],
-      "args": {},
-      "description": "Get feature flag usage timeline",
-      "flags": {
-        "json": {
-          "description": "Output raw JSON instead of a formatted table.",
-          "name": "json",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "base-url": {
-          "description": "Override the API base URL.",
-          "helpGroup": "GLOBAL",
-          "name": "base-url",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "local": {
-          "description": "Shorthand for --base-url http://localhost:8100/api.",
-          "helpGroup": "GLOBAL",
-          "name": "local",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "api-key": {
-          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
-          "helpGroup": "GLOBAL",
-          "name": "api-key",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "org": {
-          "description": "Organization slug to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "org",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "project": {
-          "description": "Project id to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "project",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "data": {
-          "char": "d",
-          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
-          "name": "data",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "projectId": {
-          "description": "Optional project key to filter usage by a specific project. If not provided, returns organization-wide usage.",
-          "name": "projectId",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "fromDate": {
-          "description": "Start date for the timeline period (inclusive, YYYY-MM-DD). Defaults to 30 days ago if not provided.",
-          "name": "fromDate",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "toDate": {
-          "description": "End date for the timeline period (inclusive, YYYY-MM-DD). Defaults to today if not provided.",
-          "name": "toDate",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "timezone": {
-          "description": "Client timezone (e.g. \"Africa/Cairo\", \"America/New_York\"). Used to convert date boundaries to UTC.",
-          "name": "timezone",
-          "required": true,
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "feature-flags:usage:timeline",
-      "pluginAlias": "@kitbase/cli",
-      "pluginName": "@kitbase/cli",
-      "pluginType": "core",
-      "strict": true,
-      "enableJsonFlag": false,
-      "isESM": true,
-      "relativePath": [
-        "dist",
-        "commands",
-        "feature-flags",
-        "usage",
-        "timeline.js"
-      ]
-    },
     "organizations:current:get": {
       "aliases": [],
       "args": {},
@@ -16250,6 +15987,269 @@
         "organizations",
         "current",
         "update.js"
+      ]
+    },
+    "in-app-messages:views:clear": {
+      "aliases": [],
+      "args": {
+        "messageId": {
+          "description": "messageId",
+          "name": "messageId",
+          "required": true
+        }
+      },
+      "description": "Clear all views for a message",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "in-app-messages:views:clear",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "in-app-messages",
+        "views",
+        "clear.js"
+      ]
+    },
+    "in-app-messages:views:delete": {
+      "aliases": [],
+      "args": {
+        "messageId": {
+          "description": "messageId",
+          "name": "messageId",
+          "required": true
+        },
+        "viewId": {
+          "description": "viewId",
+          "name": "viewId",
+          "required": true
+        }
+      },
+      "description": "Delete a single message view",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "in-app-messages:views:delete",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "in-app-messages",
+        "views",
+        "delete.js"
+      ]
+    },
+    "in-app-messages:views:list": {
+      "aliases": [],
+      "args": {
+        "messageId": {
+          "description": "messageId",
+          "name": "messageId",
+          "required": true
+        }
+      },
+      "description": "List message views",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "page": {
+          "name": "page",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "size": {
+          "name": "size",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "in-app-messages:views:list",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "in-app-messages",
+        "views",
+        "list.js"
       ]
     },
     "web-analytics:dimension:timeline": {
