@@ -77,28 +77,6 @@ importers:
         specifier: ^1.2.0
         version: 1.6.1(@types/node@20.19.27)(jsdom@28.1.0)(less@4.5.1)(sass@1.97.3)
 
-  analytics/typescript/packages/mcp:
-    dependencies:
-      '@modelcontextprotocol/sdk':
-        specifier: ^1.12.1
-        version: 1.27.1(zod@3.25.76)
-      zod:
-        specifier: ^3.24.2
-        version: 3.25.76
-    devDependencies:
-      '@types/node':
-        specifier: ^20.11.0
-        version: 20.19.27
-      tsup:
-        specifier: ^8.0.1
-        version: 8.5.1(postcss@8.5.6)(tsx@4.22.5)(typescript@5.9.3)(yaml@2.9.0)
-      typescript:
-        specifier: ^5.3.3
-        version: 5.9.3
-      vitest:
-        specifier: ^1.2.0
-        version: 1.6.1(@types/node@20.19.27)(jsdom@28.1.0)(less@4.5.1)(sass@1.97.3)
-
   analytics/typescript/packages/react:
     dependencies:
       '@kitbase/analytics':
@@ -230,6 +208,31 @@ importers:
       vitest:
         specifier: ^1.2.0
         version: 1.6.1(@types/node@20.19.27)(jsdom@28.1.0)(less@4.5.1)(sass@1.97.3)
+
+  mcp:
+    dependencies:
+      '@modelcontextprotocol/sdk':
+        specifier: ^1.20.0
+        version: 1.27.1(zod@3.25.76)
+      openapi-fetch:
+        specifier: ^0.13.0
+        version: 0.13.8
+      zod:
+        specifier: ^3.25.0
+        version: 3.25.76
+    devDependencies:
+      '@types/node':
+        specifier: ^22
+        version: 22.19.15
+      openapi-typescript:
+        specifier: ^7
+        version: 7.13.0(typescript@5.9.3)
+      tsx:
+        specifier: ^4.19.0
+        version: 4.22.5
+      typescript:
+        specifier: ^5.7.0
+        version: 5.9.3
 
   messaging/react:
     dependencies:

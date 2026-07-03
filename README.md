@@ -14,7 +14,12 @@ Official SDKs for [Kitbase](https://kitbase.io).
 | React | `@kitbase/analytics-react` | [Documentation](https://docs.kitbase.dev/sdks/react) |
 | Angular | `@kitbase/analytics-angular` | [Documentation](https://docs.kitbase.dev/sdks/angular) |
 | Dart / Flutter | `kitbase_analytics` | [Documentation](https://docs.kitbase.dev/sdks/dart) |
-| MCP Server | `@kitbase/analytics-mcp` | [Documentation](https://docs.kitbase.dev/sdks/mcp) |
+
+### MCP Server
+
+| Package | Docs |
+| ------- | ---- |
+| `@kitbase/mcp` | [Documentation](https://docs.kitbase.dev/sdks/mcp) |
 
 ### Feature Flags
 

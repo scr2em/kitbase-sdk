@@ -1,0 +1,37 @@
+{
+	"name": "@kitbase/mcp",
+	"version": "0.1.0",
+	"description": "Kitbase MCP server — project analytics, AI visibility, sessions and more, for Claude and other MCP clients",
+	"type": "module",
+	"bin": {
+		"kitbase-mcp": "./dist/stdio.js"
+	},
+	"files": [
+		"dist"
+	],
+	"exports": "./dist/modules/index.js",
+	"scripts": {
+		"build": "npm run clean && tsc",
+		"stdio": "tsx src/stdio.ts",
+		"generate:types": "openapi-typescript ../../Flyway/openapi.yaml -o src/generated/api.ts",
+		"generate": "npm run generate:types",
+		"typecheck": "tsc --noEmit",
+		"lint": "oxlint src",
+		"clean": "rm -rf dist",
+		"prepublishOnly": "npm run build"
+	},
+	"dependencies": {
+		"@modelcontextprotocol/sdk": "^1.20.0",
+		"openapi-fetch": "^0.13.0",
+		"zod": "^3.25.0"
+	},
+	"devDependencies": {
+		"@types/node": "^22",
+		"openapi-typescript": "^7",
+		"tsx": "^4.19.0",
+		"typescript": "^5.7.0"
+	},
+	"engines": {
+		"node": ">=20"
+	}
+}
