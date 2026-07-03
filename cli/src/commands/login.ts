@@ -13,8 +13,20 @@ import { getCredentials } from "../lib/credentials.js";
 import { AuthenticationError } from "../lib/errors.js";
 import { CLI_VERSION } from "../lib/version.js";
 
-function sleep(ms: number): Promise<void> {
-	return new Promise((resolve) => setTimeout(resolve, ms));
+/**
+ * Waits up to `ms`, or until `other` resolves first — whichever comes first. Unlike a plain
+ * `Promise.race([sleep(ms), other])`, this clears the timer on the losing branch, so a fast
+ * loopback ping doesn't leave a dangling `setTimeout` (and therefore an active event-loop handle)
+ * around for the rest of the interval after the race is already decided.
+ */
+function raceAgainstTimeout(ms: number, other: Promise<void>): Promise<void> {
+	return new Promise((resolve) => {
+		const timer = setTimeout(resolve, ms);
+		other.then(() => {
+			clearTimeout(timer);
+			resolve();
+		});
+	});
 }
 
 /** Starts a loopback HTTP server for the instant browser -> CLI handoff. Returns `null` if the
@@ -44,6 +56,12 @@ async function startLoopbackServer(
 			server.listen(0, "127.0.0.1", resolve);
 		});
 
+		// This server must never be the reason the CLI process fails to exit — unref it so a
+		// lingering keep-alive socket from the browser's ping (or the server simply still being
+		// open because no ping ever arrived) can't block Node from exiting naturally once the
+		// login flow is done.
+		server.unref();
+
 		const port = (server.address() as AddressInfo).port;
 
 		return {
@@ -61,7 +79,10 @@ async function startLoopbackServer(
 						resolve();
 					};
 				}),
-			close: () => server.close(),
+			close: () => {
+				server.closeAllConnections();
+				server.close();
+			},
 		};
 	} catch {
 		return null;
@@ -140,7 +161,7 @@ export default class Login extends BaseCommand {
 			}
 
 			intervalSeconds = result.pollIntervalSeconds;
-			await Promise.race([sleep(intervalSeconds * 1000), loopback?.waitForPing() ?? sleep(intervalSeconds * 1000)]);
+			await raceAgainstTimeout(intervalSeconds * 1000, loopback?.waitForPing() ?? new Promise(() => {}));
 		}
 
 		process.stdout.write("\r" + " ".repeat(30) + "\r");

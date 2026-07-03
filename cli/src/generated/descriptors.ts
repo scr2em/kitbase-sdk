@@ -22,16 +22,6 @@ export const descriptors: Record<string, OperationDescriptor> = {
 		bodyFields: [],
 		requiredBodyFields: [],
 	},
-	"changePassword": {
-		method: "put",
-		path: "/users/me/password",
-		needsOrg: false,
-		needsProject: false,
-		pathParams: [],
-		queryParams: [],
-		bodyFields: ["currentPassword","newPassword"],
-		requiredBodyFields: ["newPassword"],
-	},
 	"setupTwoFactor": {
 		method: "post",
 		path: "/users/me/2fa/setup",
@@ -1635,16 +1625,6 @@ export const descriptors: Record<string, OperationDescriptor> = {
 	"reactivateSubscription": {
 		method: "post",
 		path: "/{orgSlug}/billing/subscription/reactivate",
-		needsOrg: true,
-		needsProject: false,
-		pathParams: [],
-		queryParams: [],
-		bodyFields: [],
-		requiredBodyFields: [],
-	},
-	"cancelSubscription": {
-		method: "post",
-		path: "/{orgSlug}/billing/cancel-subscription",
 		needsOrg: true,
 		needsProject: false,
 		pathParams: [],

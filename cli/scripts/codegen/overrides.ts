@@ -21,6 +21,8 @@ export const DENYLIST_OPERATION_IDS = new Set([
 	"finishPasskeyRegistration",
 	"startSlackOAuth", // requires the dashboard's OAuth redirect URI, not CLI-automatable
 	"completeSlackOAuth",
+	"changePassword", // too sensitive/high-stakes for a bare CLI flag flow
+	"cancelSubscription", // destructive billing action — dashboard only for now
 ]);
 
 /**
@@ -31,7 +33,6 @@ export const ID_OVERRIDES: Record<string, string[]> = {
 	// Users tag ops that read oddly under a generic "users" topic — fold into account-style ids.
 	updateCurrentUser: ["account", "update"],
 	getCurrentUserWithOrgContext: ["account", "get"],
-	changePassword: ["account", "change-password"],
 	getTwoFactorStatus: ["two-factor", "status"],
 	setupTwoFactor: ["two-factor", "setup"],
 	enableTwoFactor: ["two-factor", "enable"],

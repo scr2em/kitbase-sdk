@@ -5,7 +5,7 @@ import type { HttpMethod, SpecOperation } from "./spec.js";
 import type { NamedOperation } from "./naming.js";
 import { queryParamsToFlags, bodyFieldsToFlags, type FlagSpec } from "./flags.js";
 
-const GENERATED_BANNER = "// @generated from openapi.yaml — do not edit. Run `npm run generate:commands`.";
+export const GENERATED_BANNER = "// @generated from openapi.yaml — do not edit. Run `npm run generate:commands`.";
 
 export interface EmittableOperation {
 	named: NamedOperation;
@@ -44,7 +44,7 @@ function cleanGeneratedCommands(dir: string): void {
 	}
 }
 
-function flagLiteral(flag: FlagSpec, enforceRequired: boolean): string {
+export function flagLiteral(flag: FlagSpec, enforceRequired: boolean): string {
 	const oclifType = flag.kind === "integer" ? "Flags.integer" : flag.kind === "boolean" ? "Flags.boolean" : "Flags.string";
 	const props: string[] = [];
 	if (flag.description) props.push(`description: ${JSON.stringify(flag.description)}`);
@@ -56,21 +56,21 @@ function flagLiteral(flag: FlagSpec, enforceRequired: boolean): string {
 	return `${oclifType}({ ${props.join(", ")} })`;
 }
 
-function argLiteral(name: string, description: string | undefined): string {
+export function argLiteral(name: string, description: string | undefined): string {
 	// oclif only renders the ARGUMENTS help section when at least one arg has a description, so
 	// always provide a fallback rather than leaving positional args undocumented in --help.
 	const props = [`description: ${JSON.stringify(description ?? name)}`, "required: true"];
 	return `Args.string({ ${props.join(", ")} })`;
 }
 
-function relativeImportFromCommand(commandDir: string, targetRelativeToSrc: string): string {
+export function relativeImportFromCommand(commandDir: string, targetRelativeToSrc: string): string {
 	// The file lives at src/commands/<commandDir>/<file>.ts, so escaping back to src/ means
 	// climbing out of "commands/" (1 level) plus every segment of commandDir.
 	const depth = 1 + (commandDir === "." ? 0 : commandDir.split("/").length);
 	return `${"../".repeat(depth)}${targetRelativeToSrc}`;
 }
 
-function renderCommandFile(item: EmittableOperation, commandDir: string, className: string): string {
+export function renderCommandFile(item: EmittableOperation, commandDir: string, className: string): string {
 	const flagEntries = [
 		...item.queryFlags.map((f) => `\t\t${JSON.stringify(f.name)}: ${flagLiteral(f, true)},`),
 		...item.bodyFlags.map((f) => `\t\t${JSON.stringify(f.name)}: ${flagLiteral(f, false)},`),
@@ -101,7 +101,7 @@ ${argEntries ? `\tstatic args = {\n${argEntries}\n\t};\n` : ""}${flagEntries ? `
 `;
 }
 
-function toClassName(idSegments: string[]): string {
+export function toClassName(idSegments: string[]): string {
 	return idSegments
 		.map((seg) =>
 			seg
@@ -112,7 +112,7 @@ function toClassName(idSegments: string[]): string {
 		.join("");
 }
 
-function renderDescriptorsFile(items: EmittableOperation[]): string {
+export function renderDescriptorsFile(items: EmittableOperation[]): string {
 	const entries = items
 		.map((item) => {
 			const d = item.named;
