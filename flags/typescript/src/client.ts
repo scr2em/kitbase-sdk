@@ -109,8 +109,10 @@ export type FlagsClientListener = (event: FlagsClientEvent) => void;
  *
  * const flags = new FlagsClient({
  *   sdkKey: '<YOUR_SDK_KEY>',
- *   enableLocalEvaluation: true,
- *   environmentRefreshIntervalSeconds: 60,
+ *   localEvaluation: {
+ *     enabled: true,
+ *     refreshIntervalSeconds: 60,
+ *   },
  *   defaultValues: {
  *     'dark-mode': false,
  *   },
@@ -507,11 +509,9 @@ export class FlagsClient {
 			if (!this.evaluator?.isReady()) {
 				return null;
 			}
-			const config = this.evaluator.getConfiguration()!;
 			const flags = this.evaluator.evaluateAll(merged);
 			return {
 				projectId: "",
-				environmentId: config.environmentId,
 				evaluatedAt: new Date().toISOString(),
 				flags,
 			};
@@ -538,11 +538,9 @@ export class FlagsClient {
 
 		if (this.enableLocalEvaluation) {
 			await this.ensureLocalReady();
-			const config = this.evaluator!.getConfiguration()!;
 			const flags = this.evaluator!.evaluateAll(context);
 			return {
 				projectId: "",
-				environmentId: config.environmentId,
 				evaluatedAt: new Date().toISOString(),
 				flags,
 			};

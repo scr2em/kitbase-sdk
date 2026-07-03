@@ -183,7 +183,6 @@ describe('FlagsService', () => {
     it('should delegate to client.getSnapshot', async () => {
       const snapshot = {
         projectId: 'proj-123',
-        environmentId: 'env-456',
         evaluatedAt: '2024-01-15T10:30:00Z',
         flags: [],
       };
@@ -267,7 +266,6 @@ describe('FlagsService', () => {
 
       // Simulate config change event
       const newConfig: FlagConfiguration = {
-        environmentId: 'env-123',
         schemaVersion: '1.0',
         generatedAt: new Date().toISOString(),
         etag: '"abc123"',

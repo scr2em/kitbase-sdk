@@ -10,7 +10,6 @@ describe("FlagEvaluator", () => {
 		flags: FlagDefinition[],
 		segments: SegmentDefinition[] = [],
 	): FlagConfiguration => ({
-		environmentId: "env-123",
 		schemaVersion: "1.0",
 		generatedAt: new Date().toISOString(),
 		etag: '"abc123"',

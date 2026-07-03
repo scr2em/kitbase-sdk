@@ -39,7 +39,6 @@ describe("FlagsClient", () => {
 			it("should successfully get flag snapshot", async () => {
 				const mockResponse = {
 					projectId: "proj-123",
-					environmentId: "env-456",
 					evaluatedAt: "2024-01-15T10:30:00Z",
 					flags: [
 						{
@@ -78,7 +77,6 @@ describe("FlagsClient", () => {
 					ok: true,
 					json: async () => ({
 						projectId: "proj-123",
-						environmentId: "env-456",
 						evaluatedAt: "2024-01-15T10:30:00Z",
 						flags: [],
 					}),
@@ -325,7 +323,6 @@ describe("FlagsClient", () => {
 
 	describe("Local Evaluation Mode", () => {
 		const createMockConfig = (): FlagConfiguration => ({
-			environmentId: "env-123",
 			schemaVersion: "1.0",
 			generatedAt: new Date().toISOString(),
 			etag: '"abc123"',
@@ -693,7 +690,6 @@ describe("FlagsClient", () => {
 
 				const snapshot = await client.getSnapshot();
 
-				expect(snapshot.environmentId).toBe("env-123");
 				expect(snapshot.flags).toHaveLength(6);
 				expect(snapshot.flags.map((f) => f.flagKey).sort()).toEqual([
 					"api-url",
@@ -868,7 +864,6 @@ describe("FlagsClient", () => {
 			it("should return updated flag value after backend changes config", async () => {
 				// Initial config: dark-mode is true
 				const mockConfig1: FlagConfiguration = {
-					environmentId: "env-123",
 					schemaVersion: "1.0",
 					generatedAt: new Date().toISOString(),
 					etag: '"v1"',
@@ -886,7 +881,6 @@ describe("FlagsClient", () => {
 
 				// Updated config: dark-mode is now false
 				const mockConfig2: FlagConfiguration = {
-					environmentId: "env-123",
 					schemaVersion: "1.0",
 					generatedAt: new Date().toISOString(),
 					etag: '"v2"',
@@ -936,7 +930,6 @@ describe("FlagsClient", () => {
 			it("should return updated flag value when targeting rules change", async () => {
 				// Initial config: premium-feature disabled by default, enabled for premium users
 				const mockConfig1: FlagConfiguration = {
-					environmentId: "env-123",
 					schemaVersion: "1.0",
 					generatedAt: new Date().toISOString(),
 					etag: '"v1"',
@@ -967,7 +960,6 @@ describe("FlagsClient", () => {
 
 				// Updated config: now enabled for all users
 				const mockConfig2: FlagConfiguration = {
-					environmentId: "env-123",
 					schemaVersion: "1.0",
 					generatedAt: new Date().toISOString(),
 					etag: '"v2"',
@@ -1025,7 +1017,6 @@ describe("FlagsClient", () => {
 		describe("onFlagChange", () => {
 			it("should notify listeners when flag values change", async () => {
 				const mockConfig1: FlagConfiguration = {
-					environmentId: "env-123",
 					schemaVersion: "1.0",
 					generatedAt: new Date().toISOString(),
 					etag: '"v1"',
@@ -1049,7 +1040,6 @@ describe("FlagsClient", () => {
 				};
 
 				const mockConfig2: FlagConfiguration = {
-					environmentId: "env-123",
 					schemaVersion: "1.0",
 					generatedAt: new Date().toISOString(),
 					etag: '"v2"',
@@ -1110,7 +1100,6 @@ describe("FlagsClient", () => {
 
 			it("should notify listeners when multiple flags change", async () => {
 				const mockConfig1: FlagConfiguration = {
-					environmentId: "env-123",
 					schemaVersion: "1.0",
 					generatedAt: new Date().toISOString(),
 					etag: '"v1"',
@@ -1141,7 +1130,6 @@ describe("FlagsClient", () => {
 				};
 
 				const mockConfig2: FlagConfiguration = {
-					environmentId: "env-123",
 					schemaVersion: "1.0",
 					generatedAt: new Date().toISOString(),
 					etag: '"v2"',
@@ -1204,7 +1192,6 @@ describe("FlagsClient", () => {
 
 			it("should support multiple listeners", async () => {
 				const mockConfig1: FlagConfiguration = {
-					environmentId: "env-123",
 					schemaVersion: "1.0",
 					generatedAt: new Date().toISOString(),
 					etag: '"v1"',
@@ -1267,7 +1254,6 @@ describe("FlagsClient", () => {
 
 			it("should allow unsubscribing", async () => {
 				const mockConfig1: FlagConfiguration = {
-					environmentId: "env-123",
 					schemaVersion: "1.0",
 					generatedAt: new Date().toISOString(),
 					etag: '"v1"',
@@ -1353,7 +1339,6 @@ describe("FlagsClient", () => {
 
 			it("should not notify when no flags change", async () => {
 				const mockConfig1: FlagConfiguration = {
-					environmentId: "env-123",
 					schemaVersion: "1.0",
 					generatedAt: new Date().toISOString(),
 					etag: '"v1"',
@@ -1407,7 +1392,6 @@ describe("FlagsClient", () => {
 
 			it("should clear flag change listeners on close", async () => {
 				const mockConfig1: FlagConfiguration = {
-					environmentId: "env-123",
 					schemaVersion: "1.0",
 					generatedAt: new Date().toISOString(),
 					etag: '"v1"',
@@ -1447,7 +1431,6 @@ describe("FlagsClient", () => {
 
 			it("should notify when a flag is removed", async () => {
 				const mockConfig1: FlagConfiguration = {
-					environmentId: "env-123",
 					schemaVersion: "1.0",
 					generatedAt: new Date().toISOString(),
 					etag: '"v1"',
@@ -1472,7 +1455,6 @@ describe("FlagsClient", () => {
 
 				// Config without 'feature-to-remove'
 				const mockConfig2: FlagConfiguration = {
-					environmentId: "env-123",
 					schemaVersion: "1.0",
 					generatedAt: new Date().toISOString(),
 					etag: '"v2"',
@@ -1885,7 +1867,6 @@ describe("FlagsClient", () => {
 			it("should return cached snapshot on second call", async () => {
 				const mockResponse = {
 					projectId: "proj-123",
-					environmentId: "env-456",
 					evaluatedAt: "2024-01-15T10:30:00Z",
 					flags: [],
 				};
@@ -2060,7 +2041,6 @@ describe("FlagsClient", () => {
 			it("should return cached snapshot synchronously", async () => {
 				const mockResponse = {
 					projectId: "proj-123",
-					environmentId: "env-456",
 					evaluatedAt: "2024-01-15T10:30:00Z",
 					flags: [],
 				};
@@ -2089,7 +2069,6 @@ describe("FlagsClient", () => {
 			it("should return null when cache expires", async () => {
 				const mockResponse = {
 					projectId: "proj-123",
-					environmentId: "env-456",
 					evaluatedAt: "2024-01-15T10:30:00Z",
 					flags: [],
 				};
@@ -2123,7 +2102,6 @@ describe("FlagsClient", () => {
 				ok: true,
 				json: async () => ({
 					projectId: "proj-123",
-					environmentId: "env-456",
 					evaluatedAt: "2024-01-15T10:30:00Z",
 					flags: [],
 				}),
@@ -2146,7 +2124,6 @@ describe("FlagsClient", () => {
 				ok: true,
 				status: 200,
 				json: async () => ({
-					environmentId: "env-123",
 					schemaVersion: "1.0",
 					generatedAt: new Date().toISOString(),
 					etag: '"abc123"',
@@ -2234,7 +2211,6 @@ describe("FlagsClient", () => {
 
 	describe("getCachedSnapshotSync for Local Evaluation", () => {
 		const createMockConfig = (): FlagConfiguration => ({
-			environmentId: "env-123",
 			schemaVersion: "1.0",
 			generatedAt: new Date().toISOString(),
 			etag: '"abc123"',
@@ -2286,7 +2262,6 @@ describe("FlagsClient", () => {
 			const snapshot = client.getCachedSnapshotSync();
 
 			expect(snapshot).not.toBeNull();
-			expect(snapshot?.environmentId).toBe("env-123");
 			expect(snapshot?.flags).toHaveLength(1);
 			expect(snapshot?.flags[0].flagKey).toBe("dark-mode");
 
@@ -2295,7 +2270,6 @@ describe("FlagsClient", () => {
 
 		it("should evaluate with context synchronously", async () => {
 			const mockConfig: FlagConfiguration = {
-				environmentId: "env-123",
 				schemaVersion: "1.0",
 				generatedAt: new Date().toISOString(),
 				etag: '"abc123"',
@@ -2464,7 +2438,6 @@ describe("FlagsClient", () => {
 
 		describe("with local evaluation mode", () => {
 			const createMockConfig = () => ({
-				environmentId: "env-123",
 				schemaVersion: "1.0",
 				generatedAt: new Date().toISOString(),
 				etag: '"abc123"',

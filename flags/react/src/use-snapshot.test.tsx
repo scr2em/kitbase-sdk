@@ -7,7 +7,6 @@ import type { FlagsClient, FlagSnapshot } from "@kitbase/flags";
 
 const mockSnapshot: FlagSnapshot = {
 	projectId: "project-123",
-	environmentId: "env-123",
 	evaluatedAt: "2024-01-01T00:00:00Z",
 	flags: [
 		{
