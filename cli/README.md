@@ -127,8 +127,9 @@ pnpm test            # vitest — codegen pipeline unit + integration tests
 
 ### Regenerating commands
 
-The command tree is generated from the Kitbase backend's `openapi.yaml` (in the sibling `Flyway`
-repo). After a backend API change:
+The command tree is generated from the Kitbase backend's `openapi.cli.yaml` (in the sibling
+`Flyway` repo) — an audience-scoped subset of the API spec derived from per-operation
+`x-audience` annotations (`make derive-specs` in the backend repo). After a backend API change:
 
 ```bash
 pnpm generate        # regenerates src/generated/api.ts + the full command tree
