@@ -25,8 +25,7 @@ kitbase use org
 kitbase use project
 
 # Now run any command
-kitbase feature-flags list
-kitbase feature-flags create --flagKey dark-mode --name "Dark Mode" --valueType boolean
+kitbase events list
 kitbase webhooks list --json | jq
 ```
 
@@ -50,7 +49,7 @@ lasts 60 days. Run `kitbase logout` to revoke it (server-side) and clear the loc
   `sk_kitbase_...`), then either:
   ```bash
   export KITBASE_API_KEY=sk_kitbase_...
-  kitbase feature-flags list
+  kitbase webhooks list
   ```
   or pass `--api-key sk_kitbase_...` on any command. A key resolves its own organization and
   project automatically — no need to run `use org`/`use project` first.
@@ -74,7 +73,7 @@ Every command prints a human-readable table or key/value view by default. Pass `
 machine-readable output:
 
 ```bash
-kitbase feature-flags list --json | jq '.data[].flagKey'
+kitbase webhooks list --json | jq '.data[].url'
 ```
 
 ### Request bodies
@@ -84,9 +83,9 @@ objects/arrays, use `--data` instead — accepts a literal JSON string, `@file.j
 stdin:
 
 ```bash
-kitbase feature-flags create --data '{"flagKey": "dark-mode", "name": "Dark Mode", "valueType": "boolean"}'
-echo '{"flagKey": "dark-mode", ...}' | kitbase feature-flags create --data -
-kitbase feature-flags create --data @flag.json
+kitbase webhooks create --data '{"name": "Deploy hook", "url": "https://example.com/hooks/kitbase", "events": ["project_created"]}'
+echo '{"name": "Deploy hook", ...}' | kitbase webhooks create --data -
+kitbase webhooks create --data @webhook.json
 ```
 
 Individual flags always take precedence over matching keys in `--data`.
@@ -94,8 +93,8 @@ Individual flags always take precedence over matching keys in `--data`.
 ### Local / self-hosted backend
 
 ```bash
-kitbase feature-flags list --local          # shorthand for --base-url http://localhost:8100/api
-kitbase feature-flags list --base-url https://api.your-domain.com
+kitbase webhooks list --local          # shorthand for --base-url http://localhost:8100/api
+kitbase webhooks list --base-url https://api.your-domain.com
 ```
 
 ## Commands
@@ -111,7 +110,7 @@ kitbase feature-flags list --base-url https://api.your-domain.com
 | `use project [id]` | Set the default project (interactive picker if omitted) |
 | `context` | Show the current base URL, auth mode, org, and project |
 
-Everything else — `feature-flags`, `webhooks`, `projects`, `ai-visibility`, `billing`, `events`,
+Everything else — `webhooks`, `projects`, `ai-visibility`, `billing`, `events`,
 `funnels`, `integrations`, `sdk-keys`, `private-api-keys`, `organizations`, `members`,
 `invitations`, `notifications`, `sessions`, `web-analytics`, and more — is generated directly
 from the Kitbase API's OpenAPI spec, one command per operation, grouped into topics matching the

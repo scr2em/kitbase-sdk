@@ -1,6 +1,6 @@
 # Kitbase SDK
 
-Official SDKs for [Kitbase](https://kitbase.io).
+Official SDKs for [Kitbase](https://kitbase.dev).
 
 **[Full Documentation](https://docs.kitbase.dev)**
 
@@ -13,21 +13,12 @@ Official SDKs for [Kitbase](https://kitbase.io).
 | JavaScript / TypeScript | `@kitbase/analytics` | [Documentation](https://docs.kitbase.dev/sdks/javascript) |
 | React | `@kitbase/analytics-react` | [Documentation](https://docs.kitbase.dev/sdks/react) |
 | Angular | `@kitbase/analytics-angular` | [Documentation](https://docs.kitbase.dev/sdks/angular) |
-| Dart / Flutter | `kitbase_analytics` | [Documentation](https://docs.kitbase.dev/sdks/dart) |
 
 ### MCP Server
 
 | Package | Docs |
 | ------- | ---- |
 | `@kitbase/mcp` | [Documentation](https://docs.kitbase.dev/sdks/mcp) |
-
-### Feature Flags
-
-| SDK | Package | Docs |
-| --- | ------- | ---- |
-| Core | `@kitbase/flags` | [Documentation](https://docs.kitbase.dev/features/flags) |
-| React | `@kitbase/flags-react` | [Documentation](https://docs.kitbase.dev/features/flags) |
-| Angular | `@kitbase/flags-angular` | [Documentation](https://docs.kitbase.dev/features/flags) |
 
 ### In-App Messaging
 
