@@ -1,6 +1,6 @@
 {
 	"name": "@kitbase/mcp",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Kitbase MCP server — project analytics, AI visibility, sessions and more, for Claude and other MCP clients",
 	"keywords": [
 		"kitbase",
