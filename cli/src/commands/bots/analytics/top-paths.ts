@@ -12,6 +12,7 @@ export default class BotsAnalyticsTopPaths extends ApiOperationCommand {
 		"to": Flags.string({ description: "End date filter (inclusive, YYYY-MM-DD). Used when preset is not provided." }),
 		"timezone": Flags.string({ description: "Client timezone (e.g. \"Africa/Cairo\"). Used to convert date boundaries to UTC." }),
 		"size": Flags.integer({ description: "Maximum number of top paths to return" }),
+		"vendor": Flags.string({ description: "Restrict to one bot vendor/company (e.g. \"OpenAI\", \"Anthropic\", \"Google\", \"Perplexity\")" }),
 	};
 
 	descriptor = descriptors["getBotsAnalyticsTopPaths"];

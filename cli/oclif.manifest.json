@@ -4636,6 +4636,13 @@
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
+        },
+        "vendor": {
+          "description": "Restrict to one bot vendor/company (e.g. \"OpenAI\", \"Anthropic\", \"Google\", \"Perplexity\")",
+          "name": "vendor",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
         }
       },
       "hasDynamicHelp": false,

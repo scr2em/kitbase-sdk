@@ -14,8 +14,8 @@
 	"scripts": {
 		"build": "npm run clean && tsc && oclif manifest && node scripts/sort-manifest.mjs",
 		"dev": "tsc --watch",
-		"generate:types": "openapi-typescript ../../Flyway/openapi.yaml -o src/generated/api.ts",
-		"generate:commands": "tsx scripts/generate-commands.ts --spec ../../Flyway/openapi.yaml",
+		"generate:types": "openapi-typescript ../../Flyway/openapi.cli.yaml -o src/generated/api.ts",
+		"generate:commands": "tsx scripts/generate-commands.ts --spec ../../Flyway/openapi.cli.yaml",
 		"generate": "npm run generate:types && npm run generate:commands",
 		"lint": "oxlint src",
 		"test": "vitest run",
