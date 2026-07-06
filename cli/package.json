@@ -1,6 +1,6 @@
 {
 	"name": "@kitbase/cli",
-	"version": "0.1.0",
+	"version": "1.0.0",
 	"description": "Kitbase CLI — manage your Kitbase projects from the terminal",
 	"bin": {
 		"kitbase": "./bin/run.js"
