@@ -2,6 +2,26 @@
 	"name": "@kitbase/mcp",
 	"version": "1.0.0",
 	"description": "Kitbase MCP server — project analytics, AI visibility, sessions and more, for Claude and other MCP clients",
+	"keywords": [
+		"kitbase",
+		"mcp",
+		"model-context-protocol",
+		"analytics",
+		"claude"
+	],
+	"homepage": "https://github.com/scr2em/kitbase-sdk/tree/main/mcp#readme",
+	"bugs": {
+		"url": "https://github.com/scr2em/kitbase-sdk/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/scr2em/kitbase-sdk.git",
+		"directory": "mcp"
+	},
+	"license": "MIT",
+	"publishConfig": {
+		"access": "public"
+	},
 	"type": "module",
 	"bin": {
 		"kitbase-mcp": "./dist/stdio.js"
@@ -13,7 +33,7 @@
 	"scripts": {
 		"build": "npm run clean && tsc",
 		"stdio": "tsx src/stdio.ts",
-		"generate:types": "openapi-typescript ../../Flyway/openapi.yaml -o src/generated/api.ts",
+		"generate:types": "sh scripts/generate-types.sh",
 		"generate": "npm run generate:types",
 		"typecheck": "tsc --noEmit",
 		"lint": "oxlint src",
