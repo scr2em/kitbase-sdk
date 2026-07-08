@@ -1,5 +1,6 @@
 import type { KitbasePlugin, PluginContext } from "./types.js";
 import type { Tags, TrackResponse } from "../types-lite.js";
+import { hasTextSelection } from "./utils.js";
 
 const ANALYTICS_CHANNEL = "__analytics";
 
@@ -13,6 +14,10 @@ export class ClickTrackingPlugin implements KitbasePlugin {
 		this.ctx = ctx;
 
 		this.clickListener = (event: MouseEvent) => {
+			// Skip repeated clicks of a multi-click sequence (double/triple-click
+			// text selection) — only count the first click.
+			if (event.detail > 1) return;
+
 			const target = event.target as Element | null;
 
 			// data-kb-track-click — user-defined click events via data attributes
@@ -36,6 +41,10 @@ export class ClickTrackingPlugin implements KitbasePlugin {
 
 			const element = ctx.findClickableElement(event);
 			if (!element) return;
+
+			// Skip clicks that finish a text-selection drag inside a text field —
+			// the user is selecting text, not clicking.
+			if (hasTextSelection(element)) return;
 
 			// Skip outbound links — already handled by outbound link tracking
 			if (ctx.config.autoTrackOutboundLinks !== false) {

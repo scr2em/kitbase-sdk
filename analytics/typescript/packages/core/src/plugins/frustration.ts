@@ -8,6 +8,8 @@ const RAGE_CLICK_WINDOW_MS = 1000;
 const RAGE_CLICK_RADIUS_PX = 30;
 const DEAD_CLICK_TIMEOUT_MS = 1000;
 
+const BUTTON_INPUT_TYPES = new Set(["button", "submit", "reset", "image"]);
+
 export class FrustrationPlugin implements KitbasePlugin {
 	readonly name = "frustration";
 	private ctx!: PluginContext;
@@ -82,6 +84,17 @@ export class FrustrationPlugin implements KitbasePlugin {
 			// Skip dead click detection for <select> and <option> — the browser renders
 			// native dropdowns outside the DOM, so no MutationObserver-visible change occurs.
 			if (clickedElement.tagName === "SELECT" || target.closest?.("select")) return;
+
+			// Skip dead click detection for form fields — focus, text selection,
+			// toggling checked state, and native picker UIs don't mutate the DOM.
+			// Button-like inputs are kept: a click there with no effect is a real signal.
+			if (clickedElement.tagName === "TEXTAREA") return;
+			if (
+				clickedElement.tagName === "INPUT" &&
+				!BUTTON_INPUT_TYPES.has((clickedElement as HTMLInputElement).type)
+			) {
+				return;
+			}
 
 			// Clear any pending dead click check
 			if (this.deadClickTimeout !== null) {

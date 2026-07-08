@@ -52,6 +52,22 @@ export function findClickableElement(event: MouseEvent): Element | null {
 }
 
 /**
+ * Whether the element is a text field with a non-collapsed selection,
+ * i.e. the click that just fired finished a text-selection drag rather
+ * than being a deliberate click.
+ */
+export function hasTextSelection(element: Element): boolean {
+	if (element.tagName !== "INPUT" && element.tagName !== "TEXTAREA") return false;
+	const el = element as HTMLInputElement | HTMLTextAreaElement;
+	try {
+		return el.selectionStart !== null && el.selectionStart !== el.selectionEnd;
+	} catch {
+		// Some input types (e.g. number, email) don't support selection
+		return false;
+	}
+}
+
+/**
  * Build a lightweight CSS selector for an element.
  * Used to identify frustration signal targets.
  */
