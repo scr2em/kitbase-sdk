@@ -180,6 +180,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/{orgSlug}/projects/{projectId}/ai-visibility/citations/pages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Cited pages
+         * @description Flat, paginated list of the exact pages (URLs) AI engines cited, across all domains,
+         *     aggregated over the same job window as the cited-domain map. With `mentioningBrand=true`
+         *     only citations from answers that featured the project's own brand (a brand mention or a
+         *     citation of the brand's domain) are counted — i.e. the pages behind the answers that
+         *     talk about the brand.
+         */
+        get: operations["getAiVisibilityCitedPages"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/{orgSlug}/projects/{projectId}/ai-visibility/breakdown": {
         parameters: {
             query?: never;
@@ -220,6 +244,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/{orgSlug}/projects/{projectId}/ai-visibility/discovered-competitors": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Suggested (untracked) competitors
+         * @description Brands the AI named organically across the most recent completed jobs that are NOT yet tracked (neither the project's own brand nor a tracked competitor), ranked by how many runs mentioned each — the suggestion feed for "track this competitor". Extracted during the analysis pass, so only runs analyzed with discovery enabled contribute.
+         */
+        get: operations["getAiVisibilityDiscoveredCompetitors"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/{orgSlug}/projects/{projectId}/ai-visibility/share-of-voice": {
         parameters: {
             query?: never;
@@ -232,6 +276,46 @@ export interface paths {
          * @description Per completed job (oldest first), each tracked brand's normalized share of voice (its runsWithBrand divided by the sum across all brands) and dense rank, for one AI provider.
          */
         get: operations["getAiVisibilityShareOfVoice"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/ai-visibility/provider-series": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Per-provider presence time series
+         * @description Per completed job (oldest first), one entry per AI provider (the 'ALL' rollup is excluded) for the project's own brand — presence and citation counts plus mention/citation rates. Powers the per-provider trend line chart.
+         */
+        get: operations["getAiVisibilityProviderSeries"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/ai-visibility/competitor-series": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Per-competitor presence time series
+         * @description Per completed job (oldest first), one entry per tracked brand (the project's own brand plus every competitor) for one AI provider — presence/citation metrics plus each brand's normalized share of voice within the job. Powers the per-competitor trend line chart.
+         */
+        get: operations["getAiVisibilityCompetitorSeries"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2069,9 +2153,6 @@ export interface components {
             totalUnits?: number;
             completedUnits?: number;
             failedUnits?: number;
-            estimatedCostUsd?: number | null;
-            /** @description Accumulated actual cost so far */
-            costUsd?: number;
             errorMessage?: string | null;
             /** Format: date-time */
             createdAt?: string;
@@ -2156,6 +2237,41 @@ export interface components {
             totalPages?: number;
             urls?: components["schemas"]["AiVisibilityDomainCitationUrl"][];
         };
+        /** @description One distinct cited page (URL) across all domains, with how many times it was cited */
+        AiVisibilityCitedPage: {
+            /** @description The full cited URL as returned by the engine */
+            rawUrl: string;
+            /** @description Registrable domain (eTLD+1) of the page; null when normalization failed */
+            domain?: string | null;
+            /** @description Path portion of the URL */
+            urlPath?: string | null;
+            /** @description Page title reported alongside the citation, if any */
+            title?: string | null;
+            /**
+             * @description Classification of the page's domain against the tracked brand set
+             * @enum {string|null}
+             */
+            classification?: "SELF" | "COMPETITOR" | "OTHER" | null;
+            /** @enum {string|null} */
+            sourceType?: "VENDOR" | "UGC" | "REVIEW_SITE" | "REFERENCE" | "NEWS" | "SOCIAL" | "DOCS" | "EDITORIAL" | null;
+            /** @description Number of citations to this exact URL across the aggregated jobs */
+            citationCount: number;
+            /** @description AI engines that cited this page at least once, scoped to the provider filter ('ALL' lists every engine) */
+            providers?: string[];
+        };
+        /** @description Paginated flat list of the pages AI engines cited, across all domains */
+        AiVisibilityCitedPagesResponse: {
+            provider?: string;
+            /** @description Echo of the request filter — true when only citations from answers featuring the project's own brand are counted */
+            mentioningBrand?: boolean;
+            /** @description Number of completed jobs aggregated */
+            jobsIncluded?: number;
+            page?: number;
+            size?: number;
+            totalElements?: number;
+            totalPages?: number;
+            pages?: components["schemas"]["AiVisibilityCitedPage"][];
+        };
         AiVisibilityBreakdownEntry: {
             provider?: string;
             runCount?: number;
@@ -2219,6 +2335,21 @@ export interface components {
             jobsIncluded?: number;
             competitors?: components["schemas"]["AiVisibilityCompetitorEntry"][];
         };
+        AiVisibilityDiscoveredCompetitorEntry: {
+            /** @description Brand/product name as the AI wrote it (display casing) */
+            name?: string;
+            /** @description Best-effort registrable domain when the answer tied the brand to a website; null otherwise */
+            primaryDomain?: string | null;
+            /** @description Number of distinct runs in which the AI named this untracked brand */
+            mentionCount?: number;
+            /** @description AI engines that named this brand at least once, scoped to the provider filter ('ALL' lists every engine) */
+            providers?: string[];
+        };
+        AiVisibilityDiscoveredCompetitorsResponse: {
+            provider?: string;
+            jobsIncluded?: number;
+            competitors?: components["schemas"]["AiVisibilityDiscoveredCompetitorEntry"][];
+        };
         AiVisibilityShareOfVoiceEntry: {
             brandId?: string;
             name?: string;
@@ -2238,6 +2369,55 @@ export interface components {
         AiVisibilityShareOfVoiceResponse: {
             provider?: string;
             points?: components["schemas"]["AiVisibilityShareOfVoicePoint"][];
+        };
+        AiVisibilityProviderSeriesEntry: {
+            provider?: string;
+            runCount?: number;
+            runsWithBrand?: number;
+            /** @description runsWithBrand / runCount, 0..1 */
+            presenceRate?: number;
+            citationCount?: number;
+            /** @description runsWithMention / runCount, 0..1; null when not analyzed */
+            mentionRate?: number | null;
+            /** @description runsWithCitation / runCount, 0..1; null when not analyzed */
+            citationRate?: number | null;
+        };
+        AiVisibilityProviderSeriesPoint: {
+            jobId?: string;
+            /** Format: date-time */
+            finishedAt?: string | null;
+            /** @description One entry per AI provider (the 'ALL' rollup is excluded) for the project's own brand */
+            entries?: components["schemas"]["AiVisibilityProviderSeriesEntry"][];
+        };
+        AiVisibilityProviderSeriesResponse: {
+            points?: components["schemas"]["AiVisibilityProviderSeriesPoint"][];
+        };
+        AiVisibilityCompetitorSeriesEntry: {
+            brandId?: string;
+            name?: string;
+            isSelf?: boolean;
+            runCount?: number;
+            runsWithBrand?: number;
+            /** @description runsWithBrand / runCount, 0..1 */
+            presenceRate?: number;
+            citationCount?: number;
+            /** @description runsWithMention / runCount, 0..1; null when not analyzed */
+            mentionRate?: number | null;
+            /** @description runsWithCitation / runCount, 0..1; null when not analyzed */
+            citationRate?: number | null;
+            /** @description This brand's runsWithBrand divided by the sum across all brands for this job; null when no brand had presence */
+            shareOfVoice?: number | null;
+        };
+        AiVisibilityCompetitorSeriesPoint: {
+            jobId?: string;
+            /** Format: date-time */
+            finishedAt?: string | null;
+            /** @description One entry per tracked brand (the project's own brand plus every competitor) for the requested provider */
+            entries?: components["schemas"]["AiVisibilityCompetitorSeriesEntry"][];
+        };
+        AiVisibilityCompetitorSeriesResponse: {
+            provider?: string;
+            points?: components["schemas"]["AiVisibilityCompetitorSeriesPoint"][];
         };
         AiVisibilityPromptProviderCell: {
             provider?: string;
@@ -2601,6 +2781,52 @@ export interface operations {
             403: components["responses"]["ForbiddenError"];
         };
     };
+    getAiVisibilityCitedPages: {
+        parameters: {
+            query?: {
+                /** @description AI provider filter ('ALL' aggregates across providers) */
+                provider?: components["parameters"]["AiVisibilityProvider"];
+                /** @description When true, only count citations from answers where the project's own brand appeared */
+                mentioningBrand?: boolean;
+                /** @description Number of most recent completed jobs to aggregate (ignored when from/to set) */
+                jobs?: number;
+                /** @description Zero-based page index of the URL list */
+                page?: number;
+                /** @description Page size of the URL list */
+                size?: number;
+                /** @description Predefined date range preset. Takes precedence over from/to. */
+                preset?: components["parameters"]["AiVisibilityPreset"];
+                /** @description Start of the date window (inclusive, interpreted in the client timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window. */
+                from?: components["parameters"]["AiVisibilityFrom"];
+                /** @description End of the date window (inclusive, interpreted in the client timezone). */
+                to?: components["parameters"]["AiVisibilityTo"];
+                /** @description Client timezone (e.g. "Africa/Cairo") used to resolve preset/date boundaries; defaults to UTC. */
+                timezone?: components["parameters"]["AiVisibilityTimezone"];
+            };
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Cited pages retrieved successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiVisibilityCitedPagesResponse"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+        };
+    };
     getAiVisibilityBreakdown: {
         parameters: {
             query?: {
@@ -2681,6 +2907,48 @@ export interface operations {
             403: components["responses"]["ForbiddenError"];
         };
     };
+    getAiVisibilityDiscoveredCompetitors: {
+        parameters: {
+            query?: {
+                /** @description Number of most recent completed jobs to aggregate (ignored when from/to set) */
+                jobs?: number;
+                /** @description Maximum number of suggested competitors to return */
+                limit?: number;
+                /** @description AI provider filter ('ALL' aggregates across providers) */
+                provider?: components["parameters"]["AiVisibilityProvider"];
+                /** @description Predefined date range preset. Takes precedence over from/to. */
+                preset?: components["parameters"]["AiVisibilityPreset"];
+                /** @description Start of the date window (inclusive, interpreted in the client timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window. */
+                from?: components["parameters"]["AiVisibilityFrom"];
+                /** @description End of the date window (inclusive, interpreted in the client timezone). */
+                to?: components["parameters"]["AiVisibilityTo"];
+                /** @description Client timezone (e.g. "Africa/Cairo") used to resolve preset/date boundaries; defaults to UTC. */
+                timezone?: components["parameters"]["AiVisibilityTimezone"];
+            };
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Suggested competitors retrieved successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiVisibilityDiscoveredCompetitorsResponse"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+        };
+    };
     getAiVisibilityShareOfVoice: {
         parameters: {
             query?: {
@@ -2715,6 +2983,84 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AiVisibilityShareOfVoiceResponse"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+        };
+    };
+    getAiVisibilityProviderSeries: {
+        parameters: {
+            query?: {
+                /** @description Maximum number of most recent jobs to include (ignored when from/to set) */
+                limit?: number;
+                /** @description Predefined date range preset. Takes precedence over from/to. */
+                preset?: components["parameters"]["AiVisibilityPreset"];
+                /** @description Start of the date window (inclusive, interpreted in the client timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window. */
+                from?: components["parameters"]["AiVisibilityFrom"];
+                /** @description End of the date window (inclusive, interpreted in the client timezone). */
+                to?: components["parameters"]["AiVisibilityTo"];
+                /** @description Client timezone (e.g. "Africa/Cairo") used to resolve preset/date boundaries; defaults to UTC. */
+                timezone?: components["parameters"]["AiVisibilityTimezone"];
+            };
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Provider series retrieved successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiVisibilityProviderSeriesResponse"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+        };
+    };
+    getAiVisibilityCompetitorSeries: {
+        parameters: {
+            query?: {
+                /** @description AI provider filter ('ALL' aggregates across providers) */
+                provider?: components["parameters"]["AiVisibilityProvider"];
+                /** @description Maximum number of most recent jobs to include (ignored when from/to set) */
+                limit?: number;
+                /** @description Predefined date range preset. Takes precedence over from/to. */
+                preset?: components["parameters"]["AiVisibilityPreset"];
+                /** @description Start of the date window (inclusive, interpreted in the client timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window. */
+                from?: components["parameters"]["AiVisibilityFrom"];
+                /** @description End of the date window (inclusive, interpreted in the client timezone). */
+                to?: components["parameters"]["AiVisibilityTo"];
+                /** @description Client timezone (e.g. "Africa/Cairo") used to resolve preset/date boundaries; defaults to UTC. */
+                timezone?: components["parameters"]["AiVisibilityTimezone"];
+            };
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Competitor series retrieved successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiVisibilityCompetitorSeriesResponse"];
                 };
             };
             401: components["responses"]["UnauthorizedError"];

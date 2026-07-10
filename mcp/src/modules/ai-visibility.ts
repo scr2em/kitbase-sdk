@@ -160,6 +160,42 @@ export function registerAiVisibilityTools(server: McpServer, { callApi }: ToolCo
 	);
 
 	server.registerTool(
+		"ai_visibility_cited_pages",
+		{
+			title: "AI visibility cited pages",
+			description:
+				"Read-only. Flat list of the exact pages (URLs) AI engines cited, across all domains, most-cited " +
+				"first. Set `mentioningBrand: true` to only count citations from answers that featured the " +
+				"project's own brand — the pages behind the answers that talk about the brand.",
+			inputSchema: {
+				orgSlug: p.orgSlug,
+				projectId: p.projectId,
+				provider: p.aiProvider,
+				mentioningBrand: z
+					.boolean()
+					.optional()
+					.describe("Only count citations from answers where the project's own brand appeared."),
+				jobs,
+				page: p.page,
+				size: p.size,
+				preset: p.preset,
+				from: p.from,
+				to: p.to,
+				timezone: aiTimezone,
+			},
+		},
+		async ({ orgSlug, projectId, provider, mentioningBrand, jobs, page, size, preset, from, to, timezone }, extra) =>
+			callApi(extra, (c) =>
+				c.GET("/{orgSlug}/projects/{projectId}/ai-visibility/citations/pages", {
+					params: {
+						path: { orgSlug, projectId },
+						query: { provider, mentioningBrand, jobs, page, size, preset, from, to, timezone },
+					},
+				}),
+			),
+	);
+
+	server.registerTool(
 		"ai_visibility_prompts",
 		{
 			title: "AI visibility prompts",
