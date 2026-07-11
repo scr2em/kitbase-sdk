@@ -1103,6 +1103,8 @@ export interface components {
             /** @description Project description */
             description?: string;
             projectType: components["schemas"]["ProjectType"];
+            /** @description The project's configured public website domain (registrable eTLD+1), or null when the project has no public website configured. */
+            websiteDomain?: string | null;
             /** @description User ID who created the project */
             createdBy: string;
             /**

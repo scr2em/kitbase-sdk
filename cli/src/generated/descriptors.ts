@@ -299,7 +299,7 @@ export const descriptors: Record<string, OperationDescriptor> = {
 		needsProject: false,
 		pathParams: [],
 		queryParams: [],
-		bodyFields: ["name","description","projectType"],
+		bodyFields: ["name","description","projectType","websiteDomain"],
 		requiredBodyFields: ["name","projectType"],
 	},
 	"getProject": {
@@ -319,7 +319,7 @@ export const descriptors: Record<string, OperationDescriptor> = {
 		needsProject: false,
 		pathParams: ["projectId"],
 		queryParams: [],
-		bodyFields: ["name","description"],
+		bodyFields: ["name","description","websiteDomain"],
 		requiredBodyFields: ["name"],
 	},
 	"deleteProject": {

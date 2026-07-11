@@ -3233,6 +3233,11 @@ export interface components {
          */
         UserStatusEnum: "active" | "inactive" | "pending" | "suspended";
         /**
+         * @description Sidebar navigation layout preference
+         * @enum {string}
+         */
+        SidebarNavMode: "drill" | "categorized";
+        /**
          * @description Invitation status
          * @enum {string}
          */
@@ -3477,6 +3482,8 @@ export interface components {
             /** @description Project description */
             description?: string;
             projectType: components["schemas"]["ProjectType"];
+            /** @description Optional public website domain for the project (registrable eTLD+1). Normalized on write (scheme/www/path stripped); invalid input is rejected with 400. Omit or leave empty for projects with no public website (apps, dashboards). */
+            websiteDomain?: string | null;
         };
         /** @description Request to update a project */
         UpdateProjectRequest: {
@@ -3484,6 +3491,8 @@ export interface components {
             name: string;
             /** @description Project description */
             description?: string;
+            /** @description The project's public website domain (registrable eTLD+1). Send a non-empty value to set it (normalized on write; invalid input rejected with 400), an empty string to clear it, or omit the field entirely to leave the current value unchanged. */
+            websiteDomain?: string | null;
         };
         /** @description User information */
         UserResponse: {
@@ -3550,6 +3559,8 @@ export interface components {
              * @description When the user was last updated
              */
             updatedAt?: string;
+            /** @description User's sidebar navigation layout preference (null = client default) */
+            sidebarNavMode?: components["schemas"]["SidebarNavMode"];
         };
         /** @description Request to update user profile */
         UpdateUserRequest: {
@@ -3743,7 +3754,7 @@ export interface components {
          * @description Permission code enum representing all available permissions in the system
          * @enum {string}
          */
-        PermissionCode: "organization.update" | "organization.view" | "member.view" | "member.invite" | "member.remove" | "member.update_role" | "project.read" | "project.create" | "project.update" | "project.delete" | "build.view" | "build.delete" | "sdk_key.view" | "sdk_key.create" | "sdk_key.delete" | "private_api_key.view" | "private_api_key.create" | "private_api_key.delete" | "environment.view" | "environment.create" | "environment.update" | "environment.delete" | "in_app_message.view" | "in_app_message.create" | "in_app_message.update" | "in_app_message.delete" | "event.view" | "event.create" | "event.update" | "event.delete" | "ota.view" | "ota.create" | "ota.update" | "ota.delete" | "analytics.view" | "support.operations" | "webhook.view" | "webhook.create" | "webhook.update" | "webhook.delete" | "feature_flag.view" | "feature_flag.create" | "feature_flag.update" | "feature_flag.delete" | "audit.read" | "integration.view" | "integration.create" | "integration.update" | "integration.delete" | "integration.subscription.view" | "integration.subscription.create" | "integration.subscription.update" | "integration.subscription.delete" | "billing.subscription.view" | "billing.subscription.manage" | "billing.usage.view" | "billing.entitlements.view" | "dashboard.view" | "dashboard.manage" | "flutter.view" | "flutter.create" | "flutter.update" | "flutter.delete" | "invitation.cancel" | "invitation.delete" | "aivisibility.view" | "aivisibility.manage" | "siteaudit.view" | "siteaudit.manage" | "engagement.view" | "engagement.manage" | "dataimport.view" | "dataimport.manage";
+        PermissionCode: "organization.update" | "organization.view" | "member.view" | "member.invite" | "member.remove" | "member.update_role" | "project.read" | "project.create" | "project.update" | "project.delete" | "build.view" | "build.delete" | "sdk_key.view" | "sdk_key.create" | "sdk_key.delete" | "private_api_key.view" | "private_api_key.create" | "private_api_key.delete" | "environment.view" | "environment.create" | "environment.update" | "environment.delete" | "in_app_message.view" | "in_app_message.create" | "in_app_message.update" | "in_app_message.delete" | "event.view" | "event.create" | "event.update" | "event.delete" | "ota.view" | "ota.create" | "ota.update" | "ota.delete" | "analytics.view" | "support.operations" | "webhook.view" | "webhook.create" | "webhook.update" | "webhook.delete" | "feature_flag.view" | "feature_flag.create" | "feature_flag.update" | "feature_flag.delete" | "audit.read" | "integration.view" | "integration.create" | "integration.update" | "integration.delete" | "integration.subscription.view" | "integration.subscription.create" | "integration.subscription.update" | "integration.subscription.delete" | "billing.subscription.view" | "billing.subscription.manage" | "billing.usage.view" | "billing.entitlements.view" | "dashboard.view" | "dashboard.manage" | "flutter.view" | "flutter.create" | "flutter.update" | "flutter.delete" | "invitation.cancel" | "invitation.delete" | "aivisibility.view" | "aivisibility.manage" | "siteaudit.view" | "siteaudit.manage" | "engagement.view" | "engagement.manage" | "dataimport.view" | "dataimport.manage" | "contentrecs.view" | "contentrecs.manage" | "sitecontent.view" | "sitecontent.manage";
         /** @description Role information with associated permissions */
         RoleWithPermissionsResponse: {
             /** @description Role ID */
@@ -3840,6 +3851,8 @@ export interface components {
             /** @description Project description */
             description?: string;
             projectType: components["schemas"]["ProjectType"];
+            /** @description The project's configured public website domain (registrable eTLD+1), or null when the project has no public website configured. */
+            websiteDomain?: string | null;
             /** @description User ID who created the project */
             createdBy: string;
             /**
