@@ -1255,6 +1255,106 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/{orgSlug}/projects/{projectId}/backlinks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List detected backlink sources
+         * @description Referring domains detected from real traffic (search engines, social networks, AI assistants and self-referrals excluded), with live session counts for the selected window. Requires backlinks.view permission.
+         */
+        get: operations["listBacklinkSources"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/backlinks/{backlinkId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update a backlink source's status
+         * @description Dismiss a source as noise (ignored) or restore it (active). Requires backlinks.manage permission.
+         */
+        patch: operations["updateBacklinkSource"];
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/backlinks/detail": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Drill into one backlink source
+         * @description Daily referred-session timeline, landing paths and the distinct verbatim referrer URLs (the linking pages) for one referring domain. Requires backlinks.view permission.
+         */
+        get: operations["getBacklinkSourceDetail"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/backlinks/reclamation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Dead pages still receiving referred traffic
+         * @description Externally referred sessions landing on pages the site crawler recorded as broken (non-2xx) — existing backlinks recoverable with a redirect. Returns siteIndexAvailable=false when the project has never indexed its site content. Requires backlinks.view permission.
+         */
+        get: operations["getBacklinkReclamation"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/backlinks/opportunities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * AI-cited domains to seek links from
+         * @description Third-party (non-self, non-competitor) domains cited by AI answers for this project's prompts, aggregated over the most recent completed AI-visibility jobs and ranked by how often they appear in prompts where the brand is absent. Requires backlinks.view permission.
+         */
+        get: operations["getBacklinkOpportunities"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/{orgSlug}/projects/{projectId}/imports": {
         parameters: {
             query?: never;
@@ -3246,7 +3346,7 @@ export interface components {
          * @description Type of notification
          * @enum {string}
          */
-        NotificationTypeEnum: "invitation_received" | "build_completed" | "member_joined" | "member_removed" | "log_rate_exceeded" | "role_updated" | "data_retention_cleanup" | "data_retention_warning" | "admin_broadcast";
+        NotificationTypeEnum: "invitation_received" | "build_completed" | "member_joined" | "member_removed" | "log_rate_exceeded" | "role_updated" | "data_retention_cleanup" | "data_retention_warning" | "admin_broadcast" | "backlink_detected";
         /**
          * @description Event types that can trigger webhook deliveries
          * @enum {string}
@@ -3754,7 +3854,7 @@ export interface components {
          * @description Permission code enum representing all available permissions in the system
          * @enum {string}
          */
-        PermissionCode: "organization.update" | "organization.view" | "member.view" | "member.invite" | "member.remove" | "member.update_role" | "project.read" | "project.create" | "project.update" | "project.delete" | "build.view" | "build.delete" | "sdk_key.view" | "sdk_key.create" | "sdk_key.delete" | "private_api_key.view" | "private_api_key.create" | "private_api_key.delete" | "environment.view" | "environment.create" | "environment.update" | "environment.delete" | "in_app_message.view" | "in_app_message.create" | "in_app_message.update" | "in_app_message.delete" | "event.view" | "event.create" | "event.update" | "event.delete" | "ota.view" | "ota.create" | "ota.update" | "ota.delete" | "analytics.view" | "support.operations" | "webhook.view" | "webhook.create" | "webhook.update" | "webhook.delete" | "feature_flag.view" | "feature_flag.create" | "feature_flag.update" | "feature_flag.delete" | "audit.read" | "integration.view" | "integration.create" | "integration.update" | "integration.delete" | "integration.subscription.view" | "integration.subscription.create" | "integration.subscription.update" | "integration.subscription.delete" | "billing.subscription.view" | "billing.subscription.manage" | "billing.usage.view" | "billing.entitlements.view" | "dashboard.view" | "dashboard.manage" | "flutter.view" | "flutter.create" | "flutter.update" | "flutter.delete" | "invitation.cancel" | "invitation.delete" | "aivisibility.view" | "aivisibility.manage" | "siteaudit.view" | "siteaudit.manage" | "engagement.view" | "engagement.manage" | "dataimport.view" | "dataimport.manage" | "contentrecs.view" | "contentrecs.manage" | "sitecontent.view" | "sitecontent.manage";
+        PermissionCode: "organization.update" | "organization.view" | "member.view" | "member.invite" | "member.remove" | "member.update_role" | "project.read" | "project.create" | "project.update" | "project.delete" | "build.view" | "build.delete" | "sdk_key.view" | "sdk_key.create" | "sdk_key.delete" | "private_api_key.view" | "private_api_key.create" | "private_api_key.delete" | "environment.view" | "environment.create" | "environment.update" | "environment.delete" | "in_app_message.view" | "in_app_message.create" | "in_app_message.update" | "in_app_message.delete" | "event.view" | "event.create" | "event.update" | "event.delete" | "ota.view" | "ota.create" | "ota.update" | "ota.delete" | "analytics.view" | "support.operations" | "webhook.view" | "webhook.create" | "webhook.update" | "webhook.delete" | "feature_flag.view" | "feature_flag.create" | "feature_flag.update" | "feature_flag.delete" | "audit.read" | "integration.view" | "integration.create" | "integration.update" | "integration.delete" | "integration.subscription.view" | "integration.subscription.create" | "integration.subscription.update" | "integration.subscription.delete" | "billing.subscription.view" | "billing.subscription.manage" | "billing.usage.view" | "billing.entitlements.view" | "dashboard.view" | "dashboard.manage" | "flutter.view" | "flutter.create" | "flutter.update" | "flutter.delete" | "invitation.cancel" | "invitation.delete" | "aivisibility.view" | "aivisibility.manage" | "siteaudit.view" | "siteaudit.manage" | "engagement.view" | "engagement.manage" | "dataimport.view" | "dataimport.manage" | "contentrecs.view" | "contentrecs.manage" | "sitecontent.view" | "sitecontent.manage" | "backlinks.view" | "backlinks.manage";
         /** @description Role information with associated permissions */
         RoleWithPermissionsResponse: {
             /** @description Role ID */
@@ -7350,6 +7450,114 @@ export interface components {
             jobsIncluded?: number;
             prompts?: components["schemas"]["AiVisibilityPromptBreakdownEntry"][];
         };
+        /**
+         * @description Whether the backlink source is shown (active) or dismissed as noise (ignored)
+         * @enum {string}
+         */
+        BacklinkSourceStatusEnum: "active" | "ignored";
+        BacklinkSourceResponse: {
+            id: string;
+            /** @description Normalized referring host (lowercased, www-stripped) */
+            domain: string;
+            status: components["schemas"]["BacklinkSourceStatusEnum"];
+            /**
+             * Format: date-time
+             * @description First session ever referred by this domain (historical, not sweep time)
+             */
+            firstSeenAt: string;
+            /** Format: date-time */
+            lastSeenAt: string;
+            /** @description A verbatim referrer URL from this domain — the exact linking page when the browser sent a full referrer */
+            sampleReferrerUrl?: string | null;
+            /** @description Landing path of the earliest referred session */
+            firstLandingPath?: string | null;
+            /** @description Sessions referred by this domain within the selected window */
+            sessions: number;
+            /** @description Most common landing path within the selected window */
+            topLandingPath?: string | null;
+        };
+        BacklinkSourcesResponse: {
+            items: components["schemas"]["BacklinkSourceResponse"][];
+            /** @description Zero-based index of the returned page of results */
+            page: number;
+            /** @description Maximum number of sources returned per result page */
+            size: number;
+            /** @description Number of sources matching the current filter/search */
+            total: number;
+        };
+        BacklinkTimelinePoint: {
+            /** Format: date */
+            date: string;
+            /** @description Sessions referred by the domain that day */
+            sessions: number;
+        };
+        BacklinkLandingPath: {
+            path: string;
+            sessions: number;
+        };
+        BacklinkSourceDetailResponse: {
+            domain: string;
+            status: components["schemas"]["BacklinkSourceStatusEnum"];
+            /** Format: date-time */
+            firstSeenAt: string;
+            /** Format: date-time */
+            lastSeenAt: string;
+            /** @description Daily referred sessions within the selected window */
+            timeline: components["schemas"]["BacklinkTimelinePoint"][];
+            /** @description Landing paths of referred sessions within the selected window */
+            landingPaths: components["schemas"]["BacklinkLandingPath"][];
+            /** @description Distinct verbatim referrer URLs seen from this domain — the pages that link to the site */
+            sourceUrls: string[];
+        };
+        UpdateBacklinkSourceRequest: {
+            status: components["schemas"]["BacklinkSourceStatusEnum"];
+        };
+        BacklinkReclamationItem: {
+            /** @description Normalized path that referred visitors land on */
+            path: string;
+            /** @description HTTP status the site crawler recorded for this page (non-2xx) */
+            httpStatus: number;
+            /** @description Externally referred sessions that landed on this dead page within the window */
+            sessions: number;
+            /** @description Referring domains still sending traffic to this page */
+            referrerDomains: string[];
+            /**
+             * Format: date-time
+             * @description Most recent referred session that hit this page
+             */
+            lastHitAt?: string | null;
+        };
+        BacklinkReclamationResponse: {
+            items: components["schemas"]["BacklinkReclamationItem"][];
+            /** @description False when the project has no indexed page inventory yet — run a site-content index to enable reclamation */
+            siteIndexAvailable: boolean;
+        };
+        BacklinkOpportunityEntry: {
+            /** @description Third-party domain cited by AI answers for this project's prompts */
+            domain: string;
+            /**
+             * @description Static source-type sub-classification; null when the job predates it
+             * @enum {string|null}
+             */
+            sourceType?: "VENDOR" | "UGC" | "REVIEW_SITE" | "REFERENCE" | "NEWS" | "SOCIAL" | "DOCS" | "EDITORIAL" | null;
+            /** @description Citations of this domain across the aggregated jobs */
+            citationCount: number;
+            /** @description Distinct prompts whose answers cited this domain */
+            promptCount: number;
+            /** @description Prompts with zero self-brand presence whose answers cited this domain — the outreach priority signal */
+            gapPromptCount: number;
+            /** @description AI engines that cited this domain at least once in the aggregated jobs */
+            providers: string[];
+            /** @description True when this domain already appears as a detected backlink source for the project */
+            alreadyLinking: boolean;
+            /** @description Up to a few cited URLs on this domain, as returned by the engines */
+            sampleUrls?: string[];
+        };
+        BacklinkOpportunitiesResponse: {
+            items: components["schemas"]["BacklinkOpportunityEntry"][];
+            /** @description Number of completed AI-visibility jobs aggregated */
+            jobsIncluded: number;
+        };
     };
     responses: {
         /** @description Resource not found */
@@ -9810,6 +10018,173 @@ export interface operations {
             401: components["responses"]["UnauthorizedError"];
             403: components["responses"]["ForbiddenError"];
             404: components["responses"]["NotFoundError"];
+        };
+    };
+    listBacklinkSources: {
+        parameters: {
+            query?: {
+                /** @description Zero-based page index */
+                page?: number;
+                /** @description Number of sources per result page (1–200) */
+                size?: number;
+                /** @description Sort by discovery recency or by referred sessions in the window */
+                sort?: "first_seen" | "sessions";
+                /** @description Server-side status filter */
+                status?: "all" | "active" | "ignored";
+                /** @description Case-insensitive substring match on the domain */
+                q?: string;
+                /** @description Window in days for the live session counts */
+                days?: number;
+            };
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Backlink sources retrieved successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BacklinkSourcesResponse"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+        };
+    };
+    updateBacklinkSource: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+                /** @description Backlink source ID */
+                backlinkId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateBacklinkSourceRequest"];
+            };
+        };
+        responses: {
+            /** @description Backlink source updated */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            404: components["responses"]["NotFoundError"];
+        };
+    };
+    getBacklinkSourceDetail: {
+        parameters: {
+            query: {
+                /** @description Normalized referring host as returned by the list endpoint */
+                domain: string;
+                /** @description Window in days for the timeline and landing paths */
+                days?: number;
+            };
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Backlink source detail retrieved successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BacklinkSourceDetailResponse"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            404: components["responses"]["NotFoundError"];
+        };
+    };
+    getBacklinkReclamation: {
+        parameters: {
+            query?: {
+                /** @description Window in days for referred-session counts */
+                days?: number;
+            };
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Reclamation candidates retrieved successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BacklinkReclamationResponse"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+        };
+    };
+    getBacklinkOpportunities: {
+        parameters: {
+            query?: {
+                /** @description Number of most recent completed AI-visibility jobs to aggregate */
+                jobs?: number;
+                /** @description Maximum number of domains to return */
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Link opportunities retrieved successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BacklinkOpportunitiesResponse"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
         };
     };
     listDataImports: {

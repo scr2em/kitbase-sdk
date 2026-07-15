@@ -6,6 +6,7 @@ import { registerWebAnalyticsTools } from "./web-analytics.js";
 import { registerEventsTools } from "./events.js";
 import { registerAiVisibilityTools } from "./ai-visibility.js";
 import { registerBotsTools } from "./bots.js";
+import { registerBacklinksTools } from "./backlinks.js";
 import { registerSessionsTools } from "./sessions.js";
 import { registerUsersTools } from "./users.js";
 import { registerSdkKeysTools } from "./sdk-keys.js";
@@ -20,6 +21,7 @@ const MODULES: ReadonlyArray<(server: McpServer, ctx: ToolContext) => void> = [
 	registerEventsTools,
 	registerAiVisibilityTools,
 	registerBotsTools,
+	registerBacklinksTools,
 	registerSessionsTools,
 	registerUsersTools,
 	registerSdkKeysTools,
