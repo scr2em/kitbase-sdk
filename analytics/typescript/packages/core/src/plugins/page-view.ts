@@ -10,6 +10,7 @@ export class PageViewPlugin implements KitbasePlugin {
 	private active = false;
 	private popstateListener: (() => void) | null = null;
 	private pageshowListener: ((e: PageTransitionEvent) => void) | null = null;
+	private lastPath: string | null = null;
 
 	setup(ctx: PluginContext): void | false {
 		if (typeof window === "undefined") return false;
@@ -28,7 +29,7 @@ export class PageViewPlugin implements KitbasePlugin {
 		history.pushState = (...args) => {
 			originalPushState(...args);
 			if (this.active) {
-				this.trackPageView().catch((err) => ctx.log("Failed to track page view (pushState)", err));
+				this.trackAutoPageView().catch((err) => ctx.log("Failed to track page view (pushState)", err));
 			}
 		};
 
@@ -41,7 +42,7 @@ export class PageViewPlugin implements KitbasePlugin {
 		// Listen to popstate (browser back/forward)
 		this.popstateListener = () => {
 			if (this.active) {
-				this.trackPageView().catch((err) => ctx.log("Failed to track page view (popstate)", err));
+				this.trackAutoPageView().catch((err) => ctx.log("Failed to track page view (popstate)", err));
 			}
 		};
 		window.addEventListener("popstate", this.popstateListener);
@@ -78,8 +79,22 @@ export class PageViewPlugin implements KitbasePlugin {
 		};
 	}
 
+	/**
+	 * Auto-triggered page view (pushState / popstate). Skips when the resolved
+	 * path is unchanged, so same-path history updates — query/state-only
+	 * pushState calls made by frameworks, consent tools, chat widgets, filters,
+	 * etc. — don't emit duplicate screen_view events. The initial load, explicit
+	 * trackPageView() calls, and bfcache restores still fire unconditionally.
+	 */
+	private async trackAutoPageView(): Promise<TrackResponse | void> {
+		const path = typeof window !== "undefined" ? window.location.pathname : "";
+		if (path === this.lastPath) return;
+		return this.trackPageView();
+	}
+
 	private async trackPageView(options: PageViewOptions = {}): Promise<TrackResponse | void> {
 		const path = options.path ?? (typeof window !== "undefined" ? window.location.pathname : "");
+		this.lastPath = path;
 		const title = options.title ?? (typeof document !== "undefined" ? document.title : "");
 		const referrer = options.referrer ?? (typeof document !== "undefined" ? document.referrer : "");
 
