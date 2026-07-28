@@ -10,6 +10,8 @@ export interface FlagSpec {
 	description?: string;
 	options?: string[];
 	required: boolean;
+	/** Repeatable flag (`--f a --f b`), for a query param the spec types as an array. */
+	multiple?: boolean;
 }
 
 function kindOf(type: unknown): FlagKind {
@@ -18,16 +20,30 @@ function kindOf(type: unknown): FlagKind {
 	return "string";
 }
 
+/** An array param's kind/enum live on `items`, not on the parameter schema itself. */
+function itemSchema(schema: Record<string, unknown> | undefined): Record<string, unknown> | undefined {
+	if (schema?.type !== "array") return schema;
+	return schema.items as Record<string, unknown> | undefined;
+}
+
 export function queryParamsToFlags(parameters: SpecParameter[]): FlagSpec[] {
 	return parameters
 		.filter((p) => p.in === "query")
-		.map((p) => ({
-			name: p.name,
-			kind: kindOf(p.schema?.type),
-			description: p.description,
-			options: Array.isArray(p.schema?.enum) ? (p.schema!.enum as string[]) : undefined,
-			required: p.required,
-		}));
+		.map((p) => {
+			// An array query param (style: form, explode: true) has to stay an array
+			// all the way to the request: collapsing it to one string silently caps
+			// the filter at a single value.
+			const isArray = p.schema?.type === "array";
+			const items = itemSchema(p.schema);
+			return {
+				name: p.name,
+				kind: kindOf(items?.type),
+				description: p.description,
+				options: Array.isArray(items?.enum) ? (items!.enum as string[]) : undefined,
+				required: p.required,
+				...(isArray ? { multiple: true } : {}),
+			};
+		});
 }
 
 export function bodyFieldsToFlags(fields: BodyField[]): FlagSpec[] {

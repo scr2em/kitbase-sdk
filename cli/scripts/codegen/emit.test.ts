@@ -78,6 +78,11 @@ describe("flagLiteral", () => {
 		expect(flagLiteral(flag({ description: "Page number" }), true)).toContain('"Page number"');
 	});
 
+	it("emits multiple: true for a repeatable flag, and omits it otherwise", () => {
+		expect(flagLiteral(flag({ multiple: true }), true)).toContain("multiple: true");
+		expect(flagLiteral(flag({}), true)).not.toContain("multiple");
+	});
+
 	it("includes options when the flag has a non-empty enum", () => {
 		expect(flagLiteral(flag({ options: ["asc", "desc"] }), true)).toContain('["asc","desc"]');
 	});

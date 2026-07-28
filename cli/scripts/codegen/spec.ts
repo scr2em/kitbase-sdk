@@ -57,8 +57,19 @@ function toParameter(spec: AnyRecord, raw: AnyRecord): SpecParameter {
 		in: resolved.in,
 		required: Boolean(resolved.required),
 		description: resolved.description,
-		schema: resolveMaybeRef(spec, resolved.schema),
+		schema: resolveParamSchema(spec, resolved.schema),
 	};
+}
+
+/**
+ * Resolves the parameter schema AND, for an array parameter, its `items` — an
+ * array of a named enum (`items: {$ref: SomeEnum}`) otherwise loses its allowed
+ * values, so the generated flag would silently accept anything.
+ */
+function resolveParamSchema(spec: AnyRecord, raw: AnyRecord | undefined): AnyRecord | undefined {
+	const schema = resolveMaybeRef(spec, raw);
+	if (!schema || schema.type !== "array" || !schema.items) return schema;
+	return { ...schema, items: resolveMaybeRef(spec, schema.items as AnyRecord) };
 }
 
 /**

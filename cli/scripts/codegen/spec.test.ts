@@ -129,6 +129,33 @@ paths:
 		expect(operation.bodyFields).toEqual([]);
 	});
 
+	// An array parameter whose items are a named enum ($ref) must still surface its
+	// allowed values — otherwise the generated flag accepts any string silently.
+	it("resolves a $ref inside an array parameter's items so the enum survives", () => {
+		const file = writeSpec(`
+paths:
+  /widgets:
+    get:
+      operationId: listWidgets
+      parameters:
+        - name: engines
+          in: query
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/EngineEnum'
+components:
+  schemas:
+    EngineEnum:
+      type: string
+      enum: [CHATGPT, GEMINI]
+`);
+		const [operation] = loadSpec(file);
+		const param = operation.parameters.find((p) => p.name === "engines");
+		expect(param?.schema?.type).toBe("array");
+		expect((param?.schema?.items as { enum?: string[] })?.enum).toEqual(["CHATGPT", "GEMINI"]);
+	});
+
 	describe("request body field extraction", () => {
 		const specWithBody = (schemaYaml: string) =>
 			writeSpec(`

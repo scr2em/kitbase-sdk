@@ -15,7 +15,7 @@ export default class AnalyticsUsers extends ApiOperationCommand {
 		"page": Flags.integer({ description: "Page number (0-indexed)" }),
 		"size": Flags.integer({ description: "Page size" }),
 		"search": Flags.string({ description: "Search by user_id or anonymous_id (partial match)" }),
-		"filters": Flags.string({ description: "Dimension filters in format dimension:operator:values.\nOperator is 'is' (include) or 'is_not' (exclude).\nValues are comma-separated. Can specify multiple filters.\nExample: filters=country:is:US,UK&filters=browser:is_not:Safari\n" }),
+		"filters": Flags.string({ description: "Dimension filters in format dimension:operator:values.\nOperator is 'is' (include) or 'is_not' (exclude).\nValues are comma-separated. Can specify multiple filters.\nExample: filters=country:is:US,UK&filters=browser:is_not:Safari\n", multiple: true }),
 	};
 
 	descriptor = descriptors["listAnalyticsUsers"];

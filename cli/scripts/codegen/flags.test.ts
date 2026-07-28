@@ -72,6 +72,30 @@ describe("queryParamsToFlags", () => {
 		const flags = queryParamsToFlags([param({ name: "page", description: "Page number (0-based)" })]);
 		expect(flags[0].description).toBe("Page number (0-based)");
 	});
+
+	// An array query param (style: form, explode: true) must stay repeatable end to end.
+	// Collapsing it to a single-value flag caps the filter at one value with no error —
+	// `--topicIds a --topicIds b` would silently keep only the last one.
+	it("marks an array-typed query param as a repeatable (multiple) flag", () => {
+		const flags = queryParamsToFlags([
+			param({ name: "topicIds", schema: { type: "array", items: { type: "string" } } }),
+		]);
+		expect(flags[0].multiple).toBe(true);
+	});
+
+	it("leaves multiple unset for a scalar query param", () => {
+		const flags = queryParamsToFlags([param({ name: "search", schema: { type: "string" } })]);
+		expect(flags[0].multiple).toBeUndefined();
+	});
+
+	it("reads an array param's kind and enum off items, not the array schema", () => {
+		const flags = queryParamsToFlags([
+			param({ name: "ids", schema: { type: "array", items: { type: "integer" } } }),
+			param({ name: "statuses", schema: { type: "array", items: { type: "string", enum: ["a", "b"] } } }),
+		]);
+		expect(flags[0].kind).toBe("integer");
+		expect(flags[1].options).toEqual(["a", "b"]);
+	});
 });
 
 describe("bodyFieldsToFlags", () => {

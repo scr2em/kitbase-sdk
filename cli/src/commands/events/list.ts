@@ -17,7 +17,7 @@ export default class EventsList extends ApiOperationCommand {
 		"page": Flags.integer({ description: "Page number" }),
 		"size": Flags.integer({ description: "Page size" }),
 		"sort": Flags.string({ description: "Sort order by timestamp", options: ["asc","desc"] }),
-		"filters": Flags.string({ description: "Dimension filters in format dimension:operator:values.\nOperator is 'is' (include) or 'is_not' (exclude).\nValues are comma-separated. Can specify multiple filters.\nExample: filters=country:is:US,UK&filters=browser:is_not:Safari\n" }),
+		"filters": Flags.string({ description: "Dimension filters in format dimension:operator:values.\nOperator is 'is' (include) or 'is_not' (exclude).\nValues are comma-separated. Can specify multiple filters.\nExample: filters=country:is:US,UK&filters=browser:is_not:Safari\n", multiple: true }),
 	};
 
 	descriptor = descriptors["listEvents"];

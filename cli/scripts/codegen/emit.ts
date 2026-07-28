@@ -49,6 +49,7 @@ export function flagLiteral(flag: FlagSpec, enforceRequired: boolean): string {
 	const props: string[] = [];
 	if (flag.description) props.push(`description: ${JSON.stringify(flag.description)}`);
 	if (flag.options && flag.options.length > 0) props.push(`options: ${JSON.stringify(flag.options)}`);
+	if (flag.multiple) props.push("multiple: true");
 	// Body-field flags are never oclif-`required`, even when the schema marks them required —
 	// `--data`/stdin is an equally valid way to supply them, and operation-command.ts already
 	// enforces required body fields itself (with a TTY prompt fallback) after merging --data.

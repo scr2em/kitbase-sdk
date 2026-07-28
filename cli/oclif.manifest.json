@@ -632,6 +632,33 @@
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
+        },
+        "topicIds": {
+          "description": "Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics.\n",
+          "name": "topicIds",
+          "hasDynamicHelp": false,
+          "multiple": true,
+          "type": "option"
+        },
+        "providers": {
+          "description": "AI engines to include. Repeat the parameter to select several; omitted or empty aggregates across every engine. There is no 'ALL' sentinel — an empty selection is what \"all engines\" means.\n",
+          "name": "providers",
+          "hasDynamicHelp": false,
+          "multiple": true,
+          "options": [
+            "PERPLEXITY",
+            "GEMINI",
+            "CLAUDE",
+            "CHATGPT",
+            "DEEPSEEK",
+            "GLM",
+            "KIMI",
+            "GOOGLE_AI_OVERVIEW",
+            "GOOGLE_AI_MODE",
+            "CHATGPT_WEB",
+            "GEMINI_WEB"
+          ],
+          "type": "option"
         }
       },
       "hasDynamicHelp": false,
@@ -708,17 +735,23 @@
           "multiple": false,
           "type": "option"
         },
-        "provider": {
-          "description": "AI provider filter ('ALL' aggregates across providers)",
-          "name": "provider",
+        "providers": {
+          "description": "AI engines to include. Repeat the parameter to select several; omitted or empty aggregates across every engine. There is no 'ALL' sentinel — an empty selection is what \"all engines\" means.\n",
+          "name": "providers",
           "hasDynamicHelp": false,
-          "multiple": false,
+          "multiple": true,
           "options": [
             "PERPLEXITY",
             "GEMINI",
             "CLAUDE",
             "CHATGPT",
-            "ALL"
+            "DEEPSEEK",
+            "GLM",
+            "KIMI",
+            "GOOGLE_AI_OVERVIEW",
+            "GOOGLE_AI_MODE",
+            "CHATGPT_WEB",
+            "GEMINI_WEB"
           ],
           "type": "option"
         },
@@ -785,6 +818,13 @@
           "name": "timezone",
           "hasDynamicHelp": false,
           "multiple": false,
+          "type": "option"
+        },
+        "topicIds": {
+          "description": "Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics.\n",
+          "name": "topicIds",
+          "hasDynamicHelp": false,
+          "multiple": true,
           "type": "option"
         }
       },
@@ -863,17 +903,23 @@
           "multiple": false,
           "type": "option"
         },
-        "provider": {
-          "description": "AI provider filter ('ALL' aggregates across providers)",
-          "name": "provider",
+        "providers": {
+          "description": "AI engines to include. Repeat the parameter to select several; omitted or empty aggregates across every engine. There is no 'ALL' sentinel — an empty selection is what \"all engines\" means.\n",
+          "name": "providers",
           "hasDynamicHelp": false,
-          "multiple": false,
+          "multiple": true,
           "options": [
             "PERPLEXITY",
             "GEMINI",
             "CLAUDE",
             "CHATGPT",
-            "ALL"
+            "DEEPSEEK",
+            "GLM",
+            "KIMI",
+            "GOOGLE_AI_OVERVIEW",
+            "GOOGLE_AI_MODE",
+            "CHATGPT_WEB",
+            "GEMINI_WEB"
           ],
           "type": "option"
         },
@@ -920,6 +966,13 @@
           "name": "timezone",
           "hasDynamicHelp": false,
           "multiple": false,
+          "type": "option"
+        },
+        "topicIds": {
+          "description": "Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics.\n",
+          "name": "topicIds",
+          "hasDynamicHelp": false,
+          "multiple": true,
           "type": "option"
         }
       },
@@ -1011,17 +1064,23 @@
           "multiple": false,
           "type": "option"
         },
-        "provider": {
-          "description": "AI provider filter ('ALL' aggregates across providers)",
-          "name": "provider",
+        "providers": {
+          "description": "AI engines to include. Repeat the parameter to select several; omitted or empty aggregates across every engine. There is no 'ALL' sentinel — an empty selection is what \"all engines\" means.\n",
+          "name": "providers",
           "hasDynamicHelp": false,
-          "multiple": false,
+          "multiple": true,
           "options": [
             "PERPLEXITY",
             "GEMINI",
             "CLAUDE",
             "CHATGPT",
-            "ALL"
+            "DEEPSEEK",
+            "GLM",
+            "KIMI",
+            "GOOGLE_AI_OVERVIEW",
+            "GOOGLE_AI_MODE",
+            "CHATGPT_WEB",
+            "GEMINI_WEB"
           ],
           "type": "option"
         },
@@ -1061,6 +1120,13 @@
           "name": "timezone",
           "hasDynamicHelp": false,
           "multiple": false,
+          "type": "option"
+        },
+        "topicIds": {
+          "description": "Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics.\n",
+          "name": "topicIds",
+          "hasDynamicHelp": false,
+          "multiple": true,
           "type": "option"
         }
       },
@@ -1152,17 +1218,23 @@
           "multiple": false,
           "type": "option"
         },
-        "provider": {
-          "description": "AI provider filter ('ALL' aggregates across providers)",
-          "name": "provider",
+        "providers": {
+          "description": "AI engines to include. Repeat the parameter to select several; omitted or empty aggregates across every engine. There is no 'ALL' sentinel — an empty selection is what \"all engines\" means.\n",
+          "name": "providers",
           "hasDynamicHelp": false,
-          "multiple": false,
+          "multiple": true,
           "options": [
             "PERPLEXITY",
             "GEMINI",
             "CLAUDE",
             "CHATGPT",
-            "ALL"
+            "DEEPSEEK",
+            "GLM",
+            "KIMI",
+            "GOOGLE_AI_OVERVIEW",
+            "GOOGLE_AI_MODE",
+            "CHATGPT_WEB",
+            "GEMINI_WEB"
           ],
           "type": "option"
         },
@@ -1279,17 +1351,23 @@
           "multiple": false,
           "type": "option"
         },
-        "provider": {
-          "description": "AI provider filter ('ALL' aggregates across providers)",
-          "name": "provider",
+        "providers": {
+          "description": "AI engines to include. Repeat the parameter to select several; omitted or empty aggregates across every engine. There is no 'ALL' sentinel — an empty selection is what \"all engines\" means.\n",
+          "name": "providers",
           "hasDynamicHelp": false,
-          "multiple": false,
+          "multiple": true,
           "options": [
             "PERPLEXITY",
             "GEMINI",
             "CLAUDE",
             "CHATGPT",
-            "ALL"
+            "DEEPSEEK",
+            "GLM",
+            "KIMI",
+            "GOOGLE_AI_OVERVIEW",
+            "GOOGLE_AI_MODE",
+            "CHATGPT_WEB",
+            "GEMINI_WEB"
           ],
           "type": "option"
         },
@@ -1343,6 +1421,13 @@
           "name": "timezone",
           "hasDynamicHelp": false,
           "multiple": false,
+          "type": "option"
+        },
+        "topicIds": {
+          "description": "Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics.\n",
+          "name": "topicIds",
+          "hasDynamicHelp": false,
+          "multiple": true,
           "type": "option"
         }
       },
@@ -1426,17 +1511,23 @@
           "multiple": false,
           "type": "option"
         },
-        "provider": {
-          "description": "AI provider filter ('ALL' aggregates across providers)",
-          "name": "provider",
+        "providers": {
+          "description": "AI engines to include. Repeat the parameter to select several; omitted or empty aggregates across every engine. There is no 'ALL' sentinel — an empty selection is what \"all engines\" means.\n",
+          "name": "providers",
           "hasDynamicHelp": false,
-          "multiple": false,
+          "multiple": true,
           "options": [
             "PERPLEXITY",
             "GEMINI",
             "CLAUDE",
             "CHATGPT",
-            "ALL"
+            "DEEPSEEK",
+            "GLM",
+            "KIMI",
+            "GOOGLE_AI_OVERVIEW",
+            "GOOGLE_AI_MODE",
+            "CHATGPT_WEB",
+            "GEMINI_WEB"
           ],
           "type": "option"
         },
@@ -1497,6 +1588,13 @@
           "name": "timezone",
           "hasDynamicHelp": false,
           "multiple": false,
+          "type": "option"
+        },
+        "topicIds": {
+          "description": "Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics.\n",
+          "name": "topicIds",
+          "hasDynamicHelp": false,
+          "multiple": true,
           "type": "option"
         }
       },
@@ -2263,6 +2361,33 @@
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
+        },
+        "topicIds": {
+          "description": "Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics.\n",
+          "name": "topicIds",
+          "hasDynamicHelp": false,
+          "multiple": true,
+          "type": "option"
+        },
+        "providers": {
+          "description": "AI engines to include. Repeat the parameter to select several; omitted or empty aggregates across every engine. There is no 'ALL' sentinel — an empty selection is what \"all engines\" means.\n",
+          "name": "providers",
+          "hasDynamicHelp": false,
+          "multiple": true,
+          "options": [
+            "PERPLEXITY",
+            "GEMINI",
+            "CLAUDE",
+            "CHATGPT",
+            "DEEPSEEK",
+            "GLM",
+            "KIMI",
+            "GOOGLE_AI_OVERVIEW",
+            "GOOGLE_AI_MODE",
+            "CHATGPT_WEB",
+            "GEMINI_WEB"
+          ],
+          "type": "option"
         }
       },
       "hasDynamicHelp": false,
@@ -2697,6 +2822,13 @@
           "name": "active",
           "allowNo": false,
           "type": "boolean"
+        },
+        "topicId": {
+          "description": "Topic assignment. On PUT, omitted or null clears the assignment.",
+          "name": "topicId",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
         }
       },
       "hasDynamicHelp": false,
@@ -2818,6 +2950,33 @@
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
+        },
+        "topicIds": {
+          "description": "Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics.\n",
+          "name": "topicIds",
+          "hasDynamicHelp": false,
+          "multiple": true,
+          "type": "option"
+        },
+        "providers": {
+          "description": "AI engines to include. Repeat the parameter to select several; omitted or empty aggregates across every engine. There is no 'ALL' sentinel — an empty selection is what \"all engines\" means.\n",
+          "name": "providers",
+          "hasDynamicHelp": false,
+          "multiple": true,
+          "options": [
+            "PERPLEXITY",
+            "GEMINI",
+            "CLAUDE",
+            "CHATGPT",
+            "DEEPSEEK",
+            "GLM",
+            "KIMI",
+            "GOOGLE_AI_OVERVIEW",
+            "GOOGLE_AI_MODE",
+            "CHATGPT_WEB",
+            "GEMINI_WEB"
+          ],
+          "type": "option"
         }
       },
       "hasDynamicHelp": false,
@@ -2834,6 +2993,81 @@
         "commands",
         "ai-visibility",
         "provider-series.js"
+      ]
+    },
+    "ai-visibility:providers": {
+      "aliases": [],
+      "args": {},
+      "description": "AI engines available to this organization",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "ai-visibility:providers",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "ai-visibility",
+        "providers.js"
       ]
     },
     "ai-visibility:runs:get": {
@@ -3051,17 +3285,23 @@
           "multiple": false,
           "type": "option"
         },
-        "provider": {
-          "description": "AI provider filter ('ALL' aggregates across providers)",
-          "name": "provider",
+        "providers": {
+          "description": "AI engines to include. Repeat the parameter to select several; omitted or empty aggregates across every engine. There is no 'ALL' sentinel — an empty selection is what \"all engines\" means.\n",
+          "name": "providers",
           "hasDynamicHelp": false,
-          "multiple": false,
+          "multiple": true,
           "options": [
             "PERPLEXITY",
             "GEMINI",
             "CLAUDE",
             "CHATGPT",
-            "ALL"
+            "DEEPSEEK",
+            "GLM",
+            "KIMI",
+            "GOOGLE_AI_OVERVIEW",
+            "GOOGLE_AI_MODE",
+            "CHATGPT_WEB",
+            "GEMINI_WEB"
           ],
           "type": "option"
         },
@@ -3109,6 +3349,13 @@
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
+        },
+        "topicIds": {
+          "description": "Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics.\n",
+          "name": "topicIds",
+          "hasDynamicHelp": false,
+          "multiple": true,
+          "type": "option"
         }
       },
       "hasDynamicHelp": false,
@@ -3125,6 +3372,559 @@
         "commands",
         "ai-visibility",
         "share-of-voice.js"
+      ]
+    },
+    "ai-visibility:topics-breakdown": {
+      "aliases": [],
+      "args": {},
+      "description": "Per-topic visibility and share of voice",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "providers": {
+          "description": "AI engines to include. Repeat the parameter to select several; omitted or empty aggregates across every engine. There is no 'ALL' sentinel — an empty selection is what \"all engines\" means.\n",
+          "name": "providers",
+          "hasDynamicHelp": false,
+          "multiple": true,
+          "options": [
+            "PERPLEXITY",
+            "GEMINI",
+            "CLAUDE",
+            "CHATGPT",
+            "DEEPSEEK",
+            "GLM",
+            "KIMI",
+            "GOOGLE_AI_OVERVIEW",
+            "GOOGLE_AI_MODE",
+            "CHATGPT_WEB",
+            "GEMINI_WEB"
+          ],
+          "type": "option"
+        },
+        "jobs": {
+          "name": "jobs",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "preset": {
+          "description": "Predefined date range preset. Takes precedence over from/to.",
+          "name": "preset",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "last_30_minutes",
+            "last_hour",
+            "today",
+            "yesterday",
+            "last_7_days",
+            "last_30_days",
+            "this_month",
+            "this_year"
+          ],
+          "type": "option"
+        },
+        "from": {
+          "description": "Start of the date window (inclusive, interpreted in the client timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window.\n",
+          "name": "from",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "to": {
+          "description": "End of the date window (inclusive, interpreted in the client timezone).",
+          "name": "to",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "timezone": {
+          "description": "Client timezone (e.g. \"Africa/Cairo\") used to resolve preset/date boundaries; defaults to UTC.",
+          "name": "timezone",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "ai-visibility:topics-breakdown",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "ai-visibility",
+        "topics-breakdown.js"
+      ]
+    },
+    "ai-visibility:topics:backfill": {
+      "aliases": [],
+      "args": {},
+      "description": "Apply current topic assignments to legacy runs",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "dryRun": {
+          "name": "dryRun",
+          "allowNo": false,
+          "type": "boolean"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "ai-visibility:topics:backfill",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "ai-visibility",
+        "topics",
+        "backfill.js"
+      ]
+    },
+    "ai-visibility:topics:create": {
+      "aliases": [],
+      "args": {},
+      "description": "Create a prompt topic",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "name": {
+          "name": "name",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "ai-visibility:topics:create",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "ai-visibility",
+        "topics",
+        "create.js"
+      ]
+    },
+    "ai-visibility:topics:delete": {
+      "aliases": [],
+      "args": {
+        "topicId": {
+          "description": "topicId",
+          "name": "topicId",
+          "required": true
+        }
+      },
+      "description": "Archive a prompt topic",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "ai-visibility:topics:delete",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "ai-visibility",
+        "topics",
+        "delete.js"
+      ]
+    },
+    "ai-visibility:topics:list": {
+      "aliases": [],
+      "args": {},
+      "description": "List prompt topics",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "includeArchived": {
+          "name": "includeArchived",
+          "allowNo": false,
+          "type": "boolean"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "ai-visibility:topics:list",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "ai-visibility",
+        "topics",
+        "list.js"
+      ]
+    },
+    "ai-visibility:topics:update": {
+      "aliases": [],
+      "args": {
+        "topicId": {
+          "description": "topicId",
+          "name": "topicId",
+          "required": true
+        }
+      },
+      "description": "Rename a prompt topic",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "name": {
+          "name": "name",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "ai-visibility:topics:update",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "ai-visibility",
+        "topics",
+        "update.js"
       ]
     },
     "ai-visibility:visibility": {
@@ -3185,17 +3985,23 @@
           "multiple": false,
           "type": "option"
         },
-        "provider": {
-          "description": "AI provider filter ('ALL' aggregates across providers)",
-          "name": "provider",
+        "providers": {
+          "description": "AI engines to include. Repeat the parameter to select several; omitted or empty aggregates across every engine. There is no 'ALL' sentinel — an empty selection is what \"all engines\" means.\n",
+          "name": "providers",
           "hasDynamicHelp": false,
-          "multiple": false,
+          "multiple": true,
           "options": [
             "PERPLEXITY",
             "GEMINI",
             "CLAUDE",
             "CHATGPT",
-            "ALL"
+            "DEEPSEEK",
+            "GLM",
+            "KIMI",
+            "GOOGLE_AI_OVERVIEW",
+            "GOOGLE_AI_MODE",
+            "CHATGPT_WEB",
+            "GEMINI_WEB"
           ],
           "type": "option"
         },
@@ -3242,6 +4048,13 @@
           "name": "timezone",
           "hasDynamicHelp": false,
           "multiple": false,
+          "type": "option"
+        },
+        "topicIds": {
+          "description": "Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics.\n",
+          "name": "topicIds",
+          "hasDynamicHelp": false,
+          "multiple": true,
           "type": "option"
         }
       },
@@ -3485,7 +4298,7 @@
           "description": "Dimension filters in format dimension:operator:values.\nOperator is 'is' (include) or 'is_not' (exclude).\nValues are comma-separated. Can specify multiple filters.\nExample: filters=country:is:US,UK&filters=browser:is_not:Safari\n",
           "name": "filters",
           "hasDynamicHelp": false,
-          "multiple": false,
+          "multiple": true,
           "type": "option"
         }
       },
@@ -3907,6 +4720,95 @@
         "list.js"
       ]
     },
+    "backlinks:competitor-gap": {
+      "aliases": [],
+      "args": {},
+      "description": "Domains linking to competitors but not to you",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "limit": {
+          "description": "Maximum number of gap domains to return",
+          "name": "limit",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "competitor": {
+          "description": "Narrow the list to sources linking to this one competitor domain. Must be one of the values in the response's competitors array — anything else simply matches nothing. Case-insensitive.\n",
+          "name": "competitor",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "backlinks:competitor-gap",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "backlinks",
+        "competitor-gap.js"
+      ]
+    },
     "backlinks:detail": {
       "aliases": [],
       "args": {},
@@ -3997,6 +4899,184 @@
         "detail.js"
       ]
     },
+    "backlinks:graph-summary": {
+      "aliases": [],
+      "args": {},
+      "description": "Link profile summary",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "backlinks:graph-summary",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "backlinks",
+        "graph-summary.js"
+      ]
+    },
+    "backlinks:links": {
+      "aliases": [],
+      "args": {},
+      "description": "Exact backlinks pointing at the site",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "page": {
+          "description": "Zero-based page index",
+          "name": "page",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "size": {
+          "description": "Page size",
+          "name": "size",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "domain": {
+          "description": "Narrow the list to links from this one referring domain. Case-insensitive.",
+          "name": "domain",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "q": {
+          "description": "Substring match on the linking page URL or anchor text",
+          "name": "q",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "backlinks:links",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "backlinks",
+        "links.js"
+      ]
+    },
     "backlinks:list": {
       "aliases": [],
       "args": {},
@@ -4081,14 +5161,16 @@
           "type": "option"
         },
         "status": {
-          "description": "Server-side status filter",
+          "description": "Server-side filter. all/active/ignored list traffic-detected sources and select on the stored curation status. lost and untapped are a separate axis reading the link graph instead: lost returns every domain the graph reports as no longer linking regardless of curation status, ordered most-recently-lost first; untapped returns live graph domains that have never referred a session — links that exist but have not driven traffic yet — ordered by authority. Both include domains with a null id and no first/last seen (nothing to curate).\n",
           "name": "status",
           "hasDynamicHelp": false,
           "multiple": false,
           "options": [
             "all",
             "active",
-            "ignored"
+            "ignored",
+            "lost",
+            "untapped"
           ],
           "type": "option"
         },
@@ -4292,6 +5374,233 @@
         "commands",
         "backlinks",
         "reclamation.js"
+      ]
+    },
+    "backlinks:refresh:create": {
+      "aliases": [],
+      "args": {},
+      "description": "Refresh the link graph now",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "backlinks:refresh:create",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "backlinks",
+        "refresh",
+        "create.js"
+      ]
+    },
+    "backlinks:refresh:list": {
+      "aliases": [],
+      "args": {},
+      "description": "Get link-graph refresh state",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "backlinks:refresh:list",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "backlinks",
+        "refresh",
+        "list.js"
+      ]
+    },
+    "backlinks:synced-data": {
+      "aliases": [],
+      "args": {},
+      "description": "Delete synced link-graph data",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "backlinks:synced-data",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "backlinks",
+        "synced-data.js"
       ]
     },
     "backlinks:update": {
@@ -7196,7 +8505,7 @@
           "description": "Dimension filters in format dimension:operator:values.\nOperator is 'is' (include) or 'is_not' (exclude).\nValues are comma-separated. Can specify multiple filters.\nExample: filters=country:is:US,UK&filters=browser:is_not:Safari\n",
           "name": "filters",
           "hasDynamicHelp": false,
-          "multiple": false,
+          "multiple": true,
           "type": "option"
         }
       },
@@ -13336,6 +14645,87 @@
         "update.js"
       ]
     },
+    "notifications:delete": {
+      "aliases": [],
+      "args": {
+        "notificationId": {
+          "description": "Notification ID",
+          "name": "notificationId",
+          "required": true
+        }
+      },
+      "description": "Delete a notification",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "notifications:delete",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "notifications",
+        "delete.js"
+      ]
+    },
     "notifications:list": {
       "aliases": [],
       "args": {},
@@ -13413,6 +14803,35 @@
           "name": "unreadOnly",
           "allowNo": false,
           "type": "boolean"
+        },
+        "type": {
+          "description": "Only return notifications of these types (comma-separated). Omit for all types. unreadCount is always the unfiltered total, so a filtered page never changes the badge.\n",
+          "name": "type",
+          "hasDynamicHelp": false,
+          "multiple": true,
+          "options": [
+            "invitation_received",
+            "build_completed",
+            "member_joined",
+            "member_removed",
+            "log_rate_exceeded",
+            "role_updated",
+            "data_retention_cleanup",
+            "data_retention_warning",
+            "admin_broadcast",
+            "backlink_detected",
+            "payment_failed",
+            "export_completed",
+            "workflow_report",
+            "workflow_approval_requested",
+            "marketplace_order_paid",
+            "marketplace_order_published",
+            "marketplace_order_revision_requested",
+            "marketplace_order_rejected",
+            "marketplace_order_link_lost",
+            "marketplace_order_refunded"
+          ],
+          "type": "option"
         }
       },
       "hasDynamicHelp": false,
@@ -13666,6 +15085,81 @@
         "commands",
         "notifications",
         "unread.js"
+      ]
+    },
+    "notifications:unread-count": {
+      "aliases": [],
+      "args": {},
+      "description": "Get unread notification count",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "notifications:unread-count",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "notifications",
+        "unread-count.js"
       ]
     },
     "organizations:create": {
@@ -15684,7 +17178,7 @@
           "description": "Dimension filters in format dimension:operator:values.\nOperator is 'is' (include) or 'is_not' (exclude).\nValues are comma-separated. Can specify multiple filters.\nExample: filters=country:is:US,UK&filters=browser:is_not:Safari\n",
           "name": "filters",
           "hasDynamicHelp": false,
-          "multiple": false,
+          "multiple": true,
           "type": "option"
         },
         "page": {
@@ -16588,7 +18082,7 @@
           "description": "Dimension filters in format dimension:operator:values.\nOperator is 'is' (include) or 'is_not' (exclude).\nValues are comma-separated. Can specify multiple filters.\nExample: filters=country:is:US,UK&filters=browser:is_not:Safari\n",
           "name": "filters",
           "hasDynamicHelp": false,
-          "multiple": false,
+          "multiple": true,
           "type": "option"
         },
         "timezone": {
@@ -16755,7 +18249,7 @@
           "description": "Dimension filters in format dimension:operator:values.\nOperator is 'is' (include) or 'is_not' (exclude).\nValues are comma-separated. Can specify multiple filters.\nExample: filters=country:is:US,UK&filters=browser:is_not:Safari\n",
           "name": "filters",
           "hasDynamicHelp": false,
-          "multiple": false,
+          "multiple": true,
           "type": "option"
         }
       },
@@ -16907,7 +18401,7 @@
           "description": "Dimension filters in format dimension:operator:values.\nOperator is 'is' (include) or 'is_not' (exclude).\nValues are comma-separated. Can specify multiple filters.\nExample: filters=country:is:US,UK&filters=browser:is_not:Safari\n",
           "name": "filters",
           "hasDynamicHelp": false,
-          "multiple": false,
+          "multiple": true,
           "type": "option"
         },
         "timezone": {
@@ -17029,7 +18523,7 @@
           "description": "Dimension filters in format dimension:operator:values.\nOperator is 'is' (include) or 'is_not' (exclude).\nValues are comma-separated. Can specify multiple filters.\nExample: filters=country:is:US,UK&filters=browser:is_not:Safari\n",
           "name": "filters",
           "hasDynamicHelp": false,
-          "multiple": false,
+          "multiple": true,
           "type": "option"
         },
         "timezone": {
@@ -17150,7 +18644,7 @@
           "description": "Dimension filters in format dimension:operator:values.\nOperator is 'is' (include) or 'is_not' (exclude).\nValues are comma-separated. Can specify multiple filters.\nExample: filters=country:is:US,UK&filters=browser:is_not:Safari\n",
           "name": "filters",
           "hasDynamicHelp": false,
-          "multiple": false,
+          "multiple": true,
           "type": "option"
         },
         "timezone": {
@@ -17359,7 +18853,7 @@
           "description": "Dimension filters in format dimension:operator:values.\nOperator is 'is' (include) or 'is_not' (exclude).\nValues are comma-separated. Can specify multiple filters.\nExample: filters=country:is:US,UK&filters=browser:is_not:Safari\n",
           "name": "filters",
           "hasDynamicHelp": false,
-          "multiple": false,
+          "multiple": true,
           "type": "option"
         },
         "timezone": {

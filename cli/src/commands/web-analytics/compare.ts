@@ -14,7 +14,7 @@ export default class WebAnalyticsCompare extends ApiOperationCommand {
 		"previousTo": Flags.string({ description: "End date of the previous period (inclusive, YYYY-MM-DD)", required: true }),
 		"timezone": Flags.string({ description: "Client timezone (e.g. \"Africa/Cairo\", \"America/New_York\"). Used to convert date boundaries to UTC. Defaults to UTC." }),
 		"limit": Flags.integer({ description: "Maximum number of results to return (default 10)" }),
-		"filters": Flags.string({ description: "Dimension filters in format dimension:operator:values.\nOperator is 'is' (include) or 'is_not' (exclude).\nValues are comma-separated. Can specify multiple filters.\nExample: filters=country:is:US,UK&filters=browser:is_not:Safari\n" }),
+		"filters": Flags.string({ description: "Dimension filters in format dimension:operator:values.\nOperator is 'is' (include) or 'is_not' (exclude).\nValues are comma-separated. Can specify multiple filters.\nExample: filters=country:is:US,UK&filters=browser:is_not:Safari\n", multiple: true }),
 	};
 
 	descriptor = descriptors["compareWebAnalyticsPeriods"];

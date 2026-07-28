@@ -803,6 +803,76 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/{orgSlug}/projects/{projectId}/ai-visibility/topics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List prompt topics */
+        get: operations["listAiVisibilityTopics"];
+        put?: never;
+        /** Create a prompt topic */
+        post: operations["createAiVisibilityTopic"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/ai-visibility/topics/backfill": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Apply current topic assignments to legacy runs */
+        post: operations["backfillAiVisibilityTopics"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/ai-visibility/topics/{topicId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Rename a prompt topic */
+        put: operations["updateAiVisibilityTopic"];
+        post?: never;
+        /** Archive a prompt topic */
+        delete: operations["deleteAiVisibilityTopic"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/ai-visibility/topics-breakdown": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Per-topic visibility and share of voice */
+        get: operations["getAiVisibilityTopicsBreakdown"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/{orgSlug}/projects/{projectId}/ai-visibility/prompts": {
         parameters: {
             query?: never;
@@ -860,6 +930,26 @@ export interface paths {
          * @description Pre-run cost estimate (active prompts x enabled providers) plus current month-to-date spend against the budget cap.
          */
         get: operations["getAiVisibilityJobEstimate"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/ai-visibility/providers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * AI engines available to this organization
+         * @description The AI search engines this project can run and display, resolved server-side: the engines configured on the server intersected with the organization's plan (billing feature ai_visibility_providers). Clients must use this list — not a hardcoded one — when rendering engine filters, so plans that exclude engines never surface them in the UI.
+         */
+        get: operations["getAiVisibilityProviders"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1355,6 +1445,110 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/{orgSlug}/projects/{projectId}/backlinks/graph-summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Link profile summary
+         * @description Profile-wide link-graph totals from the last refresh, plus how many of the stored referring domains actually sent traffic. Returns available=false when no refresh has completed yet, and configured=false when this server has no DataForSEO credentials. Requires backlinks.view permission.
+         */
+        get: operations["getBacklinkGraphSummary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/backlinks/competitor-gap": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Domains linking to competitors but not to you
+         * @description The link gap computed by the last refresh, ranked by how many tracked competitors each domain links to and then by domain authority. The competitor set is resolved server-side from the AI-visibility brand directory. Requires backlinks.view permission.
+         */
+        get: operations["getBacklinkCompetitorGap"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/backlinks/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get link-graph refresh state
+         * @description Whether a refresh is currently active for this project and when the last one finished. Requires backlinks.view permission.
+         */
+        get: operations["getBacklinkRefreshRunState"];
+        put?: never;
+        /**
+         * Refresh the link graph now
+         * @description Enqueue an on-demand link-graph refresh (profile summary, referring domains, exact backlinks and competitor gap). Both the target domain and the competitor set are resolved server-side. Fails when the server has no DataForSEO credentials or the project has no website domain (400), when the organization's monthly SEO data budget is exhausted (400), or when a refresh is already running (409). Requires backlinks.manage permission.
+         */
+        post: operations["startBacklinkRefreshJob"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/backlinks/links": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Exact backlinks pointing at the site
+         * @description The individual linking pages stored by the last link-graph refresh — each row is one exact link (linking page URL, linked page, anchor, dofollow, rank and spam score), ordered by link rank. A bounded snapshot: the refresh stores the top links by rank, one per referring domain and anchor. Requires backlinks.view permission.
+         */
+        get: operations["listBacklinkLinks"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/backlinks/synced-data": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete synced link-graph data
+         * @description Removes everything the DataForSEO sync has stored for this project — the profile summary, the referring-domain snapshot, the exact-link list and the competitor gap. Traffic-derived backlink sources (referrers that actually sent sessions) are first-party analytics and are NOT touched. Data returns on the next refresh, manual or scheduled. Fails with 409 while a refresh is running. Requires backlinks.manage permission.
+         */
+        delete: operations["deleteBacklinkSyncedData"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/{orgSlug}/projects/{projectId}/imports": {
         parameters: {
             query?: never;
@@ -1749,12 +1943,52 @@ export interface paths {
         };
         /**
          * Get user notifications
-         * @description Get paginated list of notifications for the authenticated user with unread count.
+         * @description Get paginated list of notifications for the authenticated user with unread count. Scoped to the organization in the path: returns notifications belonging to that organization plus the user's account-level ones (those with no organizationId), which are shown in every organization.
          */
         get: operations["getNotifications"];
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/notifications/unread-count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get unread notification count
+         * @description Unread count alone, for the notification bell's badge. The list endpoint also returns this, but making the bell fetch a page of notifications just to render a number is the reason this exists.
+         */
+        get: operations["getUnreadNotificationCount"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/notifications/{notificationId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete a notification
+         * @description Permanently delete one of the authenticated user's notifications. Also the escape hatch for a row the client cannot render.
+         */
+        delete: operations["deleteNotification"];
         options?: never;
         head?: never;
         patch?: never;
@@ -3343,15 +3577,17 @@ export interface components {
          */
         InvitationStatusEnum: "pending" | "accepted" | "expired" | "canceled";
         /**
-         * @description Type of notification
+         * @description Type of notification. MUST contain every type a NotificationHandler creates — NotificationService maps stored rows through NotificationTypeEnum.fromValue, which throws (VAL_001) on any value missing here, breaking GET /notifications for that user.
+         *     Handlers are not the only writers: workflow node executors call NotificationService directly too (workflow_report, workflow_approval_requested). ApprovalGateExecutor references this generated constant rather than a literal, which is what a listing omission should look like everywhere — a compile error, not a broken inbox.
+         *     The marketplace_order_* values are the worked example of that failure: AbstractMarketplaceOrderNotificationHandler has been writing them as IN_APP rows while they were absent here, so the list endpoint 500'd permanently for every member of an org that had ever placed an order, with no way to clear the unreadable row.
          * @enum {string}
          */
-        NotificationTypeEnum: "invitation_received" | "build_completed" | "member_joined" | "member_removed" | "log_rate_exceeded" | "role_updated" | "data_retention_cleanup" | "data_retention_warning" | "admin_broadcast" | "backlink_detected";
+        NotificationTypeEnum: "invitation_received" | "build_completed" | "member_joined" | "member_removed" | "log_rate_exceeded" | "role_updated" | "data_retention_cleanup" | "data_retention_warning" | "admin_broadcast" | "backlink_detected" | "payment_failed" | "export_completed" | "workflow_report" | "workflow_approval_requested" | "marketplace_order_paid" | "marketplace_order_published" | "marketplace_order_revision_requested" | "marketplace_order_rejected" | "marketplace_order_link_lost" | "marketplace_order_refunded";
         /**
          * @description Event types that can trigger webhook deliveries
          * @enum {string}
          */
-        WebhookEventTypeEnum: "invitation_received" | "build_completed" | "member_joined" | "member_removed" | "log_rate_exceeded" | "role_updated" | "data_retention_cleanup" | "data_retention_warning" | "organization_created" | "organization_updated" | "invitation_accepted" | "invitation_canceled" | "invitation_revoked" | "project_created" | "project_updated" | "project_deleted" | "environment_created" | "environment_updated" | "environment_deleted" | "feature_flag_created" | "feature_flag_updated" | "feature_flag_deleted" | "segment_created" | "segment_updated" | "segment_deleted" | "sdk_key_created" | "sdk_key_deleted" | "api_key_created" | "api_key_deleted" | "ota_update_deployed" | "webhook_created" | "webhook_updated" | "webhook_deleted" | "payment_failed" | "custom_event_created";
+        WebhookEventTypeEnum: "invitation_received" | "build_completed" | "member_joined" | "member_removed" | "log_rate_exceeded" | "role_updated" | "data_retention_cleanup" | "data_retention_warning" | "organization_created" | "organization_updated" | "invitation_accepted" | "invitation_canceled" | "invitation_revoked" | "project_created" | "project_updated" | "project_deleted" | "environment_created" | "environment_updated" | "environment_deleted" | "feature_flag_created" | "feature_flag_updated" | "feature_flag_deleted" | "segment_created" | "segment_updated" | "segment_deleted" | "sdk_key_created" | "sdk_key_deleted" | "api_key_created" | "api_key_deleted" | "ota_update_deployed" | "webhook_created" | "webhook_updated" | "webhook_deleted" | "payment_failed" | "custom_event_created" | "backlink_detected";
         /**
          * @description The framework or technology type of the project
          * @enum {string}
@@ -3854,7 +4090,7 @@ export interface components {
          * @description Permission code enum representing all available permissions in the system
          * @enum {string}
          */
-        PermissionCode: "organization.update" | "organization.view" | "member.view" | "member.invite" | "member.remove" | "member.update_role" | "project.read" | "project.create" | "project.update" | "project.delete" | "build.view" | "build.delete" | "sdk_key.view" | "sdk_key.create" | "sdk_key.delete" | "private_api_key.view" | "private_api_key.create" | "private_api_key.delete" | "environment.view" | "environment.create" | "environment.update" | "environment.delete" | "in_app_message.view" | "in_app_message.create" | "in_app_message.update" | "in_app_message.delete" | "event.view" | "event.create" | "event.update" | "event.delete" | "ota.view" | "ota.create" | "ota.update" | "ota.delete" | "analytics.view" | "support.operations" | "webhook.view" | "webhook.create" | "webhook.update" | "webhook.delete" | "feature_flag.view" | "feature_flag.create" | "feature_flag.update" | "feature_flag.delete" | "audit.read" | "integration.view" | "integration.create" | "integration.update" | "integration.delete" | "integration.subscription.view" | "integration.subscription.create" | "integration.subscription.update" | "integration.subscription.delete" | "billing.subscription.view" | "billing.subscription.manage" | "billing.usage.view" | "billing.entitlements.view" | "dashboard.view" | "dashboard.manage" | "flutter.view" | "flutter.create" | "flutter.update" | "flutter.delete" | "invitation.cancel" | "invitation.delete" | "aivisibility.view" | "aivisibility.manage" | "siteaudit.view" | "siteaudit.manage" | "engagement.view" | "engagement.manage" | "dataimport.view" | "dataimport.manage" | "contentrecs.view" | "contentrecs.manage" | "sitecontent.view" | "sitecontent.manage" | "backlinks.view" | "backlinks.manage";
+        PermissionCode: "organization.update" | "organization.view" | "member.view" | "member.invite" | "member.remove" | "member.update_role" | "project.read" | "project.create" | "project.update" | "project.delete" | "build.view" | "build.delete" | "sdk_key.view" | "sdk_key.create" | "sdk_key.delete" | "private_api_key.view" | "private_api_key.create" | "private_api_key.delete" | "environment.view" | "environment.create" | "environment.update" | "environment.delete" | "in_app_message.view" | "in_app_message.create" | "in_app_message.update" | "in_app_message.delete" | "event.view" | "event.create" | "event.update" | "event.delete" | "ota.view" | "ota.create" | "ota.update" | "ota.delete" | "analytics.view" | "support.operations" | "webhook.view" | "webhook.create" | "webhook.update" | "webhook.delete" | "feature_flag.view" | "feature_flag.create" | "feature_flag.update" | "feature_flag.delete" | "audit.read" | "integration.view" | "integration.create" | "integration.update" | "integration.delete" | "integration.subscription.view" | "integration.subscription.create" | "integration.subscription.update" | "integration.subscription.delete" | "billing.subscription.view" | "billing.subscription.manage" | "billing.usage.view" | "billing.entitlements.view" | "dashboard.view" | "dashboard.manage" | "flutter.view" | "flutter.create" | "flutter.update" | "flutter.delete" | "invitation.cancel" | "invitation.delete" | "aivisibility.view" | "aivisibility.manage" | "siteaudit.view" | "siteaudit.manage" | "engagement.view" | "engagement.manage" | "dataimport.view" | "dataimport.manage" | "contentrecs.view" | "contentrecs.manage" | "sitecontent.view" | "sitecontent.manage" | "backlinks.view" | "backlinks.manage" | "marketplace.view" | "marketplace.order" | "workflow.view" | "workflow.manage" | "workflow.run" | "contentdraft.view" | "contentdraft.manage";
         /** @description Role information with associated permissions */
         RoleWithPermissionsResponse: {
             /** @description Role ID */
@@ -4228,7 +4464,7 @@ export interface components {
             totalPages: number;
         };
         /** @description Audit log entry - type varies based on action */
-        AuditLogResponse: components["schemas"]["SdkKeyCreatedAuditLog"] | components["schemas"]["SdkKeyDeletedAuditLog"] | components["schemas"]["ProjectCreatedAuditLog"] | components["schemas"]["ProjectUpdatedAuditLog"] | components["schemas"]["ProjectDeletedAuditLog"] | components["schemas"]["InAppMessageCreatedAuditLog"] | components["schemas"]["InAppMessageUpdatedAuditLog"] | components["schemas"]["InAppMessageDeletedAuditLog"] | components["schemas"]["FeatureFlagCreatedAuditLog"] | components["schemas"]["FeatureFlagUpdatedAuditLog"] | components["schemas"]["FeatureFlagDeletedAuditLog"] | components["schemas"]["FeatureFlagRulesUpdatedAuditLog"] | components["schemas"]["SegmentCreatedAuditLog"] | components["schemas"]["SegmentUpdatedAuditLog"] | components["schemas"]["SegmentDeletedAuditLog"] | components["schemas"]["WebhookCreatedAuditLog"] | components["schemas"]["WebhookUpdatedAuditLog"] | components["schemas"]["WebhookDeletedAuditLog"] | components["schemas"]["InvitationCreatedAuditLog"] | components["schemas"]["InvitationAcceptedAuditLog"] | components["schemas"]["InvitationCanceledAuditLog"] | components["schemas"]["InvitationRevokedAuditLog"] | components["schemas"]["MemberRemovedAuditLog"] | components["schemas"]["MemberRoleUpdatedAuditLog"] | components["schemas"]["OrganizationCreatedAuditLog"] | components["schemas"]["OrganizationUpdatedAuditLog"] | components["schemas"]["UserLoginSuccessAuditLog"] | components["schemas"]["UserLoginFailedAuditLog"] | components["schemas"]["PasswordChangedAuditLog"] | components["schemas"]["LogRateExceededAuditLog"];
+        AuditLogResponse: components["schemas"]["SdkKeyCreatedAuditLog"] | components["schemas"]["SdkKeyDeletedAuditLog"] | components["schemas"]["PrivateApiKeyCreatedAuditLog"] | components["schemas"]["PrivateApiKeyDeletedAuditLog"] | components["schemas"]["ProjectCreatedAuditLog"] | components["schemas"]["ProjectUpdatedAuditLog"] | components["schemas"]["ProjectDeletedAuditLog"] | components["schemas"]["InAppMessageCreatedAuditLog"] | components["schemas"]["InAppMessageUpdatedAuditLog"] | components["schemas"]["InAppMessageDeletedAuditLog"] | components["schemas"]["FeatureFlagCreatedAuditLog"] | components["schemas"]["FeatureFlagUpdatedAuditLog"] | components["schemas"]["FeatureFlagDeletedAuditLog"] | components["schemas"]["FeatureFlagRulesUpdatedAuditLog"] | components["schemas"]["SegmentCreatedAuditLog"] | components["schemas"]["SegmentUpdatedAuditLog"] | components["schemas"]["SegmentDeletedAuditLog"] | components["schemas"]["WebhookCreatedAuditLog"] | components["schemas"]["WebhookUpdatedAuditLog"] | components["schemas"]["WebhookDeletedAuditLog"] | components["schemas"]["InvitationCreatedAuditLog"] | components["schemas"]["InvitationAcceptedAuditLog"] | components["schemas"]["InvitationCanceledAuditLog"] | components["schemas"]["InvitationRevokedAuditLog"] | components["schemas"]["MemberRemovedAuditLog"] | components["schemas"]["MemberRoleUpdatedAuditLog"] | components["schemas"]["OrganizationCreatedAuditLog"] | components["schemas"]["OrganizationUpdatedAuditLog"] | components["schemas"]["UserLoginSuccessAuditLog"] | components["schemas"]["UserLoginFailedAuditLog"] | components["schemas"]["PasswordChangedAuditLog"] | components["schemas"]["LogRateExceededAuditLog"] | components["schemas"]["GenericAuditLog"];
         AuditLogBase: {
             /** @description Unique identifier for the audit log entry */
             id: string;
@@ -4252,9 +4488,9 @@ export interface components {
         };
         SdkKeyCreatedAuditLog: components["schemas"]["AuditLogBase"] & {
             /** @enum {string} */
-            action?: "API_KEY_CREATED";
+            action?: "SDK_KEY_CREATED";
             /** @enum {string} */
-            resourceType?: "API_KEY";
+            resourceType?: "SDK_KEY";
             metadata?: components["schemas"]["SdkKeyCreatedMetadata"];
         };
         SdkKeyCreatedMetadata: {
@@ -4266,15 +4502,43 @@ export interface components {
         };
         SdkKeyDeletedAuditLog: components["schemas"]["AuditLogBase"] & {
             /** @enum {string} */
-            action?: "API_KEY_DELETED";
+            action?: "SDK_KEY_DELETED";
             /** @enum {string} */
-            resourceType?: "API_KEY";
+            resourceType?: "SDK_KEY";
             metadata?: components["schemas"]["SdkKeyDeletedMetadata"];
         };
         SdkKeyDeletedMetadata: {
             before?: {
                 name?: string;
                 apiKey?: string;
+                projectId?: string;
+            };
+        };
+        PrivateApiKeyCreatedAuditLog: components["schemas"]["AuditLogBase"] & {
+            /** @enum {string} */
+            action?: "PRIVATE_API_KEY_CREATED";
+            /** @enum {string} */
+            resourceType?: "PRIVATE_API_KEY";
+            metadata?: components["schemas"]["PrivateApiKeyCreatedMetadata"];
+        };
+        PrivateApiKeyCreatedMetadata: {
+            after?: {
+                name?: string;
+                keyPrefix?: string;
+                projectId?: string;
+            };
+        };
+        PrivateApiKeyDeletedAuditLog: components["schemas"]["AuditLogBase"] & {
+            /** @enum {string} */
+            action?: "PRIVATE_API_KEY_DELETED";
+            /** @enum {string} */
+            resourceType?: "PRIVATE_API_KEY";
+            metadata?: components["schemas"]["PrivateApiKeyDeletedMetadata"];
+        };
+        PrivateApiKeyDeletedMetadata: {
+            before?: {
+                name?: string;
+                keyPrefix?: string;
                 projectId?: string;
             };
         };
@@ -4666,6 +4930,11 @@ export interface components {
             /** @enum {string} */
             resourceType?: "PROJECT";
         };
+        GenericAuditLog: components["schemas"]["AuditLogBase"] & {
+            metadata?: {
+                [key: string]: unknown;
+            };
+        };
         /** @description Paginated audit log response */
         PaginatedAuditLogResponse: {
             /** @description List of audit log entries */
@@ -4692,11 +4961,24 @@ export interface components {
             isRead: boolean;
             /** @description ID of the related resource (invitation_id, build_id, etc.) */
             resourceId?: string;
+            /** @description Structured, type-specific content for this notification, at the grain of this row — the data the title and message were rendered from. Shape varies by type and is not part of this contract: clients must render it defensively and fall back to `message`. Absent on rows written before the payload column existed, and on types that carry nothing beyond their text. */
+            payload?: {
+                [key: string]: unknown;
+            };
+            /** @description Organization this notification belongs to. Absent means account-level (an invitation to an org you are not yet a member of, an admin broadcast) — those are returned in every organization's list. */
+            organizationId?: string;
+            /** @description Project this notification belongs to, when it has one */
+            projectId?: string;
             /**
              * Format: date-time
              * @description When the notification was created
              */
             createdAt: string;
+        };
+        /** @description Unread notification count for the notification bell badge */
+        UnreadNotificationCountResponse: {
+            /** @description Number of unread notifications visible in this organization */
+            unreadCount: number;
         };
         /** @description Paginated notification response with unread count */
         PaginatedNotificationResponse: {
@@ -6666,12 +6948,12 @@ export interface components {
          * @description How feature values are interpreted
          * @enum {string}
          */
-        BillingFeatureValueTypeEnum: "boolean" | "numeric" | "unlimited";
+        BillingFeatureValueTypeEnum: "boolean" | "numeric" | "unlimited" | "string";
         /**
          * @description Available billing feature codes
          * @enum {string}
          */
-        BillingFeatureCodeEnum: "max_organizations" | "max_projects" | "max_team_members" | "max_feature_flags" | "data_retention_days" | "events_per_month" | "feature_flag_segments" | "audit_logs" | "sso" | "webhooks" | "api_access" | "priority_support" | "custom_events_enabled" | "custom_dashboards" | "ai_visibility_max_prompts" | "bot_events_per_month" | "ai_visibility_runs_per_month" | "engagement_max_keywords";
+        BillingFeatureCodeEnum: "max_organizations" | "max_projects" | "max_team_members" | "max_feature_flags" | "data_retention_days" | "events_per_month" | "feature_flag_segments" | "audit_logs" | "sso" | "webhooks" | "api_access" | "priority_support" | "custom_events_enabled" | "custom_dashboards" | "ai_visibility_max_prompts" | "bot_events_per_month" | "ai_visibility_runs_per_month" | "engagement_max_keywords" | "ai_visibility_providers" | "ai_visibility_max_projects" | "ai_visibility_run_interval_days" | "monthly_budget_usd" | "backlinks_refresh_interval_days" | "workflows_enabled" | "max_active_workflows" | "workflow_runs_per_month";
         /** @description A billing plan available in the system */
         BillingPlanResponse: {
             /** @description Unique plan identifier */
@@ -7029,6 +7311,8 @@ export interface components {
             locale: string;
             /** @default true */
             active: boolean;
+            /** @description Topic assignment. On PUT, omitted or null clears the assignment. */
+            topicId?: string | null;
         };
         AiVisibilityPromptSuggestionsRequest: {
             brandName: string;
@@ -7052,6 +7336,8 @@ export interface components {
             intentTier?: string;
             locale?: string;
             active?: boolean;
+            topicId?: string | null;
+            topicName?: string | null;
             /** Format: date-time */
             createdAt?: string;
         };
@@ -7060,18 +7346,16 @@ export interface components {
             promptCount?: number;
             /** @description Plan limit on active prompts (null when unlimited) */
             maxPrompts?: number | null;
-            /** @description Providers with an API key configured */
+            /** @description Engines that would run for this organization (plan-gated) */
             enabledProviders?: string[];
-            /** @description Estimated cost of one full analysis run */
-            estimatedCostUsd?: number;
-            /** @description Organization's accumulated job cost this calendar month */
-            monthlySpendUsd?: number;
-            /** @description Monthly spend cap applied to this organization */
-            monthlyCapUsd?: number;
-            /** @description Whether starting this run would stay within the cap */
+            /** @description Whether starting this run is allowed under the organization's monthly limit (internal cost figures are never exposed) */
             withinBudget?: boolean;
             /** @description Whether the AI analysis pass (entity extraction) is configured; required for an analysis run to start */
             analysisConfigured?: boolean;
+        };
+        AiVisibilityProvidersResponse: {
+            /** @description Engines the organization's plan allows AND the server has keys for (AiProvider names; never includes the ALL sentinel) */
+            providers: string[];
         };
         AiVisibilityScheduleResponse: {
             /** @description Whether analyses run automatically for this project (organization has an active paid subscription) */
@@ -7138,7 +7422,8 @@ export interface components {
             citationRate?: number | null;
         };
         AiVisibilitySeriesResponse: {
-            provider?: string;
+            /** @description The engine selection this response was computed for (empty = every engine) */
+            providers?: components["schemas"]["AiVisibilityProviderEnum"][];
             points?: components["schemas"]["AiVisibilitySeriesPoint"][];
         };
         AiVisibilityDomainEntry: {
@@ -7153,9 +7438,17 @@ export interface components {
             sourceType?: "VENDOR" | "UGC" | "REVIEW_SITE" | "REFERENCE" | "NEWS" | "SOCIAL" | "DOCS" | "EDITORIAL" | null;
             /** @description AI engines that cited this domain at least once in the aggregated jobs, scoped to the provider filter ('ALL' lists every engine) */
             providers?: string[];
+            /** @description Set when this cited domain is purchasable as a guest-post placement in the marketplace — deep-links to the catalog. Null when the marketplace is disabled or does not carry the domain. */
+            marketplaceSiteId?: string | null;
+            /**
+             * Format: int64
+             * @description Cheapest retail placement price on this domain in USD cents; null when not purchasable
+             */
+            purchasableFromCents?: number | null;
         };
         AiVisibilityDomainsResponse: {
-            provider?: string;
+            /** @description The engine selection this response was computed for (empty = every engine) */
+            providers?: components["schemas"]["AiVisibilityProviderEnum"][];
             /** @description Number of completed jobs aggregated */
             jobsIncluded?: number;
             domains?: components["schemas"]["AiVisibilityDomainEntry"][];
@@ -7186,6 +7479,13 @@ export interface components {
             providers?: string[];
             /** @description Number of completed jobs aggregated */
             jobsIncluded?: number;
+            /** @description Set when this domain is purchasable as a guest-post placement in the marketplace; null otherwise */
+            marketplaceSiteId?: string | null;
+            /**
+             * Format: int64
+             * @description Cheapest retail placement price on this domain in USD cents; null when not purchasable
+             */
+            purchasableFromCents?: number | null;
             page?: number;
             size?: number;
             totalElements?: number;
@@ -7216,7 +7516,8 @@ export interface components {
         };
         /** @description Paginated flat list of the pages AI engines cited, across all domains */
         AiVisibilityCitedPagesResponse: {
-            provider?: string;
+            /** @description The engine selection this response was computed for (empty = every engine) */
+            providers?: components["schemas"]["AiVisibilityProviderEnum"][];
             /** @description Echo of the request filter — true when only citations from answers featuring the project's own brand are counted */
             mentioningBrand?: boolean;
             /** @description Number of completed jobs aggregated */
@@ -7301,7 +7602,8 @@ export interface components {
             providers?: string[];
         };
         AiVisibilityDiscoveredCompetitorsResponse: {
-            provider?: string;
+            /** @description The engine selection this response was computed for (empty = every engine) */
+            providers?: components["schemas"]["AiVisibilityProviderEnum"][];
             jobsIncluded?: number;
             competitors?: components["schemas"]["AiVisibilityDiscoveredCompetitorEntry"][];
         };
@@ -7337,9 +7639,13 @@ export interface components {
             id?: string;
             provider?: string;
             /** @enum {string} */
-            status?: "PENDING" | "PROCESSING" | "SUCCEEDED" | "FAILED";
+            status?: "PENDING" | "PROCESSING" | "AWAITING_PROVIDER" | "SUCCEEDED" | "FAILED";
             promptId?: string | null;
             promptText?: string | null;
+            /** @description Topic snapshotted on the run at execution/backfill time (null = uncategorized) */
+            topicId?: string | null;
+            /** @description Resolved topic name (kept resolvable for archived topics) */
+            topicName?: string | null;
             errorMessage?: string | null;
             /** Format: date-time */
             finishedAt?: string | null;
@@ -7348,7 +7654,7 @@ export interface components {
             id?: string;
             provider?: string;
             /** @enum {string} */
-            status?: "PENDING" | "PROCESSING" | "SUCCEEDED" | "FAILED";
+            status?: "PENDING" | "PROCESSING" | "AWAITING_PROVIDER" | "SUCCEEDED" | "FAILED";
             modelVersion?: string | null;
             errorMessage?: string | null;
             promptText?: string | null;
@@ -7375,9 +7681,15 @@ export interface components {
             entries?: components["schemas"]["AiVisibilityShareOfVoiceEntry"][];
         };
         AiVisibilityShareOfVoiceResponse: {
-            provider?: string;
+            /** @description The engine selection this response was computed for (empty = every engine) */
+            providers?: components["schemas"]["AiVisibilityProviderEnum"][];
             points?: components["schemas"]["AiVisibilityShareOfVoicePoint"][];
         };
+        /**
+         * @description A single AI answer engine. Note this deliberately has NO 'ALL' member: "all engines" is expressed as an empty selection. Per-row `provider` fields elsewhere stay plain strings because the aggregation marks its cross-engine rollup row with the internal sentinel 'ALL'.
+         * @enum {string}
+         */
+        AiVisibilityProviderEnum: "PERPLEXITY" | "GEMINI" | "CLAUDE" | "CHATGPT" | "DEEPSEEK" | "GLM" | "KIMI" | "GOOGLE_AI_OVERVIEW" | "GOOGLE_AI_MODE" | "CHATGPT_WEB" | "GEMINI_WEB";
         AiVisibilityProviderSeriesEntry: {
             provider?: string;
             runCount?: number;
@@ -7424,7 +7736,8 @@ export interface components {
             entries?: components["schemas"]["AiVisibilityCompetitorSeriesEntry"][];
         };
         AiVisibilityCompetitorSeriesResponse: {
-            provider?: string;
+            /** @description The engine selection this response was computed for (empty = every engine) */
+            providers?: components["schemas"]["AiVisibilityProviderEnum"][];
             points?: components["schemas"]["AiVisibilityCompetitorSeriesPoint"][];
         };
         AiVisibilityPromptProviderCell: {
@@ -7432,6 +7745,8 @@ export interface components {
             runCount?: number;
             runsWithBrand?: number;
             presenceRate?: number;
+            /** @description Self brand's rank among all tracked brands by answer visibility for this prompt (1 = most visible, standard competition ranking); null when no tracked brand is visible in the prompt's answers. */
+            visibilityRank?: number | null;
             runsWithMention?: number | null;
             runsWithCitation?: number | null;
             recommendedCount?: number | null;
@@ -7443,6 +7758,10 @@ export interface components {
             text?: string | null;
             intentTier?: string | null;
             active?: boolean;
+            /** @description The prompt's current configured topic, independent of the historical run snapshot filter. */
+            currentTopicId?: string | null;
+            /** @description The prompt's current configured topic name. */
+            currentTopicName?: string | null;
             overall?: components["schemas"]["AiVisibilityPromptProviderCell"];
             byProvider?: components["schemas"]["AiVisibilityPromptProviderCell"][];
         };
@@ -7450,23 +7769,63 @@ export interface components {
             jobsIncluded?: number;
             prompts?: components["schemas"]["AiVisibilityPromptBreakdownEntry"][];
         };
+        AiVisibilityTopicRequest: {
+            name: string;
+        };
+        AiVisibilityTopicResponse: {
+            id?: string;
+            name?: string;
+            promptCount?: number;
+            archived?: boolean;
+            /** Format: date-time */
+            createdAt?: string;
+        };
+        AiVisibilityTopicBrandMetrics: {
+            brandId?: string;
+            brandName?: string;
+            isSelf?: boolean;
+            runsWithBrand?: number;
+            visibilityRate?: number | null;
+            shareOfVoice?: number | null;
+        };
+        AiVisibilityTopicBreakdownEntry: {
+            topicId?: string | null;
+            topicName?: string | null;
+            archived?: boolean;
+            promptsWithRuns?: number;
+            runCount?: number;
+            brands?: components["schemas"]["AiVisibilityTopicBrandMetrics"][];
+        };
+        AiVisibilityTopicsBreakdownResponse: {
+            topics?: components["schemas"]["AiVisibilityTopicBreakdownEntry"][];
+        };
+        AiVisibilityTopicBackfillRequest: {
+            promptIds?: string[];
+            /** @default false */
+            dryRun: boolean;
+        };
+        AiVisibilityTopicBackfillResponse: {
+            eligibleRuns?: number;
+            runsRetagged?: number | null;
+        };
         /**
          * @description Whether the backlink source is shown (active) or dismissed as noise (ignored)
          * @enum {string}
          */
         BacklinkSourceStatusEnum: "active" | "ignored";
         BacklinkSourceResponse: {
-            id: string;
+            /** @description Backlink source ID, for the status-update endpoint. Null means this domain is known from the link graph only — it has never referred a session, so there is no source row to ignore or restore and the curation action must be hidden. Only appears under status=lost. */
+            id?: string | null;
             /** @description Normalized referring host (lowercased, www-stripped) */
             domain: string;
             status: components["schemas"]["BacklinkSourceStatusEnum"];
             /**
              * Format: date-time
-             * @description First session ever referred by this domain (historical, not sweep time)
+             * @description First session ever referred by this domain (historical, not sweep time). Null for a link-graph-only domain that never sent traffic.
              */
-            firstSeenAt: string;
+            firstSeenAt?: string | null;
             /** Format: date-time */
-            lastSeenAt: string;
+            lastSeenAt?: string | null;
             /** @description A verbatim referrer URL from this domain — the exact linking page when the browser sent a full referrer */
             sampleReferrerUrl?: string | null;
             /** @description Landing path of the earliest referred session */
@@ -7475,6 +7834,24 @@ export interface components {
             sessions: number;
             /** @description Most common landing path within the selected window */
             topLandingPath?: string | null;
+            /**
+             * Format: date-time
+             * @description Provider-reported date the link from this domain disappeared. Null means either still linking or not present in the link graph at all — liveness is a separate axis from the active/ignored status.
+             */
+            lostAt?: string | null;
+            /** @description Link-graph authority rank (0–1000) of the referring domain; null when the domain is not in the graph */
+            domainRank?: number | null;
+            /** @description DataForSEO spam score (0–100, higher is spammier) of the referring domain's links; null when the domain is not in the graph or the provider returned none */
+            spamScore?: number | null;
+            /** @description Total links from this domain to the site, per the link graph; null when the domain is not in the graph */
+            backlinksCount?: number | null;
+            /**
+             * Format: date-time
+             * @description The most recent refresh in which the provider still returned this domain. Null for a traffic-only domain that is not in the link graph.
+             */
+            observedAt?: string | null;
+            /** @description True when the latest refresh did not return this domain, so its rank and counts are left over from an earlier one. A domain drops out mainly by falling below the stored top-N rank cap, which is NOT the same as the link being lost — hence a separate flag from lostAt. Always false for traffic-only domains, which the provider never reported in the first place. */
+            stale: boolean;
         };
         BacklinkSourcesResponse: {
             items: components["schemas"]["BacklinkSourceResponse"][];
@@ -7552,11 +7929,134 @@ export interface components {
             alreadyLinking: boolean;
             /** @description Up to a few cited URLs on this domain, as returned by the engines */
             sampleUrls?: string[];
+            /** @description Set when this domain is purchasable in the guest-post marketplace — deep-links the opportunity to the catalog. Null when the marketplace is disabled or does not carry the domain. */
+            marketplaceSiteId?: string | null;
+            /**
+             * Format: int64
+             * @description Cheapest retail placement price on this domain in USD cents; null when not purchasable
+             */
+            purchasableFromCents?: number | null;
         };
         BacklinkOpportunitiesResponse: {
             items: components["schemas"]["BacklinkOpportunityEntry"][];
             /** @description Number of completed AI-visibility jobs aggregated */
             jobsIncluded: number;
+        };
+        BacklinkGraphSummaryResponse: {
+            /** @description Whether a link-graph refresh has ever completed for this project */
+            available: boolean;
+            /** @description Whether this server has DataForSEO credentials, i.e. whether a refresh can be run at all */
+            configured: boolean;
+            /** @description Referring domains in the whole link profile, per the provider */
+            referringDomainsTotal: number;
+            /**
+             * Format: int64
+             * @description Total inbound links in the whole link profile
+             */
+            backlinksTotal: number;
+            /**
+             * Format: int64
+             * @description How many of those links are dofollow
+             */
+            dofollowTotal: number;
+            /** @description Authority rank (0–1000) of the project's own domain */
+            targetRank?: number | null;
+            /** @description Referring domains actually stored, after the bounded top-N cap — never more than referringDomainsTotal */
+            storedDomains: number;
+            /** @description Stored referring domains that also appear in the traffic-derived sources table — links that actually sent someone. The gap between this and referringDomainsTotal is the insight. */
+            domainsWithTraffic: number;
+            /**
+             * Format: date-time
+             * @description When the link graph was last refreshed
+             */
+            refreshedAt?: string | null;
+        };
+        BacklinkCompetitorGapEntry: {
+            /** @description Normalized referring host that links to competitors but not to this site */
+            domain: string;
+            /** @description Tracked competitor domains this source links to */
+            competitorDomains: string[];
+            /** @description Number of tracked competitors linked to — the primary ranking signal */
+            competitorCount: number;
+            /** @description Authority rank (0–1000) of the referring domain */
+            domainRank?: number | null;
+            /** @description DataForSEO spam score (0–100, higher is spammier) of the referring domain's links */
+            spamScore?: number | null;
+            /** @description Links this domain points at the competitor set */
+            backlinksCount?: number | null;
+        };
+        BacklinkCompetitorGapResponse: {
+            items: components["schemas"]["BacklinkCompetitorGapEntry"][];
+            /** @description How many competitor brands with a resolvable domain the project tracks. Zero means the gap list cannot be computed at all (nothing to compare against) rather than "computed and found nothing" — the two need different empty states. Resolved server-side so clients never have to re-derive the competitor predicate. */
+            trackedCompetitors: number;
+            /** @description The competitor domains the stored gap actually names, sorted — the valid values for the competitor filter. Derived from the gap rows rather than from the tracked-brand list, because a refresh compares against a capped number of brands and a brand added since the last refresh appears in no row: offering it would be a filter that can only ever return nothing. */
+            competitors: string[];
+            /** @description The normalized competitor filter this response was built with; null when unfiltered. Lets a client confirm what it is looking at without re-deriving the normalization. */
+            appliedCompetitor?: string | null;
+            /**
+             * Format: date-time
+             * @description When the gap list was last recomputed; null when it has never run. Read unfiltered, so a competitor filter that matches nothing still reports the real value — an empty items array with a non-null computedAt means "no matches", not "never computed".
+             */
+            computedAt?: string | null;
+        };
+        BacklinkLinkEntry: {
+            /** @description Normalized referring host (lowercased, www-stripped) the linking page belongs to */
+            sourceDomain: string;
+            /** @description The exact page that links to the site, verbatim from the provider */
+            urlFrom: string;
+            /** @description The page on the site the link points to */
+            urlTo: string;
+            /** @description Anchor text of the link; null when the link has none (e.g. an image link) */
+            anchor?: string | null;
+            /** @description Whether the link passes authority; null when the provider did not say */
+            dofollow?: boolean | null;
+            /** @description DataForSEO rank (0–1000) of this individual backlink */
+            linkRank?: number | null;
+            /** @description DataForSEO spam score (0–100, higher is spammier) of this individual backlink */
+            spamScore?: number | null;
+            /**
+             * Format: date-time
+             * @description When the provider first crawled this link
+             */
+            firstSeenAt?: string | null;
+            /**
+             * Format: date-time
+             * @description When the provider last confirmed this link
+             */
+            lastSeenAt?: string | null;
+        };
+        BacklinkLinksResponse: {
+            items: components["schemas"]["BacklinkLinkEntry"][];
+            /** @description Zero-based index of the returned page of results */
+            page: number;
+            /** @description Maximum number of links returned per result page */
+            size: number;
+            /** @description Number of stored links matching the current filter/search */
+            total: number;
+            /**
+             * Format: date-time
+             * @description When the stored link list was last refreshed; null when no refresh has stored links yet
+             */
+            observedAt?: string | null;
+        };
+        DeleteBacklinkSyncedDataResponse: {
+            /** @description Referring-domain snapshot rows removed */
+            deletedDomains: number;
+            /** @description Exact-link rows removed */
+            deletedLinks: number;
+            /** @description Competitor-gap rows removed */
+            deletedGaps: number;
+        };
+        StartBacklinkRefreshJobResponse: {
+            jobId: string;
+        };
+        BacklinkRefreshRunStateResponse: {
+            /** @description Whether a link-graph refresh is currently active for this project */
+            running: boolean;
+            /** Format: date-time */
+            lastFinishedAt?: string | null;
+            /** @description Status of the most recent finished refresh (COMPLETED | FAILED | CANCELLED) */
+            lastJobStatus?: string | null;
         };
     };
     responses: {
@@ -7624,8 +8124,10 @@ export interface components {
         AiVisibilityJobId: string;
         /** @description Data import ID */
         DataImportId: string;
-        /** @description AI provider filter ('ALL' aggregates across providers) */
-        AiVisibilityProvider: "PERPLEXITY" | "GEMINI" | "CLAUDE" | "CHATGPT" | "ALL";
+        /** @description AI engines to include. Repeat the parameter to select several; omitted or empty aggregates across every engine. There is no 'ALL' sentinel — an empty selection is what "all engines" means. */
+        AiVisibilityProvider: components["schemas"]["AiVisibilityProviderEnum"][];
+        /** @description Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics. */
+        AiVisibilityTopicFilter: string[];
         /** @description Predefined date range preset. Takes precedence over from/to. */
         AiVisibilityPreset: components["schemas"]["DateRangePreset"];
         /** @description Start of the date window (inclusive, interpreted in the client timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window. */
@@ -9154,6 +9656,190 @@ export interface operations {
             403: components["responses"]["ForbiddenError"];
         };
     };
+    listAiVisibilityTopics: {
+        parameters: {
+            query?: {
+                includeArchived?: boolean;
+            };
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Topics retrieved */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiVisibilityTopicResponse"][];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+        };
+    };
+    createAiVisibilityTopic: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AiVisibilityTopicRequest"];
+            };
+        };
+        responses: {
+            /** @description Topic created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiVisibilityTopicResponse"];
+                };
+            };
+            400: components["responses"]["ValidationError"];
+            409: components["responses"]["ConflictError"];
+        };
+    };
+    backfillAiVisibilityTopics: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AiVisibilityTopicBackfillRequest"];
+            };
+        };
+        responses: {
+            /** @description Backfill preview or result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiVisibilityTopicBackfillResponse"];
+                };
+            };
+            400: components["responses"]["ValidationError"];
+        };
+    };
+    updateAiVisibilityTopic: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+                topicId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AiVisibilityTopicRequest"];
+            };
+        };
+        responses: {
+            /** @description Topic updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiVisibilityTopicResponse"];
+                };
+            };
+            404: components["responses"]["NotFoundError"];
+            409: components["responses"]["ConflictError"];
+        };
+    };
+    deleteAiVisibilityTopic: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+                topicId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Topic archived */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            404: components["responses"]["NotFoundError"];
+        };
+    };
+    getAiVisibilityTopicsBreakdown: {
+        parameters: {
+            query?: {
+                /** @description AI engines to include. Repeat the parameter to select several; omitted or empty aggregates across every engine. There is no 'ALL' sentinel — an empty selection is what "all engines" means. */
+                providers?: components["parameters"]["AiVisibilityProvider"];
+                jobs?: number;
+                /** @description Predefined date range preset. Takes precedence over from/to. */
+                preset?: components["parameters"]["AiVisibilityPreset"];
+                /** @description Start of the date window (inclusive, interpreted in the client timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window. */
+                from?: components["parameters"]["AiVisibilityFrom"];
+                /** @description End of the date window (inclusive, interpreted in the client timezone). */
+                to?: components["parameters"]["AiVisibilityTo"];
+                /** @description Client timezone (e.g. "Africa/Cairo") used to resolve preset/date boundaries; defaults to UTC. */
+                timezone?: components["parameters"]["AiVisibilityTimezone"];
+            };
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Topic breakdown retrieved */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiVisibilityTopicsBreakdownResponse"];
+                };
+            };
+        };
+    };
     listAiVisibilityPrompts: {
         parameters: {
             query?: never;
@@ -9299,6 +9985,31 @@ export interface operations {
             };
             401: components["responses"]["UnauthorizedError"];
             403: components["responses"]["ForbiddenError"];
+        };
+    };
+    getAiVisibilityProviders: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Available engines retrieved */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiVisibilityProvidersResponse"];
+                };
+            };
         };
     };
     getAiVisibilitySchedule: {
@@ -9542,8 +10253,8 @@ export interface operations {
     getAiVisibilitySeries: {
         parameters: {
             query?: {
-                /** @description AI provider filter ('ALL' aggregates across providers) */
-                provider?: components["parameters"]["AiVisibilityProvider"];
+                /** @description AI engines to include. Repeat the parameter to select several; omitted or empty aggregates across every engine. There is no 'ALL' sentinel — an empty selection is what "all engines" means. */
+                providers?: components["parameters"]["AiVisibilityProvider"];
                 /** @description Maximum number of most recent jobs to include (ignored when from/to set) */
                 limit?: number;
                 /** @description Predefined date range preset. Takes precedence over from/to. */
@@ -9554,6 +10265,8 @@ export interface operations {
                 to?: components["parameters"]["AiVisibilityTo"];
                 /** @description Client timezone (e.g. "Africa/Cairo") used to resolve preset/date boundaries; defaults to UTC. */
                 timezone?: components["parameters"]["AiVisibilityTimezone"];
+                /** @description Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics. */
+                topicIds?: components["parameters"]["AiVisibilityTopicFilter"];
             };
             header?: never;
             path: {
@@ -9582,8 +10295,8 @@ export interface operations {
     getAiVisibilityDomains: {
         parameters: {
             query?: {
-                /** @description AI provider filter ('ALL' aggregates across providers) */
-                provider?: components["parameters"]["AiVisibilityProvider"];
+                /** @description AI engines to include. Repeat the parameter to select several; omitted or empty aggregates across every engine. There is no 'ALL' sentinel — an empty selection is what "all engines" means. */
+                providers?: components["parameters"]["AiVisibilityProvider"];
                 /** @description Number of most recent completed jobs to aggregate (ignored when from/to set) */
                 jobs?: number;
                 /** @description Maximum number of domains to return */
@@ -9596,6 +10309,8 @@ export interface operations {
                 to?: components["parameters"]["AiVisibilityTo"];
                 /** @description Client timezone (e.g. "Africa/Cairo") used to resolve preset/date boundaries; defaults to UTC. */
                 timezone?: components["parameters"]["AiVisibilityTimezone"];
+                /** @description Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics. */
+                topicIds?: components["parameters"]["AiVisibilityTopicFilter"];
             };
             header?: never;
             path: {
@@ -9624,8 +10339,8 @@ export interface operations {
     getAiVisibilityDomainCitations: {
         parameters: {
             query?: {
-                /** @description AI provider filter ('ALL' aggregates across providers) */
-                provider?: components["parameters"]["AiVisibilityProvider"];
+                /** @description AI engines to include. Repeat the parameter to select several; omitted or empty aggregates across every engine. There is no 'ALL' sentinel — an empty selection is what "all engines" means. */
+                providers?: components["parameters"]["AiVisibilityProvider"];
                 /** @description Number of most recent completed jobs to aggregate (ignored when from/to set) */
                 jobs?: number;
                 /** @description Zero-based page index of the URL list */
@@ -9640,6 +10355,8 @@ export interface operations {
                 to?: components["parameters"]["AiVisibilityTo"];
                 /** @description Client timezone (e.g. "Africa/Cairo") used to resolve preset/date boundaries; defaults to UTC. */
                 timezone?: components["parameters"]["AiVisibilityTimezone"];
+                /** @description Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics. */
+                topicIds?: components["parameters"]["AiVisibilityTopicFilter"];
             };
             header?: never;
             path: {
@@ -9670,8 +10387,8 @@ export interface operations {
     getAiVisibilityCitedPages: {
         parameters: {
             query?: {
-                /** @description AI provider filter ('ALL' aggregates across providers) */
-                provider?: components["parameters"]["AiVisibilityProvider"];
+                /** @description AI engines to include. Repeat the parameter to select several; omitted or empty aggregates across every engine. There is no 'ALL' sentinel — an empty selection is what "all engines" means. */
+                providers?: components["parameters"]["AiVisibilityProvider"];
                 /** @description When true, only count citations from answers where the project's own brand appeared */
                 mentioningBrand?: boolean;
                 /** @description Number of most recent completed jobs to aggregate (ignored when from/to set) */
@@ -9688,6 +10405,8 @@ export interface operations {
                 to?: components["parameters"]["AiVisibilityTo"];
                 /** @description Client timezone (e.g. "Africa/Cairo") used to resolve preset/date boundaries; defaults to UTC. */
                 timezone?: components["parameters"]["AiVisibilityTimezone"];
+                /** @description Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics. */
+                topicIds?: components["parameters"]["AiVisibilityTopicFilter"];
             };
             header?: never;
             path: {
@@ -9726,6 +10445,10 @@ export interface operations {
                 to?: components["parameters"]["AiVisibilityTo"];
                 /** @description Client timezone (e.g. "Africa/Cairo") used to resolve preset/date boundaries; defaults to UTC. */
                 timezone?: components["parameters"]["AiVisibilityTimezone"];
+                /** @description Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics. */
+                topicIds?: components["parameters"]["AiVisibilityTopicFilter"];
+                /** @description AI engines to include. Repeat the parameter to select several; omitted or empty aggregates across every engine. There is no 'ALL' sentinel — an empty selection is what "all engines" means. */
+                providers?: components["parameters"]["AiVisibilityProvider"];
             };
             header?: never;
             path: {
@@ -9758,8 +10481,8 @@ export interface operations {
                 jobs?: number;
                 /** @description Maximum number of brands to return */
                 limit?: number;
-                /** @description AI provider filter ('ALL' aggregates across providers) */
-                provider?: components["parameters"]["AiVisibilityProvider"];
+                /** @description AI engines to include. Repeat the parameter to select several; omitted or empty aggregates across every engine. There is no 'ALL' sentinel — an empty selection is what "all engines" means. */
+                providers?: components["parameters"]["AiVisibilityProvider"];
                 /** @description Predefined date range preset. Takes precedence over from/to. */
                 preset?: components["parameters"]["AiVisibilityPreset"];
                 /** @description Start of the date window (inclusive, interpreted in the client timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window. */
@@ -9768,6 +10491,8 @@ export interface operations {
                 to?: components["parameters"]["AiVisibilityTo"];
                 /** @description Client timezone (e.g. "Africa/Cairo") used to resolve preset/date boundaries; defaults to UTC. */
                 timezone?: components["parameters"]["AiVisibilityTimezone"];
+                /** @description Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics. */
+                topicIds?: components["parameters"]["AiVisibilityTopicFilter"];
             };
             header?: never;
             path: {
@@ -9800,8 +10525,8 @@ export interface operations {
                 jobs?: number;
                 /** @description Maximum number of suggested competitors to return */
                 limit?: number;
-                /** @description AI provider filter ('ALL' aggregates across providers) */
-                provider?: components["parameters"]["AiVisibilityProvider"];
+                /** @description AI engines to include. Repeat the parameter to select several; omitted or empty aggregates across every engine. There is no 'ALL' sentinel — an empty selection is what "all engines" means. */
+                providers?: components["parameters"]["AiVisibilityProvider"];
                 /** @description Predefined date range preset. Takes precedence over from/to. */
                 preset?: components["parameters"]["AiVisibilityPreset"];
                 /** @description Start of the date window (inclusive, interpreted in the client timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window. */
@@ -9838,8 +10563,8 @@ export interface operations {
     getAiVisibilityShareOfVoice: {
         parameters: {
             query?: {
-                /** @description AI provider filter ('ALL' aggregates across providers) */
-                provider?: components["parameters"]["AiVisibilityProvider"];
+                /** @description AI engines to include. Repeat the parameter to select several; omitted or empty aggregates across every engine. There is no 'ALL' sentinel — an empty selection is what "all engines" means. */
+                providers?: components["parameters"]["AiVisibilityProvider"];
                 /** @description Number of most recent completed jobs to include (ignored when from/to set) */
                 jobs?: number;
                 /** @description Predefined date range preset. Takes precedence over from/to. */
@@ -9850,6 +10575,8 @@ export interface operations {
                 to?: components["parameters"]["AiVisibilityTo"];
                 /** @description Client timezone (e.g. "Africa/Cairo") used to resolve preset/date boundaries; defaults to UTC. */
                 timezone?: components["parameters"]["AiVisibilityTimezone"];
+                /** @description Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics. */
+                topicIds?: components["parameters"]["AiVisibilityTopicFilter"];
             };
             header?: never;
             path: {
@@ -9888,6 +10615,10 @@ export interface operations {
                 to?: components["parameters"]["AiVisibilityTo"];
                 /** @description Client timezone (e.g. "Africa/Cairo") used to resolve preset/date boundaries; defaults to UTC. */
                 timezone?: components["parameters"]["AiVisibilityTimezone"];
+                /** @description Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics. */
+                topicIds?: components["parameters"]["AiVisibilityTopicFilter"];
+                /** @description AI engines to include. Repeat the parameter to select several; omitted or empty aggregates across every engine. There is no 'ALL' sentinel — an empty selection is what "all engines" means. */
+                providers?: components["parameters"]["AiVisibilityProvider"];
             };
             header?: never;
             path: {
@@ -9916,8 +10647,8 @@ export interface operations {
     getAiVisibilityCompetitorSeries: {
         parameters: {
             query?: {
-                /** @description AI provider filter ('ALL' aggregates across providers) */
-                provider?: components["parameters"]["AiVisibilityProvider"];
+                /** @description AI engines to include. Repeat the parameter to select several; omitted or empty aggregates across every engine. There is no 'ALL' sentinel — an empty selection is what "all engines" means. */
+                providers?: components["parameters"]["AiVisibilityProvider"];
                 /** @description Maximum number of most recent jobs to include (ignored when from/to set) */
                 limit?: number;
                 /** @description Predefined date range preset. Takes precedence over from/to. */
@@ -9928,6 +10659,8 @@ export interface operations {
                 to?: components["parameters"]["AiVisibilityTo"];
                 /** @description Client timezone (e.g. "Africa/Cairo") used to resolve preset/date boundaries; defaults to UTC. */
                 timezone?: components["parameters"]["AiVisibilityTimezone"];
+                /** @description Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics. */
+                topicIds?: components["parameters"]["AiVisibilityTopicFilter"];
             };
             header?: never;
             path: {
@@ -9966,6 +10699,10 @@ export interface operations {
                 to?: components["parameters"]["AiVisibilityTo"];
                 /** @description Client timezone (e.g. "Africa/Cairo") used to resolve preset/date boundaries; defaults to UTC. */
                 timezone?: components["parameters"]["AiVisibilityTimezone"];
+                /** @description Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics. */
+                topicIds?: components["parameters"]["AiVisibilityTopicFilter"];
+                /** @description AI engines to include. Repeat the parameter to select several; omitted or empty aggregates across every engine. There is no 'ALL' sentinel — an empty selection is what "all engines" means. */
+                providers?: components["parameters"]["AiVisibilityProvider"];
             };
             header?: never;
             path: {
@@ -10029,8 +10766,8 @@ export interface operations {
                 size?: number;
                 /** @description Sort by discovery recency or by referred sessions in the window */
                 sort?: "first_seen" | "sessions";
-                /** @description Server-side status filter */
-                status?: "all" | "active" | "ignored";
+                /** @description Server-side filter. all/active/ignored list traffic-detected sources and select on the stored curation status. lost and untapped are a separate axis reading the link graph instead: lost returns every domain the graph reports as no longer linking regardless of curation status, ordered most-recently-lost first; untapped returns live graph domains that have never referred a session — links that exist but have not driven traffic yet — ordered by authority. Both include domains with a null id and no first/last seen (nothing to curate). */
+                status?: "all" | "active" | "ignored" | "lost" | "untapped";
                 /** @description Case-insensitive substring match on the domain */
                 q?: string;
                 /** @description Window in days for the live session counts */
@@ -10185,6 +10922,185 @@ export interface operations {
             };
             401: components["responses"]["UnauthorizedError"];
             403: components["responses"]["ForbiddenError"];
+        };
+    };
+    getBacklinkGraphSummary: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Link profile summary retrieved successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BacklinkGraphSummaryResponse"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+        };
+    };
+    getBacklinkCompetitorGap: {
+        parameters: {
+            query?: {
+                /** @description Maximum number of gap domains to return */
+                limit?: number;
+                /** @description Narrow the list to sources linking to this one competitor domain. Must be one of the values in the response's competitors array — anything else simply matches nothing. Case-insensitive. */
+                competitor?: string;
+            };
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Competitor link gap retrieved successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BacklinkCompetitorGapResponse"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+        };
+    };
+    getBacklinkRefreshRunState: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Refresh state retrieved successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BacklinkRefreshRunStateResponse"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+        };
+    };
+    startBacklinkRefreshJob: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Refresh accepted */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StartBacklinkRefreshJobResponse"];
+                };
+            };
+            400: components["responses"]["BadRequestError"];
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            409: components["responses"]["ConflictError"];
+        };
+    };
+    listBacklinkLinks: {
+        parameters: {
+            query?: {
+                /** @description Zero-based page index */
+                page?: number;
+                /** @description Page size */
+                size?: number;
+                /** @description Narrow the list to links from this one referring domain. Case-insensitive. */
+                domain?: string;
+                /** @description Substring match on the linking page URL or anchor text */
+                q?: string;
+            };
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Exact backlinks retrieved successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BacklinkLinksResponse"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+        };
+    };
+    deleteBacklinkSyncedData: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Synced link-graph data deleted */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeleteBacklinkSyncedDataResponse"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            409: components["responses"]["ConflictError"];
         };
     };
     listDataImports: {
@@ -11208,6 +12124,8 @@ export interface operations {
                 size?: number;
                 /** @description If true, only return unread notifications */
                 unreadOnly?: boolean;
+                /** @description Only return notifications of these types (comma-separated). Omit for all types. unreadCount is always the unfiltered total, so a filtered page never changes the badge. */
+                type?: components["schemas"]["NotificationTypeEnum"][];
             };
             header?: never;
             path: {
@@ -11228,6 +12146,55 @@ export interface operations {
                 };
             };
             401: components["responses"]["UnauthorizedError"];
+        };
+    };
+    getUnreadNotificationCount: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Unread count retrieved successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnreadNotificationCountResponse"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+        };
+    };
+    deleteNotification: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Notification ID */
+                notificationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Notification deleted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["UnauthorizedError"];
+            404: components["responses"]["NotFoundError"];
         };
     };
     markNotificationAsRead: {
