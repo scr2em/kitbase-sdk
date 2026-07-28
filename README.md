@@ -18,7 +18,6 @@ Official SDKs for [Kitbase](https://kitbase.dev).
 
 | Package | Docs |
 | ------- | ---- |
-| `@kitbase/mcp` | [Documentation](https://docs.kitbase.dev/sdks/mcp) |
 
 ### In-App Messaging
 

@@ -22,6 +22,3 @@ packages:
 
   # CLI Tools
   - "cli"
-
-  # MCP Server
-  - "mcp"
