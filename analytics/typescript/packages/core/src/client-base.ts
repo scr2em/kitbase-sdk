@@ -524,6 +524,21 @@ export class KitbaseAnalytics {
 	 * treated as "one visit" by anything downstream.
 	 * @internal
 	 */
+	/**
+	 * Adopt a session left behind by an earlier page load, so a reload in the
+	 * middle of a visit continues it instead of starting a new one. Ignored if
+	 * that session is already past the idle window.
+	 * @internal
+	 */
+	protected resumeClientSession(sessionId: string, lastActivityAt: number): void {
+		if (Date.now() - lastActivityAt > KitbaseAnalytics.SESSION_TIMEOUT_MS) {
+			return;
+		}
+		this.clientSessionId = sessionId;
+		this.lastActivityAt = lastActivityAt;
+		this.log("Resumed client session", { sessionId });
+	}
+
 	protected getClientSessionId(): string {
 		const now = Date.now();
 		if (

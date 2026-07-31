@@ -106,6 +106,16 @@ export class KitbaseAnalytics extends KitbaseAnalyticsBase {
 			this.queue.setDebugMode(this.debugMode, this.log.bind(this));
 			this.queue.setSendCallback(this.sendQueuedEvents.bind(this));
 			this.queue.startFlushTimer();
+			// The queue outlives this JS context, so a reload mid-visit would
+			// otherwise mint a new session id for events that belong together.
+			this.queue
+				.lastQueuedSession()
+				.then((previous) => {
+					if (previous) {
+						this.resumeClientSession(previous.sessionId, previous.at);
+					}
+				})
+				.catch((err) => this.log("Could not resume client session", err));
 			this.log("Offline queueing enabled", {
 				storageType: this.queue.getStorageType(),
 			});

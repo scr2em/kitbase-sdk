@@ -218,6 +218,28 @@ export class EventQueue implements EventQueueInterface {
 	}
 
 	/**
+	 * The session id and time of the most recently queued event, if any.
+	 *
+	 * Used to resume an offline session across a page load or app restart: the
+	 * queue outlives the JS context that created it, so without this every
+	 * reload would start a new session id mid-visit and the server would see one
+	 * visit as several.
+	 */
+	async lastQueuedSession(): Promise<{ sessionId: string; at: number } | null> {
+		let newest: QueuedEvent | undefined;
+		if (this.useIndexedDB && this.db) {
+			newest = await this.db.events.orderBy("timestamp").last();
+		} else if (this.memoryQueue) {
+			const all = await this.memoryQueue.dequeue(Number.MAX_SAFE_INTEGER);
+			newest = all[all.length - 1];
+		}
+
+		const sessionId = newest?.payload.client_session_id;
+		const at = newest?.payload.client_timestamp;
+		return sessionId && typeof at === "number" ? { sessionId, at } : null;
+	}
+
+	/**
 	 * Mark events as successfully sent (remove from queue)
 	 */
 	async markSent(ids: number[]): Promise<void> {
