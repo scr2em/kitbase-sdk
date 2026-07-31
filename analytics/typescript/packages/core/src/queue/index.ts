@@ -8,6 +8,13 @@ import type {
 	SendEventsCallback,
 } from "./types.js";
 
+/**
+ * How long a flush may hold a claim on a queued row before another flush may
+ * take it. Longer than the request's own 30s abort timeout, so a claim is only
+ * reclaimed once the tab holding it is genuinely gone.
+ */
+const CLAIM_TIMEOUT_MS = 60_000;
+
 const DEFAULT_CONFIG: Required<OfflineConfig> = {
 	enabled: false,
 	maxQueueSize: 1000,
@@ -50,6 +57,10 @@ class KitbaseQueueDB extends Dexie {
 		this.version(1).stores({
 			events: "++id, timestamp, retries, lastAttempt",
 		});
+		// Adds the flush claim that stops two tabs sending the same rows.
+		this.version(2)
+			.stores({ events: "++id, timestamp, retries, lastAttempt, claimedAt" })
+			.upgrade((tx) => tx.table("events").toCollection().modify({ claimedAt: 0 }));
 	}
 }
 
@@ -204,12 +215,22 @@ export class EventQueue implements EventQueueInterface {
 	 */
 	async dequeue(count: number): Promise<QueuedEvent[]> {
 		if (this.useIndexedDB && this.db) {
-			// Get events sorted by timestamp (oldest first), excluding those with too many retries
-			return this.db.events
-				.where("retries")
-				.below(this.config.maxRetries)
-				.sortBy("timestamp")
-				.then((events) => events.slice(0, count));
+			// Claim the rows inside the read so a second tab flushing the same
+			// database cannot pick them up as well and send them a second time.
+			const claimableBefore = Date.now() - CLAIM_TIMEOUT_MS;
+			return this.db.transaction("rw", this.db.events, async () => {
+				const rows = await this.db!.events.where("retries")
+					.below(this.config.maxRetries)
+					.sortBy("timestamp");
+				const claimed = rows
+					.filter((e) => !e.claimedAt || e.claimedAt < claimableBefore)
+					.slice(0, count);
+				const now = Date.now();
+				await Promise.all(
+					claimed.map((e) => this.db!.events.update(e.id!, { claimedAt: now })),
+				);
+				return claimed;
+			});
 		} else if (this.memoryQueue) {
 			const events = await this.memoryQueue.dequeue(count);
 			return events.filter((e) => e.retries < this.config.maxRetries);
@@ -264,12 +285,15 @@ export class EventQueue implements EventQueueInterface {
 
 		if (this.useIndexedDB && this.db) {
 			await this.db.transaction("rw", this.db.events, async () => {
+				// Released along with the retry bump: a failed send is free to be
+				// picked up again, by this tab or another.
 				for (const id of ids) {
 					const event = await this.db!.events.get(id);
 					if (event) {
 						await this.db!.events.update(id, {
 							retries: event.retries + 1,
 							lastAttempt: now,
+							claimedAt: 0,
 						});
 					}
 				}

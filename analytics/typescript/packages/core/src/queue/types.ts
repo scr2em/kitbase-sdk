@@ -57,6 +57,17 @@ export interface QueuedEvent {
 	payload: LogPayload;
 
 	/**
+	 * When a flush claimed this row (ms since epoch), or 0 when unclaimed.
+	 *
+	 * Tabs share one queue database but flush independently, so without a claim
+	 * two of them read the same rows and both send them — the server stores the
+	 * event twice and the visitor's pageviews are double counted. A claim older
+	 * than {@link CLAIM_TIMEOUT_MS} is treated as abandoned, so a tab that dies
+	 * mid-flush does not strand its events.
+	 */
+	claimedAt?: number;
+
+	/**
 	 * Timestamp when the event was queued (ms since epoch)
 	 */
 	timestamp: number;
