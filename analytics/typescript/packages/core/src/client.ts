@@ -246,7 +246,10 @@ export class KitbaseAnalytics extends KitbaseAnalyticsBase {
 			channel: options.channel,
 			event: options.event,
 			client_timestamp: Date.now(),
-			client_session_id: this.getClientSessionId(),
+			// Only when offline queueing is on: it marks events that may reach
+			// the server long after they happened. Online, the server opens and
+			// closes the visit itself and there is nothing for the client to say.
+			...(this.queue && { client_session_id: this.getClientSessionId() }),
 			...(options.user_id && { user_id: options.user_id }),
 			...(options.icon && { icon: options.icon }),
 			...(options.notify !== undefined && { notify: options.notify }),

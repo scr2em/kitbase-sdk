@@ -101,9 +101,25 @@ describe("KitbaseAnalytics", () => {
 				tags: { plan: "premium", trial: false },
 			});
 			expect(body.client_timestamp).toEqual(expect.any(Number));
-			expect(body.client_session_id).toEqual(expect.any(String));
 			expect(body.sdk_version).toEqual(expect.any(String));
 			expect(body.sdk_version).not.toEqual("");
+		});
+
+		it("should not send a client session id for live events", async () => {
+			mockFetch.mockResolvedValueOnce({
+				ok: true,
+				status: 202,
+				json: async () => ({ id: "evt-1" }),
+			});
+
+			const client = new KitbaseAnalytics({ sdkKey: "test-token" });
+			await client.track({ channel: "test", event: "Test Event" });
+
+			// Online there is no session state to report: the server opens the
+			// visit on the first event it sees and closes it after 30 idle
+			// minutes. Sending an id would imply the client decides the visit.
+			const body = JSON.parse(mockFetch.mock.calls[0][1].body);
+			expect(body.client_session_id).toBeUndefined();
 		});
 
 		it("should throw AuthenticationError on 401", async () => {

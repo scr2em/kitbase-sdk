@@ -512,8 +512,16 @@ export class KitbaseAnalytics {
 	// ============================================================
 
 	/**
-	 * Get or create a client-side session ID.
-	 * Rotates the session after 30 minutes of inactivity.
+	 * Get or create the id that marks a run of offline-queued events, rotating
+	 * it after 30 minutes without a tracked event.
+	 *
+	 * Only used when offline queueing is enabled — live events carry no session
+	 * id, because the server owns the visit: it opens one on the first event
+	 * from a visitor and closes it after 30 idle minutes.
+	 *
+	 * This is a hint, not an identity. It lives in memory, so a page load, an
+	 * app restart or a second tab each start a new one, and it must not be
+	 * treated as "one visit" by anything downstream.
 	 * @internal
 	 */
 	protected getClientSessionId(): string {
@@ -597,11 +605,12 @@ export class KitbaseAnalytics {
 			...(duration !== undefined ? { $duration: duration } : {}),
 		};
 
+		// No client_session_id: this build has no offline queue, so every event
+		// is live and the server resolves the visit itself.
 		const payload: LogPayload = {
 			channel: options.channel,
 			event: options.event,
 			client_timestamp: Date.now(),
-			client_session_id: this.getClientSessionId(),
 			...(options.user_id && { user_id: options.user_id }),
 			...(options.icon && { icon: options.icon }),
 			...(options.notify !== undefined && { notify: options.notify }),

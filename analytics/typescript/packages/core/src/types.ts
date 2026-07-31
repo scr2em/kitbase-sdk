@@ -145,10 +145,17 @@ export interface LogPayload {
 	 */
 	client_timestamp: number;
 	/**
-	 * Client-generated session UUID, rotated after 30min of inactivity.
-	 * Used by the server for offline session reconstruction.
+	 * Marks events that came out of the offline queue, so the server can tell
+	 * replayed traffic from live traffic. Only present when offline queueing is
+	 * enabled — online events do not have or need one.
+	 *
+	 * Sessions themselves are the server's concern: it opens one on the first
+	 * event it receives from a visitor and closes it after 30 minutes of
+	 * inactivity. The client has no session state to report, and this id is
+	 * deliberately not what the server groups a visit by — it lives in memory
+	 * and so changes on every page load, app restart and extra tab.
 	 */
-	client_session_id: string;
+	client_session_id?: string;
 	/**
 	 * Version of the Kitbase SDK package that produced this event.
 	 * Injected at build time from the core package's package.json.
