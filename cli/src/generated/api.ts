@@ -4,6 +4,26 @@
  */
 
 export interface paths {
+    "/{orgSlug}/projects/{projectId}/agent/conversations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete every conversation in this scope
+         * @description Clears the caller's assistant history for this project (or, with workflowId, for that workflow). Permanent: the conversations and their messages are deleted, not archived. Scoped exactly like the list it clears, so a project conversation is the signed-in user's own and a workflow conversation is the one shared for that graph.
+         */
+        delete: operations["deleteAllProjectAgentConversations"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/users/me": {
         parameters: {
             query?: never;
@@ -958,6 +978,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/{orgSlug}/projects/{projectId}/ai-visibility/regions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Regions available to this organization and selected by this project
+         * @description The geographic vantage points this project can be measured from, resolved server-side: US always, plus any region the organization is entitled to (hidden billing feature ai_visibility_regions_enabled), together with the project's own current selection. Clients render the region filter only when `available` has more than one entry — the entitlement is never derived on the client, and hidden features are absent from the billing payloads anyway.
+         */
+        get: operations["getAiVisibilityRegions"];
+        /**
+         * Set the regions this project runs
+         * @description Replaces the project's region selection. Every region must be one the organization is entitled to, and at least one is required. Each prompt runs once per selected region, so adding one adds a full pass of every prompt on every engine, and multiplies the run's draw on the organization's monthly spend budget accordingly. A region covering several countries (EU) is sampled per prompt rather than queried in every country, so it costs the same per run as a single-country one.
+         */
+        put: operations["updateAiVisibilityRegions"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/{orgSlug}/projects/{projectId}/ai-visibility/schedule": {
         parameters: {
             query?: never;
@@ -1337,6 +1381,256 @@ export interface paths {
          * @description Full detail of one provider call — answer text, citations, and detected brand mentions.
          */
         get: operations["getAiVisibilityRun"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/characters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List the characters this project can run
+         * @description The ones we ship and the ones written here, in one list. Internal characters come back with a null systemPrompt. Requires 'workflow.view'.
+         */
+        get: operations["listAgentCharacters"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/characters/{characterId}/run": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Have a character read something now
+         * @description Runs one character against a page, or against whatever you ask it. Costs AI credits, so it requires 'workflow.manage' rather than view. Returns 204 when no AI provider is configured or the character had nothing to say.
+         */
+        post: operations["runAgentCharacter"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/site-content/pages/audit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Grade one page against the rest of the site
+         * @description Whether this page says something the site already says differently — a figure restated, a structure counted another way, a reserved word applied to something the site does not classify that way, or a title a live page already carries. Deterministic and free. Requires sitecontent.view.
+         */
+        get: operations["auditSiteContentPage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/site-content/pages/ai-analysis": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Have AI read one page as a marketer would
+         * @description Asks the organization's configured model what question the page answers, what it presents itself as, and whether that is the story the rest of the site tells — the half counting cannot reach.
+         *     POST because it spends: one page per call, metered to the AI budget, and never run across the whole inventory on its own initiative. Returns 204 when no provider is configured or the model declined, so the free findings can still be shown. Requires sitecontent.manage, since it costs money.
+         */
+        post: operations["analyzeSiteContentPageWithAi"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/site-content/system-of-record": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Where the site contradicts itself
+         * @description The site-level checklist, as opposed to the per-page one: whether the navigation lists as many things as the homepage says exist, whether the header and footer classify a group the same way, whether one figure is stated two ways on two pages, whether navigation links leave the domain, whether any pages are linked from nowhere, and whether template sample pages are live. Every finding is a relation between two things the site publishes, so no per-page check can produce one.
+         *     Computed from the stored page index on each call; deterministic and free. Returns an empty checklist when the project has never been indexed, which is a real state rather than an error. Requires sitecontent.view.
+         */
+        get: operations["getSiteSystemOfRecord"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/site-content/analysis/cross": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Read every page's positioning together
+         * @description Asks the organization's configured model where two pages collide: two answering the same buyer question, a page describing itself as something the navigation files differently, one thing carried under two names, and the buyer questions no page answers.
+         *     The findings none of the counted checks can produce, because the pages that actually compete rarely share a title. It reads the short fields the per-page AI step already stored rather than the pages themselves, so it costs one call whatever the site's size, and the results are appended to the latest round.
+         *     POST because it spends, and by hand rather than on every crawl: a site's collisions do not change between two crawls that changed nothing. Returns 204 when there is no round yet, no provider is configured, fewer than two pages carry a per-page reading, or the model declined. Requires sitecontent.manage.
+         *     Accepted, not awaited: this is one model call over the whole inventory and takes a minute or more, so it runs as a job. Poll `crossAnalysisRunning` on the system-of-record response; the findings are appended to the current round.
+         */
+        post: operations["runSiteContentCrossAnalysis"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/site-content/pages/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * One page across analysis rounds
+         * @description What each crawl found about this page, newest first — its build score, whether it contradicted the rest of the site, and how the AI read its positioning. The comparison read: an unchanged page carries its previous AI reading forward, and aiCarried says so, so a stale reading is never mistaken for a fresh one. Requires sitecontent.view.
+         */
+        get: operations["getSiteContentPageHistory"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/site-content/rounds": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List analysis rounds
+         * @description One round per crawl, newest first, with what each covered. Coverage is part of the result: a round that spent its AI budget on 50 of 500 pages is not the same statement as one that read them all, and pagesAiSkipped is how a reader tells which they are looking at. Requires sitecontent.view.
+         */
+        get: operations["listSiteContentRounds"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/site-content/spec/docs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List the planning documents this site is graded against
+         * @description The approved plan, messaging or build standard a project has uploaded. Without one, every check grades the site against what it says about itself; with one, findings can say "this is not what you approved". Requires sitecontent.view.
+         */
+        get: operations["listSpecDocs"];
+        put?: never;
+        /**
+         * Upload a planning document
+         * @description Stores the document and reads the requirements it sets, using the organization's configured model. Extracted rules are NOT enforced until a person approves each one: a wrong rule mis-grades the whole site against a requirement nobody set, and it does it silently. Text and Markdown in v1. Requires sitecontent.manage, since extraction spends AI budget.
+         */
+        post: operations["uploadSpecDoc"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/site-content/spec/rules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List the rules read from the planning documents
+         * @description Each rule beside the sentence it was read from, so a reviewer can approve or reject it in seconds. Only APPROVED rules are ever graded against. Requires sitecontent.view.
+         */
+        get: operations["listSpecRules"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/site-content/spec/rules/{ruleId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Approve, reject or correct one rule
+         * @description Approving is what lets a rule grade the site. Editing one re-approves it — the person changing it is the one vouching for it. Requires sitecontent.manage.
+         */
+        patch: operations["reviewSpecRule"];
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/site-content/rounds/{roundId}/report": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The whole record of one crawl
+         * @description Everything one round established, assembled from stored rows: the scale numbers, the site-level findings by area, a record per page, the process rules from any approved plan, and what the round did and did not cover.
+         *     Nothing is recomputed and no model is called — a report is a reading of a crawl that already happened, and re-deriving it would date it "now" while describing then. Every citation is a join, which is what makes "Wireframe v15, July 13" checkable rather than a claim. Requires sitecontent.view.
+         */
+        get: operations["getSiteContentReport"];
         put?: never;
         post?: never;
         delete?: never;
@@ -6953,7 +7247,7 @@ export interface components {
          * @description Available billing feature codes
          * @enum {string}
          */
-        BillingFeatureCodeEnum: "max_organizations" | "max_projects" | "max_team_members" | "max_feature_flags" | "data_retention_days" | "events_per_month" | "feature_flag_segments" | "audit_logs" | "sso" | "webhooks" | "api_access" | "priority_support" | "custom_events_enabled" | "custom_dashboards" | "ai_visibility_max_prompts" | "bot_events_per_month" | "ai_visibility_runs_per_month" | "engagement_max_keywords" | "ai_visibility_providers" | "ai_visibility_max_projects" | "ai_visibility_run_interval_days" | "monthly_budget_usd" | "backlinks_refresh_interval_days" | "workflows_enabled" | "max_active_workflows" | "workflow_runs_per_month";
+        BillingFeatureCodeEnum: "max_organizations" | "max_projects" | "max_team_members" | "max_feature_flags" | "data_retention_days" | "events_per_month" | "feature_flag_segments" | "audit_logs" | "sso" | "webhooks" | "api_access" | "priority_support" | "custom_events_enabled" | "custom_dashboards" | "ai_visibility_max_prompts" | "bot_events_per_month" | "ai_visibility_runs_per_month" | "engagement_max_keywords" | "ai_visibility_providers" | "ai_visibility_max_projects" | "ai_visibility_run_interval_days" | "ai_visibility_regions_enabled" | "monthly_budget_usd" | "free_monthly_budget_usd" | "backlinks_refresh_interval_days" | "workflows_enabled" | "max_active_workflows" | "workflow_runs_per_month";
         /** @description A billing plan available in the system */
         BillingPlanResponse: {
             /** @description Unique plan identifier */
@@ -7357,6 +7651,21 @@ export interface components {
             /** @description Engines the organization's plan allows AND the server has keys for (AiProvider names; never includes the ALL sentinel) */
             providers: string[];
         };
+        /**
+         * @description A geographic vantage point a prompt is asked from. One region aggregates one or more concrete countries (server config), so EU answers from several European markets roll up into one bucket.
+         * @enum {string}
+         */
+        AiVisibilityRegionEnum: "US" | "EU";
+        AiVisibilityRegionsResponse: {
+            /** @description Regions the organization may measure from, resolved server-side. Always contains US; more appear only when the organization is entitled to multi-region tracking. Clients render the region filter ONLY when this list has more than one entry — never from a hardcoded list, and never by inspecting billing features. */
+            available: components["schemas"]["AiVisibilityRegionEnum"][];
+            /** @description Regions this project currently runs and reports on (never empty; defaults to US for a project that never opted in). */
+            selected: components["schemas"]["AiVisibilityRegionEnum"][];
+        };
+        AiVisibilityRegionsRequest: {
+            /** @description Regions this project should run. At least one; every entry must be one the organization is entitled to. Each added region adds one more pass of every prompt on every engine — the cost multiplier is the number of regions, not the number of countries they cover. */
+            regions: components["schemas"]["AiVisibilityRegionEnum"][];
+        };
         AiVisibilityScheduleResponse: {
             /** @description Whether analyses run automatically for this project (organization has an active paid subscription) */
             autoRunEnabled?: boolean;
@@ -7638,6 +7947,9 @@ export interface components {
         AiVisibilityRunSummary: {
             id?: string;
             provider?: string;
+            region?: components["schemas"]["AiVisibilityRegionEnum"];
+            /** @description ISO-3166 alpha-2 country this run actually queried (the region may cover several) */
+            market?: string;
             /** @enum {string} */
             status?: "PENDING" | "PROCESSING" | "AWAITING_PROVIDER" | "SUCCEEDED" | "FAILED";
             promptId?: string | null;
@@ -7653,6 +7965,9 @@ export interface components {
         AiVisibilityRunDetailResponse: {
             id?: string;
             provider?: string;
+            region?: components["schemas"]["AiVisibilityRegionEnum"];
+            /** @description ISO-3166 alpha-2 country this run actually queried (the region may cover several) */
+            market?: string;
             /** @enum {string} */
             status?: "PENDING" | "PROCESSING" | "AWAITING_PROVIDER" | "SUCCEEDED" | "FAILED";
             modelVersion?: string | null;
@@ -7807,6 +8122,11 @@ export interface components {
         AiVisibilityTopicBackfillResponse: {
             eligibleRuns?: number;
             runsRetagged?: number | null;
+        };
+        /** @description The cross-page reading is a job, not a response. It is one model call carrying the whole inventory — a minute or more — and holding a connection for it lost answers that had already been paid for whenever a proxy timed out or a tab closed. */
+        StartCrossAnalysisResponse: {
+            /** @description False when a reading was already running for this project. Not an error: the answer the caller wanted is the one already on its way. */
+            started: boolean;
         };
         /**
          * @description Whether the backlink source is shown (active) or dismissed as noise (ignored)
@@ -8058,6 +8378,359 @@ export interface components {
             /** @description Status of the most recent finished refresh (COMPLETED | FAILED | CANCELLED) */
             lastJobStatus?: string | null;
         };
+        /** @description A character: a named point of view that can read this project's data. Ships as one of ours or is written by the customer. */
+        AgentCharacterResponse: {
+            /** @description Internal characters are `internal:<code>`; customer ones are a UUID. */
+            id: string;
+            /** @enum {string} */
+            origin: "INTERNAL" | "CUSTOMER";
+            name: string;
+            description?: string | null;
+            /** @description The character's instructions. Present only for CUSTOMER characters, which the caller wrote. Always null for INTERNAL ones — those prompts are not part of what is sold. */
+            systemPrompt?: string | null;
+            /** @description False for internal characters, which are read-only to customers. */
+            canEdit: boolean;
+        };
+        AgentCharacterListResponse: {
+            data: components["schemas"]["AgentCharacterResponse"][];
+        };
+        RunAgentCharacterRequest: {
+            /** @description An indexed page for the character to read. */
+            path?: string | null;
+            /** @description What to ask it. Left out, it reviews the page and reports what matters. */
+            task?: string | null;
+        };
+        AgentCharacterRunResponse: {
+            characterId: string;
+            characterName: string;
+            /** @description What the character said, in prose. */
+            output: string;
+            toolsCalled: string[];
+        };
+        ContentAuditFinding: {
+            /** @enum {string} */
+            id: "CLAIM_CONFLICT" | "STRUCTURE_COUNT" | "RESERVED_LABEL" | "DUPLICATE_TITLE";
+            title: string;
+            /** @enum {string} */
+            severity: "BROKEN" | "WARNING" | "WORKS";
+            detail: string;
+            fix?: string | null;
+        };
+        /** @description One page graded against the rest of the site. Distinct from the page checklist, which grades a page on its own: every finding here is a relation to another page, so it cannot be produced without the rest of the inventory. */
+        ContentAuditResponse: {
+            path?: string | null;
+            title?: string | null;
+            /**
+             * @description The worst thing found on this page.
+             * @enum {string}
+             */
+            verdict: "BLOCK" | "WARN" | "CLEAR";
+            findings: components["schemas"]["ContentAuditFinding"][];
+        };
+        /** @description A model's read of one page against what the site says it is. Absent when the organization has no AI provider configured or the model declined — the deterministic findings stand on their own either way. */
+        AiPageAnalysisResponse: {
+            /** @description The question a buyer would type that this page answers */
+            buyerQuestion: string;
+            /** @description What the page says it is, in its own framing */
+            presentsItselfAs: string;
+            /**
+             * @description How the page's story sits against the rest of the site
+             * @enum {string}
+             */
+            positioning: "ALIGNED" | "DRIFTED" | "CONTRADICTS";
+            strengths: string[];
+            gaps: string[];
+            recommendation: string;
+        };
+        /** @description One site-level verdict, carrying the copy that explains it. Served rather than kept in the frontend for the same reason as SiteContentPageCheck: the same findings are delivered by workflows into email, Slack and webhooks, where no client is there to look the wording up. */
+        SiteSystemOfRecordCheck: {
+            /** @enum {string} */
+            id: "DECLARED_STRUCTURE_COUNT" | "TAXONOMY_SURFACE_AGREEMENT" | "CLAIM_CONSISTENCY" | "NAV_OFFSITE_LINKS" | "ORPHAN_PAGES" | "BOILERPLATE_PAGES" | "ANSWER_LAYER_COVERAGE" | "DUPLICATE_CONTENT" | "BROKEN_INTERNAL_LINKS" | "MOVED_PAGES" | "AI_COMPETING_ANSWERS" | "AI_SELF_CLASSIFICATION" | "AI_TERMINOLOGY_DRIFT" | "AI_COVERAGE_GAPS" | "PLAN_ADDRESS" | "PLAN_FIGURE" | "PLAN_TERM";
+            /**
+             * @description POSITIONING is the one group that is not counted — those four checks are a model's reading of what the pages mean, produced only when the cross-page analysis is run. PLAN is the only group graded against something other than the site: those findings say "this is not what you approved", and exist only for a project that has uploaded a planning document and approved the rules read from it. Everything else compares two things the site published and can name both.
+             * @enum {string}
+             */
+            category: "TAXONOMY" | "CLAIMS" | "NAVIGATION" | "INVENTORY" | "POSITIONING" | "PLAN";
+            /** @description Reader-facing name of the category */
+            area: string;
+            /** @description What the check is, phrased as the good outcome */
+            title: string;
+            /** @description Why it matters — the same sentence whatever the verdict */
+            description: string;
+            /**
+             * @description BROKEN means the site contradicts something it already publishes — a relation between two surfaces, not a page falling short of a threshold. WORKS is returned rather than omitted so a reader can tell "we looked and it holds" from "we never looked".
+             * @enum {string}
+             */
+            severity: "BROKEN" | "WARNING" | "WORKS";
+            /** @description What was actually found on this site, with the measured specifics */
+            detail: string;
+            /** @description What to do about it; null on a passing check */
+            fix?: string | null;
+            /** @description The pages this finding is about, as pages rather than as prose. Empty for the checks whose finding is a count or a comparison; empty too for a round recorded before this existed, whose paths are still inside `detail`. A client renders `detail` either way and renders this list when it has one. */
+            affectedPages?: components["schemas"]["SiteFindingPage"][];
+        };
+        /** @description One page a finding names, and what is true of it. */
+        SiteFindingPage: {
+            /** @description Where it lives, so a client can link to the page's own record */
+            path: string;
+            /** @description What is true of this page, in a few words — which half of the answer layer is missing, what it duplicates, where it moved from. Null when naming the page says everything the finding has to say about it. */
+            note?: string | null;
+        };
+        SpecDocsResponse: {
+            docs: components["schemas"]["SpecDocResponse"][];
+        };
+        SpecDocResponse: {
+            id: string;
+            title: string;
+            /**
+             * Format: date
+             * @description The document's own date, which is what a citation names — not the upload's
+             */
+            docDate?: string | null;
+            version?: string | null;
+            /** @description Rules read from it, whatever their review status */
+            ruleCount: number;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        UploadSpecDocRequest: {
+            /** @description How the document will be cited, e.g. "Wireframe v15" */
+            title: string;
+            /** Format: date */
+            docDate?: string | null;
+            version?: string | null;
+            /** @description The document's text. Markdown or plain text in v1. */
+            body: string;
+        };
+        SpecRulesResponse: {
+            rules: components["schemas"]["SpecRuleResponse"][];
+        };
+        SpecRuleResponse: {
+            id: string;
+            /** @enum {string} */
+            ruleType: "PLANNED_URL" | "LOCKED_FIGURE" | "LOCKED_TERM" | "BANNED_TERM" | "NAV_PLACEMENT" | "REQUIRED_ELEMENT" | "TAXONOMY" | "PROCESS";
+            /** @description The path it applies to, or SITEWIDE */
+            scope: string;
+            expectedValue: string;
+            /**
+             * @description What the violation's severity is computed from — LOCKED is broken, RESEARCH_BACKED is worth a look, OPEN is never a finding. Nothing that writes a finding decides how serious it is.
+             * @enum {string}
+             */
+            lockLevel: "LOCKED" | "RESEARCH_BACKED" | "OPEN";
+            /** @description The sentence in the document this was read from. Shown beside the rule so a reviewer approves against the source rather than against a paraphrase. */
+            verbatimSource: string;
+            /** @enum {string} */
+            status: "EXTRACTED" | "APPROVED" | "REJECTED";
+            docTitle: string;
+            /** Format: date */
+            docDate?: string | null;
+        };
+        ReviewSpecRuleRequest: {
+            /** @enum {string} */
+            status: "APPROVED" | "REJECTED";
+            /** @description Set to correct the rule while approving it */
+            scope?: string | null;
+            expectedValue?: string | null;
+            /** @enum {string|null} */
+            lockLevel?: "LOCKED" | "RESEARCH_BACKED" | "OPEN" | null;
+        };
+        SiteContentDuplicatePage: {
+            path: string;
+            url: string;
+            title?: string | null;
+        };
+        /** @description Pages that are all reachable from one another above the near-duplicate threshold. A group rather than a pair: three pages that each duplicate the next are one problem with three pages in it, not three problems. */
+        SiteContentDuplicateCluster: {
+            /** @description The closest pair inside this group, as a percentage. */
+            topScorePercent: number;
+            pages: components["schemas"]["SiteContentDuplicatePage"][];
+        };
+        /** @description Pages whose nearest neighbour scored inside this band. */
+        SiteContentSimilarityBand: {
+            minPercent: number;
+            maxPercent: number;
+            pages: number;
+        };
+        /** @description What the content embeddings say about pages repeating each other. Distinct from the round's own duplicate count, which groups by content hash and so only ever finds byte-identical copies; this finds pages that answer the same question in different words. */
+        SiteContentDuplication: {
+            /** @description False when there is nothing to say: no page in the project has been embedded yet, or this report is for an older round. Neighbours are stored per project rather than per round, so attaching them to a superseded round would date the answer "now" while the rest of the report describes then. */
+            available: boolean;
+            /**
+             * Format: date-time
+             * @description When these neighbours were last ranked.
+             */
+            computedAt?: string | null;
+            /** @description How near two pages must be to count as near-duplicates. */
+            thresholdPercent: number;
+            /** @description Pages carrying an embedding, and so taking part in the comparison at all. */
+            pagesCompared: number;
+            /** @description Pages whose nearest neighbour is at or above the threshold. */
+            pagesWithNearTwin: number;
+            /** @description Distribution of every compared page by how near its closest neighbour is. */
+            bands: components["schemas"]["SiteContentSimilarityBand"][];
+            /** @description Near-duplicate groups, tightest first. */
+            clusters: components["schemas"]["SiteContentDuplicateCluster"][];
+        };
+        /** @description One place a figure is stated. */
+        SiteContentBaselineClaimStatement: {
+            value: string;
+            path: string;
+            /** @description The sentence it was read from, when one was kept. */
+            sentence?: string | null;
+        };
+        /** @description One figure the site commits to, everywhere it is stated. More than one distinct value among the statements is the site disagreeing with itself. */
+        SiteContentBaselineClaim: {
+            key: string;
+            /** @description What the homepage says, or the most-stated value when the homepage is silent — the value a new page has to match. */
+            authoritativeValue: string;
+            statements: components["schemas"]["SiteContentBaselineClaimStatement"][];
+        };
+        /** @description One labelled group in the site's navigation, and what it says belongs to it. */
+        SiteContentTaxonomyGroup: {
+            label: string;
+            /** @enum {string} */
+            surface: "NAV" | "FOOTER";
+            memberLabels: string[];
+        };
+        /** @description The count the homepage commits to — "built on four core solutions". */
+        SiteContentDeclaredStructure: {
+            count: number;
+            noun: string;
+            /** @description The sentence the count was read from. */
+            sentence: string;
+        };
+        /** @description What the site said it was when this round graded it — the homepage's opening answer, the count it commits to, the navigation's taxonomy, and every figure stated in an opening answer. Stored with the round, so an old report keeps describing the site as it stood then. */
+        SiteContentReportBaseline: {
+            /** @description The homepage's opening answer; empty when it has none. */
+            declaredCategory: string;
+            declaredStructure?: components["schemas"]["SiteContentDeclaredStructure"];
+            taxonomy: components["schemas"]["SiteContentTaxonomyGroup"][];
+            claims: components["schemas"]["SiteContentBaselineClaim"][];
+        };
+        SiteContentReportResponse: {
+            round: components["schemas"]["SiteContentRound"];
+            scale: components["schemas"]["SiteContentReportScale"];
+            duplication: components["schemas"]["SiteContentDuplication"];
+            baseline?: components["schemas"]["SiteContentReportBaseline"];
+            /** @description Whole-site findings, worst first */
+            siteFindings: components["schemas"]["SiteSystemOfRecordCheck"][];
+            /** @description One record per page the round graded */
+            pages: components["schemas"]["SiteContentReportPage"][];
+            /** @description Approved rules about how changes are made rather than about the site. Nothing checks them; they are the report's standards section. */
+            processRules: components["schemas"]["SpecRuleResponse"][];
+        };
+        SiteContentReportScale: {
+            pagesLive: number;
+            /** @description Pages this round actually read. Lower than pagesLive when the site is larger than one round loads, and the difference is the part nobody graded. */
+            pagesGraded: number;
+            /** @description Pages an approved plan calls for, when one exists — the audit's "92 against 30" */
+            pagesPlanned?: number | null;
+            brokenCount: number;
+            warningCount: number;
+            /** @description Pages publishing copy that already exists at another address */
+            duplicatePages: number;
+            /** @description Pages missing an opening answer, coded questions, or both */
+            pagesMissingAnswerLayer: number;
+        };
+        SiteContentReportPage: {
+            path: string;
+            title?: string | null;
+            staticScore?: number | null;
+            /** @enum {string|null} */
+            consistencyVerdict?: "BLOCK" | "WARN" | "CLEAR" | null;
+            aiBuyerQuestion?: string | null;
+            aiPresentsItselfAs?: string | null;
+            /** @enum {string|null} */
+            aiPositioning?: "ALIGNED" | "DRIFTED" | "CONTRADICTS" | null;
+            /** @description The AI half was carried from an earlier round rather than read in this one */
+            aiCarried?: boolean;
+            /** @description What the AI reading said this page should do next, when it said anything. */
+            aiRecommendation?: string | null;
+            findings: components["schemas"]["SiteContentReportFinding"][];
+            /** @description Figures this page commits to, as the round read them */
+            figures?: components["schemas"]["SiteContentFigure"][];
+        };
+        /** @description One finding against a page. The id is a string rather than an enum because a page collects findings from two vocabularies — the per-page audit's, and the site-level checks that happen to name a page (a cross-page collision, a plan violation). Pinning it to either enum makes the other a 500. */
+        SiteContentReportFinding: {
+            id: string;
+            title: string;
+            /** @enum {string} */
+            severity: "BROKEN" | "WARNING" | "WORKS";
+            detail: string;
+            fix?: string | null;
+            /** @description Reader-facing category name when the finding's id belongs to the site vocabulary; null for per-page audit checks, which have no category. */
+            area?: string | null;
+        };
+        SiteContentFigure: {
+            attribute: string;
+            valueRaw: string;
+            /** @description The sentence it was read from — the evidence a reader checks it against */
+            verbatim: string;
+            /**
+             * @description REGEX counted it; AI read it. Kept apart because they fail differently.
+             * @enum {string}
+             */
+            source: "REGEX" | "AI";
+        };
+        SiteContentPageHistoryResponse: {
+            path: string;
+            rounds: components["schemas"]["SiteContentPageRound"][];
+        };
+        /** @description What one round found about one page. */
+        SiteContentPageRound: {
+            runId: string;
+            /** Format: date-time */
+            analyzedAt: string;
+            /** @description Percentage of this page's graded build checks that passed. INFO checks are excluded from both halves — they report rather than grade, so counting them as failures would mark a page down for a check with no opinion. */
+            staticScore?: number | null;
+            /**
+             * @description How the page stood against the rest of the site in this round
+             * @enum {string|null}
+             */
+            consistencyVerdict?: "BLOCK" | "WARN" | "CLEAR" | null;
+            /**
+             * @description Null when no AI reading stood for this page in this round
+             * @enum {string|null}
+             */
+            aiPositioning?: "ALIGNED" | "DRIFTED" | "CONTRADICTS" | null;
+            aiBuyerQuestion?: string | null;
+            aiPresentsItselfAs?: string | null;
+            aiRecommendation?: string | null;
+            /** @description True when the AI half was carried forward from an earlier round because the page had not changed, rather than read again in this one. Without this a stale reading is indistinguishable from a fresh one. */
+            aiCarried: boolean;
+            /** @description The round that actually paid for the reading, when it was carried */
+            aiFromRunId?: string | null;
+        };
+        SiteContentRoundsResponse: {
+            rounds: components["schemas"]["SiteContentRound"][];
+        };
+        /** @description One crawl's analysis, and what it covered. */
+        SiteContentRound: {
+            id: string;
+            /** Format: date-time */
+            finishedAt: string;
+            pagesAudited: number;
+            siteChecksRun: number;
+            brokenCount: number;
+            warningCount: number;
+            /** @description Pages an AI reading stands for in this round — read fresh by this crawl, or carried forward because the page has not changed since it was read */
+            pagesAiAnalyzed: number;
+            /** @description Pages the round did not read with AI — over the per-round cap, past the load cap, or refused by the model. Reported rather than dropped: partial coverage that reads as complete is worse than none. */
+            pagesAiSkipped: number;
+            /**
+             * Format: date-time
+             * @description When the cross-page reading was run against this round. Null means nobody has asked, which is not the same as asked-and-found-nothing.
+             */
+            aiCrossAnalyzedAt?: string | null;
+        };
+        SiteSystemOfRecordResponse: {
+            /** @description Every check that ran, passes included, and empty when the project has no indexed page that kept its markup. A check with nothing to compare against is omitted entirely rather than reported as passing. */
+            checks: components["schemas"]["SiteSystemOfRecordCheck"][];
+            brokenCount: number;
+            warningCount: number;
+            /** @description A cross-page reading is in flight for this project. The reading is a job now, so the client polls this rather than holding a request open; the button stays disabled and the findings refresh when it clears. */
+            crossAnalysisRunning?: boolean;
+        };
     };
     responses: {
         /** @description Resource not found */
@@ -8128,6 +8801,8 @@ export interface components {
         AiVisibilityProvider: components["schemas"]["AiVisibilityProviderEnum"][];
         /** @description Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics. */
         AiVisibilityTopicFilter: string[];
+        /** @description Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected. */
+        AiVisibilityRegionFilter: components["schemas"]["AiVisibilityRegionEnum"][];
         /** @description Predefined date range preset. Takes precedence over from/to. */
         AiVisibilityPreset: components["schemas"]["DateRangePreset"];
         /** @description Start of the date window (inclusive, interpreted in the client timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window. */
@@ -8143,6 +8818,34 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    deleteAllProjectAgentConversations: {
+        parameters: {
+            query?: {
+                /** @description Scopes the clear to one workflow's shared conversation. */
+                workflowId?: string;
+            };
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description History cleared */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+        };
+    };
     updateCurrentUser: {
         parameters: {
             query?: never;
@@ -9817,6 +10520,8 @@ export interface operations {
                 to?: components["parameters"]["AiVisibilityTo"];
                 /** @description Client timezone (e.g. "Africa/Cairo") used to resolve preset/date boundaries; defaults to UTC. */
                 timezone?: components["parameters"]["AiVisibilityTimezone"];
+                /** @description Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected. */
+                regions?: components["parameters"]["AiVisibilityRegionFilter"];
             };
             header?: never;
             path: {
@@ -10012,6 +10717,65 @@ export interface operations {
             };
         };
     };
+    getAiVisibilityRegions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Available and selected regions retrieved */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiVisibilityRegionsResponse"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+        };
+    };
+    updateAiVisibilityRegions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AiVisibilityRegionsRequest"];
+            };
+        };
+        responses: {
+            /** @description Region selection updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiVisibilityRegionsResponse"];
+                };
+            };
+            400: components["responses"]["BadRequestError"];
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+        };
+    };
     getAiVisibilitySchedule: {
         parameters: {
             query?: never;
@@ -10129,7 +10893,10 @@ export interface operations {
     };
     listAiVisibilityJobRuns: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected. */
+                regions?: components["parameters"]["AiVisibilityRegionFilter"];
+            };
             header?: never;
             path: {
                 /** @description Organization slug */
@@ -10267,6 +11034,8 @@ export interface operations {
                 timezone?: components["parameters"]["AiVisibilityTimezone"];
                 /** @description Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics. */
                 topicIds?: components["parameters"]["AiVisibilityTopicFilter"];
+                /** @description Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected. */
+                regions?: components["parameters"]["AiVisibilityRegionFilter"];
             };
             header?: never;
             path: {
@@ -10311,6 +11080,8 @@ export interface operations {
                 timezone?: components["parameters"]["AiVisibilityTimezone"];
                 /** @description Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics. */
                 topicIds?: components["parameters"]["AiVisibilityTopicFilter"];
+                /** @description Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected. */
+                regions?: components["parameters"]["AiVisibilityRegionFilter"];
             };
             header?: never;
             path: {
@@ -10357,6 +11128,8 @@ export interface operations {
                 timezone?: components["parameters"]["AiVisibilityTimezone"];
                 /** @description Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics. */
                 topicIds?: components["parameters"]["AiVisibilityTopicFilter"];
+                /** @description Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected. */
+                regions?: components["parameters"]["AiVisibilityRegionFilter"];
             };
             header?: never;
             path: {
@@ -10407,6 +11180,8 @@ export interface operations {
                 timezone?: components["parameters"]["AiVisibilityTimezone"];
                 /** @description Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics. */
                 topicIds?: components["parameters"]["AiVisibilityTopicFilter"];
+                /** @description Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected. */
+                regions?: components["parameters"]["AiVisibilityRegionFilter"];
             };
             header?: never;
             path: {
@@ -10447,6 +11222,8 @@ export interface operations {
                 timezone?: components["parameters"]["AiVisibilityTimezone"];
                 /** @description Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics. */
                 topicIds?: components["parameters"]["AiVisibilityTopicFilter"];
+                /** @description Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected. */
+                regions?: components["parameters"]["AiVisibilityRegionFilter"];
                 /** @description AI engines to include. Repeat the parameter to select several; omitted or empty aggregates across every engine. There is no 'ALL' sentinel — an empty selection is what "all engines" means. */
                 providers?: components["parameters"]["AiVisibilityProvider"];
             };
@@ -10493,6 +11270,8 @@ export interface operations {
                 timezone?: components["parameters"]["AiVisibilityTimezone"];
                 /** @description Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics. */
                 topicIds?: components["parameters"]["AiVisibilityTopicFilter"];
+                /** @description Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected. */
+                regions?: components["parameters"]["AiVisibilityRegionFilter"];
             };
             header?: never;
             path: {
@@ -10535,6 +11314,10 @@ export interface operations {
                 to?: components["parameters"]["AiVisibilityTo"];
                 /** @description Client timezone (e.g. "Africa/Cairo") used to resolve preset/date boundaries; defaults to UTC. */
                 timezone?: components["parameters"]["AiVisibilityTimezone"];
+                /** @description Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected. */
+                regions?: components["parameters"]["AiVisibilityRegionFilter"];
+                /** @description Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics. */
+                topicIds?: components["parameters"]["AiVisibilityTopicFilter"];
             };
             header?: never;
             path: {
@@ -10577,6 +11360,8 @@ export interface operations {
                 timezone?: components["parameters"]["AiVisibilityTimezone"];
                 /** @description Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics. */
                 topicIds?: components["parameters"]["AiVisibilityTopicFilter"];
+                /** @description Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected. */
+                regions?: components["parameters"]["AiVisibilityRegionFilter"];
             };
             header?: never;
             path: {
@@ -10617,6 +11402,8 @@ export interface operations {
                 timezone?: components["parameters"]["AiVisibilityTimezone"];
                 /** @description Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics. */
                 topicIds?: components["parameters"]["AiVisibilityTopicFilter"];
+                /** @description Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected. */
+                regions?: components["parameters"]["AiVisibilityRegionFilter"];
                 /** @description AI engines to include. Repeat the parameter to select several; omitted or empty aggregates across every engine. There is no 'ALL' sentinel — an empty selection is what "all engines" means. */
                 providers?: components["parameters"]["AiVisibilityProvider"];
             };
@@ -10661,6 +11448,8 @@ export interface operations {
                 timezone?: components["parameters"]["AiVisibilityTimezone"];
                 /** @description Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics. */
                 topicIds?: components["parameters"]["AiVisibilityTopicFilter"];
+                /** @description Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected. */
+                regions?: components["parameters"]["AiVisibilityRegionFilter"];
             };
             header?: never;
             path: {
@@ -10701,6 +11490,8 @@ export interface operations {
                 timezone?: components["parameters"]["AiVisibilityTimezone"];
                 /** @description Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics. */
                 topicIds?: components["parameters"]["AiVisibilityTopicFilter"];
+                /** @description Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected. */
+                regions?: components["parameters"]["AiVisibilityRegionFilter"];
                 /** @description AI engines to include. Repeat the parameter to select several; omitted or empty aggregates across every engine. There is no 'ALL' sentinel — an empty selection is what "all engines" means. */
                 providers?: components["parameters"]["AiVisibilityProvider"];
             };
@@ -10750,6 +11541,397 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AiVisibilityRunDetailResponse"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            404: components["responses"]["NotFoundError"];
+        };
+    };
+    listAgentCharacters: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The characters available here */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgentCharacterListResponse"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+        };
+    };
+    runAgentCharacter: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+                characterId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RunAgentCharacterRequest"];
+            };
+        };
+        responses: {
+            /** @description What the character said */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgentCharacterRunResponse"];
+                };
+            };
+            /** @description No provider configured, or nothing to say */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+        };
+    };
+    auditSiteContentPage: {
+        parameters: {
+            query: {
+                /** @description The indexed page's path */
+                path: string;
+            };
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The page's audit */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContentAuditResponse"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+        };
+    };
+    analyzeSiteContentPageWithAi: {
+        parameters: {
+            query: {
+                path: string;
+            };
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The model's read of the page */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiPageAnalysisResponse"];
+                };
+            };
+            /** @description No AI provider configured, page not indexed, or the model declined */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+        };
+    };
+    getSiteSystemOfRecord: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The site-level checklist */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SiteSystemOfRecordResponse"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+        };
+    };
+    runSiteContentCrossAnalysis: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The reading was accepted, not performed. `started` is false when one was already in flight for this project. */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StartCrossAnalysisResponse"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+        };
+    };
+    getSiteContentPageHistory: {
+        parameters: {
+            query: {
+                /** @description The indexed page's path */
+                path: string;
+            };
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The page's rounds, newest first */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SiteContentPageHistoryResponse"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+        };
+    };
+    listSiteContentRounds: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The project's retained rounds */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SiteContentRoundsResponse"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+        };
+    };
+    listSpecDocs: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The project's planning documents */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SpecDocsResponse"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+        };
+    };
+    uploadSpecDoc: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UploadSpecDocRequest"];
+            };
+        };
+        responses: {
+            /** @description The document, with the rules read from it awaiting review */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SpecDocResponse"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+        };
+    };
+    listSpecRules: {
+        parameters: {
+            query?: {
+                /** @description Omit for all */
+                status?: "EXTRACTED" | "APPROVED" | "REJECTED";
+            };
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The project's rules */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SpecRulesResponse"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+        };
+    };
+    reviewSpecRule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+                ruleId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReviewSpecRuleRequest"];
+            };
+        };
+        responses: {
+            /** @description Recorded */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            404: components["responses"]["NotFoundError"];
+        };
+    };
+    getSiteContentReport: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+                roundId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The round's record */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SiteContentReportResponse"];
                 };
             };
             401: components["responses"]["UnauthorizedError"];

@@ -13,6 +13,7 @@ export default class AiVisibilityTopicsBreakdown extends ApiOperationCommand {
 		"from": Flags.string({ description: "Start of the date window (inclusive, interpreted in the client timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window.\n" }),
 		"to": Flags.string({ description: "End of the date window (inclusive, interpreted in the client timezone)." }),
 		"timezone": Flags.string({ description: "Client timezone (e.g. \"Africa/Cairo\") used to resolve preset/date boundaries; defaults to UTC." }),
+		"regions": Flags.string({ description: "Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected.\n", options: ["US","EU"], multiple: true }),
 	};
 
 	descriptor = descriptors["getAiVisibilityTopicsBreakdown"];
