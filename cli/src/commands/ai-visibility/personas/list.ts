@@ -4,8 +4,11 @@ import { Args, Flags } from "@oclif/core";
 import { ApiOperationCommand } from "../../../runtime/operation-command.js";
 import { descriptors } from "../../../generated/descriptors.js";
 
-export default class AiVisibilityRegionsUpdate extends ApiOperationCommand {
-	static description = "Set the regions this project runs";
+export default class AiVisibilityPersonasList extends ApiOperationCommand {
+	static description = "List buyer personas";
+	static flags = {
+		"includeArchived": Flags.boolean({  }),
+	};
 
-	descriptor = descriptors["updateAiVisibilityRegions"];
+	descriptor = descriptors["listAiVisibilityPersonas"];
 }

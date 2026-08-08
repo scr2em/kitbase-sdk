@@ -88,11 +88,17 @@ export abstract class ApiOperationCommand extends BaseCommand {
 		descriptor: OperationDescriptor,
 		flags: Record<string, unknown>,
 	): Promise<Record<string, unknown> | undefined> {
+		const provided = typeof flags.data === "string" ? await parseDataFlag(flags.data) : undefined;
+
+		// Array and object properties never become flags (see extractBodyFields),
+		// so an operation whose body holds only those — `prompts create`,
+		// `prompts bulk-delete` — has no bodyFields at all. Returning early here
+		// dropped the one way left to call them, `--data`.
 		if (descriptor.bodyFields.length === 0) {
-			return undefined;
+			return provided;
 		}
 
-		const body: Record<string, unknown> = typeof flags.data === "string" ? await parseDataFlag(flags.data) : {};
+		const body: Record<string, unknown> = provided ?? {};
 
 		for (const field of descriptor.bodyFields) {
 			if (flags[field] !== undefined) {

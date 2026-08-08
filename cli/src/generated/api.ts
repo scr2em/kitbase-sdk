@@ -893,6 +893,102 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/{orgSlug}/projects/{projectId}/ai-visibility/personas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List buyer personas */
+        get: operations["listAiVisibilityPersonas"];
+        put?: never;
+        /** Create a buyer persona */
+        post: operations["createAiVisibilityPersona"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/ai-visibility/personas/backfill": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Apply current persona assignments to legacy runs */
+        post: operations["backfillAiVisibilityPersonas"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/ai-visibility/personas/suggest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Draft candidate buyer personas
+         * @description Drafts 2-3 personas from the brand name and domain. Nothing is persisted: the drafts are returned for the caller to edit and save through the create endpoint, because an unreviewed auto-generated persona is reliably too broad to change which prompts get written.
+         */
+        post: operations["suggestAiVisibilityPersonas"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/ai-visibility/personas/{personaId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update a buyer persona */
+        put: operations["updateAiVisibilityPersona"];
+        post?: never;
+        /**
+         * Archive a buyer persona
+         * @description Archiving unassigns the persona from its prompts. Historical runs keep their snapshotted persona, so past reporting is unchanged.
+         */
+        delete: operations["deleteAiVisibilityPersona"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/ai-visibility/personas-breakdown": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Per-persona visibility and share of voice
+         * @description One row per persona, plus a row for prompts with no persona. Because a prompt has exactly one persona, every run lands in exactly one row — so these shares are directly summable, unlike a tag-style grouping where a run counted under several personas would double-count.
+         */
+        get: operations["getAiVisibilityPersonasBreakdown"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/{orgSlug}/projects/{projectId}/ai-visibility/prompts": {
         parameters: {
             query?: never;
@@ -917,6 +1013,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/{orgSlug}/projects/{projectId}/ai-visibility/prompts/bulk-move": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Move AI visibility prompts to a topic (bulk)
+         * @description Re-assigns every listed prompt to one topic in a single transaction. All or nothing: an unknown prompt id, or a topic that is not an active topic of this project, fails the whole call and moves nothing.
+         */
+        post: operations["bulkMoveAiVisibilityPrompts"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/ai-visibility/prompts/bulk-delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Delete AI visibility prompts (bulk)
+         * @description Permanently deletes every listed prompt in a single transaction. Their runs and computed metrics go with them, so periods that included them lose their contribution to the aggregates. All or nothing: an unknown prompt id fails the whole call and deletes nothing. To stop prompts from running while keeping their history, set `active: false` via PUT instead.
+         */
+        post: operations["bulkDeleteAiVisibilityPrompts"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/{orgSlug}/projects/{projectId}/ai-visibility/prompts/{promptId}": {
         parameters: {
             query?: never;
@@ -929,8 +1065,8 @@ export interface paths {
         put: operations["updateAiVisibilityPrompt"];
         post?: never;
         /**
-         * Deactivate AI visibility prompt
-         * @description Soft-deletes (deactivates) a prompt so its historical run data is preserved.
+         * Delete AI visibility prompt
+         * @description Permanently deletes a prompt. Its runs and computed metrics are deleted with it, so periods that included it lose its contribution to the aggregates. To stop a prompt from running while keeping its history, set `active: false` via PUT instead.
          */
         delete: operations["deleteAiVisibilityPrompt"];
         options?: never;
@@ -986,15 +1122,11 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Regions available to this organization and selected by this project
-         * @description The geographic vantage points this project can be measured from, resolved server-side: US always, plus any region the organization is entitled to (hidden billing feature ai_visibility_regions_enabled), together with the project's own current selection. Clients render the region filter only when `available` has more than one entry — the entitlement is never derived on the client, and hidden features are absent from the billing payloads anyway.
+         * Regions this project is measured from
+         * @description The geographic vantage points this project's prompts are asked from, resolved server-side from the organization's `ai_visibility_regions` entitlement (hidden, granted by support). Always contains US. Each entry carries the countries the region covers, for display. Read-only — the customer does not choose these. Clients render the region filter only when more than one region is returned, and never derive entitlement themselves.
          */
         get: operations["getAiVisibilityRegions"];
-        /**
-         * Set the regions this project runs
-         * @description Replaces the project's region selection. Every region must be one the organization is entitled to, and at least one is required. Each prompt runs once per selected region, so adding one adds a full pass of every prompt on every engine, and multiplies the run's draw on the organization's monthly spend budget accordingly. A region covering several countries (EU) is sampled per prompt rather than queried in every country, so it costs the same per run as a single-country one.
-         */
-        put: operations["updateAiVisibilityRegions"];
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -1241,6 +1373,26 @@ export interface paths {
          * @description Presence and citation totals per AI provider aggregated over the most recent completed jobs.
          */
         get: operations["getAiVisibilityBreakdown"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/ai-visibility/paid-placements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Sponsored placements inside AI answers
+         * @description Who is buying ad slots inside the AI answers for this project's prompts, and on which prompts. Read from the SERP responses the tracked engines already return, so it costs nothing extra to collect.
+         */
+        get: operations["getAiVisibilityPaidPlacements"];
         put?: never;
         post?: never;
         delete?: never;
@@ -3249,6 +3401,33 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/{orgSlug}/projects/{projectId}/web-analytics/activity-heatmap": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get visitor activity by hour of day
+         * @description Get distinct visitors per (row, hour-of-day) cell — the "when do people visit" heatmap.
+         *     Rows are either the seven weekdays or the busiest countries, and hours are bucketed in
+         *     the requested timezone.
+         *
+         *     A heatmap needs at least a week of days to be readable, so a selected range narrower
+         *     than 7 days is widened to the last 7 days; wider ranges are used as selected. The
+         *     window actually queried is echoed back in the response's from/to.
+         *     Requires analytics.view permission.
+         */
+        get: operations["getProjectWebAnalyticsActivityHeatmap"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/{orgSlug}/projects/{projectId}/web-analytics/breakdown": {
         parameters: {
             query?: never;
@@ -3876,12 +4055,12 @@ export interface components {
          *     The marketplace_order_* values are the worked example of that failure: AbstractMarketplaceOrderNotificationHandler has been writing them as IN_APP rows while they were absent here, so the list endpoint 500'd permanently for every member of an org that had ever placed an order, with no way to clear the unreadable row.
          * @enum {string}
          */
-        NotificationTypeEnum: "invitation_received" | "build_completed" | "member_joined" | "member_removed" | "log_rate_exceeded" | "role_updated" | "data_retention_cleanup" | "data_retention_warning" | "admin_broadcast" | "backlink_detected" | "payment_failed" | "export_completed" | "workflow_report" | "workflow_approval_requested" | "marketplace_order_paid" | "marketplace_order_published" | "marketplace_order_revision_requested" | "marketplace_order_rejected" | "marketplace_order_link_lost" | "marketplace_order_refunded";
+        NotificationTypeEnum: "invitation_received" | "build_completed" | "member_joined" | "member_removed" | "log_rate_exceeded" | "usage_limit_warning" | "role_updated" | "data_retention_cleanup" | "data_retention_warning" | "admin_broadcast" | "backlink_detected" | "payment_failed" | "export_completed" | "workflow_report" | "workflow_approval_requested" | "marketplace_order_paid" | "marketplace_order_published" | "marketplace_order_revision_requested" | "marketplace_order_rejected" | "marketplace_order_link_lost" | "marketplace_order_refunded";
         /**
          * @description Event types that can trigger webhook deliveries
          * @enum {string}
          */
-        WebhookEventTypeEnum: "invitation_received" | "build_completed" | "member_joined" | "member_removed" | "log_rate_exceeded" | "role_updated" | "data_retention_cleanup" | "data_retention_warning" | "organization_created" | "organization_updated" | "invitation_accepted" | "invitation_canceled" | "invitation_revoked" | "project_created" | "project_updated" | "project_deleted" | "environment_created" | "environment_updated" | "environment_deleted" | "feature_flag_created" | "feature_flag_updated" | "feature_flag_deleted" | "segment_created" | "segment_updated" | "segment_deleted" | "sdk_key_created" | "sdk_key_deleted" | "api_key_created" | "api_key_deleted" | "ota_update_deployed" | "webhook_created" | "webhook_updated" | "webhook_deleted" | "payment_failed" | "custom_event_created" | "backlink_detected";
+        WebhookEventTypeEnum: "invitation_received" | "build_completed" | "member_joined" | "member_removed" | "log_rate_exceeded" | "usage_limit_warning" | "role_updated" | "data_retention_cleanup" | "data_retention_warning" | "organization_created" | "organization_updated" | "invitation_accepted" | "invitation_canceled" | "invitation_revoked" | "project_created" | "project_updated" | "project_deleted" | "environment_created" | "environment_updated" | "environment_deleted" | "feature_flag_created" | "feature_flag_updated" | "feature_flag_deleted" | "segment_created" | "segment_updated" | "segment_deleted" | "sdk_key_created" | "sdk_key_deleted" | "api_key_created" | "api_key_deleted" | "ota_update_deployed" | "webhook_created" | "webhook_updated" | "webhook_deleted" | "payment_failed" | "custom_event_created" | "backlink_detected";
         /**
          * @description The framework or technology type of the project
          * @enum {string}
@@ -4509,7 +4688,7 @@ export interface components {
              */
             uniqueUsers: number;
         };
-        /** @description Project-level data-collection settings (server enforcement + SDK autocapture). */
+        /** @description Project-level settings: data collection (server enforcement + SDK autocapture) and reporting. */
         ProjectSettingsResponse: {
             /** @description Whether event ingestion is enabled for the project. */
             eventsEnabled: boolean;
@@ -4527,6 +4706,11 @@ export interface components {
             autoTrackScrollDepth: boolean;
             /** @description SDK autocapture of element visibility. */
             autoTrackVisibility: boolean;
+            /**
+             * @description IANA timezone every analytics date boundary for this project is resolved in — presets ("last 7 days"), from/to days, and time-series buckets. Server-held, so the dashboard, the assistant, the API, and exports all describe the same period identically. Defaults to UTC.
+             * @example Africa/Cairo
+             */
+            reportingTimezone: string;
         };
         /** @description Partial update of project settings. Only provided fields are changed. */
         UpdateProjectSettingsRequest: {
@@ -4538,6 +4722,11 @@ export interface components {
             autoTrackClicks?: boolean;
             autoTrackScrollDepth?: boolean;
             autoTrackVisibility?: boolean;
+            /**
+             * @description IANA timezone id, e.g. "Africa/Cairo" or "UTC". Rejected with VAL_001 if it is not a zone the server knows.
+             * @example Africa/Cairo
+             */
+            reportingTimezone?: string;
         };
         /** @description Project analytics data including events and storage metrics */
         ProjectAnalyticsResponse: {
@@ -6242,6 +6431,57 @@ export interface components {
             previousPeriod: components["schemas"]["FlexibleWebTimelinePeriod"];
             granularity: components["schemas"]["TimelineInterval"];
         };
+        /**
+         * @description What the rows of the visitor activity heatmap are grouped by
+         * @enum {string}
+         */
+        ActivityHeatmapRowDimension: "day_of_week" | "country";
+        /** @description Unique visitors in one hour-of-day bucket of a heatmap row */
+        ActivityHeatmapCell: {
+            /** @description Hour of the day (0-23) in the requested timezone */
+            hour: number;
+            /** @description Distinct visitors whose session started in this hour bucket */
+            visitors: number;
+        };
+        /** @description One row of the heatmap, always carrying all 24 hourly cells so the grid is complete. */
+        ActivityHeatmapRow: {
+            /**
+             * @description Row identity, interpreted per the response's rowDimension:
+             *     the ISO day number as a string ("1" = Monday … "7" = Sunday) for day_of_week,
+             *     or the country value (ISO alpha-2 code, or "Unknown") for country.
+             */
+            key: string;
+            /** @description The 24 hourly cells, ordered by hour ascending */
+            cells: components["schemas"]["ActivityHeatmapCell"][];
+        };
+        /**
+         * @description Distinct visitors per (row, hour-of-day) cell, for the "when do people visit" heatmap.
+         *
+         *     Cells count distinct visitors within their own bucket and therefore do not sum to the
+         *     period total — the same person browsing on Monday and Tuesday counts in both rows.
+         *     Over windows longer than a week a day_of_week cell aggregates every occurrence of that
+         *     weekday in the window, so weekdays that occur one extra time read slightly higher.
+         */
+        WebAnalyticsActivityHeatmapResponse: {
+            rowDimension: components["schemas"]["ActivityHeatmapRowDimension"];
+            /**
+             * Format: date
+             * @description First day actually queried, in the requested timezone. The heatmap needs at least a
+             *     week of days to be readable, so a narrower selected range is widened to the last
+             *     7 days; wider ranges are used as selected. Echoed so the UI can label the window.
+             */
+            from: string;
+            /**
+             * Format: date
+             * @description Last day actually queried (inclusive), in the requested timezone
+             */
+            to: string;
+            /**
+             * @description All 7 weekdays (Monday first) for day_of_week, or the busiest countries ordered by
+             *     total visitors descending for country.
+             */
+            rows: components["schemas"]["ActivityHeatmapRow"][];
+        };
         /** @description Bot/crawler request counts over time, grouped by vendor, for per-vendor bar charts. */
         BotVendorTimelineResponse: {
             interval: components["schemas"]["TimelineInterval"];
@@ -6525,11 +6765,6 @@ export interface components {
             name: string;
             /** @description Number of events/sessions for this value */
             count: number;
-            /**
-             * Format: double
-             * @description Percentage of total
-             */
-            percentage: number;
             /** @description Number of unique visitors (only present for top_page dimension) */
             visitors?: number;
             /** @description Total page views (only present for top_page dimension) */
@@ -7000,6 +7235,8 @@ export interface components {
             id: string;
             provider: components["schemas"]["IntegrationProviderEnum"];
             status: components["schemas"]["IntegrationStatusEnum"];
+            /** @description True when the grant this install holds no longer covers everything the app asks for, so the workspace has to go through OAuth again. An active install in this state keeps working for anything we send outbound while silently receiving nothing — the assistant is unreachable from chat until it is reconnected. Installs made before granted scopes were recorded read as true, because there is no way to tell what they were given. */
+            reconnectRequired?: boolean;
             /** @description Slack workspace ID */
             teamId?: string;
             /** @description Slack workspace name */
@@ -7247,7 +7484,7 @@ export interface components {
          * @description Available billing feature codes
          * @enum {string}
          */
-        BillingFeatureCodeEnum: "max_organizations" | "max_projects" | "max_team_members" | "max_feature_flags" | "data_retention_days" | "events_per_month" | "feature_flag_segments" | "audit_logs" | "sso" | "webhooks" | "api_access" | "priority_support" | "custom_events_enabled" | "custom_dashboards" | "ai_visibility_max_prompts" | "bot_events_per_month" | "ai_visibility_runs_per_month" | "engagement_max_keywords" | "ai_visibility_providers" | "ai_visibility_max_projects" | "ai_visibility_run_interval_days" | "ai_visibility_regions_enabled" | "monthly_budget_usd" | "free_monthly_budget_usd" | "backlinks_refresh_interval_days" | "workflows_enabled" | "max_active_workflows" | "workflow_runs_per_month";
+        BillingFeatureCodeEnum: "max_organizations" | "max_projects" | "max_team_members" | "max_feature_flags" | "data_retention_days" | "events_per_month" | "feature_flag_segments" | "audit_logs" | "sso" | "webhooks" | "api_access" | "priority_support" | "custom_events_enabled" | "custom_dashboards" | "ai_visibility_max_prompts" | "ai_visibility_max_personas" | "bot_events_per_month" | "ai_visibility_runs_per_month" | "engagement_max_keywords" | "ai_visibility_providers" | "ai_visibility_max_projects" | "ai_visibility_run_interval_days" | "ai_visibility_regions" | "monthly_budget_usd" | "free_monthly_budget_usd" | "backlinks_refresh_interval_days" | "workflows_enabled" | "max_active_workflows" | "workflow_runs_per_month";
         /** @description A billing plan available in the system */
         BillingPlanResponse: {
             /** @description Unique plan identifier */
@@ -7583,6 +7820,8 @@ export interface components {
             active: boolean;
             /** @description Alternative names matched in AI answers (stored lowercased) */
             aliases?: string[];
+            /** @description Topics this competitor is NOT tracked in — it is treated as absent from every run tagged with one of them, so those runs leave both its numerator and its denominator. Replaces the whole set: send an empty array to clear it. On PUT, OMITTING the field leaves the current scope untouched (unlike aliases), so a client that predates this field cannot wipe it. Rejected for the self brand; uncategorized prompts always count. */
+            excludedTopicIds?: string[];
         };
         AiVisibilityBrandResponse: {
             id?: string;
@@ -7591,6 +7830,8 @@ export interface components {
             isSelf?: boolean;
             active?: boolean;
             aliases?: string[];
+            /** @description Topics this competitor is not tracked in; empty means tracked everywhere */
+            excludedTopicIds?: string[];
             /** Format: date-time */
             createdAt?: string;
         };
@@ -7607,6 +7848,8 @@ export interface components {
             active: boolean;
             /** @description Topic assignment. On PUT, omitted or null clears the assignment. */
             topicId?: string | null;
+            /** @description Persona assignment. On PUT, omitted or null clears the assignment. */
+            personaId?: string | null;
         };
         AiVisibilityPromptSuggestionsRequest: {
             brandName: string;
@@ -7616,13 +7859,37 @@ export interface components {
              * @default 8
              */
             count: number;
+            /** @description Active persona ids to write for. The generated queries carry each persona's context as a natural clause ("...for a 20-person remote design agency"); omitted or empty generates persona-neutral queries. */
+            personaIds?: string[];
+        };
+        AiVisibilityPromptSuggestion: {
+            text?: string;
+            /** @description The persona this query was written for, if any. */
+            personaId?: string | null;
+            personaName?: string | null;
+            /** @description One line on why this query is worth tracking. */
+            reason?: string;
+            /** @description Suggested tier ('buying' | 'category' | 'branded') */
+            intentTier?: string;
         };
         AiVisibilityPromptSuggestionsResponse: {
             /** @description Candidate prompts for review — not persisted */
-            prompts?: string[];
+            suggestions?: components["schemas"]["AiVisibilityPromptSuggestion"][];
         };
         CreateAiVisibilityPromptsRequest: {
             prompts: components["schemas"]["AiVisibilityPromptRequest"][];
+        };
+        AiVisibilityPromptBulkMoveRequest: {
+            promptIds: string[];
+            /** @description Topic to move every listed prompt into. Omitted or null moves them out of whatever topic they are in. Unlike PUT on a single prompt, there is no "leave the topic alone" case here — setting the topic is the entire operation. */
+            topicId?: string | null;
+        };
+        AiVisibilityPromptBulkDeleteRequest: {
+            promptIds: string[];
+        };
+        AiVisibilityPromptBulkResponse: {
+            /** @description How many prompts the call changed. */
+            affected?: number;
         };
         AiVisibilityPromptResponse: {
             id?: string;
@@ -7632,6 +7899,8 @@ export interface components {
             active?: boolean;
             topicId?: string | null;
             topicName?: string | null;
+            personaId?: string | null;
+            personaName?: string | null;
             /** Format: date-time */
             createdAt?: string;
         };
@@ -7657,13 +7926,7 @@ export interface components {
          */
         AiVisibilityRegionEnum: "US" | "EU";
         AiVisibilityRegionsResponse: {
-            /** @description Regions the organization may measure from, resolved server-side. Always contains US; more appear only when the organization is entitled to multi-region tracking. Clients render the region filter ONLY when this list has more than one entry — never from a hardcoded list, and never by inspecting billing features. */
-            available: components["schemas"]["AiVisibilityRegionEnum"][];
-            /** @description Regions this project currently runs and reports on (never empty; defaults to US for a project that never opted in). */
-            selected: components["schemas"]["AiVisibilityRegionEnum"][];
-        };
-        AiVisibilityRegionsRequest: {
-            /** @description Regions this project should run. At least one; every entry must be one the organization is entitled to. Each added region adds one more pass of every prompt on every engine — the cost multiplier is the number of regions, not the number of countries they cover. */
+            /** @description The regions this project is measured from, resolved server-side, never empty (US at minimum). Read-only: the set is granted per organization by support, not chosen by the customer, so there is no corresponding write endpoint. A region is the whole unit of meaning here — the concrete countries it samples are an internal detail and are deliberately not exposed. */
             regions: components["schemas"]["AiVisibilityRegionEnum"][];
         };
         AiVisibilityScheduleResponse: {
@@ -7976,8 +8239,79 @@ export interface components {
             answerText?: string | null;
             citations?: components["schemas"]["AiVisibilityCitationEntry"][];
             mentions?: components["schemas"]["AiVisibilityMentionEntry"][];
+            /** @description Advertisements Google rendered inside this answer. Always empty for engines whose answers cannot carry ads (every chat provider). */
+            paidPlacements?: components["schemas"]["AiVisibilityPaidPlacementEntry"][];
             /** Format: date-time */
             finishedAt?: string | null;
+        };
+        /** @description One sponsored result shown inside an AI answer. */
+        AiVisibilityPaidPlacementEntry: {
+            /** @description Order the ad was rendered in within the answer */
+            position?: number;
+            /**
+             * @description Alignment of the sponsored block; null when the provider did not report one
+             * @enum {string|null}
+             */
+            blockPosition?: "LEFT" | "RIGHT" | null;
+            /** @description The answer's own lead-in to the sponsored block */
+            blockText?: string | null;
+            /** @description The advertiser's homepage — NOT the ad's landing page. Google does not expose the destination without following the ad click referral. */
+            advertiserUrl?: string | null;
+            /** @description Advertiser's registrable domain (eTLD+1); null when normalization failed */
+            normalizedDomain?: string | null;
+            /**
+             * @description The advertiser's relationship to this project's tracked brands; null when the domain is unknown
+             * @enum {string|null}
+             */
+            classification?: "SELF" | "COMPETITOR" | "OTHER" | null;
+            title?: string | null;
+            snippet?: string | null;
+            websiteName?: string | null;
+            breadcrumb?: string | null;
+        };
+        /** @description One advertiser's presence across the aggregated jobs. */
+        AiVisibilityPaidAdvertiserEntry: {
+            domain?: string;
+            /** @enum {string} */
+            classification?: "SELF" | "COMPETITOR" | "OTHER";
+            /** @description Set when the advertiser matches one of the project's tracked brands */
+            brandId?: string | null;
+            brandName?: string | null;
+            /** @description Times this advertiser was shown across the aggregated answers */
+            placementCount?: number;
+            /** @description Distinct prompts whose answers carried this advertiser's ad */
+            promptCount?: number;
+            /** @description Engines whose answers carried this advertiser's ad */
+            providers?: string[];
+            /** @description One of the advertiser's ad headlines, as competitor messaging intel */
+            sampleTitle?: string | null;
+            sampleSnippet?: string | null;
+        };
+        /** @description One prompt whose answers carried advertising. */
+        AiVisibilityPaidPromptEntry: {
+            promptId?: string;
+            promptText?: string | null;
+            placementCount?: number;
+            /** @description Answers for this prompt that carried at least one ad */
+            runsWithAds?: number;
+            advertiserDomains?: string[];
+            /** @description How many of those advertisers are tracked competitors of this project */
+            competitorAdvertisers?: number;
+            /** @description True when the project's own brand was named organically in at least one of this prompt's ad-carrying answers — i.e. someone is paying for a slot on an answer this brand already earned. */
+            selfMentioned?: boolean;
+        };
+        /** @description Sponsored placements inside AI answers, aggregated over the same job window as every other AI visibility read. Only engines that read a SERP can report ads, so the measured counts are scoped to those engines — a zero here means "no ads were shown", never "we did not look". */
+        AiVisibilityPaidPlacementsResponse: {
+            /** @description The ad-reporting engines this response was computed for */
+            providers?: components["schemas"]["AiVisibilityProviderEnum"][];
+            jobsIncluded?: number;
+            /** @description Distinct prompts actually asked on an ad-reporting engine in this window */
+            promptsMeasured?: number;
+            promptsWithAds?: number;
+            runsMeasured?: number;
+            runsWithAds?: number;
+            advertisers?: components["schemas"]["AiVisibilityPaidAdvertiserEntry"][];
+            prompts?: components["schemas"]["AiVisibilityPaidPromptEntry"][];
         };
         AiVisibilityShareOfVoiceEntry: {
             brandId?: string;
@@ -8095,7 +8429,7 @@ export interface components {
             /** Format: date-time */
             createdAt?: string;
         };
-        AiVisibilityTopicBrandMetrics: {
+        AiVisibilityBreakdownBrandMetrics: {
             brandId?: string;
             brandName?: string;
             isSelf?: boolean;
@@ -8109,7 +8443,7 @@ export interface components {
             archived?: boolean;
             promptsWithRuns?: number;
             runCount?: number;
-            brands?: components["schemas"]["AiVisibilityTopicBrandMetrics"][];
+            brands?: components["schemas"]["AiVisibilityBreakdownBrandMetrics"][];
         };
         AiVisibilityTopicsBreakdownResponse: {
             topics?: components["schemas"]["AiVisibilityTopicBreakdownEntry"][];
@@ -8122,6 +8456,53 @@ export interface components {
         AiVisibilityTopicBackfillResponse: {
             eligibleRuns?: number;
             runsRetagged?: number | null;
+        };
+        AiVisibilityPersonaRequest: {
+            name: string;
+            /** @description 3-5 sentences covering this buyer's goals, pain points, and the vocabulary they would actually type. Used to seed prompt generation and to label results — never sent to an answer engine. */
+            description: string;
+        };
+        AiVisibilityPersonaResponse: {
+            id?: string;
+            name?: string;
+            description?: string;
+            promptCount?: number;
+            archived?: boolean;
+            /** Format: date-time */
+            createdAt?: string;
+        };
+        AiVisibilityPersonaBreakdownEntry: {
+            /** @description Null is the "no persona" bucket. */
+            personaId?: string | null;
+            personaName?: string | null;
+            archived?: boolean;
+            promptsWithRuns?: number;
+            runCount?: number;
+            brands?: components["schemas"]["AiVisibilityBreakdownBrandMetrics"][];
+        };
+        AiVisibilityPersonasBreakdownResponse: {
+            personas?: components["schemas"]["AiVisibilityPersonaBreakdownEntry"][];
+        };
+        AiVisibilityPersonaBackfillRequest: {
+            promptIds?: string[];
+            /** @default false */
+            dryRun: boolean;
+        };
+        AiVisibilityPersonaBackfillResponse: {
+            eligibleRuns?: number;
+            runsRetagged?: number | null;
+        };
+        AiVisibilityPersonaSuggestionsRequest: {
+            brandName: string;
+            primaryDomain?: string;
+        };
+        AiVisibilityPersonaDraft: {
+            name?: string;
+            description?: string;
+        };
+        AiVisibilityPersonaSuggestionsResponse: {
+            /** @description Drafts for review — nothing is persisted. An auto-generated persona is reliably too broad to be useful, so it becomes real only when someone edits and saves it. */
+            personas?: components["schemas"]["AiVisibilityPersonaDraft"][];
         };
         /** @description The cross-page reading is a job, not a response. It is one model call carrying the whole inventory — a minute or more — and holding a connection for it lost answers that had already been paid for whenever a proxy timed out or a tab closed. */
         StartCrossAnalysisResponse: {
@@ -10545,6 +10926,222 @@ export interface operations {
             };
         };
     };
+    listAiVisibilityPersonas: {
+        parameters: {
+            query?: {
+                includeArchived?: boolean;
+            };
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Personas retrieved */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiVisibilityPersonaResponse"][];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+        };
+    };
+    createAiVisibilityPersona: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AiVisibilityPersonaRequest"];
+            };
+        };
+        responses: {
+            /** @description Persona created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiVisibilityPersonaResponse"];
+                };
+            };
+            400: components["responses"]["ValidationError"];
+            409: components["responses"]["ConflictError"];
+        };
+    };
+    backfillAiVisibilityPersonas: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AiVisibilityPersonaBackfillRequest"];
+            };
+        };
+        responses: {
+            /** @description Backfill preview or result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiVisibilityPersonaBackfillResponse"];
+                };
+            };
+            400: components["responses"]["ValidationError"];
+        };
+    };
+    suggestAiVisibilityPersonas: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AiVisibilityPersonaSuggestionsRequest"];
+            };
+        };
+        responses: {
+            /** @description Persona drafts generated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiVisibilityPersonaSuggestionsResponse"];
+                };
+            };
+            400: components["responses"]["ValidationError"];
+        };
+    };
+    updateAiVisibilityPersona: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+                personaId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AiVisibilityPersonaRequest"];
+            };
+        };
+        responses: {
+            /** @description Persona updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiVisibilityPersonaResponse"];
+                };
+            };
+            404: components["responses"]["NotFoundError"];
+            409: components["responses"]["ConflictError"];
+        };
+    };
+    deleteAiVisibilityPersona: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+                personaId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Persona archived */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            404: components["responses"]["NotFoundError"];
+        };
+    };
+    getAiVisibilityPersonasBreakdown: {
+        parameters: {
+            query?: {
+                /** @description AI engines to include. Repeat the parameter to select several; omitted or empty aggregates across every engine. There is no 'ALL' sentinel — an empty selection is what "all engines" means. */
+                providers?: components["parameters"]["AiVisibilityProvider"];
+                jobs?: number;
+                /** @description Predefined date range preset. Takes precedence over from/to. */
+                preset?: components["parameters"]["AiVisibilityPreset"];
+                /** @description Start of the date window (inclusive, interpreted in the client timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window. */
+                from?: components["parameters"]["AiVisibilityFrom"];
+                /** @description End of the date window (inclusive, interpreted in the client timezone). */
+                to?: components["parameters"]["AiVisibilityTo"];
+                /** @description Client timezone (e.g. "Africa/Cairo") used to resolve preset/date boundaries; defaults to UTC. */
+                timezone?: components["parameters"]["AiVisibilityTimezone"];
+                /** @description Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected. */
+                regions?: components["parameters"]["AiVisibilityRegionFilter"];
+            };
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Persona breakdown retrieved */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiVisibilityPersonasBreakdownResponse"];
+                };
+            };
+        };
+    };
     listAiVisibilityPrompts: {
         parameters: {
             query?: never;
@@ -10604,6 +11201,72 @@ export interface operations {
             403: components["responses"]["ForbiddenError"];
         };
     };
+    bulkMoveAiVisibilityPrompts: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AiVisibilityPromptBulkMoveRequest"];
+            };
+        };
+        responses: {
+            /** @description Prompts moved */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiVisibilityPromptBulkResponse"];
+                };
+            };
+            400: components["responses"]["ValidationError"];
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            404: components["responses"]["NotFoundError"];
+        };
+    };
+    bulkDeleteAiVisibilityPrompts: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AiVisibilityPromptBulkDeleteRequest"];
+            };
+        };
+        responses: {
+            /** @description Prompts deleted */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiVisibilityPromptBulkResponse"];
+                };
+            };
+            400: components["responses"]["ValidationError"];
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            404: components["responses"]["NotFoundError"];
+        };
+    };
     updateAiVisibilityPrompt: {
         parameters: {
             query?: never;
@@ -10653,7 +11316,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Prompt deactivated successfully */
+            /** @description Prompt deleted */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -10731,7 +11394,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Available and selected regions retrieved */
+            /** @description Regions retrieved */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -10740,38 +11403,6 @@ export interface operations {
                     "application/json": components["schemas"]["AiVisibilityRegionsResponse"];
                 };
             };
-            401: components["responses"]["UnauthorizedError"];
-            403: components["responses"]["ForbiddenError"];
-        };
-    };
-    updateAiVisibilityRegions: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Organization slug */
-                orgSlug: components["parameters"]["OrgSlugPath"];
-                /** @description Project ID */
-                projectId: components["parameters"]["projectIdPathParam"];
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["AiVisibilityRegionsRequest"];
-            };
-        };
-        responses: {
-            /** @description Region selection updated */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AiVisibilityRegionsResponse"];
-                };
-            };
-            400: components["responses"]["BadRequestError"];
             401: components["responses"]["UnauthorizedError"];
             403: components["responses"]["ForbiddenError"];
         };
@@ -11245,6 +11876,50 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AiVisibilityBreakdownResponse"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+        };
+    };
+    getAiVisibilityPaidPlacements: {
+        parameters: {
+            query?: {
+                /** @description Number of most recent completed jobs to aggregate (ignored when from/to set) */
+                jobs?: number;
+                /** @description Predefined date range preset. Takes precedence over from/to. */
+                preset?: components["parameters"]["AiVisibilityPreset"];
+                /** @description Start of the date window (inclusive, interpreted in the client timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window. */
+                from?: components["parameters"]["AiVisibilityFrom"];
+                /** @description End of the date window (inclusive, interpreted in the client timezone). */
+                to?: components["parameters"]["AiVisibilityTo"];
+                /** @description Client timezone (e.g. "Africa/Cairo") used to resolve preset/date boundaries; defaults to UTC. */
+                timezone?: components["parameters"]["AiVisibilityTimezone"];
+                /** @description Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics. */
+                topicIds?: components["parameters"]["AiVisibilityTopicFilter"];
+                /** @description Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected. */
+                regions?: components["parameters"]["AiVisibilityRegionFilter"];
+                /** @description AI engines to include. Repeat the parameter to select several; omitted or empty aggregates across every engine. There is no 'ALL' sentinel — an empty selection is what "all engines" means. */
+                providers?: components["parameters"]["AiVisibilityProvider"];
+            };
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Paid placements retrieved successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiVisibilityPaidPlacementsResponse"];
                 };
             };
             401: components["responses"]["UnauthorizedError"];
@@ -15248,6 +15923,54 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["FlexibleWebTimelineResponse"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+        };
+    };
+    getProjectWebAnalyticsActivityHeatmap: {
+        parameters: {
+            query: {
+                /** @description What the rows are grouped by. Defaults to day_of_week. */
+                rowDimension?: components["schemas"]["ActivityHeatmapRowDimension"];
+                /** @description Predefined date range preset. When provided, overrides from/to parameters. */
+                preset?: components["schemas"]["DateRangePreset"];
+                /** @description Start date for the analytics period (inclusive, YYYY-MM-DD). Defaults to 7 days ago. */
+                from?: string;
+                /** @description End date for the analytics period (inclusive, YYYY-MM-DD). Defaults to today. */
+                to?: string;
+                /**
+                 * @description Dimension filters in format dimension:operator:values.
+                 *     Operator is 'is' (include) or 'is_not' (exclude).
+                 *     Values are comma-separated. Can specify multiple filters.
+                 *     Example: filters=country:is:US,UK&filters=browser:is_not:Safari
+                 */
+                filters?: string[];
+                /**
+                 * @description Client timezone (e.g. "Africa/Cairo", "America/New_York"). Both the date boundaries
+                 *     and the hour/weekday buckets are resolved in this zone.
+                 */
+                timezone: string;
+            };
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Visitor activity heatmap */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WebAnalyticsActivityHeatmapResponse"];
                 };
             };
             401: components["responses"]["UnauthorizedError"];

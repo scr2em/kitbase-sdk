@@ -4,11 +4,11 @@ import { Args, Flags } from "@oclif/core";
 import { ApiOperationCommand } from "../../../runtime/operation-command.js";
 import { descriptors } from "../../../generated/descriptors.js";
 
-export default class AiVisibilityPromptsDelete extends ApiOperationCommand {
-	static description = "Delete AI visibility prompt";
+export default class AiVisibilityPersonasDelete extends ApiOperationCommand {
+	static description = "Archive a buyer persona";
 	static args = {
-		"promptId": Args.string({ description: "promptId", required: true }),
+		"personaId": Args.string({ description: "personaId", required: true }),
 	};
 
-	descriptor = descriptors["deleteAiVisibilityPrompt"];
+	descriptor = descriptors["deleteAiVisibilityPersona"];
 }

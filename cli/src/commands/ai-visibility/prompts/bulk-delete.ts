@@ -4,8 +4,8 @@ import { Args, Flags } from "@oclif/core";
 import { ApiOperationCommand } from "../../../runtime/operation-command.js";
 import { descriptors } from "../../../generated/descriptors.js";
 
-export default class AiVisibilityRegionsList extends ApiOperationCommand {
-	static description = "Regions available to this organization and selected by this project";
+export default class AiVisibilityPromptsBulkDelete extends ApiOperationCommand {
+	static description = "Delete AI visibility prompts (bulk)";
 
-	descriptor = descriptors["getAiVisibilityRegions"];
+	descriptor = descriptors["bulkDeleteAiVisibilityPrompts"];
 }

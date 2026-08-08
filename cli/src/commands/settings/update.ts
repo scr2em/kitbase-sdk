@@ -15,6 +15,7 @@ export default class SettingsUpdate extends ApiOperationCommand {
 		"autoTrackClicks": Flags.boolean({  }),
 		"autoTrackScrollDepth": Flags.boolean({  }),
 		"autoTrackVisibility": Flags.boolean({  }),
+		"reportingTimezone": Flags.string({ description: "IANA timezone id, e.g. \"Africa/Cairo\" or \"UTC\". Rejected with VAL_001 if it is not a zone the server knows." }),
 	};
 
 	descriptor = descriptors["updateProjectSettings"];
