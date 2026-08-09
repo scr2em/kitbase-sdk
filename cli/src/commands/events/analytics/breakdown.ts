@@ -10,7 +10,6 @@ export default class EventsAnalyticsBreakdown extends ApiOperationCommand {
 		"dimension": Flags.string({ description: "Dimension to group events by", options: ["event_name","user","country","region","city","browser","browser_version","os","os_version","device","brand","model","utm_source","utm_medium","utm_campaign"], required: true }),
 		"from": Flags.string({ description: "Start date filter (inclusive, YYYY-MM-DD)" }),
 		"to": Flags.string({ description: "End date filter (inclusive, YYYY-MM-DD)" }),
-		"timezone": Flags.string({ description: "Client timezone (e.g. \"Africa/Cairo\", \"America/New_York\"). Used to convert date boundaries to UTC.", required: true }),
 		"limit": Flags.integer({ description: "Maximum number of results to return" }),
 	};
 

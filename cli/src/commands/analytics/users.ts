@@ -11,7 +11,6 @@ export default class AnalyticsUsers extends ApiOperationCommand {
 		"preset": Flags.string({ description: "Predefined date range preset. When provided, overrides from/to parameters.", options: ["last_30_minutes","last_hour","today","yesterday","last_7_days","last_30_days","this_month","this_year"] }),
 		"from": Flags.string({ description: "Start date filter (inclusive, YYYY-MM-DD)" }),
 		"to": Flags.string({ description: "End date filter (inclusive, YYYY-MM-DD)" }),
-		"timezone": Flags.string({ description: "Client timezone (e.g. \"Africa/Cairo\", \"America/New_York\"). Used to convert date boundaries to UTC. Defaults to UTC if omitted." }),
 		"page": Flags.integer({ description: "Page number (0-indexed)" }),
 		"size": Flags.integer({ description: "Page size" }),
 		"search": Flags.string({ description: "Search by user_id or anonymous_id (partial match)" }),

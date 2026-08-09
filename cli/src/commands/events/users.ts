@@ -10,7 +10,6 @@ export default class EventsUsers extends ApiOperationCommand {
 		"search": Flags.string({ description: "Search by user ID (partial match)" }),
 		"from": Flags.string({ description: "Start date filter (inclusive, YYYY-MM-DD)" }),
 		"to": Flags.string({ description: "End date filter (inclusive, YYYY-MM-DD)" }),
-		"timezone": Flags.string({ description: "Client timezone (e.g. \"Africa/Cairo\", \"America/New_York\"). Used to convert date boundaries to UTC.", required: true }),
 		"page": Flags.integer({ description: "Page number" }),
 		"size": Flags.integer({ description: "Page size" }),
 		"sort": Flags.string({ description: "Sort order by last seen timestamp", options: ["asc","desc"] }),

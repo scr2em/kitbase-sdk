@@ -10,7 +10,6 @@ export default class FeatureFlagsUsage extends ApiOperationCommand {
 		"projectId": Flags.string({ description: "Optional project key to filter usage by a specific project. If not provided, returns organization-wide usage." }),
 		"fromDate": Flags.string({ description: "Start date for the usage period (inclusive, YYYY-MM-DD)", required: true }),
 		"toDate": Flags.string({ description: "End date for the usage period (inclusive, YYYY-MM-DD)", required: true }),
-		"timezone": Flags.string({ description: "Client timezone (e.g. \"Africa/Cairo\", \"America/New_York\"). Used to convert date boundaries to UTC.", required: true }),
 	};
 
 	descriptor = descriptors["getFeatureFlagUsage"];

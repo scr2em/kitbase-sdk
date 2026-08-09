@@ -12,7 +12,6 @@ export default class WebAnalyticsTimeline extends ApiOperationCommand {
 		"to": Flags.string({ description: "End date for the analytics period (inclusive, YYYY-MM-DD). Used when preset is not provided. Defaults to today." }),
 		"interval": Flags.string({ description: "Time-bucketing granularity for the timeline data. Defaults to hour.", options: ["minute","hour","day"] }),
 		"filters": Flags.string({ description: "Dimension filters in format dimension:operator:values.\nOperator is 'is' (include) or 'is_not' (exclude).\nValues are comma-separated. Can specify multiple filters.\nExample: filters=country:is:US,UK&filters=browser:is_not:Safari\n", multiple: true }),
-		"timezone": Flags.string({ description: "Client timezone (e.g. \"Africa/Cairo\", \"America/New_York\"). Used to convert date boundaries to UTC.", required: true }),
 	};
 
 	descriptor = descriptors["getProjectWebAnalyticsTimeline"];

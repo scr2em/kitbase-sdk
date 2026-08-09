@@ -12,7 +12,6 @@ export default class WebAnalyticsActivityHeatmap extends ApiOperationCommand {
 		"from": Flags.string({ description: "Start date for the analytics period (inclusive, YYYY-MM-DD). Defaults to 7 days ago." }),
 		"to": Flags.string({ description: "End date for the analytics period (inclusive, YYYY-MM-DD). Defaults to today." }),
 		"filters": Flags.string({ description: "Dimension filters in format dimension:operator:values.\nOperator is 'is' (include) or 'is_not' (exclude).\nValues are comma-separated. Can specify multiple filters.\nExample: filters=country:is:US,UK&filters=browser:is_not:Safari\n", multiple: true }),
-		"timezone": Flags.string({ description: "Client timezone (e.g. \"Africa/Cairo\", \"America/New_York\"). Both the date boundaries\nand the hour/weekday buckets are resolved in this zone.\n", required: true }),
 	};
 
 	descriptor = descriptors["getProjectWebAnalyticsActivityHeatmap"];

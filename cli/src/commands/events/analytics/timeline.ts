@@ -11,7 +11,6 @@ export default class EventsAnalyticsTimeline extends ApiOperationCommand {
 		"event": Flags.string({ description: "Filter by specific event name" }),
 		"from": Flags.string({ description: "Start date filter (inclusive, YYYY-MM-DD)" }),
 		"to": Flags.string({ description: "End date filter (inclusive, YYYY-MM-DD)" }),
-		"timezone": Flags.string({ description: "Client timezone (e.g. \"Africa/Cairo\", \"America/New_York\"). Used to convert date boundaries to UTC.", required: true }),
 	};
 
 	descriptor = descriptors["getEventsAnalyticsTimeline"];

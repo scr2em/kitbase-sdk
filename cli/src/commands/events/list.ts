@@ -13,7 +13,6 @@ export default class EventsList extends ApiOperationCommand {
 		"preset": Flags.string({ description: "Predefined date range preset. When provided, overrides from/to parameters.", options: ["last_30_minutes","last_hour","today","yesterday","last_7_days","last_30_days","this_month","this_year"] }),
 		"from": Flags.string({ description: "Start of time range" }),
 		"to": Flags.string({ description: "End of time range" }),
-		"timezone": Flags.string({ description: "Client timezone (e.g. \"Africa/Cairo\", \"America/New_York\"). Used to convert date boundaries to UTC.", required: true }),
 		"page": Flags.integer({ description: "Page number" }),
 		"size": Flags.integer({ description: "Page size" }),
 		"sort": Flags.string({ description: "Sort order by timestamp", options: ["asc","desc"] }),

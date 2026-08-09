@@ -3412,7 +3412,7 @@ export interface paths {
          * Get visitor activity by hour of day
          * @description Get distinct visitors per (row, hour-of-day) cell — the "when do people visit" heatmap.
          *     Rows are either the seven weekdays or the busiest countries, and hours are bucketed in
-         *     the requested timezone.
+         *     the project's reporting timezone (see the project settings endpoint).
          *
          *     A heatmap needs at least a week of days to be readable, so a selected range narrower
          *     than 7 days is widened to the last 7 days; wider ranges are used as selected. The
@@ -6438,7 +6438,7 @@ export interface components {
         ActivityHeatmapRowDimension: "day_of_week" | "country";
         /** @description Unique visitors in one hour-of-day bucket of a heatmap row */
         ActivityHeatmapCell: {
-            /** @description Hour of the day (0-23) in the requested timezone */
+            /** @description Hour of the day (0-23) in the project's reporting timezone */
             hour: number;
             /** @description Distinct visitors whose session started in this hour bucket */
             visitors: number;
@@ -6466,14 +6466,14 @@ export interface components {
             rowDimension: components["schemas"]["ActivityHeatmapRowDimension"];
             /**
              * Format: date
-             * @description First day actually queried, in the requested timezone. The heatmap needs at least a
+             * @description First day actually queried, in the project's reporting timezone. The heatmap needs at least a
              *     week of days to be readable, so a narrower selected range is widened to the last
              *     7 days; wider ranges are used as selected. Echoed so the UI can label the window.
              */
             from: string;
             /**
              * Format: date
-             * @description Last day actually queried (inclusive), in the requested timezone
+             * @description Last day actually queried (inclusive), in the project's reporting timezone
              */
             to: string;
             /**
@@ -9186,12 +9186,10 @@ export interface components {
         AiVisibilityRegionFilter: components["schemas"]["AiVisibilityRegionEnum"][];
         /** @description Predefined date range preset. Takes precedence over from/to. */
         AiVisibilityPreset: components["schemas"]["DateRangePreset"];
-        /** @description Start of the date window (inclusive, interpreted in the client timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window. */
+        /** @description Start of the date window (inclusive, interpreted in the project's reporting timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window. */
         AiVisibilityFrom: string;
-        /** @description End of the date window (inclusive, interpreted in the client timezone). */
+        /** @description End of the date window (inclusive, interpreted in the project's reporting timezone). */
         AiVisibilityTo: string;
-        /** @description Client timezone (e.g. "Africa/Cairo") used to resolve preset/date boundaries; defaults to UTC. */
-        AiVisibilityTimezone: string;
     };
     requestBodies: never;
     headers: never;
@@ -10895,12 +10893,10 @@ export interface operations {
                 jobs?: number;
                 /** @description Predefined date range preset. Takes precedence over from/to. */
                 preset?: components["parameters"]["AiVisibilityPreset"];
-                /** @description Start of the date window (inclusive, interpreted in the client timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window. */
+                /** @description Start of the date window (inclusive, interpreted in the project's reporting timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window. */
                 from?: components["parameters"]["AiVisibilityFrom"];
-                /** @description End of the date window (inclusive, interpreted in the client timezone). */
+                /** @description End of the date window (inclusive, interpreted in the project's reporting timezone). */
                 to?: components["parameters"]["AiVisibilityTo"];
-                /** @description Client timezone (e.g. "Africa/Cairo") used to resolve preset/date boundaries; defaults to UTC. */
-                timezone?: components["parameters"]["AiVisibilityTimezone"];
                 /** @description Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected. */
                 regions?: components["parameters"]["AiVisibilityRegionFilter"];
             };
@@ -11111,12 +11107,10 @@ export interface operations {
                 jobs?: number;
                 /** @description Predefined date range preset. Takes precedence over from/to. */
                 preset?: components["parameters"]["AiVisibilityPreset"];
-                /** @description Start of the date window (inclusive, interpreted in the client timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window. */
+                /** @description Start of the date window (inclusive, interpreted in the project's reporting timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window. */
                 from?: components["parameters"]["AiVisibilityFrom"];
-                /** @description End of the date window (inclusive, interpreted in the client timezone). */
+                /** @description End of the date window (inclusive, interpreted in the project's reporting timezone). */
                 to?: components["parameters"]["AiVisibilityTo"];
-                /** @description Client timezone (e.g. "Africa/Cairo") used to resolve preset/date boundaries; defaults to UTC. */
-                timezone?: components["parameters"]["AiVisibilityTimezone"];
                 /** @description Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected. */
                 regions?: components["parameters"]["AiVisibilityRegionFilter"];
             };
@@ -11657,12 +11651,10 @@ export interface operations {
                 limit?: number;
                 /** @description Predefined date range preset. Takes precedence over from/to. */
                 preset?: components["parameters"]["AiVisibilityPreset"];
-                /** @description Start of the date window (inclusive, interpreted in the client timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window. */
+                /** @description Start of the date window (inclusive, interpreted in the project's reporting timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window. */
                 from?: components["parameters"]["AiVisibilityFrom"];
-                /** @description End of the date window (inclusive, interpreted in the client timezone). */
+                /** @description End of the date window (inclusive, interpreted in the project's reporting timezone). */
                 to?: components["parameters"]["AiVisibilityTo"];
-                /** @description Client timezone (e.g. "Africa/Cairo") used to resolve preset/date boundaries; defaults to UTC. */
-                timezone?: components["parameters"]["AiVisibilityTimezone"];
                 /** @description Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics. */
                 topicIds?: components["parameters"]["AiVisibilityTopicFilter"];
                 /** @description Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected. */
@@ -11703,12 +11695,10 @@ export interface operations {
                 limit?: number;
                 /** @description Predefined date range preset. Takes precedence over from/to. */
                 preset?: components["parameters"]["AiVisibilityPreset"];
-                /** @description Start of the date window (inclusive, interpreted in the client timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window. */
+                /** @description Start of the date window (inclusive, interpreted in the project's reporting timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window. */
                 from?: components["parameters"]["AiVisibilityFrom"];
-                /** @description End of the date window (inclusive, interpreted in the client timezone). */
+                /** @description End of the date window (inclusive, interpreted in the project's reporting timezone). */
                 to?: components["parameters"]["AiVisibilityTo"];
-                /** @description Client timezone (e.g. "Africa/Cairo") used to resolve preset/date boundaries; defaults to UTC. */
-                timezone?: components["parameters"]["AiVisibilityTimezone"];
                 /** @description Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics. */
                 topicIds?: components["parameters"]["AiVisibilityTopicFilter"];
                 /** @description Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected. */
@@ -11751,12 +11741,10 @@ export interface operations {
                 size?: number;
                 /** @description Predefined date range preset. Takes precedence over from/to. */
                 preset?: components["parameters"]["AiVisibilityPreset"];
-                /** @description Start of the date window (inclusive, interpreted in the client timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window. */
+                /** @description Start of the date window (inclusive, interpreted in the project's reporting timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window. */
                 from?: components["parameters"]["AiVisibilityFrom"];
-                /** @description End of the date window (inclusive, interpreted in the client timezone). */
+                /** @description End of the date window (inclusive, interpreted in the project's reporting timezone). */
                 to?: components["parameters"]["AiVisibilityTo"];
-                /** @description Client timezone (e.g. "Africa/Cairo") used to resolve preset/date boundaries; defaults to UTC. */
-                timezone?: components["parameters"]["AiVisibilityTimezone"];
                 /** @description Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics. */
                 topicIds?: components["parameters"]["AiVisibilityTopicFilter"];
                 /** @description Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected. */
@@ -11803,12 +11791,10 @@ export interface operations {
                 size?: number;
                 /** @description Predefined date range preset. Takes precedence over from/to. */
                 preset?: components["parameters"]["AiVisibilityPreset"];
-                /** @description Start of the date window (inclusive, interpreted in the client timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window. */
+                /** @description Start of the date window (inclusive, interpreted in the project's reporting timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window. */
                 from?: components["parameters"]["AiVisibilityFrom"];
-                /** @description End of the date window (inclusive, interpreted in the client timezone). */
+                /** @description End of the date window (inclusive, interpreted in the project's reporting timezone). */
                 to?: components["parameters"]["AiVisibilityTo"];
-                /** @description Client timezone (e.g. "Africa/Cairo") used to resolve preset/date boundaries; defaults to UTC. */
-                timezone?: components["parameters"]["AiVisibilityTimezone"];
                 /** @description Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics. */
                 topicIds?: components["parameters"]["AiVisibilityTopicFilter"];
                 /** @description Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected. */
@@ -11845,12 +11831,10 @@ export interface operations {
                 jobs?: number;
                 /** @description Predefined date range preset. Takes precedence over from/to. */
                 preset?: components["parameters"]["AiVisibilityPreset"];
-                /** @description Start of the date window (inclusive, interpreted in the client timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window. */
+                /** @description Start of the date window (inclusive, interpreted in the project's reporting timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window. */
                 from?: components["parameters"]["AiVisibilityFrom"];
-                /** @description End of the date window (inclusive, interpreted in the client timezone). */
+                /** @description End of the date window (inclusive, interpreted in the project's reporting timezone). */
                 to?: components["parameters"]["AiVisibilityTo"];
-                /** @description Client timezone (e.g. "Africa/Cairo") used to resolve preset/date boundaries; defaults to UTC. */
-                timezone?: components["parameters"]["AiVisibilityTimezone"];
                 /** @description Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics. */
                 topicIds?: components["parameters"]["AiVisibilityTopicFilter"];
                 /** @description Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected. */
@@ -11889,12 +11873,10 @@ export interface operations {
                 jobs?: number;
                 /** @description Predefined date range preset. Takes precedence over from/to. */
                 preset?: components["parameters"]["AiVisibilityPreset"];
-                /** @description Start of the date window (inclusive, interpreted in the client timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window. */
+                /** @description Start of the date window (inclusive, interpreted in the project's reporting timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window. */
                 from?: components["parameters"]["AiVisibilityFrom"];
-                /** @description End of the date window (inclusive, interpreted in the client timezone). */
+                /** @description End of the date window (inclusive, interpreted in the project's reporting timezone). */
                 to?: components["parameters"]["AiVisibilityTo"];
-                /** @description Client timezone (e.g. "Africa/Cairo") used to resolve preset/date boundaries; defaults to UTC. */
-                timezone?: components["parameters"]["AiVisibilityTimezone"];
                 /** @description Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics. */
                 topicIds?: components["parameters"]["AiVisibilityTopicFilter"];
                 /** @description Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected. */
@@ -11937,12 +11919,10 @@ export interface operations {
                 providers?: components["parameters"]["AiVisibilityProvider"];
                 /** @description Predefined date range preset. Takes precedence over from/to. */
                 preset?: components["parameters"]["AiVisibilityPreset"];
-                /** @description Start of the date window (inclusive, interpreted in the client timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window. */
+                /** @description Start of the date window (inclusive, interpreted in the project's reporting timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window. */
                 from?: components["parameters"]["AiVisibilityFrom"];
-                /** @description End of the date window (inclusive, interpreted in the client timezone). */
+                /** @description End of the date window (inclusive, interpreted in the project's reporting timezone). */
                 to?: components["parameters"]["AiVisibilityTo"];
-                /** @description Client timezone (e.g. "Africa/Cairo") used to resolve preset/date boundaries; defaults to UTC. */
-                timezone?: components["parameters"]["AiVisibilityTimezone"];
                 /** @description Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics. */
                 topicIds?: components["parameters"]["AiVisibilityTopicFilter"];
                 /** @description Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected. */
@@ -11983,12 +11963,10 @@ export interface operations {
                 providers?: components["parameters"]["AiVisibilityProvider"];
                 /** @description Predefined date range preset. Takes precedence over from/to. */
                 preset?: components["parameters"]["AiVisibilityPreset"];
-                /** @description Start of the date window (inclusive, interpreted in the client timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window. */
+                /** @description Start of the date window (inclusive, interpreted in the project's reporting timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window. */
                 from?: components["parameters"]["AiVisibilityFrom"];
-                /** @description End of the date window (inclusive, interpreted in the client timezone). */
+                /** @description End of the date window (inclusive, interpreted in the project's reporting timezone). */
                 to?: components["parameters"]["AiVisibilityTo"];
-                /** @description Client timezone (e.g. "Africa/Cairo") used to resolve preset/date boundaries; defaults to UTC. */
-                timezone?: components["parameters"]["AiVisibilityTimezone"];
                 /** @description Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected. */
                 regions?: components["parameters"]["AiVisibilityRegionFilter"];
                 /** @description Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics. */
@@ -12027,12 +12005,10 @@ export interface operations {
                 jobs?: number;
                 /** @description Predefined date range preset. Takes precedence over from/to. */
                 preset?: components["parameters"]["AiVisibilityPreset"];
-                /** @description Start of the date window (inclusive, interpreted in the client timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window. */
+                /** @description Start of the date window (inclusive, interpreted in the project's reporting timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window. */
                 from?: components["parameters"]["AiVisibilityFrom"];
-                /** @description End of the date window (inclusive, interpreted in the client timezone). */
+                /** @description End of the date window (inclusive, interpreted in the project's reporting timezone). */
                 to?: components["parameters"]["AiVisibilityTo"];
-                /** @description Client timezone (e.g. "Africa/Cairo") used to resolve preset/date boundaries; defaults to UTC. */
-                timezone?: components["parameters"]["AiVisibilityTimezone"];
                 /** @description Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics. */
                 topicIds?: components["parameters"]["AiVisibilityTopicFilter"];
                 /** @description Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected. */
@@ -12069,12 +12045,10 @@ export interface operations {
                 limit?: number;
                 /** @description Predefined date range preset. Takes precedence over from/to. */
                 preset?: components["parameters"]["AiVisibilityPreset"];
-                /** @description Start of the date window (inclusive, interpreted in the client timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window. */
+                /** @description Start of the date window (inclusive, interpreted in the project's reporting timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window. */
                 from?: components["parameters"]["AiVisibilityFrom"];
-                /** @description End of the date window (inclusive, interpreted in the client timezone). */
+                /** @description End of the date window (inclusive, interpreted in the project's reporting timezone). */
                 to?: components["parameters"]["AiVisibilityTo"];
-                /** @description Client timezone (e.g. "Africa/Cairo") used to resolve preset/date boundaries; defaults to UTC. */
-                timezone?: components["parameters"]["AiVisibilityTimezone"];
                 /** @description Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics. */
                 topicIds?: components["parameters"]["AiVisibilityTopicFilter"];
                 /** @description Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected. */
@@ -12115,12 +12089,10 @@ export interface operations {
                 limit?: number;
                 /** @description Predefined date range preset. Takes precedence over from/to. */
                 preset?: components["parameters"]["AiVisibilityPreset"];
-                /** @description Start of the date window (inclusive, interpreted in the client timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window. */
+                /** @description Start of the date window (inclusive, interpreted in the project's reporting timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window. */
                 from?: components["parameters"]["AiVisibilityFrom"];
-                /** @description End of the date window (inclusive, interpreted in the client timezone). */
+                /** @description End of the date window (inclusive, interpreted in the project's reporting timezone). */
                 to?: components["parameters"]["AiVisibilityTo"];
-                /** @description Client timezone (e.g. "Africa/Cairo") used to resolve preset/date boundaries; defaults to UTC. */
-                timezone?: components["parameters"]["AiVisibilityTimezone"];
                 /** @description Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics. */
                 topicIds?: components["parameters"]["AiVisibilityTopicFilter"];
                 /** @description Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected. */
@@ -12157,12 +12129,10 @@ export interface operations {
                 jobs?: number;
                 /** @description Predefined date range preset. Takes precedence over from/to. */
                 preset?: components["parameters"]["AiVisibilityPreset"];
-                /** @description Start of the date window (inclusive, interpreted in the client timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window. */
+                /** @description Start of the date window (inclusive, interpreted in the project's reporting timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window. */
                 from?: components["parameters"]["AiVisibilityFrom"];
-                /** @description End of the date window (inclusive, interpreted in the client timezone). */
+                /** @description End of the date window (inclusive, interpreted in the project's reporting timezone). */
                 to?: components["parameters"]["AiVisibilityTo"];
-                /** @description Client timezone (e.g. "Africa/Cairo") used to resolve preset/date boundaries; defaults to UTC. */
-                timezone?: components["parameters"]["AiVisibilityTimezone"];
                 /** @description Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics. */
                 topicIds?: components["parameters"]["AiVisibilityTopicFilter"];
                 /** @description Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected. */
@@ -14714,7 +14684,7 @@ export interface operations {
     };
     listEvents: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Filter by event name */
                 event?: string;
                 /** @description Filter by channel */
@@ -14727,8 +14697,6 @@ export interface operations {
                 from?: string;
                 /** @description End of time range */
                 to?: string;
-                /** @description Client timezone (e.g. "Africa/Cairo", "America/New_York"). Used to convert date boundaries to UTC. */
-                timezone: string;
                 /** @description Page number */
                 page?: number;
                 /** @description Page size */
@@ -14800,15 +14768,13 @@ export interface operations {
     };
     listEventUsers: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Search by user ID (partial match) */
                 search?: string;
                 /** @description Start date filter (inclusive, YYYY-MM-DD) */
                 from?: string;
                 /** @description End date filter (inclusive, YYYY-MM-DD) */
                 to?: string;
-                /** @description Client timezone (e.g. "Africa/Cairo", "America/New_York"). Used to convert date boundaries to UTC. */
-                timezone: string;
                 /** @description Page number */
                 page?: number;
                 /** @description Page size */
@@ -14843,15 +14809,13 @@ export interface operations {
     };
     listEventsByUserId: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Filter by event name (partial match) */
                 event?: string;
                 /** @description Start of time range */
                 from?: string;
                 /** @description End of time range */
                 to?: string;
-                /** @description Client timezone (e.g. "Africa/Cairo", "America/New_York"). Used to convert date boundaries to UTC. */
-                timezone: string;
                 /** @description Page number */
                 page?: number;
                 /** @description Page size */
@@ -14888,13 +14852,11 @@ export interface operations {
     };
     getEventUserDetails: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Start date filter (inclusive, YYYY-MM-DD) */
                 from?: string;
                 /** @description End date filter (inclusive, YYYY-MM-DD) */
                 to?: string;
-                /** @description Client timezone (e.g. "Africa/Cairo", "America/New_York"). Used to convert date boundaries to UTC. */
-                timezone: string;
             };
             header?: never;
             path: {
@@ -14925,7 +14887,7 @@ export interface operations {
     };
     getEventsAnalyticsStats: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Group statistics by event name or user */
                 group_by?: "event" | "user";
                 /** @description Filter by channel */
@@ -14934,8 +14896,6 @@ export interface operations {
                 from?: string;
                 /** @description End date filter (inclusive, YYYY-MM-DD) */
                 to?: string;
-                /** @description Client timezone (e.g. "Africa/Cairo", "America/New_York"). Used to convert date boundaries to UTC. */
-                timezone: string;
             };
             header?: never;
             path: {
@@ -14971,8 +14931,6 @@ export interface operations {
                 from?: string;
                 /** @description End date filter (inclusive, YYYY-MM-DD) */
                 to?: string;
-                /** @description Client timezone (e.g. "Africa/Cairo", "America/New_York"). Used to convert date boundaries to UTC. */
-                timezone: string;
                 /** @description Maximum number of results to return */
                 limit?: number;
             };
@@ -15003,7 +14961,7 @@ export interface operations {
     };
     getEventsAnalyticsTimeline: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Time interval for grouping data */
                 interval?: "hour" | "day" | "week" | "month";
                 /** @description Filter by specific event name */
@@ -15012,8 +14970,6 @@ export interface operations {
                 from?: string;
                 /** @description End date filter (inclusive, YYYY-MM-DD) */
                 to?: string;
-                /** @description Client timezone (e.g. "Africa/Cairo", "America/New_York"). Used to convert date boundaries to UTC. */
-                timezone: string;
             };
             header?: never;
             path: {
@@ -15042,7 +14998,7 @@ export interface operations {
     };
     getEventsAnalyticsAggregations: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Filter by channel */
                 channel?: string;
                 /** @description Case-insensitive substring filter on event name */
@@ -15055,8 +15011,6 @@ export interface operations {
                 from?: string;
                 /** @description End date filter (inclusive, YYYY-MM-DD) */
                 to?: string;
-                /** @description Client timezone (e.g. "Africa/Cairo", "America/New_York"). Used to convert date boundaries to UTC. */
-                timezone: string;
                 /** @description Page number (0-indexed) */
                 page?: number;
                 /** @description Number of items per page */
@@ -15098,8 +15052,6 @@ export interface operations {
                 from?: string;
                 /** @description End date filter (inclusive, YYYY-MM-DD) */
                 to?: string;
-                /** @description Client timezone. Used to convert date boundaries to UTC. Defaults to UTC if omitted. */
-                timezone?: string;
                 /** @description Search by bot name, vendor, or path (partial match) */
                 search?: string;
                 /** @description Filter by actor type (verified_bot, spoofed_bot, suspected_bot) */
@@ -15134,7 +15086,7 @@ export interface operations {
     };
     getBotsAnalyticsTimeline: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Predefined date range preset. When provided, overrides from/to parameters. */
                 preset?: components["schemas"]["DateRangePreset"];
                 /** @description Start date filter (inclusive, YYYY-MM-DD). Used when preset is not provided. */
@@ -15143,8 +15095,6 @@ export interface operations {
                 to?: string;
                 /** @description Time-bucketing granularity for the timeline data. Defaults to day. */
                 interval?: components["schemas"]["TimelineInterval"];
-                /** @description Client timezone (e.g. "Africa/Cairo", "America/New_York"). Used to convert date boundaries to UTC. */
-                timezone: string;
             };
             header?: never;
             path: {
@@ -15178,8 +15128,6 @@ export interface operations {
                 from?: string;
                 /** @description End date filter (inclusive, YYYY-MM-DD). Used when preset is not provided. */
                 to?: string;
-                /** @description Client timezone (e.g. "Africa/Cairo"). Used to convert date boundaries to UTC. */
-                timezone?: string;
                 /** @description Zero-based page number */
                 page?: number;
                 /** @description Items per page */
@@ -15217,8 +15165,6 @@ export interface operations {
                 from?: string;
                 /** @description End date filter (inclusive, YYYY-MM-DD). Used when preset is not provided. */
                 to?: string;
-                /** @description Client timezone (e.g. "Africa/Cairo"). Used to convert date boundaries to UTC. */
-                timezone?: string;
                 /** @description Maximum number of top bots to return */
                 size?: number;
             };
@@ -15254,8 +15200,6 @@ export interface operations {
                 from?: string;
                 /** @description End date filter (inclusive, YYYY-MM-DD). Used when preset is not provided. */
                 to?: string;
-                /** @description Client timezone (e.g. "Africa/Cairo"). Used to convert date boundaries to UTC. */
-                timezone?: string;
                 /** @description Maximum number of top paths to return */
                 size?: number;
                 /** @description Restrict to one bot vendor/company (e.g. "OpenAI", "Anthropic", "Google", "Perplexity") */
@@ -15293,8 +15237,6 @@ export interface operations {
                 from?: string;
                 /** @description End date filter (inclusive, YYYY-MM-DD) */
                 to?: string;
-                /** @description Client timezone (e.g. "Africa/Cairo", "America/New_York"). Used to convert date boundaries to UTC. Defaults to UTC if omitted. */
-                timezone?: string;
                 /** @description Search by user ID or session ID (partial match) */
                 search?: string;
                 /**
@@ -15410,8 +15352,6 @@ export interface operations {
                 from?: string;
                 /** @description End date filter (inclusive, YYYY-MM-DD) */
                 to?: string;
-                /** @description Client timezone (e.g. "Africa/Cairo", "America/New_York"). Used to convert date boundaries to UTC. Defaults to UTC if omitted. */
-                timezone?: string;
                 /** @description Page number (0-indexed) */
                 page?: number;
                 /** @description Page size */
@@ -15697,8 +15637,6 @@ export interface operations {
                 from?: string;
                 /** @description End date filter (inclusive, YYYY-MM-DD) */
                 to?: string;
-                /** @description Client timezone (e.g. "Africa/Cairo", "America/New_York"). Used to convert date boundaries to UTC. Defaults to UTC if omitted. */
-                timezone?: string;
             };
             header?: never;
             path: {
@@ -15750,8 +15688,6 @@ export interface operations {
                 from?: string;
                 /** @description End date filter (inclusive, YYYY-MM-DD) */
                 to?: string;
-                /** @description Client timezone (e.g. "Africa/Cairo", "America/New_York"). Used to convert date boundaries to UTC. Defaults to UTC if omitted. */
-                timezone?: string;
                 /** @description Page number (0-indexed) */
                 page?: number;
                 /** @description Page size */
@@ -15802,8 +15738,6 @@ export interface operations {
                 from?: string;
                 /** @description End date filter (inclusive, YYYY-MM-DD) */
                 to?: string;
-                /** @description Client timezone (e.g. "Africa/Cairo", "America/New_York"). Used to convert date boundaries to UTC. Defaults to UTC if omitted. */
-                timezone?: string;
             };
             header?: never;
             path: {
@@ -15843,7 +15777,7 @@ export interface operations {
     };
     getProjectWebAnalytics: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Predefined date range preset. When provided, overrides from/to parameters. */
                 preset?: components["schemas"]["DateRangePreset"];
                 /** @description Start date for the analytics period (inclusive, YYYY-MM-DD). Defaults to 7 days ago. */
@@ -15857,8 +15791,6 @@ export interface operations {
                  *     Example: filters=country:is:US,UK&filters=browser:is_not:Safari
                  */
                 filters?: string[];
-                /** @description Client timezone (e.g. "Africa/Cairo", "America/New_York"). Used to convert date boundaries to UTC. */
-                timezone: string;
             };
             header?: never;
             path: {
@@ -15886,7 +15818,7 @@ export interface operations {
     };
     getProjectWebAnalyticsTimeline: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Predefined date range preset. When provided, overrides from/to parameters. */
                 preset?: components["schemas"]["DateRangePreset"];
                 /** @description Start date for the analytics period (inclusive, YYYY-MM-DD). Used when preset is not provided. Defaults to today. */
@@ -15902,8 +15834,6 @@ export interface operations {
                  *     Example: filters=country:is:US,UK&filters=browser:is_not:Safari
                  */
                 filters?: string[];
-                /** @description Client timezone (e.g. "Africa/Cairo", "America/New_York"). Used to convert date boundaries to UTC. */
-                timezone: string;
             };
             header?: never;
             path: {
@@ -15931,7 +15861,7 @@ export interface operations {
     };
     getProjectWebAnalyticsActivityHeatmap: {
         parameters: {
-            query: {
+            query?: {
                 /** @description What the rows are grouped by. Defaults to day_of_week. */
                 rowDimension?: components["schemas"]["ActivityHeatmapRowDimension"];
                 /** @description Predefined date range preset. When provided, overrides from/to parameters. */
@@ -15947,11 +15877,6 @@ export interface operations {
                  *     Example: filters=country:is:US,UK&filters=browser:is_not:Safari
                  */
                 filters?: string[];
-                /**
-                 * @description Client timezone (e.g. "Africa/Cairo", "America/New_York"). Both the date boundaries
-                 *     and the hour/weekday buckets are resolved in this zone.
-                 */
-                timezone: string;
             };
             header?: never;
             path: {
@@ -15999,8 +15924,6 @@ export interface operations {
                  *     Example: filters=country:is:US,UK&filters=browser:is_not:Safari
                  */
                 filters?: string[];
-                /** @description Client timezone (e.g. "Africa/Cairo", "America/New_York"). Used to convert date boundaries to UTC. */
-                timezone: string;
             };
             header?: never;
             path: {
@@ -16028,7 +15951,7 @@ export interface operations {
     };
     getProjectPageDurationBreakdown: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Predefined date range preset. When provided, overrides from/to parameters. */
                 preset?: components["schemas"]["DateRangePreset"];
                 /** @description Start date for the analytics period (inclusive, YYYY-MM-DD). Defaults to 7 days ago. */
@@ -16042,8 +15965,6 @@ export interface operations {
                  *     Example: filters=country:is:US,UK&filters=browser:is_not:Safari
                  */
                 filters?: string[];
-                /** @description Client timezone (e.g. "Africa/Cairo", "America/New_York"). Used to convert date boundaries to UTC. */
-                timezone: string;
             };
             header?: never;
             path: {
@@ -16089,8 +16010,6 @@ export interface operations {
                  *     Example: filters=country:is:US,UK&filters=browser:is_not:Safari
                  */
                 filters?: string[];
-                /** @description Client timezone (e.g. "Africa/Cairo", "America/New_York"). Used to convert date boundaries to UTC. */
-                timezone: string;
             };
             header?: never;
             path: {
@@ -16156,8 +16075,6 @@ export interface operations {
                 previousFrom: string;
                 /** @description End date of the previous period (inclusive, YYYY-MM-DD) */
                 previousTo: string;
-                /** @description Client timezone (e.g. "Africa/Cairo", "America/New_York"). Used to convert date boundaries to UTC. Defaults to UTC. */
-                timezone?: string;
                 /** @description Maximum number of results to return (default 10) */
                 limit?: number;
                 /**
@@ -16385,8 +16302,6 @@ export interface operations {
                 fromDate: string;
                 /** @description End date for the usage period (inclusive, YYYY-MM-DD) */
                 toDate: string;
-                /** @description Client timezone (e.g. "Africa/Cairo", "America/New_York"). Used to convert date boundaries to UTC. */
-                timezone: string;
             };
             header?: never;
             path: {
@@ -16412,15 +16327,13 @@ export interface operations {
     };
     getFeatureFlagUsageTimeline: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Optional project key to filter usage by a specific project. If not provided, returns organization-wide usage. */
                 projectId?: string;
                 /** @description Start date for the timeline period (inclusive, YYYY-MM-DD). Defaults to 30 days ago if not provided. */
                 fromDate?: string;
                 /** @description End date for the timeline period (inclusive, YYYY-MM-DD). Defaults to today if not provided. */
                 toDate?: string;
-                /** @description Client timezone (e.g. "Africa/Cairo", "America/New_York"). Used to convert date boundaries to UTC. */
-                timezone: string;
             };
             header?: never;
             path: {
