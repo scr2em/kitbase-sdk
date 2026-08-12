@@ -7,7 +7,7 @@ import { descriptors } from "../../../generated/descriptors.js";
 export default class AiVisibilityPromptsBulkMove extends ApiOperationCommand {
 	static description = "Move AI visibility prompts to a topic (bulk)";
 	static flags = {
-		"topicId": Flags.string({ description: "Topic to move every listed prompt into. Omitted or null moves them out of whatever topic they are in. Unlike PUT on a single prompt, there is no \"leave the topic alone\" case here — setting the topic is the entire operation." }),
+		"topicId": Flags.string({ description: "Topic to move every listed prompt into. Omitted or null moves them out of whatever topic they are in. There is no \"leave the topic alone\" case — setting the topic is the entire operation, which is why null can mean unassign here without ambiguity." }),
 	};
 
 	descriptor = descriptors["bulkMoveAiVisibilityPrompts"];

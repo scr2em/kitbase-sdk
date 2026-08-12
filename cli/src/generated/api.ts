@@ -1033,6 +1033,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/{orgSlug}/projects/{projectId}/ai-visibility/prompts/bulk-assign-persona": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Assign a persona to AI visibility prompts (bulk)
+         * @description Assigns one persona to every listed prompt in a single transaction, or unassigns them all when `personaId` is null. All or nothing: an unknown prompt id, or a persona that is not an active persona of this project, fails the whole call and assigns nothing. Prompts already carrying the destination persona are skipped, so re-running the call is quiet rather than filling the audit trail with changes that did not happen.
+         */
+        post: operations["bulkAssignAiVisibilityPromptPersona"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/{orgSlug}/projects/{projectId}/ai-visibility/prompts/bulk-delete": {
         parameters: {
             query?: never;
@@ -1061,7 +1081,10 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        /** Update AI visibility prompt */
+        /**
+         * Update AI visibility prompt
+         * @description Replaces the prompt's own fields — text, intent tier, locale, and whether it runs. It leaves the prompt's topic and persona exactly as they were; move those with `prompts/bulk-move` and `prompts/bulk-assign-persona`, which accept a single id.
+         */
         put: operations["updateAiVisibilityPrompt"];
         post?: never;
         /**
@@ -3524,29 +3547,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/{orgSlug}/projects/{projectId}/web-analytics/compare": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Compare web analytics between two periods
-         * @description Compare a breakdown dimension across two arbitrary date ranges.
-         *     Returns per-value counts for both periods with absolute and percentage change,
-         *     sorted by biggest movers first.
-         *     Requires analytics.view permission.
-         */
-        get: operations["compareWebAnalyticsPeriods"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/{orgSlug}/projects/{projectId}/events/names": {
         parameters: {
             query?: never;
@@ -3561,137 +3561,6 @@ export interface paths {
          *     Requires event.view permission.
          */
         get: operations["getUniqueEventNames"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/{orgSlug}/dashboard/events/timeline": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get flexible events timeline for dashboard
-         * @description Get event counts for the current and previous periods across all projects in the organization.
-         *     Supports flexible time ranges with auto-determined granularity.
-         *     Useful for drawing comparison charts on the dashboard. Requires dashboard.view permission.
-         */
-        get: operations["getDashboardEventsTimeline"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/{orgSlug}/dashboard/users": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get daily unique users timeline for dashboard
-         * @description Get daily unique user counts for the current month and previous month across all projects in the organization.
-         *     Returns a Mixpanel-style timeline chart data with one data point per day. Requires dashboard.view permission.
-         */
-        get: operations["getDashboardUniqueUsers"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/{orgSlug}/dashboard/events/top": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get top events comparison for dashboard
-         * @description Get the top 10 events for the current month with their counts, and compare them to the previous month.
-         *     The previous month results contain the same events as current month (for easy comparison).
-         *     Requires dashboard.view permission.
-         */
-        get: operations["getDashboardTopEvents"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/{orgSlug}/dashboard/events/summary": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get dashboard KPI summary
-         * @description Get total event counts and unique user counts for the current and previous month,
-         *     with percentage change calculations. Useful for dashboard header KPI cards.
-         *     Requires dashboard.view permission.
-         */
-        get: operations["getDashboardEventsSummary"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/{orgSlug}/dashboard/events/by-project": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get events breakdown by project
-         * @description Get event counts broken down by project for the current and previous month.
-         *     Useful for identifying which projects generate the most activity.
-         *     Requires dashboard.view permission.
-         */
-        get: operations["getDashboardEventsByProject"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/{orgSlug}/dashboard/users/top": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get top users by event count
-         * @description Get the top 10 most active users for the current month by event count,
-         *     with comparison to their activity in the previous month.
-         *     Requires dashboard.view permission.
-         */
-        get: operations["getDashboardTopUsers"];
         put?: never;
         post?: never;
         delete?: never;
@@ -5930,6 +5799,17 @@ export interface components {
             botCount: number;
             /** @description Total bot/crawler requests from this country */
             requestCount: number;
+            /** @description Requests from this country in the comparison window. Always present; 0 when no bot reached the site from there. */
+            previousRequestCount?: number;
+            /** @description Distinct bots observed from this country in the comparison window. Always present. */
+            previousBotCount?: number;
+            /** @description requestCount - previousRequestCount. Always present. Requests are the ranked metric, so the change fields describe them rather than the bot count. */
+            absoluteChange?: number;
+            /**
+             * Format: double
+             * @description Percentage change from previousRequestCount to requestCount. Null when previousRequestCount is 0.
+             */
+            percentageChange?: number | null;
         };
         /** @description Paginated per-country bot/crawler breakdown, ordered by request count descending */
         PaginatedBotCountryResponse: {
@@ -5943,6 +5823,7 @@ export interface components {
             totalElements: number;
             /** @description Total number of pages */
             totalPages: number;
+            comparisonWindow?: components["schemas"]["ComparisonWindow"];
         };
         /** @description Bot/crawler traffic aggregated for a single bot, for the top-bots ranking */
         TopBotStat: {
@@ -5954,11 +5835,26 @@ export interface components {
             isAi?: boolean | null;
             /** @description Total bot/crawler requests attributed to this bot */
             requestCount: number;
+            /** @description Requests attributed to this bot in the comparison window. Always present; 0 when the bot did not visit at all then, which is how a newly arrived crawler reads. */
+            previousRequestCount?: number;
+            /** @description requestCount - previousRequestCount. Always present. */
+            absoluteChange?: number;
+            /**
+             * Format: double
+             * @description Percentage change from previousRequestCount to requestCount. Null when previousRequestCount is 0.
+             */
+            percentageChange?: number | null;
         };
-        /** @description Top bots/crawlers by request count (descending), capped to the requested limit */
+        /**
+         * @description Top bots/crawlers by request count (descending), capped to the requested limit.
+         *
+         *     The ranking is always the selected period's. A bot that only appears in the
+         *     comparison window is absent from this list rather than ranked into it.
+         */
         TopBotsResponse: {
             /** @description Top bots ordered by request count descending */
             data: components["schemas"]["TopBotStat"][];
+            comparisonWindow?: components["schemas"]["ComparisonWindow"];
         };
         /** @description Bot/crawler traffic aggregated for a single URL path, for the top-scraped-paths ranking */
         TopPathStat: {
@@ -5968,11 +5864,27 @@ export interface components {
             requestCount: number;
             /** @description Distinct bot vendors/companies that scraped this path in the range */
             vendors?: string[];
+            /** @description Requests observed for this path in the comparison window, under the same vendor filter. Always present; 0 when the path was not scraped then. */
+            previousRequestCount?: number;
+            /** @description requestCount - previousRequestCount. Always present. */
+            absoluteChange?: number;
+            /**
+             * Format: double
+             * @description Percentage change from previousRequestCount to requestCount. Null when previousRequestCount is 0.
+             */
+            percentageChange?: number | null;
         };
-        /** @description Top paths scraped by bots/crawlers by request count (descending), capped to the requested limit */
+        /**
+         * @description Top paths scraped by bots/crawlers by request count (descending), capped to the
+         *     requested limit.
+         *
+         *     The ranking is always the selected period's. A path scraped only in the
+         *     comparison window is absent from this list rather than ranked into it.
+         */
         TopPathsResponse: {
             /** @description Top paths ordered by request count descending */
             data: components["schemas"]["TopPathStat"][];
+            comparisonWindow?: components["schemas"]["ComparisonWindow"];
         };
         /** @description Session detail with metadata */
         SessionDetailResponse: {
@@ -6385,16 +6297,6 @@ export interface components {
             /** @description Total number of pages */
             totalPages: number;
         };
-        /** @description Event count for a single day */
-        DailyEventCount: {
-            /**
-             * Format: date
-             * @description The date (YYYY-MM-DD)
-             */
-            date: string;
-            /** @description Number of events on this day */
-            count: number;
-        };
         /** @description A single data point in a flexible timeline series */
         FlexibleTimelinePoint: {
             /**
@@ -6404,17 +6306,6 @@ export interface components {
             datetime: string;
             /** @description The number of events in this bucket */
             count: number;
-        };
-        /** @description Event counts for current and previous periods with flexible granularity */
-        FlexibleTimelineResponse: {
-            /** @description Timeline data points for the current period */
-            currentPeriod: components["schemas"]["FlexibleTimelinePoint"][];
-            /** @description Timeline data points for the previous (comparison) period */
-            previousPeriod: components["schemas"]["FlexibleTimelinePoint"][];
-            /** @description The resolved range value (e.g. "24h", "7d") */
-            range: string;
-            /** @description The date-truncation granularity used (e.g. "hour", "day") */
-            granularity: string;
         };
         /** @description Web analytics timeline data for a single period using flexible granularity */
         FlexibleWebTimelinePeriod: {
@@ -6430,6 +6321,7 @@ export interface components {
             currentPeriod: components["schemas"]["FlexibleWebTimelinePeriod"];
             previousPeriod: components["schemas"]["FlexibleWebTimelinePeriod"];
             granularity: components["schemas"]["TimelineInterval"];
+            comparisonWindow?: components["schemas"]["ComparisonWindow"];
         };
         /**
          * @description What the rows of the visitor activity heatmap are grouped by
@@ -6487,6 +6379,17 @@ export interface components {
             interval: components["schemas"]["TimelineInterval"];
             /** @description One series per vendor, ordered by total descending. */
             series: components["schemas"]["BotVendorTimelineSeries"][];
+            /**
+             * @description The same per-vendor series read over the comparison window, at the same interval
+             *     and ordered the same way. Always present.
+             *
+             *     Its buckets carry the comparison window's own datetimes, so a chart lines
+             *     the two up by position rather than by date. A vendor that only crawled in
+             *     the comparison window has a series here and none in `series`, and one that
+             *     only crawled in the selected period has the reverse.
+             */
+            comparisonSeries?: components["schemas"]["BotVendorTimelineSeries"][];
+            comparisonWindow?: components["schemas"]["ComparisonWindow"];
         };
         /** @description Time-bucketed bot/crawler counts for a single vendor. */
         BotVendorTimelineSeries: {
@@ -6678,76 +6581,56 @@ export interface components {
          * @enum {string}
          */
         DateRangePreset: "last_30_minutes" | "last_hour" | "today" | "yesterday" | "last_7_days" | "last_30_days" | "this_month" | "this_year";
-        /** @description Unique user count for a single day */
-        DailyUserCount: {
+        /**
+         * @description Which earlier window a report's comparison figures are read from. Every window
+         *     is resolved in the project's reporting timezone.
+         *
+         *     - `previous_period`: keeps the length of the selected period and ends immediately
+         *       before it starts, so the two windows never overlap.
+         *     - `previous_week` / `previous_month` / `previous_quarter` / `previous_year`: both
+         *       ends of the selected period are moved back by 7 days, or by 1, 3 or 12 calendar
+         *       months, clamped to the shorter month (a boundary on May 31 moves to April 30).
+         *
+         *     The calendar presets therefore preserve calendar alignment rather than duration:
+         *     all of July compares against all of June, 31 days against 30. A selection of
+         *     exactly one calendar week, month, quarter or year maps onto the previous one
+         *     exactly. A selection **longer** than the shift distance still overlaps the current
+         *     period — three months compared against `previous_month` share two of them — which
+         *     is what "one month earlier" means, and the only case where the windows overlap.
+         *
+         *     A comparison window may not start more than 1 year before the selected period.
+         * @enum {string}
+         */
+        ComparisonPreset: "previous_period" | "previous_week" | "previous_month" | "previous_quarter" | "previous_year";
+        /**
+         * @description The window the comparison figures were read from, echoed so a report can
+         *     label what it compares against. Present on every report that reads a date
+         *     range — which is all of them except an AI visibility read answering by job
+         *     count, where there is no period to have compared with.
+         */
+        ComparisonWindow: {
             /**
-             * Format: date
-             * @description The date (YYYY-MM-DD)
+             * Format: date-time
+             * @description First instant of the comparison window, inclusive (UTC).
              */
-            date: string;
-            /** @description Number of unique users on this day */
-            count: number;
-        };
-        /** @description Daily unique users timeline for current and previous month (Mixpanel-style) */
-        DashboardUsersResponse: {
-            /** @description Daily unique user counts for the current month */
-            currentMonth: components["schemas"]["DailyUserCount"][];
-            /** @description Daily unique user counts for the previous month */
-            previousMonth: components["schemas"]["DailyUserCount"][];
-        };
-        /** @description Daily event counts for a specific event name */
-        EventTimelineSeries: {
-            /** @description Name of the event */
-            eventName: string;
-            /** @description Total count for the period */
-            total: number;
-            /** @description Daily breakdown of event counts */
-            data: components["schemas"]["DailyEventCount"][];
-        };
-        /** @description Top events with daily timeline for current and previous month */
-        DashboardTopEventsResponse: {
-            /** @description Top 10 events with daily counts for the current month */
-            currentMonth: components["schemas"]["EventTimelineSeries"][];
-            /** @description Same events with daily counts for the previous month */
-            previousMonth: components["schemas"]["EventTimelineSeries"][];
-        };
-        /** @description Summary metrics for a time period */
-        DashboardPeriodSummary: {
-            /** @description Total number of events in the period */
-            totalEvents: number;
-            /** @description Number of unique users in the period */
-            uniqueUsers: number;
-        };
-        /** @description Percentage change between periods */
-        DashboardPercentageChange: {
+            from: string;
             /**
-             * Format: double
-             * @description Percentage change in events (positive = growth)
+             * Format: date-time
+             * @description End of the comparison window, exclusive (UTC).
              */
-            events: number;
-            /**
-             * Format: double
-             * @description Percentage change in users (positive = growth)
-             */
-            users: number;
-        };
-        /** @description Quick KPI summary with current vs previous month totals */
-        DashboardSummaryResponse: {
-            currentMonth: components["schemas"]["DashboardPeriodSummary"];
-            previousMonth: components["schemas"]["DashboardPeriodSummary"];
-            percentageChange: components["schemas"]["DashboardPercentageChange"];
+            to: string;
         };
         /** @description A metric value with current vs previous comparison */
         MetricValue: {
             /** @description Current period value */
             current: number;
-            /** @description Previous period value */
-            previous: number;
+            /** @description The same metric over the comparison window. Null — never 0 — when that window holds nothing to measure: a rate needs sessions to be a rate, and reporting 0% bounce for an hour nobody visited would invent a measurement and then invent a change from it. */
+            previous: number | null;
             /**
              * Format: double
-             * @description Percentage change from previous to current
+             * @description Relative change from previous to current, as a percentage to one decimal. Null when previous is 0 or absent — there is no percentage that describes a rise from nothing, and reporting one (this field used to answer 100) turned an empty comparison window into a doubling.
              */
-            change: number;
+            change: number | null;
         };
         /** @description Web analytics metrics (OpenPanel-style) */
         WebAnalyticsResponse: {
@@ -6758,6 +6641,7 @@ export interface components {
             bounceRate: components["schemas"]["MetricValue"];
             avgSessionDuration: components["schemas"]["MetricValue"];
             revenue: components["schemas"]["MetricValue"];
+            comparisonWindow?: components["schemas"]["ComparisonWindow"];
         };
         /** @description A metric for a single dimension value (e.g., a browser, country, etc.) */
         DimensionMetric: {
@@ -6769,6 +6653,19 @@ export interface components {
             visitors?: number;
             /** @description Total page views (only present for top_page dimension) */
             views?: number;
+            /** @description Count for the same dimension value in the comparison window. Always present; 0 when the value has no rows there. */
+            previousCount?: number;
+            /** @description Unique visitors in the comparison window (only present for the top_page dimension, and only when a comparison was requested). */
+            previousVisitors?: number;
+            /** @description Page views in the comparison window (only present for the top_page dimension, and only when a comparison was requested). */
+            previousViews?: number;
+            /** @description count - previousCount. Always present. */
+            absoluteChange?: number;
+            /**
+             * Format: double
+             * @description Percentage change from previousCount to count. Null when previousCount is 0.
+             */
+            percentageChange?: number | null;
         };
         /** @description Paginated breakdown analytics response for any dimension */
         PaginatedBreakdownResponse: {
@@ -6787,6 +6684,7 @@ export interface components {
             pageSize: number;
             /** @description Total number of distinct dimension values */
             totalItems: number;
+            comparisonWindow?: components["schemas"]["ComparisonWindow"];
         };
         /** @description A metric showing average time spent on a page */
         PageDurationMetric: {
@@ -6812,6 +6710,21 @@ export interface components {
              * @example 15.5
              */
             percentage: number;
+            /**
+             * Format: double
+             * @description Average time spent on the page in the comparison window. Null when no comparison was requested, and null — not 0 — when the page was never visited in the comparison window, because "nobody read it" is not a duration of zero.
+             */
+            previousAvgDurationMs?: number | null;
+            /**
+             * Format: double
+             * @description avgDurationMs - previousAvgDurationMs, in milliseconds. Null when there is no comparison figure to subtract.
+             */
+            absoluteChange?: number | null;
+            /**
+             * Format: double
+             * @description Percentage change from previousAvgDurationMs to avgDurationMs. Null when there is no comparison figure, or when it is 0.
+             */
+            percentageChange?: number | null;
         };
         /** @description Response containing top pages by average time spent */
         PageDurationBreakdownResponse: {
@@ -6819,56 +6732,7 @@ export interface components {
             data: components["schemas"]["PageDurationMetric"][];
             /** @description Total number of unique pages in the period */
             totalPages: number;
-        };
-        /** @description A metric comparing a dimension value across two time periods */
-        PeriodComparisonMetric: {
-            /** @description The dimension value (e.g., "Chrome", "US", "/dashboard") */
-            name: string;
-            /** @description Count in the current period */
-            currentCount: number;
-            /** @description Count in the previous period */
-            previousCount: number;
-            /** @description Difference between current and previous (current - previous) */
-            absoluteChange: number;
-            /**
-             * Format: double
-             * @description Percentage change from previous to current. Null when previous count is 0.
-             */
-            percentageChange: number | null;
-        };
-        /** @description Response comparing web analytics between two time periods */
-        PeriodComparisonResponse: {
-            /**
-             * @description The dimension that was compared
-             * @example country
-             */
-            dimension: string;
-            /**
-             * Format: date
-             * @description Start date of the current period
-             */
-            currentFrom: string;
-            /**
-             * Format: date
-             * @description End date of the current period
-             */
-            currentTo: string;
-            /**
-             * Format: date
-             * @description Start date of the previous period
-             */
-            previousFrom: string;
-            /**
-             * Format: date
-             * @description End date of the previous period
-             */
-            previousTo: string;
-            /** @description Comparison metrics for each dimension value, sorted by absolute change descending */
-            data: components["schemas"]["PeriodComparisonMetric"][];
-            /** @description Total count across all values in the current period */
-            currentTotal: number;
-            /** @description Total count across all values in the previous period */
-            previousTotal: number;
+            comparisonWindow?: components["schemas"]["ComparisonWindow"];
         };
         /** @description A single data point in a dimension timeline */
         DimensionTimelineDataPoint: {
@@ -6888,54 +6752,14 @@ export interface components {
             value: string;
             /** @description Timeline data points */
             data: components["schemas"]["DimensionTimelineDataPoint"][];
+            /** @description The same series read over the comparison window, bucketed by day. Always present. Its dates are the comparison window's own, so a chart plots it against the current series by position rather than by date. */
+            comparisonData?: components["schemas"]["DimensionTimelineDataPoint"][];
+            comparisonWindow?: components["schemas"]["ComparisonWindow"];
         };
         /** @description Response containing a list of unique string values */
         UniqueValuesResponse: {
             /** @description List of unique values */
             values: string[];
-        };
-        /** @description Event count for a single project */
-        ProjectEventCount: {
-            /**
-             * Format: uuid
-             * @description The project ID
-             */
-            projectId: string;
-            /** @description The project name */
-            projectName: string;
-            /** @description Number of events for this project */
-            count: number;
-            /**
-             * Format: double
-             * @description Percentage of total events
-             */
-            percentage: number;
-        };
-        /** @description Event counts broken down by project */
-        DashboardEventsByProjectResponse: {
-            /** @description Project event counts for the current month */
-            currentMonth: components["schemas"]["ProjectEventCount"][];
-            /** @description Project event counts for the previous month */
-            previousMonth: components["schemas"]["ProjectEventCount"][];
-        };
-        /** @description Event count for a single user */
-        UserEventCount: {
-            /** @description The user ID */
-            userId: string;
-            /** @description Number of events by this user */
-            eventCount: number;
-            /**
-             * Format: double
-             * @description Percentage of total events
-             */
-            percentage: number;
-        };
-        /** @description Top users by event count */
-        DashboardTopUsersResponse: {
-            /** @description Top 10 users for the current month */
-            currentMonth: components["schemas"]["UserEventCount"][];
-            /** @description Same users with counts for the previous month */
-            previousMonth: components["schemas"]["UserEventCount"][];
         };
         /**
          * @description The data type of the feature flag value
@@ -7703,14 +7527,22 @@ export interface components {
             /** @description ID of the plan to upgrade to */
             planId: string;
         };
-        /** @description Response containing checkout session details. For new subscriptions returns checkoutUrl and sessionId. For plan changes on existing subscriptions, returns updated flag. */
+        /** @description Result of asking to move onto a plan. A new subscription returns checkoutUrl and sessionId to redirect to. Every other outcome is settled server-side and returns message plus the one flag naming what happened. */
         CheckoutSessionResponse: {
             /** @description URL to redirect the user to for checkout (for new subscriptions) */
             checkoutUrl?: string;
             /** @description Stripe checkout session ID (for new subscriptions) */
             sessionId?: string;
+            /** @description Human-readable description of the outcome, set on every non-checkout branch */
+            message?: string;
             /** @description Set to "true" when an existing subscription was updated directly (no checkout needed) */
             updated?: string;
+            /** @description Set to "true" when a downgrade was scheduled for the end of the billing period */
+            scheduled?: string;
+            /** @description Set to "true" when a previously scheduled plan change was cancelled */
+            cancelled?: string;
+            /** @description Set to "true" when the organization was already on the requested plan */
+            unchanged?: string;
         };
         /** @description Request to create a Stripe billing portal session */
         CreateBillingPortalRequest: {
@@ -7835,6 +7667,7 @@ export interface components {
             /** Format: date-time */
             createdAt?: string;
         };
+        /** @description A prompt to create. Creation is the only place an assignment travels with the prompt's own fields — afterwards, topic and persona are moved by `prompts/bulk-move` and `prompts/bulk-assign-persona`. */
         AiVisibilityPromptRequest: {
             text: string;
             /**
@@ -7846,10 +7679,23 @@ export interface components {
             locale: string;
             /** @default true */
             active: boolean;
-            /** @description Topic assignment. On PUT, omitted or null clears the assignment. */
+            /** @description Topic to file the new prompt under. Omitted or null leaves it uncategorised. */
             topicId?: string | null;
-            /** @description Persona assignment. On PUT, omitted or null clears the assignment. */
+            /** @description Persona to write the new prompt for. Omitted or null leaves it unassigned. */
             personaId?: string | null;
+        };
+        /** @description Edits a prompt's own fields, and replaces every one of them — an omitted `locale` or `active` returns to its default. It deliberately carries no `topicId` or `personaId`: assignment is what `prompts/bulk-move` and `prompts/bulk-assign-persona` are for, so renaming a prompt cannot silently clear the topic or persona somebody filed it under. */
+        AiVisibilityPromptUpdateRequest: {
+            text: string;
+            /**
+             * @description Free-form intent tier ('buying' | 'category' | 'branded')
+             * @default category
+             */
+            intentTier: string;
+            /** @default en-US */
+            locale: string;
+            /** @default true */
+            active: boolean;
         };
         AiVisibilityPromptSuggestionsRequest: {
             brandName: string;
@@ -7881,8 +7727,13 @@ export interface components {
         };
         AiVisibilityPromptBulkMoveRequest: {
             promptIds: string[];
-            /** @description Topic to move every listed prompt into. Omitted or null moves them out of whatever topic they are in. Unlike PUT on a single prompt, there is no "leave the topic alone" case here — setting the topic is the entire operation. */
+            /** @description Topic to move every listed prompt into. Omitted or null moves them out of whatever topic they are in. There is no "leave the topic alone" case — setting the topic is the entire operation, which is why null can mean unassign here without ambiguity. */
             topicId?: string | null;
+        };
+        AiVisibilityPromptBulkAssignPersonaRequest: {
+            promptIds: string[];
+            /** @description Persona to assign to every listed prompt. Omitted or null unassigns them. As with the topic, setting the persona is the entire operation — the call never touches a prompt's topic or text. */
+            personaId?: string | null;
         };
         AiVisibilityPromptBulkDeleteRequest: {
             promptIds: string[];
@@ -7997,10 +7848,25 @@ export interface components {
             /** @description The engine selection this response was computed for (empty = every engine) */
             providers?: components["schemas"]["AiVisibilityProviderEnum"][];
             points?: components["schemas"]["AiVisibilitySeriesPoint"][];
+            /**
+             * @description The same series read over the comparison window, under the same engine, topic
+             *     and region filters. Present unless the read answers by job count.
+             *
+             *     Its points are that window's own jobs, carrying their own ids and finish
+             *     times, so a chart lines the two up by position rather than by date — the two
+             *     windows rarely run the same number of scans, and no job here has a
+             *     counterpart there. The citations page's headline figures are sums over these
+             *     points (total citations, own citations, citations per answer), so the earlier
+             *     figures are the same sums over this array.
+             */
+            comparisonSeries?: components["schemas"]["AiVisibilitySeriesPoint"][];
+            comparisonWindow?: components["schemas"]["ComparisonWindow"];
         };
         AiVisibilityDomainEntry: {
             domain?: string;
             citationCount?: number;
+            /** @description This domain's share of the citations the selected period recorded, 0..1. The denominator is every citation across every domain the window cited — not only the domains on this page — which is the same denominator previousCitationShare is taken against, so the two are comparable. Null when the window recorded no citations at all: a domain cannot hold a share of nothing, and 0 would claim it was measured and found absent. */
+            citationShare?: number | null;
             /** @enum {string} */
             classification?: "SELF" | "COMPETITOR" | "OTHER";
             /**
@@ -8017,13 +7883,34 @@ export interface components {
              * @description Cheapest retail placement price on this domain in USD cents; null when not purchasable
              */
             purchasableFromCents?: number | null;
+            /** @description Citations this domain received in the comparison window, under the same engine, topic and region filters. Present unless the read answers by job count; 0 when that window cited the domain not at all. */
+            previousCitationCount?: number;
+            /** @description This domain's share of every citation the comparison window recorded, 0..1 — 0 when that window cited other domains but never this one, which is a measured zero. Null means there is nothing to take a share of: the window recorded no citations at all, so this domain was never measured there rather than measured at nothing. */
+            previousCitationShare?: number | null;
+            /** @description citationCount - previousCitationCount. Citations are what the map ranks on, so the change fields describe them. Present unless the read answers by job count. */
+            absoluteChange?: number;
+            /**
+             * Format: double
+             * @description Relative change from previousCitationCount to citationCount. Null when previousCitationCount is 0 — there is no percentage that describes going from nothing to something.
+             */
+            percentageChange?: number | null;
         };
+        /**
+         * @description The cited-domain map as the selected period ranks it. Which domains appear, and in
+         *     which order, is decided by that period alone — a domain cited only in the
+         *     comparison window is not listed on a page about who is being cited now, and each
+         *     listed domain's earlier figures are looked up by its own name rather than read off
+         *     whatever occupied its position back then.
+         */
         AiVisibilityDomainsResponse: {
             /** @description The engine selection this response was computed for (empty = every engine) */
             providers?: components["schemas"]["AiVisibilityProviderEnum"][];
             /** @description Number of completed jobs aggregated */
             jobsIncluded?: number;
+            /** @description Completed jobs the comparison figures were read from, counted the same way as jobsIncluded. Present unless the read answers by job count. 0 says the project ran no analysis in that window at all — which is why every previous figure is zero and every previous share is null — as opposed to having run and cited nobody. */
+            comparisonJobsIncluded?: number;
             domains?: components["schemas"]["AiVisibilityDomainEntry"][];
+            comparisonWindow?: components["schemas"]["ComparisonWindow"];
         };
         /** @description One distinct cited URL under a domain, with how many times it was cited */
         AiVisibilityDomainCitationUrl: {
@@ -8083,10 +7970,29 @@ export interface components {
             sourceType?: "VENDOR" | "UGC" | "REVIEW_SITE" | "REFERENCE" | "NEWS" | "SOCIAL" | "DOCS" | "EDITORIAL" | null;
             /** @description Number of citations to this exact URL across the aggregated jobs */
             citationCount: number;
+            /** @description This page's share of the citations the selected period recorded, 0..1. The denominator is every citation the window holds across all cited pages — not only the ones on this page of results — which is the same denominator previousCitationShare is taken against, so the two are comparable. Null when the window recorded no citations at all. */
+            citationShare?: number | null;
             /** @description AI engines that cited this page at least once, scoped to the provider filter ('ALL' lists every engine) */
             providers?: string[];
+            /** @description Citations this exact URL received in the comparison window, under the same engine, topic, region and mentioningBrand filters. Present unless the read answers by job count; 0 when that window cited the page not at all. */
+            previousCitationCount?: number;
+            /** @description This page's share of every citation the comparison window recorded, 0..1 — 0 when that window cited other pages but never this one, which is a measured zero. Null means there is nothing to take a share of: the window recorded no citations at all, so this page was never measured there rather than measured at nothing. */
+            previousCitationShare?: number | null;
+            /** @description citationCount - previousCitationCount. Citations are what the list ranks on, so the change fields describe them. Present unless the read answers by job count. */
+            absoluteChange?: number;
+            /**
+             * Format: double
+             * @description Relative change from previousCitationCount to citationCount. Null when previousCitationCount is 0 — there is no percentage that describes going from nothing to something.
+             */
+            percentageChange?: number | null;
         };
-        /** @description Paginated flat list of the pages AI engines cited, across all domains */
+        /**
+         * @description Paginated flat list of the pages AI engines cited, across all domains. Which pages
+         *     appear, and on which page of the list, is decided by the selected period alone — a
+         *     URL cited only in the comparison window is not listed — and each listed page's
+         *     earlier figures are looked up by its own URL rather than read off whatever
+         *     occupied its position back then.
+         */
         AiVisibilityCitedPagesResponse: {
             /** @description The engine selection this response was computed for (empty = every engine) */
             providers?: components["schemas"]["AiVisibilityProviderEnum"][];
@@ -8094,11 +8000,14 @@ export interface components {
             mentioningBrand?: boolean;
             /** @description Number of completed jobs aggregated */
             jobsIncluded?: number;
+            /** @description Completed jobs the comparison figures were read from, counted the same way as jobsIncluded. Present unless the read answers by job count. 0 says the project ran no analysis in that window at all — which is why every previous figure is zero and every previous share is null — as opposed to having run and cited nothing. */
+            comparisonJobsIncluded?: number;
             page?: number;
             size?: number;
             totalElements?: number;
             totalPages?: number;
             pages?: components["schemas"]["AiVisibilityCitedPage"][];
+            comparisonWindow?: components["schemas"]["ComparisonWindow"];
         };
         AiVisibilityBreakdownEntry: {
             provider?: string;
@@ -8125,10 +8034,39 @@ export interface components {
             recommendedRate?: number | null;
             /** @description answerRankSum / answerRankCount; null when no ranked answers */
             avgAnswerRank?: number | null;
+            /** @description Runs this engine answered in the comparison window, under the same topic and region filters. Present unless the read answers by job count; 0 when the engine did not run then. */
+            previousRunCount?: number;
+            /** @description Runs of this engine the brand was present in during the comparison window. Present unless the read answers by job count. */
+            previousRunsWithBrand?: number;
+            /** @description previousRunsWithBrand / previousRunCount, 0..1 — 0 when the engine did not run in the comparison window. Present unless the read answers by job count. */
+            previousPresenceRate?: number;
+            /** @description Citations this engine's answers carried in the comparison window. Present unless the read answers by job count. */
+            previousCitationCount?: number;
+            /** @description How many of those comparison-window citations pointed at the project's own domains. Paired with previousCitationCount it gives the earlier window's self-citation share, which is what the citation meter compares against. Present unless the read answers by job count. */
+            previousSelfCitationCount?: number;
+            /** @description Mention rate over the comparison window; null when nothing was analyzed then. */
+            previousMentionRate?: number | null;
+            /** @description Domain-citation rate over the comparison window; null when nothing was analyzed then. */
+            previousCitationRate?: number | null;
+            /** @description Average answer rank over the comparison window. Null — never 0 — when the engine ranked no answers then: 0 is the best position there is, not absence. */
+            previousAvgAnswerRank?: number | null;
+            /**
+             * Format: double
+             * @description Change in presenceRate, in percentage points (presenceRate is the engine's headline metric, so the change fields describe it). A rate of 0.4286 against 0.2857 reads as 14.3 — the difference between the two figures as the page shows them. Present unless the read answers by job count.
+             */
+            absoluteChange?: number;
+            /**
+             * Format: double
+             * @description Relative change from previousPresenceRate to presenceRate. Null when previousPresenceRate is 0.
+             */
+            percentageChange?: number | null;
         };
         AiVisibilityBreakdownResponse: {
             jobsIncluded?: number;
+            /** @description Completed jobs the comparison figures were read from. Present unless the read answers by job count. 0 says the project ran no analysis in that window at all — which is why every previous figure is zero — as opposed to having run and found nothing. */
+            comparisonJobsIncluded?: number;
             byProvider?: components["schemas"]["AiVisibilityBreakdownEntry"][];
+            comparisonWindow?: components["schemas"]["ComparisonWindow"];
         };
         AiVisibilityCompetitorEntry: {
             brandId?: string;
@@ -8158,10 +8096,38 @@ export interface components {
             sentimentPositiveCount?: number | null;
             sentimentNeutralCount?: number | null;
             sentimentNegativeCount?: number | null;
+            /** @description This brand's visibility rate over the comparison window, 0..1, under the same engine, topic and region filters. Present unless the read answers by job count; 0 when the brand was not visible then. */
+            previousVisibilityRate?: number;
+            /** @description Where this brand stood in the comparison window's leaderboard. Null — never a number — when the brand was not measured at all then, because a rank is a position: reporting it as last place would read as "was bottom, now second" for a brand that simply had no data. */
+            previousRank?: number | null;
+            /** @description This brand's share of voice over the comparison window; null when no brand had any presence then. */
+            previousShareOfVoice?: number | null;
+            /** @description Citations this brand's domain received in the comparison window. Present unless the read answers by job count. */
+            previousCitationCount?: number;
+            /** @description Average answer rank over the comparison window. Null — never 0 — when the brand had no ranked answers then: 0 is the best position there is, not absence. */
+            previousAvgAnswerRank?: number | null;
+            /**
+             * Format: double
+             * @description Change in visibilityRate, in percentage points (visibility is what the leaderboard ranks on, so the change fields describe it). A rate of 0.4286 against 0.2857 reads as 14.3. Present unless the read answers by job count.
+             */
+            absoluteChange?: number;
+            /**
+             * Format: double
+             * @description Relative change from previousVisibilityRate to visibilityRate. Null when previousVisibilityRate is 0.
+             */
+            percentageChange?: number | null;
         };
+        /**
+         * @description The leaderboard as the selected period ranks it. A brand's position, and whether
+         *     it appears at all, is decided by that period alone — a competitor that was visible
+         *     only in the comparison window is not ranked into a picture of who is winning now.
+         */
         AiVisibilityCompetitorsResponse: {
             jobsIncluded?: number;
+            /** @description Completed jobs the comparison figures were read from, counted the same way as jobsIncluded. Present unless the read answers by job count. 0 says the project ran no analysis in that window at all, which is why every previous figure is zero — as opposed to having run and found nobody. */
+            comparisonJobsIncluded?: number;
             competitors?: components["schemas"]["AiVisibilityCompetitorEntry"][];
+            comparisonWindow?: components["schemas"]["ComparisonWindow"];
         };
         AiVisibilityDiscoveredCompetitorEntry: {
             /** @description Brand/product name as the AI wrote it (display casing) */
@@ -8322,6 +8288,22 @@ export interface components {
             shareOfVoice?: number | null;
             /** @description 1-based dense rank within the job, descending by runsWithBrand (ties broken by brandId) */
             rank?: number;
+            /** @description Runs this brand was present in across the whole comparison window. Present unless the read answers by job count; 0 when it was not present then. */
+            previousRunsWithBrand?: number;
+            /** @description This brand's share of voice across the comparison window taken as a whole — its runs-with-brand over every brand's, summed across that window's jobs. It is one figure per brand, repeated on every point, because the comparison window runs its own jobs on its own dates and no job here corresponds to a job there. Null when no brand had any presence in that window. */
+            previousShareOfVoice?: number | null;
+            /** @description This brand's dense rank in that same window-wide aggregate, ranked exactly as `rank` is within a job. A brand the window measured but never featured is ranked, tied last with every other brand on nothing — it was there to be counted and came bottom. Null when the window holds no reading for the brand at all: a rank is a position, and inventing last place for a brand that was never measured would read as a climb it never made. */
+            previousRank?: number | null;
+            /**
+             * Format: double
+             * @description Change in shareOfVoice, in percentage points — a share of 0.4286 against 0.2857 reads as 14.3, the difference between the two figures as the page shows them. Null when either share is null (nobody had presence in that window).
+             */
+            absoluteChange?: number | null;
+            /**
+             * Format: double
+             * @description Relative change from previousShareOfVoice to shareOfVoice. Null when previousShareOfVoice is 0 or null.
+             */
+            percentageChange?: number | null;
         };
         AiVisibilityShareOfVoicePoint: {
             jobId?: string;
@@ -8333,6 +8315,7 @@ export interface components {
             /** @description The engine selection this response was computed for (empty = every engine) */
             providers?: components["schemas"]["AiVisibilityProviderEnum"][];
             points?: components["schemas"]["AiVisibilityShareOfVoicePoint"][];
+            comparisonWindow?: components["schemas"]["ComparisonWindow"];
         };
         /**
          * @description A single AI answer engine. Note this deliberately has NO 'ALL' member: "all engines" is expressed as an empty selection. Per-row `provider` fields elsewhere stay plain strings because the aggregation marks its cross-engine rollup row with the internal sentinel 'ALL'.
@@ -8360,6 +8343,18 @@ export interface components {
         };
         AiVisibilityProviderSeriesResponse: {
             points?: components["schemas"]["AiVisibilityProviderSeriesPoint"][];
+            /**
+             * @description The same per-provider series read over the comparison window, under the same
+             *     engine, topic and region filters. Present unless the read answers by job count.
+             *
+             *     Its points are that window's own jobs, carrying their own ids and finish
+             *     times, so a chart lines the two up by position rather than by date — the two
+             *     windows rarely run the same number of jobs. An engine that only ran in the
+             *     comparison window appears here and not in `points`, and one that only ran in
+             *     the selected period has the reverse.
+             */
+            comparisonSeries?: components["schemas"]["AiVisibilityProviderSeriesPoint"][];
+            comparisonWindow?: components["schemas"]["ComparisonWindow"];
         };
         AiVisibilityCompetitorSeriesEntry: {
             brandId?: string;
@@ -8389,6 +8384,7 @@ export interface components {
             providers?: components["schemas"]["AiVisibilityProviderEnum"][];
             points?: components["schemas"]["AiVisibilityCompetitorSeriesPoint"][];
         };
+        /** @description One prompt's metrics on one engine, or — when `provider` is absent — that prompt's rollup across every engine it ran on. The previous* and change fields are filled only when a comparison was requested, and describe the same cell over the comparison window. */
         AiVisibilityPromptProviderCell: {
             provider?: string;
             runCount?: number;
@@ -8401,6 +8397,24 @@ export interface components {
             recommendedCount?: number | null;
             answerRankSum?: number | null;
             answerRankCount?: number | null;
+            /** @description Answers this cell covered in the comparison window, under the same engine, topic and region filters. Present unless the read answers by job count; 0 when the prompt was not run then. */
+            previousRunCount?: number;
+            /** @description How many of those answers the brand was present in. Present unless the read answers by job count. */
+            previousRunsWithBrand?: number;
+            /** @description previousRunsWithBrand / previousRunCount, 0..1. Null — never 0 — when the prompt was not run in the comparison window at all: no answers is not the same reading as answers the brand was absent from, and 0 would show a prompt that has since started running as a collapse to nothing. */
+            previousPresenceRate?: number | null;
+            /** @description Where the brand placed in the comparison window's answers, on average. Reported already divided, unlike the selected period's `answerRankSum` and `answerRankCount`, because there is nothing here to re-aggregate it with — it is the figure `answerRankSum / answerRankCount` is compared against. Null — never 0 — when no answer there ranked the brand: 0 is the best position there is, not the absence of one. */
+            previousAvgAnswerRank?: number | null;
+            /**
+             * Format: double
+             * @description Change in presenceRate, in percentage points (presence is what the row is read for, so the change fields describe it). A rate of 0.4286 against 0.2857 reads as 14.3 — the difference between the two figures as the page shows them. Null when previousPresenceRate is null.
+             */
+            absoluteChange?: number | null;
+            /**
+             * Format: double
+             * @description Relative change from previousPresenceRate to presenceRate. Null when previousPresenceRate is 0 or null — there is no percentage that describes going from nothing to something.
+             */
+            percentageChange?: number | null;
         };
         AiVisibilityPromptBreakdownEntry: {
             promptId?: string;
@@ -8414,9 +8428,17 @@ export interface components {
             overall?: components["schemas"]["AiVisibilityPromptProviderCell"];
             byProvider?: components["schemas"]["AiVisibilityPromptProviderCell"][];
         };
+        /**
+         * @description The prompts the selected period ran. Which prompts appear is decided by that
+         *     period alone — a prompt that ran only in the comparison window is not listed,
+         *     and neither is an engine cell it only has there.
+         */
         AiVisibilityPromptsBreakdownResponse: {
             jobsIncluded?: number;
+            /** @description Completed jobs the comparison figures were read from, counted the same way as jobsIncluded. Present unless the read answers by job count. 0 says the project ran no analysis in that window at all — which is why every prompt's previous figures are absent — as opposed to having run and found nothing. */
+            comparisonJobsIncluded?: number;
             prompts?: components["schemas"]["AiVisibilityPromptBreakdownEntry"][];
+            comparisonWindow?: components["schemas"]["ComparisonWindow"];
         };
         AiVisibilityTopicRequest: {
             name: string;
@@ -8429,6 +8451,7 @@ export interface components {
             /** Format: date-time */
             createdAt?: string;
         };
+        /** @description One brand's standing inside one breakdown row. The previous* and change fields are filled only by reads that accept a comparison — the persona breakdown does not, so they are always absent there. */
         AiVisibilityBreakdownBrandMetrics: {
             brandId?: string;
             brandName?: string;
@@ -8436,6 +8459,22 @@ export interface components {
             runsWithBrand?: number;
             visibilityRate?: number | null;
             shareOfVoice?: number | null;
+            /** @description Runs this brand was present in within this row during the comparison window; 0 when it was not present then. */
+            previousRunsWithBrand?: number;
+            /** @description This brand's visibility rate within this row over the comparison window; null when the row had no runs then. */
+            previousVisibilityRate?: number | null;
+            /** @description This brand's share of voice within this row over the comparison window; null when no brand had presence there then. */
+            previousShareOfVoice?: number | null;
+            /**
+             * Format: double
+             * @description Change in visibilityRate, in percentage points — a rate of 0.4286 against 0.2857 reads as 14.3. Null when either rate is null (the row had no runs in one of the windows).
+             */
+            absoluteChange?: number | null;
+            /**
+             * Format: double
+             * @description Relative change from previousVisibilityRate to visibilityRate. Null when previousVisibilityRate is 0 or null.
+             */
+            percentageChange?: number | null;
         };
         AiVisibilityTopicBreakdownEntry: {
             topicId?: string | null;
@@ -8444,9 +8483,26 @@ export interface components {
             promptsWithRuns?: number;
             runCount?: number;
             brands?: components["schemas"]["AiVisibilityBreakdownBrandMetrics"][];
+            /** @description Runs measured for this topic in the comparison window. Present unless the read answers by job count; 0 when the topic was not covered then. */
+            previousRunCount?: number;
+            /** @description Prompts of this topic that produced runs in the comparison window. Present unless the read answers by job count. */
+            previousPromptsWithRuns?: number;
+            /** @description runCount - previousRunCount. How much the topic was measured is the row's own metric, so the change fields describe it; each brand's visibility change is on its own entry under `brands`. Present unless the read answers by job count. */
+            absoluteChange?: number;
+            /**
+             * Format: double
+             * @description Percentage change from previousRunCount to runCount. Null when previousRunCount is 0.
+             */
+            percentageChange?: number | null;
         };
+        /**
+         * @description The topics the selected period covers. A topic that saw runs only in the
+         *     comparison window is not listed on that account alone — an active topic is always
+         *     listed, and an archived one appears only when the selected period has runs for it.
+         */
         AiVisibilityTopicsBreakdownResponse: {
             topics?: components["schemas"]["AiVisibilityTopicBreakdownEntry"][];
+            comparisonWindow?: components["schemas"]["ComparisonWindow"];
         };
         AiVisibilityTopicBackfillRequest: {
             promptIds?: string[];
@@ -9178,6 +9234,12 @@ export interface components {
         AiVisibilityJobId: string;
         /** @description Data import ID */
         DataImportId: string;
+        /** @description Which earlier period the selected one is compared against. Takes precedence over compareFrom/compareTo. Omitting all three comparison parameters compares against the previous period — the same length, immediately before the selected window. There is no way to ask for no comparison. */
+        ComparePreset: components["schemas"]["ComparisonPreset"];
+        /** @description Start date of a custom comparison window (inclusive, YYYY-MM-DD), resolved in the project's reporting timezone. Must be sent together with compareTo, and is ignored when comparePreset is present. Unlike the presets, its length may differ from the selected period's. Omitted, the report compares against the previous period. */
+        CompareFrom: string;
+        /** @description End date of a custom comparison window (inclusive, YYYY-MM-DD). Must be sent together with compareFrom. Omitted, the report compares against the previous period. */
+        CompareTo: string;
         /** @description AI engines to include. Repeat the parameter to select several; omitted or empty aggregates across every engine. There is no 'ALL' sentinel — an empty selection is what "all engines" means. */
         AiVisibilityProvider: components["schemas"]["AiVisibilityProviderEnum"][];
         /** @description Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics. */
@@ -10899,6 +10961,12 @@ export interface operations {
                 to?: components["parameters"]["AiVisibilityTo"];
                 /** @description Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected. */
                 regions?: components["parameters"]["AiVisibilityRegionFilter"];
+                /** @description Which earlier period the selected one is compared against. Takes precedence over compareFrom/compareTo. Omitting all three comparison parameters compares against the previous period — the same length, immediately before the selected window. There is no way to ask for no comparison. */
+                comparePreset?: components["parameters"]["ComparePreset"];
+                /** @description Start date of a custom comparison window (inclusive, YYYY-MM-DD), resolved in the project's reporting timezone. Must be sent together with compareTo, and is ignored when comparePreset is present. Unlike the presets, its length may differ from the selected period's. Omitted, the report compares against the previous period. */
+                compareFrom?: components["parameters"]["CompareFrom"];
+                /** @description End date of a custom comparison window (inclusive, YYYY-MM-DD). Must be sent together with compareFrom. Omitted, the report compares against the previous period. */
+                compareTo?: components["parameters"]["CompareTo"];
             };
             header?: never;
             path: {
@@ -11228,6 +11296,39 @@ export interface operations {
             404: components["responses"]["NotFoundError"];
         };
     };
+    bulkAssignAiVisibilityPromptPersona: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AiVisibilityPromptBulkAssignPersonaRequest"];
+            };
+        };
+        responses: {
+            /** @description Personas assigned */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiVisibilityPromptBulkResponse"];
+                };
+            };
+            400: components["responses"]["ValidationError"];
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            404: components["responses"]["NotFoundError"];
+        };
+    };
     bulkDeleteAiVisibilityPrompts: {
         parameters: {
             query?: never;
@@ -11276,7 +11377,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["AiVisibilityPromptRequest"];
+                "application/json": components["schemas"]["AiVisibilityPromptUpdateRequest"];
             };
         };
         responses: {
@@ -11659,6 +11760,12 @@ export interface operations {
                 topicIds?: components["parameters"]["AiVisibilityTopicFilter"];
                 /** @description Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected. */
                 regions?: components["parameters"]["AiVisibilityRegionFilter"];
+                /** @description Which earlier period the selected one is compared against. Takes precedence over compareFrom/compareTo. Omitting all three comparison parameters compares against the previous period — the same length, immediately before the selected window. There is no way to ask for no comparison. */
+                comparePreset?: components["parameters"]["ComparePreset"];
+                /** @description Start date of a custom comparison window (inclusive, YYYY-MM-DD), resolved in the project's reporting timezone. Must be sent together with compareTo, and is ignored when comparePreset is present. Unlike the presets, its length may differ from the selected period's. Omitted, the report compares against the previous period. */
+                compareFrom?: components["parameters"]["CompareFrom"];
+                /** @description End date of a custom comparison window (inclusive, YYYY-MM-DD). Must be sent together with compareFrom. Omitted, the report compares against the previous period. */
+                compareTo?: components["parameters"]["CompareTo"];
             };
             header?: never;
             path: {
@@ -11703,6 +11810,12 @@ export interface operations {
                 topicIds?: components["parameters"]["AiVisibilityTopicFilter"];
                 /** @description Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected. */
                 regions?: components["parameters"]["AiVisibilityRegionFilter"];
+                /** @description Which earlier period the selected one is compared against. Takes precedence over compareFrom/compareTo. Omitting all three comparison parameters compares against the previous period — the same length, immediately before the selected window. There is no way to ask for no comparison. */
+                comparePreset?: components["parameters"]["ComparePreset"];
+                /** @description Start date of a custom comparison window (inclusive, YYYY-MM-DD), resolved in the project's reporting timezone. Must be sent together with compareTo, and is ignored when comparePreset is present. Unlike the presets, its length may differ from the selected period's. Omitted, the report compares against the previous period. */
+                compareFrom?: components["parameters"]["CompareFrom"];
+                /** @description End date of a custom comparison window (inclusive, YYYY-MM-DD). Must be sent together with compareFrom. Omitted, the report compares against the previous period. */
+                compareTo?: components["parameters"]["CompareTo"];
             };
             header?: never;
             path: {
@@ -11799,6 +11912,12 @@ export interface operations {
                 topicIds?: components["parameters"]["AiVisibilityTopicFilter"];
                 /** @description Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected. */
                 regions?: components["parameters"]["AiVisibilityRegionFilter"];
+                /** @description Which earlier period the selected one is compared against. Takes precedence over compareFrom/compareTo. Omitting all three comparison parameters compares against the previous period — the same length, immediately before the selected window. There is no way to ask for no comparison. */
+                comparePreset?: components["parameters"]["ComparePreset"];
+                /** @description Start date of a custom comparison window (inclusive, YYYY-MM-DD), resolved in the project's reporting timezone. Must be sent together with compareTo, and is ignored when comparePreset is present. Unlike the presets, its length may differ from the selected period's. Omitted, the report compares against the previous period. */
+                compareFrom?: components["parameters"]["CompareFrom"];
+                /** @description End date of a custom comparison window (inclusive, YYYY-MM-DD). Must be sent together with compareFrom. Omitted, the report compares against the previous period. */
+                compareTo?: components["parameters"]["CompareTo"];
             };
             header?: never;
             path: {
@@ -11841,6 +11960,12 @@ export interface operations {
                 regions?: components["parameters"]["AiVisibilityRegionFilter"];
                 /** @description AI engines to include. Repeat the parameter to select several; omitted or empty aggregates across every engine. There is no 'ALL' sentinel — an empty selection is what "all engines" means. */
                 providers?: components["parameters"]["AiVisibilityProvider"];
+                /** @description Which earlier period the selected one is compared against. Takes precedence over compareFrom/compareTo. Omitting all three comparison parameters compares against the previous period — the same length, immediately before the selected window. There is no way to ask for no comparison. */
+                comparePreset?: components["parameters"]["ComparePreset"];
+                /** @description Start date of a custom comparison window (inclusive, YYYY-MM-DD), resolved in the project's reporting timezone. Must be sent together with compareTo, and is ignored when comparePreset is present. Unlike the presets, its length may differ from the selected period's. Omitted, the report compares against the previous period. */
+                compareFrom?: components["parameters"]["CompareFrom"];
+                /** @description End date of a custom comparison window (inclusive, YYYY-MM-DD). Must be sent together with compareFrom. Omitted, the report compares against the previous period. */
+                compareTo?: components["parameters"]["CompareTo"];
             };
             header?: never;
             path: {
@@ -11927,6 +12052,12 @@ export interface operations {
                 topicIds?: components["parameters"]["AiVisibilityTopicFilter"];
                 /** @description Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected. */
                 regions?: components["parameters"]["AiVisibilityRegionFilter"];
+                /** @description Which earlier period the selected one is compared against. Takes precedence over compareFrom/compareTo. Omitting all three comparison parameters compares against the previous period — the same length, immediately before the selected window. There is no way to ask for no comparison. */
+                comparePreset?: components["parameters"]["ComparePreset"];
+                /** @description Start date of a custom comparison window (inclusive, YYYY-MM-DD), resolved in the project's reporting timezone. Must be sent together with compareTo, and is ignored when comparePreset is present. Unlike the presets, its length may differ from the selected period's. Omitted, the report compares against the previous period. */
+                compareFrom?: components["parameters"]["CompareFrom"];
+                /** @description End date of a custom comparison window (inclusive, YYYY-MM-DD). Must be sent together with compareFrom. Omitted, the report compares against the previous period. */
+                compareTo?: components["parameters"]["CompareTo"];
             };
             header?: never;
             path: {
@@ -12013,6 +12144,12 @@ export interface operations {
                 topicIds?: components["parameters"]["AiVisibilityTopicFilter"];
                 /** @description Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected. */
                 regions?: components["parameters"]["AiVisibilityRegionFilter"];
+                /** @description Which earlier period the selected one is compared against. Takes precedence over compareFrom/compareTo. Omitting all three comparison parameters compares against the previous period — the same length, immediately before the selected window. There is no way to ask for no comparison. */
+                comparePreset?: components["parameters"]["ComparePreset"];
+                /** @description Start date of a custom comparison window (inclusive, YYYY-MM-DD), resolved in the project's reporting timezone. Must be sent together with compareTo, and is ignored when comparePreset is present. Unlike the presets, its length may differ from the selected period's. Omitted, the report compares against the previous period. */
+                compareFrom?: components["parameters"]["CompareFrom"];
+                /** @description End date of a custom comparison window (inclusive, YYYY-MM-DD). Must be sent together with compareFrom. Omitted, the report compares against the previous period. */
+                compareTo?: components["parameters"]["CompareTo"];
             };
             header?: never;
             path: {
@@ -12055,6 +12192,12 @@ export interface operations {
                 regions?: components["parameters"]["AiVisibilityRegionFilter"];
                 /** @description AI engines to include. Repeat the parameter to select several; omitted or empty aggregates across every engine. There is no 'ALL' sentinel — an empty selection is what "all engines" means. */
                 providers?: components["parameters"]["AiVisibilityProvider"];
+                /** @description Which earlier period the selected one is compared against. Takes precedence over compareFrom/compareTo. Omitting all three comparison parameters compares against the previous period — the same length, immediately before the selected window. There is no way to ask for no comparison. */
+                comparePreset?: components["parameters"]["ComparePreset"];
+                /** @description Start date of a custom comparison window (inclusive, YYYY-MM-DD), resolved in the project's reporting timezone. Must be sent together with compareTo, and is ignored when comparePreset is present. Unlike the presets, its length may differ from the selected period's. Omitted, the report compares against the previous period. */
+                compareFrom?: components["parameters"]["CompareFrom"];
+                /** @description End date of a custom comparison window (inclusive, YYYY-MM-DD). Must be sent together with compareFrom. Omitted, the report compares against the previous period. */
+                compareTo?: components["parameters"]["CompareTo"];
             };
             header?: never;
             path: {
@@ -12139,6 +12282,12 @@ export interface operations {
                 regions?: components["parameters"]["AiVisibilityRegionFilter"];
                 /** @description AI engines to include. Repeat the parameter to select several; omitted or empty aggregates across every engine. There is no 'ALL' sentinel — an empty selection is what "all engines" means. */
                 providers?: components["parameters"]["AiVisibilityProvider"];
+                /** @description Which earlier period the selected one is compared against. Takes precedence over compareFrom/compareTo. Omitting all three comparison parameters compares against the previous period — the same length, immediately before the selected window. There is no way to ask for no comparison. */
+                comparePreset?: components["parameters"]["ComparePreset"];
+                /** @description Start date of a custom comparison window (inclusive, YYYY-MM-DD), resolved in the project's reporting timezone. Must be sent together with compareTo, and is ignored when comparePreset is present. Unlike the presets, its length may differ from the selected period's. Omitted, the report compares against the previous period. */
+                compareFrom?: components["parameters"]["CompareFrom"];
+                /** @description End date of a custom comparison window (inclusive, YYYY-MM-DD). Must be sent together with compareFrom. Omitted, the report compares against the previous period. */
+                compareTo?: components["parameters"]["CompareTo"];
             };
             header?: never;
             path: {
@@ -15095,6 +15244,12 @@ export interface operations {
                 to?: string;
                 /** @description Time-bucketing granularity for the timeline data. Defaults to day. */
                 interval?: components["schemas"]["TimelineInterval"];
+                /** @description Which earlier period the selected one is compared against. Takes precedence over compareFrom/compareTo. Omitting all three comparison parameters compares against the previous period — the same length, immediately before the selected window. There is no way to ask for no comparison. */
+                comparePreset?: components["parameters"]["ComparePreset"];
+                /** @description Start date of a custom comparison window (inclusive, YYYY-MM-DD), resolved in the project's reporting timezone. Must be sent together with compareTo, and is ignored when comparePreset is present. Unlike the presets, its length may differ from the selected period's. Omitted, the report compares against the previous period. */
+                compareFrom?: components["parameters"]["CompareFrom"];
+                /** @description End date of a custom comparison window (inclusive, YYYY-MM-DD). Must be sent together with compareFrom. Omitted, the report compares against the previous period. */
+                compareTo?: components["parameters"]["CompareTo"];
             };
             header?: never;
             path: {
@@ -15132,6 +15287,12 @@ export interface operations {
                 page?: number;
                 /** @description Items per page */
                 size?: number;
+                /** @description Which earlier period the selected one is compared against. Takes precedence over compareFrom/compareTo. Omitting all three comparison parameters compares against the previous period — the same length, immediately before the selected window. There is no way to ask for no comparison. */
+                comparePreset?: components["parameters"]["ComparePreset"];
+                /** @description Start date of a custom comparison window (inclusive, YYYY-MM-DD), resolved in the project's reporting timezone. Must be sent together with compareTo, and is ignored when comparePreset is present. Unlike the presets, its length may differ from the selected period's. Omitted, the report compares against the previous period. */
+                compareFrom?: components["parameters"]["CompareFrom"];
+                /** @description End date of a custom comparison window (inclusive, YYYY-MM-DD). Must be sent together with compareFrom. Omitted, the report compares against the previous period. */
+                compareTo?: components["parameters"]["CompareTo"];
             };
             header?: never;
             path: {
@@ -15167,6 +15328,12 @@ export interface operations {
                 to?: string;
                 /** @description Maximum number of top bots to return */
                 size?: number;
+                /** @description Which earlier period the selected one is compared against. Takes precedence over compareFrom/compareTo. Omitting all three comparison parameters compares against the previous period — the same length, immediately before the selected window. There is no way to ask for no comparison. */
+                comparePreset?: components["parameters"]["ComparePreset"];
+                /** @description Start date of a custom comparison window (inclusive, YYYY-MM-DD), resolved in the project's reporting timezone. Must be sent together with compareTo, and is ignored when comparePreset is present. Unlike the presets, its length may differ from the selected period's. Omitted, the report compares against the previous period. */
+                compareFrom?: components["parameters"]["CompareFrom"];
+                /** @description End date of a custom comparison window (inclusive, YYYY-MM-DD). Must be sent together with compareFrom. Omitted, the report compares against the previous period. */
+                compareTo?: components["parameters"]["CompareTo"];
             };
             header?: never;
             path: {
@@ -15204,6 +15371,12 @@ export interface operations {
                 size?: number;
                 /** @description Restrict to one bot vendor/company (e.g. "OpenAI", "Anthropic", "Google", "Perplexity") */
                 vendor?: string;
+                /** @description Which earlier period the selected one is compared against. Takes precedence over compareFrom/compareTo. Omitting all three comparison parameters compares against the previous period — the same length, immediately before the selected window. There is no way to ask for no comparison. */
+                comparePreset?: components["parameters"]["ComparePreset"];
+                /** @description Start date of a custom comparison window (inclusive, YYYY-MM-DD), resolved in the project's reporting timezone. Must be sent together with compareTo, and is ignored when comparePreset is present. Unlike the presets, its length may differ from the selected period's. Omitted, the report compares against the previous period. */
+                compareFrom?: components["parameters"]["CompareFrom"];
+                /** @description End date of a custom comparison window (inclusive, YYYY-MM-DD). Must be sent together with compareFrom. Omitted, the report compares against the previous period. */
+                compareTo?: components["parameters"]["CompareTo"];
             };
             header?: never;
             path: {
@@ -15791,6 +15964,12 @@ export interface operations {
                  *     Example: filters=country:is:US,UK&filters=browser:is_not:Safari
                  */
                 filters?: string[];
+                /** @description Which earlier period the selected one is compared against. Takes precedence over compareFrom/compareTo. Omitting all three comparison parameters compares against the previous period — the same length, immediately before the selected window. There is no way to ask for no comparison. */
+                comparePreset?: components["parameters"]["ComparePreset"];
+                /** @description Start date of a custom comparison window (inclusive, YYYY-MM-DD), resolved in the project's reporting timezone. Must be sent together with compareTo, and is ignored when comparePreset is present. Unlike the presets, its length may differ from the selected period's. Omitted, the report compares against the previous period. */
+                compareFrom?: components["parameters"]["CompareFrom"];
+                /** @description End date of a custom comparison window (inclusive, YYYY-MM-DD). Must be sent together with compareFrom. Omitted, the report compares against the previous period. */
+                compareTo?: components["parameters"]["CompareTo"];
             };
             header?: never;
             path: {
@@ -15834,6 +16013,12 @@ export interface operations {
                  *     Example: filters=country:is:US,UK&filters=browser:is_not:Safari
                  */
                 filters?: string[];
+                /** @description Which earlier period the selected one is compared against. Takes precedence over compareFrom/compareTo. Omitting all three comparison parameters compares against the previous period — the same length, immediately before the selected window. There is no way to ask for no comparison. */
+                comparePreset?: components["parameters"]["ComparePreset"];
+                /** @description Start date of a custom comparison window (inclusive, YYYY-MM-DD), resolved in the project's reporting timezone. Must be sent together with compareTo, and is ignored when comparePreset is present. Unlike the presets, its length may differ from the selected period's. Omitted, the report compares against the previous period. */
+                compareFrom?: components["parameters"]["CompareFrom"];
+                /** @description End date of a custom comparison window (inclusive, YYYY-MM-DD). Must be sent together with compareFrom. Omitted, the report compares against the previous period. */
+                compareTo?: components["parameters"]["CompareTo"];
             };
             header?: never;
             path: {
@@ -15924,6 +16109,12 @@ export interface operations {
                  *     Example: filters=country:is:US,UK&filters=browser:is_not:Safari
                  */
                 filters?: string[];
+                /** @description Which earlier period the selected one is compared against. Takes precedence over compareFrom/compareTo. Omitting all three comparison parameters compares against the previous period — the same length, immediately before the selected window. There is no way to ask for no comparison. */
+                comparePreset?: components["parameters"]["ComparePreset"];
+                /** @description Start date of a custom comparison window (inclusive, YYYY-MM-DD), resolved in the project's reporting timezone. Must be sent together with compareTo, and is ignored when comparePreset is present. Unlike the presets, its length may differ from the selected period's. Omitted, the report compares against the previous period. */
+                compareFrom?: components["parameters"]["CompareFrom"];
+                /** @description End date of a custom comparison window (inclusive, YYYY-MM-DD). Must be sent together with compareFrom. Omitted, the report compares against the previous period. */
+                compareTo?: components["parameters"]["CompareTo"];
             };
             header?: never;
             path: {
@@ -15965,6 +16156,12 @@ export interface operations {
                  *     Example: filters=country:is:US,UK&filters=browser:is_not:Safari
                  */
                 filters?: string[];
+                /** @description Which earlier period the selected one is compared against. Takes precedence over compareFrom/compareTo. Omitting all three comparison parameters compares against the previous period — the same length, immediately before the selected window. There is no way to ask for no comparison. */
+                comparePreset?: components["parameters"]["ComparePreset"];
+                /** @description Start date of a custom comparison window (inclusive, YYYY-MM-DD), resolved in the project's reporting timezone. Must be sent together with compareTo, and is ignored when comparePreset is present. Unlike the presets, its length may differ from the selected period's. Omitted, the report compares against the previous period. */
+                compareFrom?: components["parameters"]["CompareFrom"];
+                /** @description End date of a custom comparison window (inclusive, YYYY-MM-DD). Must be sent together with compareFrom. Omitted, the report compares against the previous period. */
+                compareTo?: components["parameters"]["CompareTo"];
             };
             header?: never;
             path: {
@@ -16010,6 +16207,12 @@ export interface operations {
                  *     Example: filters=country:is:US,UK&filters=browser:is_not:Safari
                  */
                 filters?: string[];
+                /** @description Which earlier period the selected one is compared against. Takes precedence over compareFrom/compareTo. Omitting all three comparison parameters compares against the previous period — the same length, immediately before the selected window. There is no way to ask for no comparison. */
+                comparePreset?: components["parameters"]["ComparePreset"];
+                /** @description Start date of a custom comparison window (inclusive, YYYY-MM-DD), resolved in the project's reporting timezone. Must be sent together with compareTo, and is ignored when comparePreset is present. Unlike the presets, its length may differ from the selected period's. Omitted, the report compares against the previous period. */
+                compareFrom?: components["parameters"]["CompareFrom"];
+                /** @description End date of a custom comparison window (inclusive, YYYY-MM-DD). Must be sent together with compareFrom. Omitted, the report compares against the previous period. */
+                compareTo?: components["parameters"]["CompareTo"];
             };
             header?: never;
             path: {
@@ -16062,53 +16265,6 @@ export interface operations {
             403: components["responses"]["ForbiddenError"];
         };
     };
-    compareWebAnalyticsPeriods: {
-        parameters: {
-            query: {
-                /** @description The dimension to compare */
-                dimension: components["schemas"]["BreakdownDimension"];
-                /** @description Start date of the current period (inclusive, YYYY-MM-DD) */
-                currentFrom: string;
-                /** @description End date of the current period (inclusive, YYYY-MM-DD) */
-                currentTo: string;
-                /** @description Start date of the previous period (inclusive, YYYY-MM-DD) */
-                previousFrom: string;
-                /** @description End date of the previous period (inclusive, YYYY-MM-DD) */
-                previousTo: string;
-                /** @description Maximum number of results to return (default 10) */
-                limit?: number;
-                /**
-                 * @description Dimension filters in format dimension:operator:values.
-                 *     Operator is 'is' (include) or 'is_not' (exclude).
-                 *     Values are comma-separated. Can specify multiple filters.
-                 *     Example: filters=country:is:US,UK&filters=browser:is_not:Safari
-                 */
-                filters?: string[];
-            };
-            header?: never;
-            path: {
-                /** @description Organization slug */
-                orgSlug: components["parameters"]["OrgSlugPath"];
-                /** @description Project ID */
-                projectId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Period comparison result */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PeriodComparisonResponse"];
-                };
-            };
-            401: components["responses"]["UnauthorizedError"];
-            403: components["responses"]["ForbiddenError"];
-        };
-    };
     getUniqueEventNames: {
         parameters: {
             query?: never;
@@ -16130,163 +16286,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UniqueValuesResponse"];
-                };
-            };
-            401: components["responses"]["UnauthorizedError"];
-            403: components["responses"]["ForbiddenError"];
-        };
-    };
-    getDashboardEventsTimeline: {
-        parameters: {
-            query?: {
-                /**
-                 * @description Time range preset. Controls both the time window and the date-truncation granularity.
-                 *     Supported values: "30m" (minute), "24h" (hour), "7d" (day), "30d" (day), "3m" (week), "12m" (month).
-                 *     Defaults to "24h".
-                 */
-                range?: "30m" | "24h" | "7d" | "30d" | "3m" | "12m";
-            };
-            header?: never;
-            path: {
-                /** @description Organization slug */
-                orgSlug: components["parameters"]["OrgSlugPath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Event counts for current and previous periods */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["FlexibleTimelineResponse"];
-                };
-            };
-            401: components["responses"]["UnauthorizedError"];
-            403: components["responses"]["ForbiddenError"];
-        };
-    };
-    getDashboardUniqueUsers: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Organization slug */
-                orgSlug: components["parameters"]["OrgSlugPath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Daily unique user counts for current and previous month */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["DashboardUsersResponse"];
-                };
-            };
-            401: components["responses"]["UnauthorizedError"];
-            403: components["responses"]["ForbiddenError"];
-        };
-    };
-    getDashboardTopEvents: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Organization slug */
-                orgSlug: components["parameters"]["OrgSlugPath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Top 10 events with comparison to previous month */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["DashboardTopEventsResponse"];
-                };
-            };
-            401: components["responses"]["UnauthorizedError"];
-            403: components["responses"]["ForbiddenError"];
-        };
-    };
-    getDashboardEventsSummary: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Organization slug */
-                orgSlug: components["parameters"]["OrgSlugPath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Summary KPIs for current and previous month */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["DashboardSummaryResponse"];
-                };
-            };
-            401: components["responses"]["UnauthorizedError"];
-            403: components["responses"]["ForbiddenError"];
-        };
-    };
-    getDashboardEventsByProject: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Organization slug */
-                orgSlug: components["parameters"]["OrgSlugPath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Event counts by project for current and previous month */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["DashboardEventsByProjectResponse"];
-                };
-            };
-            401: components["responses"]["UnauthorizedError"];
-            403: components["responses"]["ForbiddenError"];
-        };
-    };
-    getDashboardTopUsers: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Organization slug */
-                orgSlug: components["parameters"]["OrgSlugPath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Top 10 users with comparison to previous month */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["DashboardTopUsersResponse"];
                 };
             };
             401: components["responses"]["UnauthorizedError"];

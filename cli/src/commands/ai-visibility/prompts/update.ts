@@ -14,8 +14,6 @@ export default class AiVisibilityPromptsUpdate extends ApiOperationCommand {
 		"intentTier": Flags.string({ description: "Free-form intent tier ('buying' | 'category' | 'branded')" }),
 		"locale": Flags.string({  }),
 		"active": Flags.boolean({  }),
-		"topicId": Flags.string({ description: "Topic assignment. On PUT, omitted or null clears the assignment." }),
-		"personaId": Flags.string({ description: "Persona assignment. On PUT, omitted or null clears the assignment." }),
 	};
 
 	descriptor = descriptors["updateAiVisibilityPrompt"];

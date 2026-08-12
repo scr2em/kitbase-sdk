@@ -164,6 +164,88 @@
         "update.js"
       ]
     },
+    "agent:conversations": {
+      "aliases": [],
+      "args": {},
+      "description": "Delete every conversation in this scope",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "workflowId": {
+          "description": "Scopes the clear to one workflow's shared conversation.",
+          "name": "workflowId",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "agent:conversations",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "agent",
+        "conversations.js"
+      ]
+    },
     "ai-visibility:brands:create": {
       "aliases": [],
       "args": {},
@@ -613,22 +695,15 @@
           "type": "option"
         },
         "from": {
-          "description": "Start of the date window (inclusive, interpreted in the client timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window.\n",
+          "description": "Start of the date window (inclusive, interpreted in the project's reporting timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window.\n",
           "name": "from",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
         },
         "to": {
-          "description": "End of the date window (inclusive, interpreted in the client timezone).",
+          "description": "End of the date window (inclusive, interpreted in the project's reporting timezone).",
           "name": "to",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "timezone": {
-          "description": "Client timezone (e.g. \"Africa/Cairo\") used to resolve preset/date boundaries; defaults to UTC.",
-          "name": "timezone",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
@@ -638,6 +713,17 @@
           "name": "topicIds",
           "hasDynamicHelp": false,
           "multiple": true,
+          "type": "option"
+        },
+        "regions": {
+          "description": "Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected.\n",
+          "name": "regions",
+          "hasDynamicHelp": false,
+          "multiple": true,
+          "options": [
+            "US",
+            "EU"
+          ],
           "type": "option"
         },
         "providers": {
@@ -658,6 +744,34 @@
             "CHATGPT_WEB",
             "GEMINI_WEB"
           ],
+          "type": "option"
+        },
+        "comparePreset": {
+          "description": "Which earlier period the selected one is compared against. Takes precedence over compareFrom/compareTo. Omitting all three comparison parameters compares against the previous period — the same length, immediately before the selected window. There is no way to ask for no comparison.\n",
+          "name": "comparePreset",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "previous_period",
+            "previous_week",
+            "previous_month",
+            "previous_quarter",
+            "previous_year"
+          ],
+          "type": "option"
+        },
+        "compareFrom": {
+          "description": "Start date of a custom comparison window (inclusive, YYYY-MM-DD), resolved in the project's reporting timezone. Must be sent together with compareTo, and is ignored when comparePreset is present. Unlike the presets, its length may differ from the selected period's. Omitted, the report compares against the previous period.\n",
+          "name": "compareFrom",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "compareTo": {
+          "description": "End date of a custom comparison window (inclusive, YYYY-MM-DD). Must be sent together with compareFrom. Omitted, the report compares against the previous period.\n",
+          "name": "compareTo",
+          "hasDynamicHelp": false,
+          "multiple": false,
           "type": "option"
         }
       },
@@ -800,22 +914,15 @@
           "type": "option"
         },
         "from": {
-          "description": "Start of the date window (inclusive, interpreted in the client timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window.\n",
+          "description": "Start of the date window (inclusive, interpreted in the project's reporting timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window.\n",
           "name": "from",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
         },
         "to": {
-          "description": "End of the date window (inclusive, interpreted in the client timezone).",
+          "description": "End of the date window (inclusive, interpreted in the project's reporting timezone).",
           "name": "to",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "timezone": {
-          "description": "Client timezone (e.g. \"Africa/Cairo\") used to resolve preset/date boundaries; defaults to UTC.",
-          "name": "timezone",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
@@ -825,6 +932,45 @@
           "name": "topicIds",
           "hasDynamicHelp": false,
           "multiple": true,
+          "type": "option"
+        },
+        "regions": {
+          "description": "Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected.\n",
+          "name": "regions",
+          "hasDynamicHelp": false,
+          "multiple": true,
+          "options": [
+            "US",
+            "EU"
+          ],
+          "type": "option"
+        },
+        "comparePreset": {
+          "description": "Which earlier period the selected one is compared against. Takes precedence over compareFrom/compareTo. Omitting all three comparison parameters compares against the previous period — the same length, immediately before the selected window. There is no way to ask for no comparison.\n",
+          "name": "comparePreset",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "previous_period",
+            "previous_week",
+            "previous_month",
+            "previous_quarter",
+            "previous_year"
+          ],
+          "type": "option"
+        },
+        "compareFrom": {
+          "description": "Start date of a custom comparison window (inclusive, YYYY-MM-DD), resolved in the project's reporting timezone. Must be sent together with compareTo, and is ignored when comparePreset is present. Unlike the presets, its length may differ from the selected period's. Omitted, the report compares against the previous period.\n",
+          "name": "compareFrom",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "compareTo": {
+          "description": "End date of a custom comparison window (inclusive, YYYY-MM-DD). Must be sent together with compareFrom. Omitted, the report compares against the previous period.\n",
+          "name": "compareTo",
+          "hasDynamicHelp": false,
+          "multiple": false,
           "type": "option"
         }
       },
@@ -948,22 +1094,15 @@
           "type": "option"
         },
         "from": {
-          "description": "Start of the date window (inclusive, interpreted in the client timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window.\n",
+          "description": "Start of the date window (inclusive, interpreted in the project's reporting timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window.\n",
           "name": "from",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
         },
         "to": {
-          "description": "End of the date window (inclusive, interpreted in the client timezone).",
+          "description": "End of the date window (inclusive, interpreted in the project's reporting timezone).",
           "name": "to",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "timezone": {
-          "description": "Client timezone (e.g. \"Africa/Cairo\") used to resolve preset/date boundaries; defaults to UTC.",
-          "name": "timezone",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
@@ -973,6 +1112,17 @@
           "name": "topicIds",
           "hasDynamicHelp": false,
           "multiple": true,
+          "type": "option"
+        },
+        "regions": {
+          "description": "Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected.\n",
+          "name": "regions",
+          "hasDynamicHelp": false,
+          "multiple": true,
+          "options": [
+            "US",
+            "EU"
+          ],
           "type": "option"
         }
       },
@@ -1102,22 +1252,15 @@
           "type": "option"
         },
         "from": {
-          "description": "Start of the date window (inclusive, interpreted in the client timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window.\n",
+          "description": "Start of the date window (inclusive, interpreted in the project's reporting timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window.\n",
           "name": "from",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
         },
         "to": {
-          "description": "End of the date window (inclusive, interpreted in the client timezone).",
+          "description": "End of the date window (inclusive, interpreted in the project's reporting timezone).",
           "name": "to",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "timezone": {
-          "description": "Client timezone (e.g. \"Africa/Cairo\") used to resolve preset/date boundaries; defaults to UTC.",
-          "name": "timezone",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
@@ -1127,6 +1270,45 @@
           "name": "topicIds",
           "hasDynamicHelp": false,
           "multiple": true,
+          "type": "option"
+        },
+        "regions": {
+          "description": "Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected.\n",
+          "name": "regions",
+          "hasDynamicHelp": false,
+          "multiple": true,
+          "options": [
+            "US",
+            "EU"
+          ],
+          "type": "option"
+        },
+        "comparePreset": {
+          "description": "Which earlier period the selected one is compared against. Takes precedence over compareFrom/compareTo. Omitting all three comparison parameters compares against the previous period — the same length, immediately before the selected window. There is no way to ask for no comparison.\n",
+          "name": "comparePreset",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "previous_period",
+            "previous_week",
+            "previous_month",
+            "previous_quarter",
+            "previous_year"
+          ],
+          "type": "option"
+        },
+        "compareFrom": {
+          "description": "Start date of a custom comparison window (inclusive, YYYY-MM-DD), resolved in the project's reporting timezone. Must be sent together with compareTo, and is ignored when comparePreset is present. Unlike the presets, its length may differ from the selected period's. Omitted, the report compares against the previous period.\n",
+          "name": "compareFrom",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "compareTo": {
+          "description": "End date of a custom comparison window (inclusive, YYYY-MM-DD). Must be sent together with compareFrom. Omitted, the report compares against the previous period.\n",
+          "name": "compareTo",
+          "hasDynamicHelp": false,
+          "multiple": false,
           "type": "option"
         }
       },
@@ -1256,24 +1438,35 @@
           "type": "option"
         },
         "from": {
-          "description": "Start of the date window (inclusive, interpreted in the client timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window.\n",
+          "description": "Start of the date window (inclusive, interpreted in the project's reporting timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window.\n",
           "name": "from",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
         },
         "to": {
-          "description": "End of the date window (inclusive, interpreted in the client timezone).",
+          "description": "End of the date window (inclusive, interpreted in the project's reporting timezone).",
           "name": "to",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
         },
-        "timezone": {
-          "description": "Client timezone (e.g. \"Africa/Cairo\") used to resolve preset/date boundaries; defaults to UTC.",
-          "name": "timezone",
+        "regions": {
+          "description": "Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected.\n",
+          "name": "regions",
           "hasDynamicHelp": false,
-          "multiple": false,
+          "multiple": true,
+          "options": [
+            "US",
+            "EU"
+          ],
+          "type": "option"
+        },
+        "topicIds": {
+          "description": "Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics.\n",
+          "name": "topicIds",
+          "hasDynamicHelp": false,
+          "multiple": true,
           "type": "option"
         }
       },
@@ -1403,22 +1596,15 @@
           "type": "option"
         },
         "from": {
-          "description": "Start of the date window (inclusive, interpreted in the client timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window.\n",
+          "description": "Start of the date window (inclusive, interpreted in the project's reporting timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window.\n",
           "name": "from",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
         },
         "to": {
-          "description": "End of the date window (inclusive, interpreted in the client timezone).",
+          "description": "End of the date window (inclusive, interpreted in the project's reporting timezone).",
           "name": "to",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "timezone": {
-          "description": "Client timezone (e.g. \"Africa/Cairo\") used to resolve preset/date boundaries; defaults to UTC.",
-          "name": "timezone",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
@@ -1428,6 +1614,45 @@
           "name": "topicIds",
           "hasDynamicHelp": false,
           "multiple": true,
+          "type": "option"
+        },
+        "regions": {
+          "description": "Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected.\n",
+          "name": "regions",
+          "hasDynamicHelp": false,
+          "multiple": true,
+          "options": [
+            "US",
+            "EU"
+          ],
+          "type": "option"
+        },
+        "comparePreset": {
+          "description": "Which earlier period the selected one is compared against. Takes precedence over compareFrom/compareTo. Omitting all three comparison parameters compares against the previous period — the same length, immediately before the selected window. There is no way to ask for no comparison.\n",
+          "name": "comparePreset",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "previous_period",
+            "previous_week",
+            "previous_month",
+            "previous_quarter",
+            "previous_year"
+          ],
+          "type": "option"
+        },
+        "compareFrom": {
+          "description": "Start date of a custom comparison window (inclusive, YYYY-MM-DD), resolved in the project's reporting timezone. Must be sent together with compareTo, and is ignored when comparePreset is present. Unlike the presets, its length may differ from the selected period's. Omitted, the report compares against the previous period.\n",
+          "name": "compareFrom",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "compareTo": {
+          "description": "End date of a custom comparison window (inclusive, YYYY-MM-DD). Must be sent together with compareFrom. Omitted, the report compares against the previous period.\n",
+          "name": "compareTo",
+          "hasDynamicHelp": false,
+          "multiple": false,
           "type": "option"
         }
       },
@@ -1570,22 +1795,15 @@
           "type": "option"
         },
         "from": {
-          "description": "Start of the date window (inclusive, interpreted in the client timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window.\n",
+          "description": "Start of the date window (inclusive, interpreted in the project's reporting timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window.\n",
           "name": "from",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
         },
         "to": {
-          "description": "End of the date window (inclusive, interpreted in the client timezone).",
+          "description": "End of the date window (inclusive, interpreted in the project's reporting timezone).",
           "name": "to",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "timezone": {
-          "description": "Client timezone (e.g. \"Africa/Cairo\") used to resolve preset/date boundaries; defaults to UTC.",
-          "name": "timezone",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
@@ -1595,6 +1813,17 @@
           "name": "topicIds",
           "hasDynamicHelp": false,
           "multiple": true,
+          "type": "option"
+        },
+        "regions": {
+          "description": "Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected.\n",
+          "name": "regions",
+          "hasDynamicHelp": false,
+          "multiple": true,
+          "options": [
+            "US",
+            "EU"
+          ],
           "type": "option"
         }
       },
@@ -2240,6 +2469,17 @@
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
+        },
+        "regions": {
+          "description": "Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected.\n",
+          "name": "regions",
+          "hasDynamicHelp": false,
+          "multiple": true,
+          "options": [
+            "US",
+            "EU"
+          ],
+          "type": "option"
         }
       },
       "hasDynamicHelp": false,
@@ -2257,6 +2497,816 @@
         "ai-visibility",
         "jobs",
         "runs.js"
+      ]
+    },
+    "ai-visibility:paid-placements": {
+      "aliases": [],
+      "args": {},
+      "description": "Sponsored placements inside AI answers",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "jobs": {
+          "description": "Number of most recent completed jobs to aggregate (ignored when from/to set)",
+          "name": "jobs",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "preset": {
+          "description": "Predefined date range preset. Takes precedence over from/to.",
+          "name": "preset",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "last_30_minutes",
+            "last_hour",
+            "today",
+            "yesterday",
+            "last_7_days",
+            "last_30_days",
+            "this_month",
+            "this_year"
+          ],
+          "type": "option"
+        },
+        "from": {
+          "description": "Start of the date window (inclusive, interpreted in the project's reporting timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window.\n",
+          "name": "from",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "to": {
+          "description": "End of the date window (inclusive, interpreted in the project's reporting timezone).",
+          "name": "to",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "topicIds": {
+          "description": "Topic UUIDs to include, plus the reserved literal `uncategorized` for runs with no topic. Repeat the parameter to select several; omitted or empty means all topics.\n",
+          "name": "topicIds",
+          "hasDynamicHelp": false,
+          "multiple": true,
+          "type": "option"
+        },
+        "regions": {
+          "description": "Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected.\n",
+          "name": "regions",
+          "hasDynamicHelp": false,
+          "multiple": true,
+          "options": [
+            "US",
+            "EU"
+          ],
+          "type": "option"
+        },
+        "providers": {
+          "description": "AI engines to include. Repeat the parameter to select several; omitted or empty aggregates across every engine. There is no 'ALL' sentinel — an empty selection is what \"all engines\" means.\n",
+          "name": "providers",
+          "hasDynamicHelp": false,
+          "multiple": true,
+          "options": [
+            "PERPLEXITY",
+            "GEMINI",
+            "CLAUDE",
+            "CHATGPT",
+            "DEEPSEEK",
+            "GLM",
+            "KIMI",
+            "GOOGLE_AI_OVERVIEW",
+            "GOOGLE_AI_MODE",
+            "CHATGPT_WEB",
+            "GEMINI_WEB"
+          ],
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "ai-visibility:paid-placements",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "ai-visibility",
+        "paid-placements.js"
+      ]
+    },
+    "ai-visibility:personas-breakdown": {
+      "aliases": [],
+      "args": {},
+      "description": "Per-persona visibility and share of voice",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "providers": {
+          "description": "AI engines to include. Repeat the parameter to select several; omitted or empty aggregates across every engine. There is no 'ALL' sentinel — an empty selection is what \"all engines\" means.\n",
+          "name": "providers",
+          "hasDynamicHelp": false,
+          "multiple": true,
+          "options": [
+            "PERPLEXITY",
+            "GEMINI",
+            "CLAUDE",
+            "CHATGPT",
+            "DEEPSEEK",
+            "GLM",
+            "KIMI",
+            "GOOGLE_AI_OVERVIEW",
+            "GOOGLE_AI_MODE",
+            "CHATGPT_WEB",
+            "GEMINI_WEB"
+          ],
+          "type": "option"
+        },
+        "jobs": {
+          "name": "jobs",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "preset": {
+          "description": "Predefined date range preset. Takes precedence over from/to.",
+          "name": "preset",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "last_30_minutes",
+            "last_hour",
+            "today",
+            "yesterday",
+            "last_7_days",
+            "last_30_days",
+            "this_month",
+            "this_year"
+          ],
+          "type": "option"
+        },
+        "from": {
+          "description": "Start of the date window (inclusive, interpreted in the project's reporting timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window.\n",
+          "name": "from",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "to": {
+          "description": "End of the date window (inclusive, interpreted in the project's reporting timezone).",
+          "name": "to",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "regions": {
+          "description": "Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected.\n",
+          "name": "regions",
+          "hasDynamicHelp": false,
+          "multiple": true,
+          "options": [
+            "US",
+            "EU"
+          ],
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "ai-visibility:personas-breakdown",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "ai-visibility",
+        "personas-breakdown.js"
+      ]
+    },
+    "ai-visibility:personas:backfill": {
+      "aliases": [],
+      "args": {},
+      "description": "Apply current persona assignments to legacy runs",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "dryRun": {
+          "name": "dryRun",
+          "allowNo": false,
+          "type": "boolean"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "ai-visibility:personas:backfill",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "ai-visibility",
+        "personas",
+        "backfill.js"
+      ]
+    },
+    "ai-visibility:personas:create": {
+      "aliases": [],
+      "args": {},
+      "description": "Create a buyer persona",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "name": {
+          "name": "name",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "description": {
+          "description": "3-5 sentences covering this buyer's goals, pain points, and the vocabulary they would actually type. Used to seed prompt generation and to label results — never sent to an answer engine.\n",
+          "name": "description",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "ai-visibility:personas:create",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "ai-visibility",
+        "personas",
+        "create.js"
+      ]
+    },
+    "ai-visibility:personas:delete": {
+      "aliases": [],
+      "args": {
+        "personaId": {
+          "description": "personaId",
+          "name": "personaId",
+          "required": true
+        }
+      },
+      "description": "Archive a buyer persona",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "ai-visibility:personas:delete",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "ai-visibility",
+        "personas",
+        "delete.js"
+      ]
+    },
+    "ai-visibility:personas:list": {
+      "aliases": [],
+      "args": {},
+      "description": "List buyer personas",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "includeArchived": {
+          "name": "includeArchived",
+          "allowNo": false,
+          "type": "boolean"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "ai-visibility:personas:list",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "ai-visibility",
+        "personas",
+        "list.js"
+      ]
+    },
+    "ai-visibility:personas:suggest": {
+      "aliases": [],
+      "args": {},
+      "description": "Draft candidate buyer personas",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "brandName": {
+          "name": "brandName",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "primaryDomain": {
+          "name": "primaryDomain",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "ai-visibility:personas:suggest",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "ai-visibility",
+        "personas",
+        "suggest.js"
+      ]
+    },
+    "ai-visibility:personas:update": {
+      "aliases": [],
+      "args": {
+        "personaId": {
+          "description": "personaId",
+          "name": "personaId",
+          "required": true
+        }
+      },
+      "description": "Update a buyer persona",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "name": {
+          "name": "name",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "description": {
+          "description": "3-5 sentences covering this buyer's goals, pain points, and the vocabulary they would actually type. Used to seed prompt generation and to label results — never sent to an answer engine.\n",
+          "name": "description",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "ai-visibility:personas:update",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "ai-visibility",
+        "personas",
+        "update.js"
       ]
     },
     "ai-visibility:prompts-breakdown": {
@@ -2342,22 +3392,15 @@
           "type": "option"
         },
         "from": {
-          "description": "Start of the date window (inclusive, interpreted in the client timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window.\n",
+          "description": "Start of the date window (inclusive, interpreted in the project's reporting timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window.\n",
           "name": "from",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
         },
         "to": {
-          "description": "End of the date window (inclusive, interpreted in the client timezone).",
+          "description": "End of the date window (inclusive, interpreted in the project's reporting timezone).",
           "name": "to",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "timezone": {
-          "description": "Client timezone (e.g. \"Africa/Cairo\") used to resolve preset/date boundaries; defaults to UTC.",
-          "name": "timezone",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
@@ -2367,6 +3410,17 @@
           "name": "topicIds",
           "hasDynamicHelp": false,
           "multiple": true,
+          "type": "option"
+        },
+        "regions": {
+          "description": "Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected.\n",
+          "name": "regions",
+          "hasDynamicHelp": false,
+          "multiple": true,
+          "options": [
+            "US",
+            "EU"
+          ],
           "type": "option"
         },
         "providers": {
@@ -2388,6 +3442,34 @@
             "GEMINI_WEB"
           ],
           "type": "option"
+        },
+        "comparePreset": {
+          "description": "Which earlier period the selected one is compared against. Takes precedence over compareFrom/compareTo. Omitting all three comparison parameters compares against the previous period — the same length, immediately before the selected window. There is no way to ask for no comparison.\n",
+          "name": "comparePreset",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "previous_period",
+            "previous_week",
+            "previous_month",
+            "previous_quarter",
+            "previous_year"
+          ],
+          "type": "option"
+        },
+        "compareFrom": {
+          "description": "Start date of a custom comparison window (inclusive, YYYY-MM-DD), resolved in the project's reporting timezone. Must be sent together with compareTo, and is ignored when comparePreset is present. Unlike the presets, its length may differ from the selected period's. Omitted, the report compares against the previous period.\n",
+          "name": "compareFrom",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "compareTo": {
+          "description": "End date of a custom comparison window (inclusive, YYYY-MM-DD). Must be sent together with compareFrom. Omitted, the report compares against the previous period.\n",
+          "name": "compareTo",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
         }
       },
       "hasDynamicHelp": false,
@@ -2404,6 +3486,248 @@
         "commands",
         "ai-visibility",
         "prompts-breakdown.js"
+      ]
+    },
+    "ai-visibility:prompts:bulk-assign-persona": {
+      "aliases": [],
+      "args": {},
+      "description": "Assign a persona to AI visibility prompts (bulk)",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "personaId": {
+          "description": "Persona to assign to every listed prompt. Omitted or null unassigns them. As with the topic, setting the persona is the entire operation — the call never touches a prompt's topic or text.",
+          "name": "personaId",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "ai-visibility:prompts:bulk-assign-persona",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "ai-visibility",
+        "prompts",
+        "bulk-assign-persona.js"
+      ]
+    },
+    "ai-visibility:prompts:bulk-delete": {
+      "aliases": [],
+      "args": {},
+      "description": "Delete AI visibility prompts (bulk)",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "ai-visibility:prompts:bulk-delete",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "ai-visibility",
+        "prompts",
+        "bulk-delete.js"
+      ]
+    },
+    "ai-visibility:prompts:bulk-move": {
+      "aliases": [],
+      "args": {},
+      "description": "Move AI visibility prompts to a topic (bulk)",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "topicId": {
+          "description": "Topic to move every listed prompt into. Omitted or null moves them out of whatever topic they are in. There is no \"leave the topic alone\" case — setting the topic is the entire operation, which is why null can mean unassign here without ambiguity.",
+          "name": "topicId",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "ai-visibility:prompts:bulk-move",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "ai-visibility",
+        "prompts",
+        "bulk-move.js"
       ]
     },
     "ai-visibility:prompts:create": {
@@ -2491,7 +3815,7 @@
           "required": true
         }
       },
-      "description": "Deactivate AI visibility prompt",
+      "description": "Delete AI visibility prompt",
       "flags": {
         "json": {
           "description": "Output raw JSON instead of a formatted table.",
@@ -2822,13 +4146,6 @@
           "name": "active",
           "allowNo": false,
           "type": "boolean"
-        },
-        "topicId": {
-          "description": "Topic assignment. On PUT, omitted or null clears the assignment.",
-          "name": "topicId",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
         }
       },
       "hasDynamicHelp": false,
@@ -2931,22 +4248,15 @@
           "type": "option"
         },
         "from": {
-          "description": "Start of the date window (inclusive, interpreted in the client timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window.\n",
+          "description": "Start of the date window (inclusive, interpreted in the project's reporting timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window.\n",
           "name": "from",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
         },
         "to": {
-          "description": "End of the date window (inclusive, interpreted in the client timezone).",
+          "description": "End of the date window (inclusive, interpreted in the project's reporting timezone).",
           "name": "to",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "timezone": {
-          "description": "Client timezone (e.g. \"Africa/Cairo\") used to resolve preset/date boundaries; defaults to UTC.",
-          "name": "timezone",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
@@ -2956,6 +4266,17 @@
           "name": "topicIds",
           "hasDynamicHelp": false,
           "multiple": true,
+          "type": "option"
+        },
+        "regions": {
+          "description": "Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected.\n",
+          "name": "regions",
+          "hasDynamicHelp": false,
+          "multiple": true,
+          "options": [
+            "US",
+            "EU"
+          ],
           "type": "option"
         },
         "providers": {
@@ -2976,6 +4297,34 @@
             "CHATGPT_WEB",
             "GEMINI_WEB"
           ],
+          "type": "option"
+        },
+        "comparePreset": {
+          "description": "Which earlier period the selected one is compared against. Takes precedence over compareFrom/compareTo. Omitting all three comparison parameters compares against the previous period — the same length, immediately before the selected window. There is no way to ask for no comparison.\n",
+          "name": "comparePreset",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "previous_period",
+            "previous_week",
+            "previous_month",
+            "previous_quarter",
+            "previous_year"
+          ],
+          "type": "option"
+        },
+        "compareFrom": {
+          "description": "Start date of a custom comparison window (inclusive, YYYY-MM-DD), resolved in the project's reporting timezone. Must be sent together with compareTo, and is ignored when comparePreset is present. Unlike the presets, its length may differ from the selected period's. Omitted, the report compares against the previous period.\n",
+          "name": "compareFrom",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "compareTo": {
+          "description": "End date of a custom comparison window (inclusive, YYYY-MM-DD). Must be sent together with compareFrom. Omitted, the report compares against the previous period.\n",
+          "name": "compareTo",
+          "hasDynamicHelp": false,
+          "multiple": false,
           "type": "option"
         }
       },
@@ -3068,6 +4417,81 @@
         "commands",
         "ai-visibility",
         "providers.js"
+      ]
+    },
+    "ai-visibility:regions": {
+      "aliases": [],
+      "args": {},
+      "description": "Regions this project is measured from",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "ai-visibility:regions",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "ai-visibility",
+        "regions.js"
       ]
     },
     "ai-visibility:runs:get": {
@@ -3330,22 +4754,15 @@
           "type": "option"
         },
         "from": {
-          "description": "Start of the date window (inclusive, interpreted in the client timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window.\n",
+          "description": "Start of the date window (inclusive, interpreted in the project's reporting timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window.\n",
           "name": "from",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
         },
         "to": {
-          "description": "End of the date window (inclusive, interpreted in the client timezone).",
+          "description": "End of the date window (inclusive, interpreted in the project's reporting timezone).",
           "name": "to",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "timezone": {
-          "description": "Client timezone (e.g. \"Africa/Cairo\") used to resolve preset/date boundaries; defaults to UTC.",
-          "name": "timezone",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
@@ -3355,6 +4772,45 @@
           "name": "topicIds",
           "hasDynamicHelp": false,
           "multiple": true,
+          "type": "option"
+        },
+        "regions": {
+          "description": "Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected.\n",
+          "name": "regions",
+          "hasDynamicHelp": false,
+          "multiple": true,
+          "options": [
+            "US",
+            "EU"
+          ],
+          "type": "option"
+        },
+        "comparePreset": {
+          "description": "Which earlier period the selected one is compared against. Takes precedence over compareFrom/compareTo. Omitting all three comparison parameters compares against the previous period — the same length, immediately before the selected window. There is no way to ask for no comparison.\n",
+          "name": "comparePreset",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "previous_period",
+            "previous_week",
+            "previous_month",
+            "previous_quarter",
+            "previous_year"
+          ],
+          "type": "option"
+        },
+        "compareFrom": {
+          "description": "Start date of a custom comparison window (inclusive, YYYY-MM-DD), resolved in the project's reporting timezone. Must be sent together with compareTo, and is ignored when comparePreset is present. Unlike the presets, its length may differ from the selected period's. Omitted, the report compares against the previous period.\n",
+          "name": "compareFrom",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "compareTo": {
+          "description": "End date of a custom comparison window (inclusive, YYYY-MM-DD). Must be sent together with compareFrom. Omitted, the report compares against the previous period.\n",
+          "name": "compareTo",
+          "hasDynamicHelp": false,
+          "multiple": false,
           "type": "option"
         }
       },
@@ -3476,22 +4932,54 @@
           "type": "option"
         },
         "from": {
-          "description": "Start of the date window (inclusive, interpreted in the client timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window.\n",
+          "description": "Start of the date window (inclusive, interpreted in the project's reporting timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window.\n",
           "name": "from",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
         },
         "to": {
-          "description": "End of the date window (inclusive, interpreted in the client timezone).",
+          "description": "End of the date window (inclusive, interpreted in the project's reporting timezone).",
           "name": "to",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
         },
-        "timezone": {
-          "description": "Client timezone (e.g. \"Africa/Cairo\") used to resolve preset/date boundaries; defaults to UTC.",
-          "name": "timezone",
+        "regions": {
+          "description": "Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected.\n",
+          "name": "regions",
+          "hasDynamicHelp": false,
+          "multiple": true,
+          "options": [
+            "US",
+            "EU"
+          ],
+          "type": "option"
+        },
+        "comparePreset": {
+          "description": "Which earlier period the selected one is compared against. Takes precedence over compareFrom/compareTo. Omitting all three comparison parameters compares against the previous period — the same length, immediately before the selected window. There is no way to ask for no comparison.\n",
+          "name": "comparePreset",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "previous_period",
+            "previous_week",
+            "previous_month",
+            "previous_quarter",
+            "previous_year"
+          ],
+          "type": "option"
+        },
+        "compareFrom": {
+          "description": "Start date of a custom comparison window (inclusive, YYYY-MM-DD), resolved in the project's reporting timezone. Must be sent together with compareTo, and is ignored when comparePreset is present. Unlike the presets, its length may differ from the selected period's. Omitted, the report compares against the previous period.\n",
+          "name": "compareFrom",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "compareTo": {
+          "description": "End date of a custom comparison window (inclusive, YYYY-MM-DD). Must be sent together with compareFrom. Omitted, the report compares against the previous period.\n",
+          "name": "compareTo",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
@@ -4030,22 +5518,15 @@
           "type": "option"
         },
         "from": {
-          "description": "Start of the date window (inclusive, interpreted in the client timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window.\n",
+          "description": "Start of the date window (inclusive, interpreted in the project's reporting timezone). When a preset or a date window is given, jobs finishing inside it are aggregated instead of the last-N-jobs window.\n",
           "name": "from",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
         },
         "to": {
-          "description": "End of the date window (inclusive, interpreted in the client timezone).",
+          "description": "End of the date window (inclusive, interpreted in the project's reporting timezone).",
           "name": "to",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "timezone": {
-          "description": "Client timezone (e.g. \"Africa/Cairo\") used to resolve preset/date boundaries; defaults to UTC.",
-          "name": "timezone",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
@@ -4055,6 +5536,45 @@
           "name": "topicIds",
           "hasDynamicHelp": false,
           "multiple": true,
+          "type": "option"
+        },
+        "regions": {
+          "description": "Regions to include. Repeat the parameter to select several; omitted or empty aggregates across every region the project runs. A region the organization is not entitled to is rejected.\n",
+          "name": "regions",
+          "hasDynamicHelp": false,
+          "multiple": true,
+          "options": [
+            "US",
+            "EU"
+          ],
+          "type": "option"
+        },
+        "comparePreset": {
+          "description": "Which earlier period the selected one is compared against. Takes precedence over compareFrom/compareTo. Omitting all three comparison parameters compares against the previous period — the same length, immediately before the selected window. There is no way to ask for no comparison.\n",
+          "name": "comparePreset",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "previous_period",
+            "previous_week",
+            "previous_month",
+            "previous_quarter",
+            "previous_year"
+          ],
+          "type": "option"
+        },
+        "compareFrom": {
+          "description": "Start date of a custom comparison window (inclusive, YYYY-MM-DD), resolved in the project's reporting timezone. Must be sent together with compareTo, and is ignored when comparePreset is present. Unlike the presets, its length may differ from the selected period's. Omitted, the report compares against the previous period.\n",
+          "name": "compareFrom",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "compareTo": {
+          "description": "End date of a custom comparison window (inclusive, YYYY-MM-DD). Must be sent together with compareFrom. Omitted, the report compares against the previous period.\n",
+          "name": "compareTo",
+          "hasDynamicHelp": false,
+          "multiple": false,
           "type": "option"
         }
       },
@@ -4262,13 +5782,6 @@
         "to": {
           "description": "End date filter (inclusive, YYYY-MM-DD)",
           "name": "to",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "timezone": {
-          "description": "Client timezone (e.g. \"Africa/Cairo\", \"America/New_York\"). Used to convert date boundaries to UTC. Defaults to UTC if omitted.",
-          "name": "timezone",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
@@ -6660,13 +8173,6 @@
           "multiple": false,
           "type": "option"
         },
-        "timezone": {
-          "description": "Client timezone (e.g. \"Africa/Cairo\"). Used to convert date boundaries to UTC.",
-          "name": "timezone",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
         "page": {
           "description": "Zero-based page number",
           "name": "page",
@@ -6677,6 +8183,34 @@
         "size": {
           "description": "Items per page",
           "name": "size",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "comparePreset": {
+          "description": "Which earlier period the selected one is compared against. Takes precedence over compareFrom/compareTo. Omitting all three comparison parameters compares against the previous period — the same length, immediately before the selected window. There is no way to ask for no comparison.\n",
+          "name": "comparePreset",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "previous_period",
+            "previous_week",
+            "previous_month",
+            "previous_quarter",
+            "previous_year"
+          ],
+          "type": "option"
+        },
+        "compareFrom": {
+          "description": "Start date of a custom comparison window (inclusive, YYYY-MM-DD), resolved in the project's reporting timezone. Must be sent together with compareTo, and is ignored when comparePreset is present. Unlike the presets, its length may differ from the selected period's. Omitted, the report compares against the previous period.\n",
+          "name": "compareFrom",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "compareTo": {
+          "description": "End date of a custom comparison window (inclusive, YYYY-MM-DD). Must be sent together with compareFrom. Omitted, the report compares against the previous period.\n",
+          "name": "compareTo",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
@@ -6800,10 +8334,30 @@
           ],
           "type": "option"
         },
-        "timezone": {
-          "description": "Client timezone (e.g. \"Africa/Cairo\", \"America/New_York\"). Used to convert date boundaries to UTC.",
-          "name": "timezone",
-          "required": true,
+        "comparePreset": {
+          "description": "Which earlier period the selected one is compared against. Takes precedence over compareFrom/compareTo. Omitting all three comparison parameters compares against the previous period — the same length, immediately before the selected window. There is no way to ask for no comparison.\n",
+          "name": "comparePreset",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "previous_period",
+            "previous_week",
+            "previous_month",
+            "previous_quarter",
+            "previous_year"
+          ],
+          "type": "option"
+        },
+        "compareFrom": {
+          "description": "Start date of a custom comparison window (inclusive, YYYY-MM-DD), resolved in the project's reporting timezone. Must be sent together with compareTo, and is ignored when comparePreset is present. Unlike the presets, its length may differ from the selected period's. Omitted, the report compares against the previous period.\n",
+          "name": "compareFrom",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "compareTo": {
+          "description": "End date of a custom comparison window (inclusive, YYYY-MM-DD). Must be sent together with compareFrom. Omitted, the report compares against the previous period.\n",
+          "name": "compareTo",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
@@ -6915,16 +8469,37 @@
           "multiple": false,
           "type": "option"
         },
-        "timezone": {
-          "description": "Client timezone (e.g. \"Africa/Cairo\"). Used to convert date boundaries to UTC.",
-          "name": "timezone",
+        "size": {
+          "description": "Maximum number of top bots to return",
+          "name": "size",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
         },
-        "size": {
-          "description": "Maximum number of top bots to return",
-          "name": "size",
+        "comparePreset": {
+          "description": "Which earlier period the selected one is compared against. Takes precedence over compareFrom/compareTo. Omitting all three comparison parameters compares against the previous period — the same length, immediately before the selected window. There is no way to ask for no comparison.\n",
+          "name": "comparePreset",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "previous_period",
+            "previous_week",
+            "previous_month",
+            "previous_quarter",
+            "previous_year"
+          ],
+          "type": "option"
+        },
+        "compareFrom": {
+          "description": "Start date of a custom comparison window (inclusive, YYYY-MM-DD), resolved in the project's reporting timezone. Must be sent together with compareTo, and is ignored when comparePreset is present. Unlike the presets, its length may differ from the selected period's. Omitted, the report compares against the previous period.\n",
+          "name": "compareFrom",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "compareTo": {
+          "description": "End date of a custom comparison window (inclusive, YYYY-MM-DD). Must be sent together with compareFrom. Omitted, the report compares against the previous period.\n",
+          "name": "compareTo",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
@@ -7036,13 +8611,6 @@
           "multiple": false,
           "type": "option"
         },
-        "timezone": {
-          "description": "Client timezone (e.g. \"Africa/Cairo\"). Used to convert date boundaries to UTC.",
-          "name": "timezone",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
         "size": {
           "description": "Maximum number of top paths to return",
           "name": "size",
@@ -7053,6 +8621,34 @@
         "vendor": {
           "description": "Restrict to one bot vendor/company (e.g. \"OpenAI\", \"Anthropic\", \"Google\", \"Perplexity\")",
           "name": "vendor",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "comparePreset": {
+          "description": "Which earlier period the selected one is compared against. Takes precedence over compareFrom/compareTo. Omitting all three comparison parameters compares against the previous period — the same length, immediately before the selected window. There is no way to ask for no comparison.\n",
+          "name": "comparePreset",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "previous_period",
+            "previous_week",
+            "previous_month",
+            "previous_quarter",
+            "previous_year"
+          ],
+          "type": "option"
+        },
+        "compareFrom": {
+          "description": "Start date of a custom comparison window (inclusive, YYYY-MM-DD), resolved in the project's reporting timezone. Must be sent together with compareTo, and is ignored when comparePreset is present. Unlike the presets, its length may differ from the selected period's. Omitted, the report compares against the previous period.\n",
+          "name": "compareFrom",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "compareTo": {
+          "description": "End date of a custom comparison window (inclusive, YYYY-MM-DD). Must be sent together with compareFrom. Omitted, the report compares against the previous period.\n",
+          "name": "compareTo",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
@@ -7164,13 +8760,6 @@
           "multiple": false,
           "type": "option"
         },
-        "timezone": {
-          "description": "Client timezone. Used to convert date boundaries to UTC. Defaults to UTC if omitted.",
-          "name": "timezone",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
         "search": {
           "description": "Search by bot name, vendor, or path (partial match)",
           "name": "search",
@@ -7214,6 +8803,176 @@
         "commands",
         "bots",
         "list.js"
+      ]
+    },
+    "characters:list": {
+      "aliases": [],
+      "args": {},
+      "description": "List the characters this project can run",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "characters:list",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "characters",
+        "list.js"
+      ]
+    },
+    "characters:run": {
+      "aliases": [],
+      "args": {
+        "characterId": {
+          "description": "characterId",
+          "name": "characterId",
+          "required": true
+        }
+      },
+      "description": "Have a character read something now",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "path": {
+          "description": "An indexed page for the character to read.",
+          "name": "path",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "task": {
+          "description": "What to ask it. Left out, it reviews the page and reports what matters.",
+          "name": "task",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "characters:run",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "characters",
+        "run.js"
       ]
     },
     "context": {
@@ -7280,476 +9039,6 @@
         "dist",
         "commands",
         "context.js"
-      ]
-    },
-    "dashboard:events:by-project": {
-      "aliases": [],
-      "args": {},
-      "description": "Get events breakdown by project",
-      "flags": {
-        "json": {
-          "description": "Output raw JSON instead of a formatted table.",
-          "name": "json",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "base-url": {
-          "description": "Override the API base URL.",
-          "helpGroup": "GLOBAL",
-          "name": "base-url",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "local": {
-          "description": "Shorthand for --base-url http://localhost:8100/api.",
-          "helpGroup": "GLOBAL",
-          "name": "local",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "api-key": {
-          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
-          "helpGroup": "GLOBAL",
-          "name": "api-key",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "org": {
-          "description": "Organization slug to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "org",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "project": {
-          "description": "Project id to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "project",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "data": {
-          "char": "d",
-          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
-          "name": "data",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "dashboard:events:by-project",
-      "pluginAlias": "@kitbase/cli",
-      "pluginName": "@kitbase/cli",
-      "pluginType": "core",
-      "strict": true,
-      "enableJsonFlag": false,
-      "isESM": true,
-      "relativePath": [
-        "dist",
-        "commands",
-        "dashboard",
-        "events",
-        "by-project.js"
-      ]
-    },
-    "dashboard:events:summary": {
-      "aliases": [],
-      "args": {},
-      "description": "Get dashboard KPI summary",
-      "flags": {
-        "json": {
-          "description": "Output raw JSON instead of a formatted table.",
-          "name": "json",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "base-url": {
-          "description": "Override the API base URL.",
-          "helpGroup": "GLOBAL",
-          "name": "base-url",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "local": {
-          "description": "Shorthand for --base-url http://localhost:8100/api.",
-          "helpGroup": "GLOBAL",
-          "name": "local",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "api-key": {
-          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
-          "helpGroup": "GLOBAL",
-          "name": "api-key",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "org": {
-          "description": "Organization slug to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "org",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "project": {
-          "description": "Project id to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "project",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "data": {
-          "char": "d",
-          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
-          "name": "data",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "dashboard:events:summary",
-      "pluginAlias": "@kitbase/cli",
-      "pluginName": "@kitbase/cli",
-      "pluginType": "core",
-      "strict": true,
-      "enableJsonFlag": false,
-      "isESM": true,
-      "relativePath": [
-        "dist",
-        "commands",
-        "dashboard",
-        "events",
-        "summary.js"
-      ]
-    },
-    "dashboard:events:timeline": {
-      "aliases": [],
-      "args": {},
-      "description": "Get flexible events timeline for dashboard",
-      "flags": {
-        "json": {
-          "description": "Output raw JSON instead of a formatted table.",
-          "name": "json",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "base-url": {
-          "description": "Override the API base URL.",
-          "helpGroup": "GLOBAL",
-          "name": "base-url",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "local": {
-          "description": "Shorthand for --base-url http://localhost:8100/api.",
-          "helpGroup": "GLOBAL",
-          "name": "local",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "api-key": {
-          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
-          "helpGroup": "GLOBAL",
-          "name": "api-key",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "org": {
-          "description": "Organization slug to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "org",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "project": {
-          "description": "Project id to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "project",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "data": {
-          "char": "d",
-          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
-          "name": "data",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "range": {
-          "description": "Time range preset. Controls both the time window and the date-truncation granularity.\nSupported values: \"30m\" (minute), \"24h\" (hour), \"7d\" (day), \"30d\" (day), \"3m\" (week), \"12m\" (month).\nDefaults to \"24h\".\n",
-          "name": "range",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "options": [
-            "30m",
-            "24h",
-            "7d",
-            "30d",
-            "3m",
-            "12m"
-          ],
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "dashboard:events:timeline",
-      "pluginAlias": "@kitbase/cli",
-      "pluginName": "@kitbase/cli",
-      "pluginType": "core",
-      "strict": true,
-      "enableJsonFlag": false,
-      "isESM": true,
-      "relativePath": [
-        "dist",
-        "commands",
-        "dashboard",
-        "events",
-        "timeline.js"
-      ]
-    },
-    "dashboard:events:top": {
-      "aliases": [],
-      "args": {},
-      "description": "Get top events comparison for dashboard",
-      "flags": {
-        "json": {
-          "description": "Output raw JSON instead of a formatted table.",
-          "name": "json",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "base-url": {
-          "description": "Override the API base URL.",
-          "helpGroup": "GLOBAL",
-          "name": "base-url",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "local": {
-          "description": "Shorthand for --base-url http://localhost:8100/api.",
-          "helpGroup": "GLOBAL",
-          "name": "local",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "api-key": {
-          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
-          "helpGroup": "GLOBAL",
-          "name": "api-key",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "org": {
-          "description": "Organization slug to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "org",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "project": {
-          "description": "Project id to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "project",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "data": {
-          "char": "d",
-          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
-          "name": "data",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "dashboard:events:top",
-      "pluginAlias": "@kitbase/cli",
-      "pluginName": "@kitbase/cli",
-      "pluginType": "core",
-      "strict": true,
-      "enableJsonFlag": false,
-      "isESM": true,
-      "relativePath": [
-        "dist",
-        "commands",
-        "dashboard",
-        "events",
-        "top.js"
-      ]
-    },
-    "dashboard:users": {
-      "aliases": [],
-      "args": {},
-      "description": "Get daily unique users timeline for dashboard",
-      "flags": {
-        "json": {
-          "description": "Output raw JSON instead of a formatted table.",
-          "name": "json",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "base-url": {
-          "description": "Override the API base URL.",
-          "helpGroup": "GLOBAL",
-          "name": "base-url",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "local": {
-          "description": "Shorthand for --base-url http://localhost:8100/api.",
-          "helpGroup": "GLOBAL",
-          "name": "local",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "api-key": {
-          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
-          "helpGroup": "GLOBAL",
-          "name": "api-key",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "org": {
-          "description": "Organization slug to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "org",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "project": {
-          "description": "Project id to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "project",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "data": {
-          "char": "d",
-          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
-          "name": "data",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "dashboard:users",
-      "pluginAlias": "@kitbase/cli",
-      "pluginName": "@kitbase/cli",
-      "pluginType": "core",
-      "strict": true,
-      "enableJsonFlag": false,
-      "isESM": true,
-      "relativePath": [
-        "dist",
-        "commands",
-        "dashboard",
-        "users.js"
-      ]
-    },
-    "dashboard:users:top": {
-      "aliases": [],
-      "args": {},
-      "description": "Get top users by event count",
-      "flags": {
-        "json": {
-          "description": "Output raw JSON instead of a formatted table.",
-          "name": "json",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "base-url": {
-          "description": "Override the API base URL.",
-          "helpGroup": "GLOBAL",
-          "name": "base-url",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "local": {
-          "description": "Shorthand for --base-url http://localhost:8100/api.",
-          "helpGroup": "GLOBAL",
-          "name": "local",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "api-key": {
-          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
-          "helpGroup": "GLOBAL",
-          "name": "api-key",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "org": {
-          "description": "Organization slug to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "org",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "project": {
-          "description": "Project id to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "project",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "data": {
-          "char": "d",
-          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
-          "name": "data",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "dashboard:users:top",
-      "pluginAlias": "@kitbase/cli",
-      "pluginName": "@kitbase/cli",
-      "pluginType": "core",
-      "strict": true,
-      "enableJsonFlag": false,
-      "isESM": true,
-      "relativePath": [
-        "dist",
-        "commands",
-        "dashboard",
-        "users",
-        "top.js"
       ]
     },
     "events:analytics:aggregations": {
@@ -7858,14 +9147,6 @@
         "to": {
           "description": "End date filter (inclusive, YYYY-MM-DD)",
           "name": "to",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "timezone": {
-          "description": "Client timezone (e.g. \"Africa/Cairo\", \"America/New_York\"). Used to convert date boundaries to UTC.",
-          "name": "timezone",
-          "required": true,
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
@@ -8010,14 +9291,6 @@
           "multiple": false,
           "type": "option"
         },
-        "timezone": {
-          "description": "Client timezone (e.g. \"Africa/Cairo\", \"America/New_York\"). Used to convert date boundaries to UTC.",
-          "name": "timezone",
-          "required": true,
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
         "limit": {
           "description": "Maximum number of results to return",
           "name": "limit",
@@ -8132,14 +9405,6 @@
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
-        },
-        "timezone": {
-          "description": "Client timezone (e.g. \"Africa/Cairo\", \"America/New_York\"). Used to convert date boundaries to UTC.",
-          "name": "timezone",
-          "required": true,
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
         }
       },
       "hasDynamicHelp": false,
@@ -8247,14 +9512,6 @@
         "to": {
           "description": "End date filter (inclusive, YYYY-MM-DD)",
           "name": "to",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "timezone": {
-          "description": "Client timezone (e.g. \"Africa/Cairo\", \"America/New_York\"). Used to convert date boundaries to UTC.",
-          "name": "timezone",
-          "required": true,
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
@@ -8468,14 +9725,6 @@
           "multiple": false,
           "type": "option"
         },
-        "timezone": {
-          "description": "Client timezone (e.g. \"Africa/Cairo\", \"America/New_York\"). Used to convert date boundaries to UTC.",
-          "name": "timezone",
-          "required": true,
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
         "page": {
           "description": "Page number",
           "name": "page",
@@ -8679,14 +9928,6 @@
           "multiple": false,
           "type": "option"
         },
-        "timezone": {
-          "description": "Client timezone (e.g. \"Africa/Cairo\", \"America/New_York\"). Used to convert date boundaries to UTC.",
-          "name": "timezone",
-          "required": true,
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
         "page": {
           "description": "Page number",
           "name": "page",
@@ -8806,14 +10047,6 @@
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
-        },
-        "timezone": {
-          "description": "Client timezone (e.g. \"Africa/Cairo\", \"America/New_York\"). Used to convert date boundaries to UTC.",
-          "name": "timezone",
-          "required": true,
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
         }
       },
       "hasDynamicHelp": false,
@@ -8914,14 +10147,6 @@
         "to": {
           "description": "End of time range",
           "name": "to",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "timezone": {
-          "description": "Client timezone (e.g. \"Africa/Cairo\", \"America/New_York\"). Used to convert date boundaries to UTC.",
-          "name": "timezone",
-          "required": true,
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
@@ -9968,14 +11193,6 @@
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
-        },
-        "timezone": {
-          "description": "Client timezone (e.g. \"Africa/Cairo\", \"America/New_York\"). Used to convert date boundaries to UTC.",
-          "name": "timezone",
-          "required": true,
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
         }
       },
       "hasDynamicHelp": false,
@@ -10069,14 +11286,6 @@
         "toDate": {
           "description": "End date for the timeline period (inclusive, YYYY-MM-DD). Defaults to today if not provided.",
           "name": "toDate",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "timezone": {
-          "description": "Client timezone (e.g. \"Africa/Cairo\", \"America/New_York\"). Used to convert date boundaries to UTC.",
-          "name": "timezone",
-          "required": true,
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
@@ -10273,13 +11482,6 @@
         "to": {
           "description": "End date filter (inclusive, YYYY-MM-DD)",
           "name": "to",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "timezone": {
-          "description": "Client timezone (e.g. \"Africa/Cairo\", \"America/New_York\"). Used to convert date boundaries to UTC. Defaults to UTC if omitted.",
-          "name": "timezone",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
@@ -10671,13 +11873,6 @@
         "to": {
           "description": "End date filter (inclusive, YYYY-MM-DD)",
           "name": "to",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "timezone": {
-          "description": "Client timezone (e.g. \"Africa/Cairo\", \"America/New_York\"). Used to convert date boundaries to UTC. Defaults to UTC if omitted.",
-          "name": "timezone",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
@@ -14217,13 +15412,6 @@
           "multiple": false,
           "type": "option"
         },
-        "timezone": {
-          "description": "Client timezone (e.g. \"Africa/Cairo\", \"America/New_York\"). Used to convert date boundaries to UTC. Defaults to UTC if omitted.",
-          "name": "timezone",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
         "steps": {
           "description": "Maximum number of steps per journey path",
           "name": "steps",
@@ -14815,6 +16003,7 @@
             "member_joined",
             "member_removed",
             "log_rate_exceeded",
+            "usage_limit_warning",
             "role_updated",
             "data_retention_cleanup",
             "data_retention_warning",
@@ -17160,13 +18349,6 @@
           "multiple": false,
           "type": "option"
         },
-        "timezone": {
-          "description": "Client timezone (e.g. \"Africa/Cairo\", \"America/New_York\"). Used to convert date boundaries to UTC. Defaults to UTC if omitted.",
-          "name": "timezone",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
         "search": {
           "description": "Search by user ID or session ID (partial match)",
           "name": "search",
@@ -17384,6 +18566,13 @@
           "name": "autoTrackVisibility",
           "allowNo": false,
           "type": "boolean"
+        },
+        "reportingTimezone": {
+          "description": "IANA timezone id, e.g. \"Africa/Cairo\" or \"UTC\". Rejected with VAL_001 if it is not a zone the server knows.",
+          "name": "reportingTimezone",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
         }
       },
       "hasDynamicHelp": false,
@@ -17400,6 +18589,950 @@
         "commands",
         "settings",
         "update.js"
+      ]
+    },
+    "site-content:analysis:cross": {
+      "aliases": [],
+      "args": {},
+      "description": "Read every page's positioning together",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "site-content:analysis:cross",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "site-content",
+        "analysis",
+        "cross.js"
+      ]
+    },
+    "site-content:pages:ai-analysis": {
+      "aliases": [],
+      "args": {},
+      "description": "Have AI read one page as a marketer would",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "path": {
+          "name": "path",
+          "required": true,
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "site-content:pages:ai-analysis",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "site-content",
+        "pages",
+        "ai-analysis.js"
+      ]
+    },
+    "site-content:pages:audit": {
+      "aliases": [],
+      "args": {},
+      "description": "Grade one page against the rest of the site",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "path": {
+          "description": "The indexed page's path",
+          "name": "path",
+          "required": true,
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "site-content:pages:audit",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "site-content",
+        "pages",
+        "audit.js"
+      ]
+    },
+    "site-content:pages:history": {
+      "aliases": [],
+      "args": {},
+      "description": "One page across analysis rounds",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "path": {
+          "description": "The indexed page's path",
+          "name": "path",
+          "required": true,
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "site-content:pages:history",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "site-content",
+        "pages",
+        "history.js"
+      ]
+    },
+    "site-content:rounds": {
+      "aliases": [],
+      "args": {},
+      "description": "List analysis rounds",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "site-content:rounds",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "site-content",
+        "rounds.js"
+      ]
+    },
+    "site-content:rounds:report": {
+      "aliases": [],
+      "args": {
+        "roundId": {
+          "description": "roundId",
+          "name": "roundId",
+          "required": true
+        }
+      },
+      "description": "The whole record of one crawl",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "site-content:rounds:report",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "site-content",
+        "rounds",
+        "report.js"
+      ]
+    },
+    "site-content:spec:docs:create": {
+      "aliases": [],
+      "args": {},
+      "description": "Upload a planning document",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "title": {
+          "description": "How the document will be cited, e.g. \"Wireframe v15\"",
+          "name": "title",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "docDate": {
+          "name": "docDate",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "version": {
+          "name": "version",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "body": {
+          "description": "The document's text. Markdown or plain text in v1.",
+          "name": "body",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "site-content:spec:docs:create",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "site-content",
+        "spec",
+        "docs",
+        "create.js"
+      ]
+    },
+    "site-content:spec:docs:list": {
+      "aliases": [],
+      "args": {},
+      "description": "List the planning documents this site is graded against",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "site-content:spec:docs:list",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "site-content",
+        "spec",
+        "docs",
+        "list.js"
+      ]
+    },
+    "site-content:spec:rules": {
+      "aliases": [],
+      "args": {},
+      "description": "List the rules read from the planning documents",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "status": {
+          "description": "Omit for all",
+          "name": "status",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "EXTRACTED",
+            "APPROVED",
+            "REJECTED"
+          ],
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "site-content:spec:rules",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "site-content",
+        "spec",
+        "rules.js"
+      ]
+    },
+    "site-content:spec:rules:update": {
+      "aliases": [],
+      "args": {
+        "ruleId": {
+          "description": "ruleId",
+          "name": "ruleId",
+          "required": true
+        }
+      },
+      "description": "Approve, reject or correct one rule",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "status": {
+          "name": "status",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "APPROVED",
+            "REJECTED"
+          ],
+          "type": "option"
+        },
+        "scope": {
+          "description": "Set to correct the rule while approving it",
+          "name": "scope",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "expectedValue": {
+          "name": "expectedValue",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "lockLevel": {
+          "name": "lockLevel",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "LOCKED",
+            "RESEARCH_BACKED",
+            "OPEN"
+          ],
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "site-content:spec:rules:update",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "site-content",
+        "spec",
+        "rules",
+        "update.js"
+      ]
+    },
+    "site-content:system-of-record": {
+      "aliases": [],
+      "args": {},
+      "description": "Where the site contradicts itself",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "site-content:system-of-record",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "site-content",
+        "system-of-record.js"
       ]
     },
     "two-factor:disable": {
@@ -17944,6 +20077,130 @@
         "project.js"
       ]
     },
+    "web-analytics:activity-heatmap": {
+      "aliases": [],
+      "args": {},
+      "description": "Get visitor activity by hour of day",
+      "flags": {
+        "json": {
+          "description": "Output raw JSON instead of a formatted table.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "base-url": {
+          "description": "Override the API base URL.",
+          "helpGroup": "GLOBAL",
+          "name": "base-url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "local": {
+          "description": "Shorthand for --base-url http://localhost:8100/api.",
+          "helpGroup": "GLOBAL",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "api-key": {
+          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
+          "helpGroup": "GLOBAL",
+          "name": "api-key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "org": {
+          "description": "Organization slug to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "org",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "project": {
+          "description": "Project id to operate in.",
+          "helpGroup": "GLOBAL",
+          "name": "project",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "data": {
+          "char": "d",
+          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
+          "name": "data",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "rowDimension": {
+          "description": "What the rows are grouped by. Defaults to day_of_week.",
+          "name": "rowDimension",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "day_of_week",
+            "country"
+          ],
+          "type": "option"
+        },
+        "preset": {
+          "description": "Predefined date range preset. When provided, overrides from/to parameters.",
+          "name": "preset",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "last_30_minutes",
+            "last_hour",
+            "today",
+            "yesterday",
+            "last_7_days",
+            "last_30_days",
+            "this_month",
+            "this_year"
+          ],
+          "type": "option"
+        },
+        "from": {
+          "description": "Start date for the analytics period (inclusive, YYYY-MM-DD). Defaults to 7 days ago.",
+          "name": "from",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "to": {
+          "description": "End date for the analytics period (inclusive, YYYY-MM-DD). Defaults to today.",
+          "name": "to",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "filters": {
+          "description": "Dimension filters in format dimension:operator:values.\nOperator is 'is' (include) or 'is_not' (exclude).\nValues are comma-separated. Can specify multiple filters.\nExample: filters=country:is:US,UK&filters=browser:is_not:Safari\n",
+          "name": "filters",
+          "hasDynamicHelp": false,
+          "multiple": true,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "web-analytics:activity-heatmap",
+      "pluginAlias": "@kitbase/cli",
+      "pluginName": "@kitbase/cli",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "web-analytics",
+        "activity-heatmap.js"
+      ]
+    },
     "web-analytics:breakdown": {
       "aliases": [],
       "args": {},
@@ -18085,10 +20342,30 @@
           "multiple": true,
           "type": "option"
         },
-        "timezone": {
-          "description": "Client timezone (e.g. \"Africa/Cairo\", \"America/New_York\"). Used to convert date boundaries to UTC.",
-          "name": "timezone",
-          "required": true,
+        "comparePreset": {
+          "description": "Which earlier period the selected one is compared against. Takes precedence over compareFrom/compareTo. Omitting all three comparison parameters compares against the previous period — the same length, immediately before the selected window. There is no way to ask for no comparison.\n",
+          "name": "comparePreset",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "previous_period",
+            "previous_week",
+            "previous_month",
+            "previous_quarter",
+            "previous_year"
+          ],
+          "type": "option"
+        },
+        "compareFrom": {
+          "description": "Start date of a custom comparison window (inclusive, YYYY-MM-DD), resolved in the project's reporting timezone. Must be sent together with compareTo, and is ignored when comparePreset is present. Unlike the presets, its length may differ from the selected period's. Omitted, the report compares against the previous period.\n",
+          "name": "compareFrom",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "compareTo": {
+          "description": "End date of a custom comparison window (inclusive, YYYY-MM-DD). Must be sent together with compareFrom. Omitted, the report compares against the previous period.\n",
+          "name": "compareTo",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
@@ -18108,165 +20385,6 @@
         "commands",
         "web-analytics",
         "breakdown.js"
-      ]
-    },
-    "web-analytics:compare": {
-      "aliases": [],
-      "args": {},
-      "description": "Compare web analytics between two periods",
-      "flags": {
-        "json": {
-          "description": "Output raw JSON instead of a formatted table.",
-          "name": "json",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "base-url": {
-          "description": "Override the API base URL.",
-          "helpGroup": "GLOBAL",
-          "name": "base-url",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "local": {
-          "description": "Shorthand for --base-url http://localhost:8100/api.",
-          "helpGroup": "GLOBAL",
-          "name": "local",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "api-key": {
-          "description": "Private API key (sk_kitbase_...) for non-interactive auth.",
-          "helpGroup": "GLOBAL",
-          "name": "api-key",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "org": {
-          "description": "Organization slug to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "org",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "project": {
-          "description": "Project id to operate in.",
-          "helpGroup": "GLOBAL",
-          "name": "project",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "data": {
-          "char": "d",
-          "description": "Request body as a JSON object, @file.json, or - for stdin. Individual field flags override matching keys.",
-          "name": "data",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "dimension": {
-          "description": "The dimension to compare",
-          "name": "dimension",
-          "required": true,
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "options": [
-            "device",
-            "browser",
-            "browser_version",
-            "os",
-            "os_version",
-            "brand",
-            "model",
-            "country",
-            "region",
-            "city",
-            "utm_source",
-            "utm_medium",
-            "utm_campaign",
-            "path",
-            "entry_page",
-            "exit_page",
-            "top_page",
-            "referrer",
-            "top_referrer",
-            "outbound_link",
-            "custom_events"
-          ],
-          "type": "option"
-        },
-        "currentFrom": {
-          "description": "Start date of the current period (inclusive, YYYY-MM-DD)",
-          "name": "currentFrom",
-          "required": true,
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "currentTo": {
-          "description": "End date of the current period (inclusive, YYYY-MM-DD)",
-          "name": "currentTo",
-          "required": true,
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "previousFrom": {
-          "description": "Start date of the previous period (inclusive, YYYY-MM-DD)",
-          "name": "previousFrom",
-          "required": true,
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "previousTo": {
-          "description": "End date of the previous period (inclusive, YYYY-MM-DD)",
-          "name": "previousTo",
-          "required": true,
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "timezone": {
-          "description": "Client timezone (e.g. \"Africa/Cairo\", \"America/New_York\"). Used to convert date boundaries to UTC. Defaults to UTC.",
-          "name": "timezone",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "limit": {
-          "description": "Maximum number of results to return (default 10)",
-          "name": "limit",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "filters": {
-          "description": "Dimension filters in format dimension:operator:values.\nOperator is 'is' (include) or 'is_not' (exclude).\nValues are comma-separated. Can specify multiple filters.\nExample: filters=country:is:US,UK&filters=browser:is_not:Safari\n",
-          "name": "filters",
-          "hasDynamicHelp": false,
-          "multiple": true,
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "web-analytics:compare",
-      "pluginAlias": "@kitbase/cli",
-      "pluginName": "@kitbase/cli",
-      "pluginType": "core",
-      "strict": true,
-      "enableJsonFlag": false,
-      "isESM": true,
-      "relativePath": [
-        "dist",
-        "commands",
-        "web-analytics",
-        "compare.js"
       ]
     },
     "web-analytics:dimension:timeline": {
@@ -18404,10 +20522,30 @@
           "multiple": true,
           "type": "option"
         },
-        "timezone": {
-          "description": "Client timezone (e.g. \"Africa/Cairo\", \"America/New_York\"). Used to convert date boundaries to UTC.",
-          "name": "timezone",
-          "required": true,
+        "comparePreset": {
+          "description": "Which earlier period the selected one is compared against. Takes precedence over compareFrom/compareTo. Omitting all three comparison parameters compares against the previous period — the same length, immediately before the selected window. There is no way to ask for no comparison.\n",
+          "name": "comparePreset",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "previous_period",
+            "previous_week",
+            "previous_month",
+            "previous_quarter",
+            "previous_year"
+          ],
+          "type": "option"
+        },
+        "compareFrom": {
+          "description": "Start date of a custom comparison window (inclusive, YYYY-MM-DD), resolved in the project's reporting timezone. Must be sent together with compareTo, and is ignored when comparePreset is present. Unlike the presets, its length may differ from the selected period's. Omitted, the report compares against the previous period.\n",
+          "name": "compareFrom",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "compareTo": {
+          "description": "End date of a custom comparison window (inclusive, YYYY-MM-DD). Must be sent together with compareFrom. Omitted, the report compares against the previous period.\n",
+          "name": "compareTo",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
@@ -18526,10 +20664,30 @@
           "multiple": true,
           "type": "option"
         },
-        "timezone": {
-          "description": "Client timezone (e.g. \"Africa/Cairo\", \"America/New_York\"). Used to convert date boundaries to UTC.",
-          "name": "timezone",
-          "required": true,
+        "comparePreset": {
+          "description": "Which earlier period the selected one is compared against. Takes precedence over compareFrom/compareTo. Omitting all three comparison parameters compares against the previous period — the same length, immediately before the selected window. There is no way to ask for no comparison.\n",
+          "name": "comparePreset",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "previous_period",
+            "previous_week",
+            "previous_month",
+            "previous_quarter",
+            "previous_year"
+          ],
+          "type": "option"
+        },
+        "compareFrom": {
+          "description": "Start date of a custom comparison window (inclusive, YYYY-MM-DD), resolved in the project's reporting timezone. Must be sent together with compareTo, and is ignored when comparePreset is present. Unlike the presets, its length may differ from the selected period's. Omitted, the report compares against the previous period.\n",
+          "name": "compareFrom",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "compareTo": {
+          "description": "End date of a custom comparison window (inclusive, YYYY-MM-DD). Must be sent together with compareFrom. Omitted, the report compares against the previous period.\n",
+          "name": "compareTo",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
@@ -18647,10 +20805,30 @@
           "multiple": true,
           "type": "option"
         },
-        "timezone": {
-          "description": "Client timezone (e.g. \"Africa/Cairo\", \"America/New_York\"). Used to convert date boundaries to UTC.",
-          "name": "timezone",
-          "required": true,
+        "comparePreset": {
+          "description": "Which earlier period the selected one is compared against. Takes precedence over compareFrom/compareTo. Omitting all three comparison parameters compares against the previous period — the same length, immediately before the selected window. There is no way to ask for no comparison.\n",
+          "name": "comparePreset",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "previous_period",
+            "previous_week",
+            "previous_month",
+            "previous_quarter",
+            "previous_year"
+          ],
+          "type": "option"
+        },
+        "compareFrom": {
+          "description": "Start date of a custom comparison window (inclusive, YYYY-MM-DD), resolved in the project's reporting timezone. Must be sent together with compareTo, and is ignored when comparePreset is present. Unlike the presets, its length may differ from the selected period's. Omitted, the report compares against the previous period.\n",
+          "name": "compareFrom",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "compareTo": {
+          "description": "End date of a custom comparison window (inclusive, YYYY-MM-DD). Must be sent together with compareFrom. Omitted, the report compares against the previous period.\n",
+          "name": "compareTo",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
@@ -18856,10 +21034,30 @@
           "multiple": true,
           "type": "option"
         },
-        "timezone": {
-          "description": "Client timezone (e.g. \"Africa/Cairo\", \"America/New_York\"). Used to convert date boundaries to UTC.",
-          "name": "timezone",
-          "required": true,
+        "comparePreset": {
+          "description": "Which earlier period the selected one is compared against. Takes precedence over compareFrom/compareTo. Omitting all three comparison parameters compares against the previous period — the same length, immediately before the selected window. There is no way to ask for no comparison.\n",
+          "name": "comparePreset",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "previous_period",
+            "previous_week",
+            "previous_month",
+            "previous_quarter",
+            "previous_year"
+          ],
+          "type": "option"
+        },
+        "compareFrom": {
+          "description": "Start date of a custom comparison window (inclusive, YYYY-MM-DD), resolved in the project's reporting timezone. Must be sent together with compareTo, and is ignored when comparePreset is present. Unlike the presets, its length may differ from the selected period's. Omitted, the report compares against the previous period.\n",
+          "name": "compareFrom",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "compareTo": {
+          "description": "End date of a custom comparison window (inclusive, YYYY-MM-DD). Must be sent together with compareFrom. Omitted, the report compares against the previous period.\n",
+          "name": "compareTo",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
