@@ -3899,6 +3899,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/{orgSlug}/projects/{projectId}/trackable-actions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List trackable actions
+         * @description The project's action log, newest first. Also reachable from agents, but through the MCP tools the Spring app serves directly (TrackableActionMcpTools) rather than through this spec — MCP is not a derived-spec audience.
+         */
+        get: operations["listTrackableActions"];
+        put?: never;
+        /** Log a trackable action */
+        post: operations["createTrackableAction"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/trackable-actions/{actionId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get one trackable action */
+        get: operations["getTrackableAction"];
+        put?: never;
+        post?: never;
+        /** Delete a trackable action */
+        delete: operations["deleteTrackableAction"];
+        options?: never;
+        head?: never;
+        /** Update a trackable action */
+        patch: operations["updateTrackableAction"];
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -4432,7 +4472,7 @@ export interface components {
          * @description Permission code enum representing all available permissions in the system
          * @enum {string}
          */
-        PermissionCode: "organization.update" | "organization.view" | "member.view" | "member.invite" | "member.remove" | "member.update_role" | "project.read" | "project.create" | "project.update" | "project.delete" | "build.view" | "build.delete" | "sdk_key.view" | "sdk_key.create" | "sdk_key.delete" | "private_api_key.view" | "private_api_key.create" | "private_api_key.delete" | "environment.view" | "environment.create" | "environment.update" | "environment.delete" | "in_app_message.view" | "in_app_message.create" | "in_app_message.update" | "in_app_message.delete" | "event.view" | "event.create" | "event.update" | "event.delete" | "ota.view" | "ota.create" | "ota.update" | "ota.delete" | "analytics.view" | "support.operations" | "webhook.view" | "webhook.create" | "webhook.update" | "webhook.delete" | "feature_flag.view" | "feature_flag.create" | "feature_flag.update" | "feature_flag.delete" | "audit.read" | "integration.view" | "integration.create" | "integration.update" | "integration.delete" | "integration.subscription.view" | "integration.subscription.create" | "integration.subscription.update" | "integration.subscription.delete" | "billing.subscription.view" | "billing.subscription.manage" | "billing.usage.view" | "billing.entitlements.view" | "dashboard.view" | "dashboard.manage" | "flutter.view" | "flutter.create" | "flutter.update" | "flutter.delete" | "invitation.cancel" | "invitation.delete" | "aivisibility.view" | "aivisibility.manage" | "siteaudit.view" | "siteaudit.manage" | "engagement.view" | "engagement.manage" | "dataimport.view" | "dataimport.manage" | "contentrecs.view" | "contentrecs.manage" | "sitecontent.view" | "sitecontent.manage" | "backlinks.view" | "backlinks.manage" | "marketplace.view" | "marketplace.order" | "workflow.view" | "workflow.manage" | "workflow.run" | "contentdraft.view" | "contentdraft.manage";
+        PermissionCode: "organization.update" | "organization.view" | "member.view" | "member.invite" | "member.remove" | "member.update_role" | "project.read" | "project.create" | "project.update" | "project.delete" | "build.view" | "build.delete" | "sdk_key.view" | "sdk_key.create" | "sdk_key.delete" | "private_api_key.view" | "private_api_key.create" | "private_api_key.delete" | "environment.view" | "environment.create" | "environment.update" | "environment.delete" | "in_app_message.view" | "in_app_message.create" | "in_app_message.update" | "in_app_message.delete" | "event.view" | "event.create" | "event.update" | "event.delete" | "ota.view" | "ota.create" | "ota.update" | "ota.delete" | "analytics.view" | "support.operations" | "webhook.view" | "webhook.create" | "webhook.update" | "webhook.delete" | "feature_flag.view" | "feature_flag.create" | "feature_flag.update" | "feature_flag.delete" | "audit.read" | "integration.view" | "integration.create" | "integration.update" | "integration.delete" | "integration.subscription.view" | "integration.subscription.create" | "integration.subscription.update" | "integration.subscription.delete" | "billing.subscription.view" | "billing.subscription.manage" | "billing.usage.view" | "billing.entitlements.view" | "dashboard.view" | "dashboard.manage" | "flutter.view" | "flutter.create" | "flutter.update" | "flutter.delete" | "invitation.cancel" | "invitation.delete" | "aivisibility.view" | "aivisibility.manage" | "siteaudit.view" | "siteaudit.manage" | "engagement.view" | "engagement.manage" | "dataimport.view" | "dataimport.manage" | "contentrecs.view" | "contentrecs.manage" | "sitecontent.view" | "sitecontent.manage" | "backlinks.view" | "backlinks.manage" | "marketplace.view" | "marketplace.order" | "workflow.view" | "workflow.manage" | "workflow.run" | "contentdraft.view" | "contentdraft.manage" | "trackable_actions.view" | "trackable_actions.manage";
         /** @description Role information with associated permissions */
         RoleWithPermissionsResponse: {
             /** @description Role ID */
@@ -9167,6 +9207,92 @@ export interface components {
             warningCount: number;
             /** @description A cross-page reading is in flight for this project. The reading is a job now, so the client polls this rather than holding a request open; the button stays disabled and the findings refresh when it clears. */
             crossAnalysisRunning?: boolean;
+        };
+        /**
+         * @description What kind of thing was done. Four verbs cover everything customers track; the platform it was done on is a separate field, so "published a podcast / an app / an extension" is one verb rather than three.
+         * @enum {string}
+         */
+        TrackableActionVerbEnum: "PUBLISHED" | "CHANGED_ACCESS" | "RAN_CAMPAIGN" | "CHANGED_IDENTITY";
+        /**
+         * @description What the action touched, which is what decides how much of it can be measured. PAGE and EXTERNAL both require a URL and differ only by whose domain it is on; SITEWIDE and NONE both forbid one.
+         * @enum {string}
+         */
+        TrackableActionScopeEnum: "PAGE" | "SITEWIDE" | "EXTERNAL" | "NONE";
+        /**
+         * @description How the action got into the log.
+         * @enum {string}
+         */
+        TrackableActionSourceEnum: "MANUAL" | "DETECTED";
+        /**
+         * @description How much of the funnel this action can be measured against. Derived from the scope, never stored, so it cannot drift: FULL is our own site (crawls, citations and sessions all available), PARTIAL is someone else's URL (no crawler logs — it is not our server), TRAFFIC_ONLY is an action with no URL at all.
+         * @enum {string}
+         */
+        TrackableActionMeasurabilityEnum: "FULL" | "PARTIAL" | "TRAFFIC_ONLY";
+        TrackableActionResponse: {
+            id: string;
+            /** @description Verbatim, as the user typed it. */
+            description: string;
+            verb: components["schemas"]["TrackableActionVerbEnum"];
+            /** @description Free-form platform key (OWN_SITE, LINKEDIN, X, CHROME_WEB_STORE, APPLE_PODCASTS, …). Deliberately not an enum — a new platform must not need an API change. */
+            platform: string;
+            /** @description Null for SITEWIDE and NONE. */
+            targetUrl?: string | null;
+            scope: components["schemas"]["TrackableActionScopeEnum"];
+            measurability: components["schemas"]["TrackableActionMeasurabilityEnum"];
+            /** Format: date */
+            startedOn: string;
+            /**
+             * Format: date
+             * @description Null on a point event, and also null on a campaign that is still running — the two are told apart by the verb, not by this field.
+             */
+            endedOn?: string | null;
+            source: components["schemas"]["TrackableActionSourceEnum"];
+            confirmed: boolean;
+            createdBy?: string | null;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        TrackableActionListResponse: {
+            actions: components["schemas"]["TrackableActionResponse"][];
+            /** @description Total matching the filters, before paging. */
+            total: number;
+        };
+        CreateTrackableActionRequest: {
+            description: string;
+            verb: components["schemas"]["TrackableActionVerbEnum"];
+            platform: string;
+            /** @description Required for PAGE and EXTERNAL, rejected for SITEWIDE and NONE. A PAGE URL must sit on the project's own website domain and an EXTERNAL one must not — that check is what makes the measurability we report back honest. */
+            targetUrl?: string | null;
+            scope: components["schemas"]["TrackableActionScopeEnum"];
+            /** Format: date */
+            startedOn: string;
+            /**
+             * Format: date
+             * @description Must not precede startedOn.
+             */
+            endedOn?: string | null;
+        };
+        /**
+         * @description Every field is optional and an omitted field keeps its stored value. The scope and URL rules are then checked against the RESULTING row, not just against the fields sent — so moving a PAGE action to SITEWIDE without also clearing its URL is rejected rather than silently dropping the URL every measurement joins on.
+         *
+         *     Send an empty string for targetUrl to clear it. Clearing endedOn is deliberately not expressible: an edit that never mentioned the date must not reopen a finished campaign and turn it back into a confounder.
+         */
+        UpdateTrackableActionRequest: {
+            description?: string;
+            verb?: components["schemas"]["TrackableActionVerbEnum"];
+            platform?: string;
+            /** @description Omit to keep the stored URL; send an empty string to clear it. */
+            targetUrl?: string | null;
+            scope?: components["schemas"]["TrackableActionScopeEnum"];
+            /** Format: date */
+            startedOn?: string;
+            /**
+             * Format: date
+             * @description Omit to keep the stored value. Cannot be cleared.
+             */
+            endedOn?: string | null;
+            /** @description Promotes a detected candidate into a tracked action. */
+            confirmed?: boolean;
         };
     };
     responses: {
@@ -16704,6 +16830,166 @@ export interface operations {
                 };
             };
             401: components["responses"]["UnauthorizedError"];
+        };
+    };
+    listTrackableActions: {
+        parameters: {
+            query?: {
+                verb?: components["schemas"]["TrackableActionVerbEnum"];
+                platform?: string;
+                /** @description Free-text match against the description. */
+                q?: string;
+                /** @description Only actions that started on or after this date. */
+                from?: string;
+                /** @description Only actions that started on or before this date. */
+                to?: string;
+                page?: number;
+                size?: number;
+            };
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Actions retrieved successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TrackableActionListResponse"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+        };
+    };
+    createTrackableAction: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateTrackableActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Action logged successfully */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TrackableActionResponse"];
+                };
+            };
+            400: components["responses"]["ValidationError"];
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+        };
+    };
+    getTrackableAction: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+                actionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Action retrieved successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TrackableActionResponse"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            404: components["responses"]["NotFoundError"];
+        };
+    };
+    deleteTrackableAction: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+                actionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Action deleted successfully */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            404: components["responses"]["NotFoundError"];
+        };
+    };
+    updateTrackableAction: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+                actionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateTrackableActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Action updated successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TrackableActionResponse"];
+                };
+            };
+            400: components["responses"]["ValidationError"];
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            404: components["responses"]["NotFoundError"];
         };
     };
 }
