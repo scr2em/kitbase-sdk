@@ -17,7 +17,8 @@ export default class TrackableActionsUpdate extends ApiOperationCommand {
 		"scope": Flags.string({ description: "What the action touched, which is what decides how much of it can be measured. PAGE and EXTERNAL both require a URL and differ only by whose domain it is on; SITEWIDE and NONE both forbid one.", options: ["PAGE","SITEWIDE","EXTERNAL","NONE"] }),
 		"startedOn": Flags.string({  }),
 		"endedOn": Flags.string({ description: "Omit to keep the stored value. Cannot be cleared." }),
-		"confirmed": Flags.boolean({ description: "Promotes a detected candidate into a tracked action." }),
+		"confirmed": Flags.boolean({ description: "Promotes a detected candidate into a tracked action. Setting it true also clears any dismissal." }),
+		"dismissed": Flags.boolean({ description: "Refuses a detected candidate. The row is kept rather than deleted, so a later sweep does not propose the same page again — a suggestion you have already refused coming back daily is how an inbox stops being read." }),
 	};
 
 	descriptor = descriptors["updateTrackableAction"];

@@ -4,8 +4,11 @@ import { Args, Flags } from "@oclif/core";
 import { ApiOperationCommand } from "../../../runtime/operation-command.js";
 import { descriptors } from "../../../generated/descriptors.js";
 
-export default class BacklinksRefreshList extends ApiOperationCommand {
-	static description = "Get link-graph refresh state";
+export default class SiteAuditAuditsCancel extends ApiOperationCommand {
+	static description = "Cancel a running site audit";
+	static args = {
+		"auditId": Args.string({ description: "auditId", required: true }),
+	};
 
-	descriptor = descriptors["getBacklinkRefreshRunState"];
+	descriptor = descriptors["cancelSiteAudit"];
 }
