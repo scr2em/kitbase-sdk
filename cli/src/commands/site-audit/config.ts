@@ -4,8 +4,8 @@ import { Args, Flags } from "@oclif/core";
 import { ApiOperationCommand } from "../../runtime/operation-command.js";
 import { descriptors } from "../../generated/descriptors.js";
 
-export default class BacklinksGraphSummary extends ApiOperationCommand {
-	static description = "Link profile summary";
+export default class SiteAuditConfig extends ApiOperationCommand {
+	static description = "Get site audit configuration";
 
-	descriptor = descriptors["getBacklinkGraphSummary"];
+	descriptor = descriptors["getSiteAuditConfig"];
 }

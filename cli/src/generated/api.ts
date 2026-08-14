@@ -1564,6 +1564,76 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/{orgSlug}/projects/{projectId}/ai-visibility/exploration-providers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Engines Prompt Explorer can run right now
+         * @description The engines an ad-hoc exploration can actually be executed against: the server's configured SYNCHRONOUS adapters intersected with the organization's `ai_visibility_exploration_providers` plan value. Distinct from `/ai-visibility/providers`, which answers a tracking question and may include async consumer surfaces the synchronous exploration path cannot execute. Clients must render the engine picker from this list; an empty list means the plan grants no exploration engines and the form should be disabled.
+         */
+        get: operations["getAiVisibilityExplorationProviders"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/ai-visibility/explorations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Recent explorations
+         * @description This project's exploration history, newest first — shared across the project's users, unlike a browser-local recent list. Summaries only; fetch one by id for its answers. Explorations older than the retention window are pruned server-side.
+         */
+        get: operations["listAiVisibilityExplorations"];
+        put?: never;
+        /**
+         * Ask one question across several engines
+         * @description Runs one ad-hoc prompt against 1–4 engines synchronously and returns every answer, its citations, and — when `analyze` is on — the tracked brands each answer named. The prompt is NOT added to the tracked set and the answers never enter share-of-voice or any other measurement; use `POST /ai-visibility/prompts` to promote a question you want monitored.
+         *
+         *     This spends real money on every call. Engines are billed against the organization's monthly provider budget, an identical question reuses its cached answers for 7 days unless `runFresh` is set, and a per-organization daily exploration cap applies on top of the monthly budget. Engines settle independently: a busy or broken engine comes back as a FAILED row while its siblings return their answers, so a 201 does not mean every engine answered.
+         */
+        post: operations["createAiVisibilityExploration"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/ai-visibility/explorations/{explorationId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * One exploration with every answer
+         * @description Re-opens a stored exploration exactly as it was returned, including which answers were served from cache. Nothing is re-executed and nothing is re-paid.
+         */
+        get: operations["getAiVisibilityExploration"];
+        put?: never;
+        post?: never;
+        /**
+         * Remove an exploration from history
+         * @description Deletes the exploration and its answers for everyone in the project. Other explorations that copied one of its answers keep working — they hold their own copy, and `cacheSourceRunId` is provenance rather than a reference.
+         */
+        delete: operations["deleteAiVisibilityExploration"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/{orgSlug}/projects/{projectId}/characters": {
         parameters: {
             query?: never;
@@ -1914,26 +1984,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/{orgSlug}/projects/{projectId}/backlinks/graph-summary": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Link profile summary
-         * @description Profile-wide link-graph totals from the last refresh, plus how many of the stored referring domains actually sent traffic. Returns available=false when no refresh has completed yet, and configured=false when this server has no DataForSEO credentials. Requires backlinks.view permission.
-         */
-        get: operations["getBacklinkGraphSummary"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/{orgSlug}/projects/{projectId}/backlinks/competitor-gap": {
         parameters: {
             query?: never;
@@ -1948,30 +1998,6 @@ export interface paths {
         get: operations["getBacklinkCompetitorGap"];
         put?: never;
         post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/{orgSlug}/projects/{projectId}/backlinks/refresh": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get link-graph refresh state
-         * @description Whether a refresh is currently active for this project and when the last one finished. Requires backlinks.view permission.
-         */
-        get: operations["getBacklinkRefreshRunState"];
-        put?: never;
-        /**
-         * Refresh the link graph now
-         * @description Enqueue an on-demand link-graph refresh (profile summary, referring domains, exact backlinks and competitor gap). Both the target domain and the competitor set are resolved server-side. Fails when the server has no DataForSEO credentials or the project has no website domain (400), when the organization's monthly SEO data budget is exhausted (400), or when a refresh is already running (409). Requires backlinks.manage permission.
-         */
-        post: operations["startBacklinkRefreshJob"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2013,6 +2039,106 @@ export interface paths {
          * @description Removes everything the DataForSEO sync has stored for this project — the profile summary, the referring-domain snapshot, the exact-link list and the competitor gap. Traffic-derived backlink sources (referrers that actually sent sessions) are first-party analytics and are NOT touched. Data returns on the next refresh, manual or scheduled. Fails with 409 while a refresh is running. Requires backlinks.manage permission.
          */
         delete: operations["deleteBacklinkSyncedData"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/keyword-markets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Supported keyword research markets
+         * @description Every country keyword research can be run in, with the languages DataForSEO serves there and which API answers for it. Google-Ads-served markets return no keyword difficulty or search intent, and the picker uses that flag rather than a client-side copy of the country table.
+         *
+         *     Organization-scoped rather than project-scoped on purpose: the create-project form needs this list before a project exists. It is public configuration and performs no paid call, so any organization member may read it.
+         */
+        get: operations["listKeywordMarkets"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/keywords/research": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Research keyword ideas
+         * @description Keyword ideas for one seed, with monthly search volume, CPC, competition, ranking difficulty and search intent.
+         *
+         *     **This spends money.** A cache hit (24h, shared across the whole install because search volumes are public data) costs nothing and is returned with `fromCache: true` and the age of the answer. A miss calls DataForSEO: one call for an explicit mode, and up to THREE for `auto`, which walks related → suggestions → ideas until it has enough non-seed keywords. Use `POST .../keywords/estimate` first if the caller needs to know the range.
+         *
+         *     POST rather than GET deliberately: a paid GET is exposed to browser prefetch, proxy retries and link previews, any of which would buy results nobody asked for.
+         *
+         *     Fails with 400 when the server has no DataForSEO credentials, when the country or country/language combination is unsupported, or when the organization's monthly SEO data budget is exhausted; 429 when the provider's account-wide rate limit is saturated. Requires keywords.manage permission.
+         */
+        post: operations["researchKeywords"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/keywords/serp": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Inspect the organic SERP for a keyword
+         * @description Who currently ranks on page one for a keyword in a market, with each result's estimated traffic value and backlink profile.
+         *
+         *     **This spends money** on a miss (cached 12h globally — rankings are the same page for every customer who asks). An empty `items` with `reason: no_organic_results` is a real answer and is cached as one.
+         *
+         *     POST for the same reason as research: never let a prefetch or a proxy retry buy a SERP. Clients must not prefetch this on hover or retry it automatically. Requires keywords.manage permission.
+         */
+        post: operations["getKeywordSerp"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/keywords/saved": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List saved keywords
+         * @description The project's saved keyword list, joined to whatever metrics are cached for each keyword's market. Free — it reads nothing from the provider, so a metric that has never been fetched is null rather than bought.
+         *
+         *     Filters, ranges and sort are applied in SQL and are the same ones the CSV export accepts, so an export always covers exactly what the table showed. Requires keywords.view permission.
+         */
+        get: operations["listSavedKeywords"];
+        put?: never;
+        /**
+         * Save keywords to the project
+         * @description Adds keywords to the project's list. Free: pass the metrics the caller already holds (from a research result) in `metrics` and the save stores them without re-buying anything. Keywords already on the list are ignored rather than rejected.
+         *
+         *     The same endpoint is the destination for "save to keywords" actions elsewhere in the product, so it is not research-specific. Requires keywords.manage permission.
+         */
+        post: operations["saveKeywords"];
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -2113,6 +2239,208 @@ export interface paths {
         get: operations["listGa4Properties"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/site-audit/config": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get site audit configuration
+         * @description The project's website domain, which is what audits run against, plus a prefill suggestion derived from the AI-visibility self-brand when the project has no website set yet.
+         */
+        get: operations["getSiteAuditConfig"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/site-audit/audits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List site audits
+         * @description Audit history for the project, newest first.
+         */
+        get: operations["listSiteAudits"];
+        put?: never;
+        /**
+         * Start a site audit
+         * @description Starts a background crawl of the configured domain: crawler-access probes (robots.txt, llms.txt, sitemap, WAF behavior), a link-following crawl seeded from the homepage and the sitemap, per-page issue rules, and enrichment from the project's own bot/AI-visibility analytics. Rejected when no domain is configured or another audit is active. Poll the progress resource while it runs.
+         */
+        post: operations["startSiteAudit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/site-audit/audits/latest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the latest site audit with live progress */
+        get: operations["getLatestSiteAudit"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/site-audit/audits/{auditId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get one site audit */
+        get: operations["getSiteAudit"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/site-audit/audits/{auditId}/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get one audit's headline statistics
+         * @description The report's tile strip: how much was crawled, how many issues by severity, how fast the site answered, and the AI-readiness score. Computed in SQL rather than from a page list, because the page list can hold thousands of rows.
+         *
+         *     Counts are computed after the caller's permission filter. `availableSections` names the finding producers this caller may read: SITE_CHECK and CONTENT_CHECK additionally require sitecontent.view.
+         */
+        get: operations["getSiteAuditSummary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/site-audit/audits/{auditId}/findings/groups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List an audit's findings, grouped by rule
+         * @description One row per rule that fired, worst first, with the copy that explains it. The affected pages are fetched separately when a group is expanded — shipping them inline would put every finding on the site in one response.
+         *
+         *     Groups whose source the caller may not read are omitted entirely, aggregates included.
+         */
+        get: operations["listSiteAuditFindingGroups"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/site-audit/audits/{auditId}/findings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List an audit's findings
+         * @description The drill-down behind a group, and the export's source. `source` is required whenever `findingId` is supplied: rule ids collide across the catalogs, so an id on its own does not name one rule.
+         */
+        get: operations["listSiteAuditFindings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/site-audit/audits/{auditId}/pages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List an audit's crawled pages
+         * @description The crawl snapshot, filtered and sorted server-side because it can hold thousands of rows. This is one run's snapshot; the site-content inventory remains the living view across runs.
+         */
+        get: operations["listSiteAuditPages"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/site-audit/audits/{auditId}/progress": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Live progress of a running audit
+         * @description Phase, page counts and the last few URLs crawled. Cheap enough to poll every couple of seconds while a crawl runs; settles to DONE and stops changing once it does.
+         */
+        get: operations["getSiteAuditProgress"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/site-audit/audits/{auditId}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Cancel a running site audit
+         * @description Completed checks keep their results; remaining probes are abandoned.
+         */
+        post: operations["cancelSiteAudit"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3939,6 +4267,68 @@ export interface paths {
         patch: operations["updateTrackableAction"];
         trace?: never;
     };
+    "/{orgSlug}/projects/{projectId}/trackable-actions/{actionId}/impact": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * What one action moved
+         * @description The published → crawled → cited → referred chain for a single action, with equal windows either side of its start date.
+         *
+         *     Deliberately no brand mention rate: at one sample per prompt per engine per day it cannot carry a single action's signal, so this reports counts of things that happened rather than a rate that would look like an answer without being one. Overlapping actions and open campaign windows come back as confounders rather than being corrected for.
+         */
+        get: operations["getTrackableActionImpact"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/trackable-actions/candidates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Pages the crawl noticed that nobody logged
+         * @description Detected but unconfirmed actions, newest first. Confirm one with PATCH `confirmed: true`, refuse it with PATCH `dismissed: true`.
+         */
+        get: operations["listTrackableActionCandidates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/trackable-actions/system-events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Things in this window that nobody's customer did
+         * @description Engine model-version changes inside the window, for drawing beside a project's own logged actions. Derived from `ai_visibility_runs.model_version`, so it needs no external data and cannot go stale.
+         */
+        get: operations["listTrackableActionSystemEvents"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -4202,6 +4592,10 @@ export interface components {
             projectType: components["schemas"]["ProjectType"];
             /** @description Optional public website domain for the project (registrable eTLD+1). Normalized on write (scheme/www/path stripped); invalid input is rejected with 400. Omit or leave empty for projects with no public website (apps, dashboards). */
             websiteDomain?: string | null;
+            /** @description Default keyword research market (a DataForSEO location code from GET /{orgSlug}/keyword-markets). Omit to leave the project on 2840 (United States). An unsupported code is rejected with 400. */
+            keywordLocationCode?: number | null;
+            /** @description Language paired with keywordLocationCode. Omit to use that market's default language. A language DataForSEO does not serve in that country is rejected with 400 — the provider bills such a task before failing it. */
+            keywordLanguageCode?: string | null;
         };
         /** @description Request to update a project */
         UpdateProjectRequest: {
@@ -4211,6 +4605,10 @@ export interface components {
             description?: string;
             /** @description The project's public website domain (registrable eTLD+1). Send a non-empty value to set it (normalized on write; invalid input rejected with 400), an empty string to clear it, or omit the field entirely to leave the current value unchanged. */
             websiteDomain?: string | null;
+            /** @description Default keyword research market (a DataForSEO location code). Omit to leave it unchanged; an unsupported code is rejected with 400. */
+            keywordLocationCode?: number | null;
+            /** @description Language paired with keywordLocationCode. Omit to leave it unchanged; sending a location without a language resolves to that market's default. */
+            keywordLanguageCode?: string | null;
         };
         /** @description User information */
         UserResponse: {
@@ -4472,7 +4870,7 @@ export interface components {
          * @description Permission code enum representing all available permissions in the system
          * @enum {string}
          */
-        PermissionCode: "organization.update" | "organization.view" | "member.view" | "member.invite" | "member.remove" | "member.update_role" | "project.read" | "project.create" | "project.update" | "project.delete" | "build.view" | "build.delete" | "sdk_key.view" | "sdk_key.create" | "sdk_key.delete" | "private_api_key.view" | "private_api_key.create" | "private_api_key.delete" | "environment.view" | "environment.create" | "environment.update" | "environment.delete" | "in_app_message.view" | "in_app_message.create" | "in_app_message.update" | "in_app_message.delete" | "event.view" | "event.create" | "event.update" | "event.delete" | "ota.view" | "ota.create" | "ota.update" | "ota.delete" | "analytics.view" | "support.operations" | "webhook.view" | "webhook.create" | "webhook.update" | "webhook.delete" | "feature_flag.view" | "feature_flag.create" | "feature_flag.update" | "feature_flag.delete" | "audit.read" | "integration.view" | "integration.create" | "integration.update" | "integration.delete" | "integration.subscription.view" | "integration.subscription.create" | "integration.subscription.update" | "integration.subscription.delete" | "billing.subscription.view" | "billing.subscription.manage" | "billing.usage.view" | "billing.entitlements.view" | "dashboard.view" | "dashboard.manage" | "flutter.view" | "flutter.create" | "flutter.update" | "flutter.delete" | "invitation.cancel" | "invitation.delete" | "aivisibility.view" | "aivisibility.manage" | "siteaudit.view" | "siteaudit.manage" | "engagement.view" | "engagement.manage" | "dataimport.view" | "dataimport.manage" | "contentrecs.view" | "contentrecs.manage" | "sitecontent.view" | "sitecontent.manage" | "backlinks.view" | "backlinks.manage" | "marketplace.view" | "marketplace.order" | "workflow.view" | "workflow.manage" | "workflow.run" | "contentdraft.view" | "contentdraft.manage" | "trackable_actions.view" | "trackable_actions.manage";
+        PermissionCode: "organization.update" | "organization.view" | "member.view" | "member.invite" | "member.remove" | "member.update_role" | "project.read" | "project.create" | "project.update" | "project.delete" | "build.view" | "build.delete" | "sdk_key.view" | "sdk_key.create" | "sdk_key.delete" | "private_api_key.view" | "private_api_key.create" | "private_api_key.delete" | "environment.view" | "environment.create" | "environment.update" | "environment.delete" | "in_app_message.view" | "in_app_message.create" | "in_app_message.update" | "in_app_message.delete" | "event.view" | "event.create" | "event.update" | "event.delete" | "ota.view" | "ota.create" | "ota.update" | "ota.delete" | "analytics.view" | "support.operations" | "webhook.view" | "webhook.create" | "webhook.update" | "webhook.delete" | "feature_flag.view" | "feature_flag.create" | "feature_flag.update" | "feature_flag.delete" | "audit.read" | "integration.view" | "integration.create" | "integration.update" | "integration.delete" | "integration.subscription.view" | "integration.subscription.create" | "integration.subscription.update" | "integration.subscription.delete" | "billing.subscription.view" | "billing.subscription.manage" | "billing.usage.view" | "billing.entitlements.view" | "dashboard.view" | "dashboard.manage" | "flutter.view" | "flutter.create" | "flutter.update" | "flutter.delete" | "invitation.cancel" | "invitation.delete" | "aivisibility.view" | "aivisibility.manage" | "siteaudit.view" | "siteaudit.manage" | "engagement.view" | "engagement.manage" | "dataimport.view" | "dataimport.manage" | "contentrecs.view" | "contentrecs.manage" | "sitecontent.view" | "sitecontent.manage" | "backlinks.view" | "backlinks.manage" | "marketplace.view" | "marketplace.order" | "workflow.view" | "workflow.manage" | "workflow.run" | "contentdraft.view" | "contentdraft.manage" | "trackable_actions.view" | "trackable_actions.manage" | "keywords.view" | "keywords.manage";
         /** @description Role information with associated permissions */
         RoleWithPermissionsResponse: {
             /** @description Role ID */
@@ -4571,6 +4969,10 @@ export interface components {
             projectType: components["schemas"]["ProjectType"];
             /** @description The project's configured public website domain (registrable eTLD+1), or null when the project has no public website configured. */
             websiteDomain?: string | null;
+            /** @description The project's stored default keyword research market, or null when it has never been set (which reads as 2840, United States). */
+            keywordLocationCode?: number | null;
+            /** @description The language stored alongside keywordLocationCode, or null (which reads as that market's default language). */
+            keywordLanguageCode?: string | null;
             /** @description User ID who created the project */
             createdBy: string;
             /**
@@ -7348,7 +7750,7 @@ export interface components {
          * @description Available billing feature codes
          * @enum {string}
          */
-        BillingFeatureCodeEnum: "max_organizations" | "max_projects" | "max_team_members" | "max_feature_flags" | "data_retention_days" | "events_per_month" | "feature_flag_segments" | "audit_logs" | "sso" | "webhooks" | "api_access" | "priority_support" | "custom_events_enabled" | "custom_dashboards" | "ai_visibility_max_prompts" | "ai_visibility_max_personas" | "bot_events_per_month" | "ai_visibility_runs_per_month" | "engagement_max_keywords" | "ai_visibility_providers" | "ai_visibility_max_projects" | "ai_visibility_run_interval_days" | "ai_visibility_regions" | "monthly_budget_usd" | "free_monthly_budget_usd" | "backlinks_refresh_interval_days" | "workflows_enabled" | "max_active_workflows" | "workflow_runs_per_month";
+        BillingFeatureCodeEnum: "max_organizations" | "max_projects" | "max_team_members" | "max_feature_flags" | "data_retention_days" | "events_per_month" | "feature_flag_segments" | "audit_logs" | "sso" | "webhooks" | "api_access" | "priority_support" | "custom_events_enabled" | "custom_dashboards" | "ai_visibility_max_prompts" | "ai_visibility_max_personas" | "bot_events_per_month" | "ai_visibility_runs_per_month" | "engagement_max_keywords" | "ai_visibility_providers" | "ai_visibility_exploration_providers" | "ai_visibility_max_projects" | "ai_visibility_run_interval_days" | "ai_visibility_regions" | "monthly_budget_usd" | "free_monthly_budget_usd" | "backlinks_refresh_interval_days" | "backlinks_pulls_per_day" | "workflows_enabled" | "max_active_workflows" | "workflow_runs_per_month";
         /** @description A billing plan available in the system */
         BillingPlanResponse: {
             /** @description Unique plan identifier */
@@ -7865,6 +8267,218 @@ export interface components {
             /** @description AI engines this job ran (or is running) units against */
             providers?: string[];
         };
+        SiteAuditConfigResponse: {
+            /** @description Domain to audit (registrable eTLD+1) — the project's website domain, which is its only source. Null when the project has no website set. */
+            domain?: string | null;
+            /** @description Prefill suggestion when no website is set: the AI-visibility self-brand's primary domain. Equal to `domain` once one is set. */
+            suggestedDomain?: string | null;
+        };
+        SiteAuditProgress: {
+            totalUnits?: number;
+            completedUnits?: number;
+            failedUnits?: number;
+        };
+        SiteAuditCategoryScores: {
+            crawlerAccess?: number | null;
+            machineReadability?: number | null;
+            analytics?: number | null;
+        };
+        /** @description One audit check verdict, carrying the copy that explains it. The wording is served rather than kept in the frontend because the dashboard is not the only reader — the MCP tools hand these verdicts straight to an assistant. */
+        SiteAuditCheckResponse: {
+            /** @enum {string} */
+            checkType?: "ROBOTS_TXT_VALID" | "AI_CRAWLERS_ALLOWED" | "SITEMAP_PRESENT_VALID" | "LLMS_TXT_PRESENT" | "AI_BOT_EDGE_BLOCKING" | "HTTPS_REDIRECT_HEALTH" | "CONTENT_IN_INITIAL_HTML" | "TITLE_META_DESCRIPTION" | "STRUCTURED_DATA_JSONLD" | "OPENGRAPH_TAGS" | "CANONICAL_TAGS" | "HEADING_HIERARCHY" | "PAGE_HEALTH" | "AI_CRAWLER_VISITS_30D" | "AI_CRAWL_FRESHNESS" | "AI_SHARE_OF_VOICE";
+            /** @enum {string} */
+            category?: "CRAWLER_ACCESS" | "MACHINE_READABILITY" | "ANALYTICS";
+            /** @description What the check is, phrased as the good outcome */
+            title: string;
+            /** @description Why the check matters — the same sentence whatever the verdict */
+            description: string;
+            /** @enum {string} */
+            status?: "PASS" | "FAIL" | "WARNING" | "NOT_APPLICABLE" | "ERROR";
+            /** @description What this audit found, in a sentence */
+            detail: string;
+            /** @description What to do about it — worth showing only when the check is not passing */
+            fix: string;
+            weight?: number;
+            /** @description Structured evidence for the UI (per-bot verdicts, failing URLs, probe statuses) */
+            details?: {
+                [key: string]: unknown;
+            } | null;
+            errorMessage?: string | null;
+            /** Format: date-time */
+            checkedAt?: string;
+        };
+        SiteAuditPageResponse: {
+            url?: string;
+            /** @enum {string} */
+            source?: "HOMEPAGE" | "SITEMAP" | "LINK";
+            httpStatus?: number | null;
+            contentBytes?: number | null;
+            fetchMs?: number | null;
+            /** @description Per-page analysis (title, JSON-LD types, OG tags, canonical, headings, ...) */
+            results?: {
+                [key: string]: unknown;
+            } | null;
+            errorMessage?: string | null;
+        };
+        SiteAuditSummaryResponse: {
+            id?: string;
+            domain?: string;
+            /** @enum {string} */
+            status?: "RUNNING" | "PAUSE_REQUESTED" | "PAUSED" | "CANCEL_REQUESTED" | "CANCELLED" | "COMPLETED" | "FAILED";
+            overallScore?: number | null;
+            categoryScores?: components["schemas"]["SiteAuditCategoryScores"];
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            finishedAt?: string | null;
+        };
+        SiteAuditDetailResponse: {
+            id?: string;
+            domain?: string;
+            /** @enum {string} */
+            status?: "RUNNING" | "PAUSE_REQUESTED" | "PAUSED" | "CANCEL_REQUESTED" | "CANCELLED" | "COMPLETED" | "FAILED";
+            progress?: components["schemas"]["SiteAuditProgress"];
+            overallScore?: number | null;
+            categoryScores?: components["schemas"]["SiteAuditCategoryScores"];
+            checks?: components["schemas"]["SiteAuditCheckResponse"][];
+            summary?: components["schemas"]["SiteAuditSummaryStats"];
+            /** @description The first 50 crawled pages only. Superseded by the paginated pages resource — an audit can now crawl thousands of pages, which cannot travel inline. Kept populated so a dashboard deployed against an older contract keeps working. */
+            pages?: components["schemas"]["SiteAuditPageResponse"][];
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            finishedAt?: string | null;
+        };
+        /** @description Run options. The whole body is optional; omitting it runs with the service defaults. */
+        SiteAuditStartRequest: {
+            /** @description How many pages the crawl may fetch. Bounded by the service's own floor and ceiling; a value outside them is rejected. */
+            maxPages?: number | null;
+            /** @description Follow internal links as well as the sitemap. False audits only what the sitemap lists, which is faster and blind to anything unlisted. */
+            followLinks?: boolean | null;
+        };
+        /** @description The report's headline row, computed server-side. Every count here is produced after the caller's permission filter, so a hidden producer cannot be inferred from a total. */
+        SiteAuditSummaryStats: {
+            pagesCrawled?: number;
+            /** @description URLs admitted to the crawl frontier, crawled or not yet. */
+            pagesDiscovered?: number;
+            maxPages?: number | null;
+            /** @description The crawl hit its page cap and stopped admitting URLs. */
+            frontierTruncated?: boolean;
+            followLinks?: boolean;
+            issuesFound?: number;
+            severityCounts?: components["schemas"]["SiteAuditSeverityCounts"];
+            /** @description Mean over the pages that answered. Pages that never responded are excluded rather than counted as zero. */
+            avgResponseMs?: number | null;
+            /** @description Pages bot protection turned the crawler away from. */
+            blockedPages?: number;
+            brokenPages?: number;
+            serverErrorPages?: number;
+            overallScore?: number | null;
+            categoryScores?: components["schemas"]["SiteAuditCategoryScores"];
+            /** @description Which finding producers this caller may read. SITE_CHECK and CONTENT_CHECK additionally require sitecontent.view. */
+            availableSections?: ("CRAWL" | "CHECKLIST" | "PAGE_CHECK" | "SITE_CHECK" | "CONTENT_CHECK")[];
+        };
+        SiteAuditSeverityCounts: {
+            critical?: number;
+            warning?: number;
+            info?: number;
+        };
+        /** @description One rule, and how much of the site it affects. `source` and `findingId` together are the identity — ids collide across the catalogs, so a drill-down that sends only `findingId` is ambiguous. */
+        SiteAuditFindingGroup: {
+            /** @enum {string} */
+            source: "CRAWL" | "CHECKLIST" | "PAGE_CHECK" | "SITE_CHECK" | "CONTENT_CHECK";
+            findingId: string;
+            /** @enum {string} */
+            severity: "CRITICAL" | "WARNING" | "INFO";
+            /** @enum {string} */
+            scope: "PAGE" | "SITE";
+            /** @description What is wrong, as a short noun phrase */
+            title: string;
+            /** @description Why it matters — the same sentence whichever page it is */
+            description: string;
+            /** @description What to do about it */
+            fix: string;
+            /** @description Distinct pages carrying this finding; 0 for a site-wide one. */
+            affectedPages?: number;
+            findingCount?: number;
+        };
+        /** @description One finding on one page. */
+        SiteAuditFindingResponse: {
+            /** @enum {string} */
+            source: "CRAWL" | "CHECKLIST" | "PAGE_CHECK" | "SITE_CHECK" | "CONTENT_CHECK";
+            findingId: string;
+            /** @enum {string} */
+            severity: "CRITICAL" | "WARNING" | "INFO";
+            /** @enum {string} */
+            scope: "PAGE" | "SITE";
+            pageUrl?: string | null;
+            title: string;
+            description: string;
+            /** @description What this page measured, in a sentence. */
+            detail?: string | null;
+            fix: string;
+            /** @description Structured evidence (the chain, the duplicate group, the linking pages) */
+            details?: {
+                [key: string]: unknown;
+            } | null;
+        };
+        /** @description Paginated findings for one audit */
+        PaginatedSiteAuditFindings: {
+            data: components["schemas"]["SiteAuditFindingResponse"][];
+            page: number;
+            size: number;
+            totalElements: number;
+            totalPages: number;
+        };
+        /** @description One crawled page, as the Pages tab shows it. */
+        SiteAuditPageRow: {
+            url?: string;
+            finalUrl?: string | null;
+            statusCode?: number | null;
+            /** @enum {string|null} */
+            fetchClass?: "OK" | "REDIRECT" | "BROKEN" | "SERVER_ERROR" | "BLOCKED" | "ERROR" | null;
+            title?: string | null;
+            h1Count?: number | null;
+            wordCount?: number | null;
+            imagesTotal?: number | null;
+            imagesMissingAlt?: number | null;
+            internalLinkCount?: number | null;
+            responseTimeMs?: number | null;
+            /** @description Clicks from the homepage; null for a page seeded from the sitemap. */
+            crawlDepth?: number | null;
+            inSitemap?: boolean;
+            indexable?: boolean | null;
+            /** @enum {string} */
+            source?: "HOMEPAGE" | "SITEMAP" | "LINK";
+            issueCount?: number;
+        };
+        /** @description Paginated crawled pages for one audit */
+        PaginatedSiteAuditPages: {
+            data: components["schemas"]["SiteAuditPageRow"][];
+            page: number;
+            size: number;
+            totalElements: number;
+            totalPages: number;
+        };
+        SiteAuditRecentPage: {
+            url?: string;
+            statusCode?: number | null;
+            title?: string | null;
+            /** Format: date-time */
+            crawledAt?: string | null;
+        };
+        /** @description Live progress while an audit runs. */
+        SiteAuditProgressResponse: {
+            /** @enum {string} */
+            phase?: "DISCOVERY" | "CRAWLING" | "FINALIZING" | "DONE";
+            pagesCrawled?: number;
+            pagesDiscovered?: number;
+            totalUnits?: number;
+            completedUnits?: number;
+            failedUnits?: number;
+            recentPages?: components["schemas"]["SiteAuditRecentPage"][];
+        };
         AiVisibilitySeriesPoint: {
             jobId?: string;
             /** Format: date-time */
@@ -7913,7 +8527,7 @@ export interface components {
              * @description Static source-type sub-classification; null when the job predates it
              * @enum {string|null}
              */
-            sourceType?: "VENDOR" | "UGC" | "REVIEW_SITE" | "REFERENCE" | "NEWS" | "SOCIAL" | "DOCS" | "EDITORIAL" | null;
+            sourceType?: "VENDOR" | "UGC" | "REVIEW_SITE" | "REFERENCE" | "NEWS" | "SOCIAL" | "DOCS" | "MARKETPLACE" | "EDITORIAL" | null;
             /** @description AI engines that cited this domain at least once in the aggregated jobs, scoped to the provider filter ('ALL' lists every engine) */
             providers?: string[];
             /** @description Set when this cited domain is purchasable as a guest-post placement in the marketplace — deep-links to the catalog. Null when the marketplace is disabled or does not carry the domain. */
@@ -7969,7 +8583,7 @@ export interface components {
             /** @enum {string|null} */
             classification?: "SELF" | "COMPETITOR" | "OTHER" | null;
             /** @enum {string|null} */
-            sourceType?: "VENDOR" | "UGC" | "REVIEW_SITE" | "REFERENCE" | "NEWS" | "SOCIAL" | "DOCS" | "EDITORIAL" | null;
+            sourceType?: "VENDOR" | "UGC" | "REVIEW_SITE" | "REFERENCE" | "NEWS" | "SOCIAL" | "DOCS" | "MARKETPLACE" | "EDITORIAL" | null;
             /** @description Total citations to this domain across the aggregated jobs (for the selected provider) */
             totalCitations?: number;
             /** @description Number of distinct cited URLs under this domain */
@@ -8007,7 +8621,7 @@ export interface components {
              */
             classification?: "SELF" | "COMPETITOR" | "OTHER" | null;
             /** @enum {string|null} */
-            sourceType?: "VENDOR" | "UGC" | "REVIEW_SITE" | "REFERENCE" | "NEWS" | "SOCIAL" | "DOCS" | "EDITORIAL" | null;
+            sourceType?: "VENDOR" | "UGC" | "REVIEW_SITE" | "REFERENCE" | "NEWS" | "SOCIAL" | "DOCS" | "MARKETPLACE" | "EDITORIAL" | null;
             /** @description Number of citations to this exact URL across the aggregated jobs */
             citationCount: number;
             /** @description This page's share of the citations the selected period recorded, 0..1. The denominator is every citation the window holds across all cited pages — not only the ones on this page of results — which is the same denominator previousCitationShare is taken against, so the two are comparable. Null when the window recorded no citations at all. */
@@ -8245,7 +8859,7 @@ export interface components {
             answerText?: string | null;
             citations?: components["schemas"]["AiVisibilityCitationEntry"][];
             mentions?: components["schemas"]["AiVisibilityMentionEntry"][];
-            /** @description Advertisements Google rendered inside this answer. Always empty for engines whose answers cannot carry ads (every chat provider). */
+            /** @description Advertisements shown inside this answer, including any the engine was served but never displayed (see `isRendered`). Always empty for engines whose answers cannot carry ads. */
             paidPlacements?: components["schemas"]["AiVisibilityPaidPlacementEntry"][];
             /** Format: date-time */
             finishedAt?: string | null;
@@ -8261,8 +8875,14 @@ export interface components {
             blockPosition?: "LEFT" | "RIGHT" | null;
             /** @description The answer's own lead-in to the sponsored block */
             blockText?: string | null;
-            /** @description The advertiser's homepage — NOT the ad's landing page. Google does not expose the destination without following the ad click referral. */
+            /** @description Whether the ad was actually painted on screen. `false` means the engine was served the ad but never displayed it, so nobody saw it; `null` means the platform does not report visibility (every Google placement). Only `false` is excluded from the aggregated paid-placement counts. */
+            isRendered?: boolean | null;
+            /** @description Where the ad points: the campaign's landing page on ChatGPT, and the advertiser's homepage on Google, which does not expose the destination without following the ad click referral. */
+            adUrl?: string | null;
+            /** @description The advertiser's own site, reported beside the ad. Not a duplicate of `adUrl`, which is usually a campaign landing page. Null on Google, which reports no such field. */
             advertiserUrl?: string | null;
+            /** @description The icon shown next to the ad; null on Google, which reports none */
+            advertiserFaviconUrl?: string | null;
             /** @description Advertiser's registrable domain (eTLD+1); null when normalization failed */
             normalizedDomain?: string | null;
             /**
@@ -8306,7 +8926,7 @@ export interface components {
             /** @description True when the project's own brand was named organically in at least one of this prompt's ad-carrying answers — i.e. someone is paying for a slot on an answer this brand already earned. */
             selfMentioned?: boolean;
         };
-        /** @description Sponsored placements inside AI answers, aggregated over the same job window as every other AI visibility read. Only engines that read a SERP can report ads, so the measured counts are scoped to those engines — a zero here means "no ads were shown", never "we did not look". */
+        /** @description Sponsored placements inside AI answers, aggregated over the same job window as every other AI visibility read. Only some platforms report ads, so the measured counts are scoped to those platforms — a zero here means "no ads were shown", never "we did not look". Ads a platform reported as served but never displayed are left out of every count: nobody saw them. */
         AiVisibilityPaidPlacementsResponse: {
             /** @description The ad-reporting engines this response was computed for */
             providers?: components["schemas"]["AiVisibilityProviderEnum"][];
@@ -8362,6 +8982,114 @@ export interface components {
          * @enum {string}
          */
         AiVisibilityProviderEnum: "PERPLEXITY" | "GEMINI" | "CLAUDE" | "CHATGPT" | "DEEPSEEK" | "GLM" | "KIMI" | "GOOGLE_AI_OVERVIEW" | "GOOGLE_AI_MODE" | "CHATGPT_WEB" | "GEMINI_WEB";
+        /**
+         * @description What kind of answer an engine produces. MODEL_API is a chat completion from a configured model (ChatGPT/Gemini/Claude/... APIs); SEARCH_SURFACE is a real consumer answer surface read through a SERP provider. They are not interchangeable evidence and clients must label them differently — a MODEL_API answer is not what a buyer sees on chatgpt.com.
+         * @enum {string}
+         */
+        AiVisibilityExplorationSurfaceTypeEnum: "MODEL_API" | "SEARCH_SURFACE";
+        /**
+         * @description Whether this engine grounds its answer in a live web search. Descriptive only: search behaviour is decided by the adapter and server config, not by the request, so there is no web-search toggle in v1.
+         * @enum {string}
+         */
+        AiVisibilityExplorationWebSearchModeEnum: "ENABLED" | "DISABLED";
+        /**
+         * @description Terminal state of one engine's answer. Explorations are synchronous, so a run is settled by the time it is returned; engines fail independently, and a FAILED engine never fails its siblings.
+         * @enum {string}
+         */
+        AiVisibilityExplorationRunStatusEnum: "SUCCEEDED" | "FAILED";
+        AiVisibilityExplorationRequest: {
+            /** @description The question to ask, verbatim. Same limit as a tracked prompt. */
+            promptText: string;
+            /** @description Engines to ask, from GET /ai-visibility/exploration-providers. Anything not in that response — unknown, unconfigured, plan-disallowed, or an async-only consumer surface — is rejected by name rather than silently dropped. */
+            providers: components["schemas"]["AiVisibilityProviderEnum"][];
+            /** @description Vantage point to ask from; defaults to US. A region samples ONE of its configured countries per prompt (stable for the same prompt), so this is a regional reading, not an exact-country selector. */
+            region?: components["schemas"]["AiVisibilityRegionEnum"];
+            /**
+             * @description Run the brand extractor over each answer to detect tracked-brand mentions. Costs one extra LLM call per engine that has no reusable current-version analysis.
+             * @default true
+             */
+            analyze: boolean;
+            /** @description An arbitrary brand name to look for in every answer and citation, matched deterministically in code with no LLM involved. Independent of `analyze` and of the project's configured brands — this is how you check a name you do not track. */
+            highlightBrand?: string | null;
+            /**
+             * @description Bypass the 7-day answer cache and pay every selected engine again. Off by default: an identical question asked from the same vantage point reuses the stored answer for free.
+             * @default false
+             */
+            runFresh: boolean;
+        };
+        /** @description One source an answer cited. Same fields as AiVisibilityCitationEntry plus `highlightMatched`, which is specific to this exploration's arbitrary highlight. */
+        AiVisibilityExplorationCitationEntry: {
+            position?: number;
+            rawUrl?: string | null;
+            normalizedDomain?: string | null;
+            urlPath?: string | null;
+            title?: string | null;
+            snippet?: string | null;
+            /** @description Whether this source matched the exploration's `highlightBrand` (always false when none was given) */
+            highlightMatched?: boolean;
+        };
+        /** @description One engine's answer within an exploration. Flat `status` + nullable fields rather than a oneOf, matching AiVisibilityRunDetailResponse. */
+        AiVisibilityExplorationRun: {
+            id?: string;
+            provider?: components["schemas"]["AiVisibilityProviderEnum"];
+            /** @description ISO-3166 alpha-2 country this engine was actually asked from */
+            market?: string;
+            surfaceType?: components["schemas"]["AiVisibilityExplorationSurfaceTypeEnum"];
+            webSearchMode?: components["schemas"]["AiVisibilityExplorationWebSearchModeEnum"];
+            status?: components["schemas"]["AiVisibilityExplorationRunStatusEnum"];
+            modelVersion?: string | null;
+            /** @description Customer-facing failure text; the upstream detail stays in the server log */
+            errorMessage?: string | null;
+            answerText?: string | null;
+            citations?: components["schemas"]["AiVisibilityExplorationCitationEntry"][];
+            /** @description Tracked-brand mentions only, in the existing SELF/COMPETITOR shape. Empty when analysis was not requested, was unavailable, or found no tracked brand. */
+            mentions?: components["schemas"]["AiVisibilityMentionEntry"][];
+            /** @description Whether the answer named `highlightBrand`; null when no highlight was requested */
+            highlightBrandMentioned?: boolean | null;
+            /** @description The searches the engine ran to answer; empty when it reports none */
+            fanOutQueries?: string[];
+            outputTokens?: number | null;
+            /** @description True when this answer was copied from an earlier identical call instead of being paid for again */
+            providerCacheHit?: boolean;
+            /** @description True when the brand analysis was re-derived from stored entities instead of re-extracted */
+            analysisCacheHit?: boolean;
+            /** @description The exploration run this answer was copied from; provenance only, and it may since have been pruned */
+            cacheSourceRunId?: string | null;
+            /** Format: date-time */
+            finishedAt?: string | null;
+        };
+        AiVisibilityExplorationResponse: {
+            id?: string;
+            promptText?: string;
+            highlightBrand?: string | null;
+            region?: components["schemas"]["AiVisibilityRegionEnum"];
+            analyzeRequested?: boolean;
+            /** Format: date-time */
+            createdAt?: string;
+            createdByName?: string | null;
+            /** @description One entry per requested engine, in the order they were requested */
+            results?: components["schemas"]["AiVisibilityExplorationRun"][];
+        };
+        /** @description One row of the exploration history list — enough to re-open it, no answers. */
+        AiVisibilityExplorationSummary: {
+            id?: string;
+            promptText?: string;
+            region?: components["schemas"]["AiVisibilityRegionEnum"];
+            providers?: components["schemas"]["AiVisibilityProviderEnum"][];
+            /** Format: date-time */
+            createdAt?: string;
+            createdByName?: string | null;
+        };
+        AiVisibilityExplorationProviderEntry: {
+            provider?: components["schemas"]["AiVisibilityProviderEnum"];
+            displayName?: string;
+            surfaceType?: components["schemas"]["AiVisibilityExplorationSurfaceTypeEnum"];
+            webSearchMode?: components["schemas"]["AiVisibilityExplorationWebSearchModeEnum"];
+        };
+        AiVisibilityExplorationProvidersResponse: {
+            /** @description The engines this organization can actually run an exploration against: configured SYNCHRONOUS adapters intersected with the plan's `ai_visibility_exploration_providers` value. Deliberately distinct from GET /ai-visibility/providers, which answers a tracking question and can include async consumer surfaces this path cannot execute. Empty means the plan grants none — render the form disabled, do not fall back to a hardcoded list. */
+            providers: components["schemas"]["AiVisibilityExplorationProviderEntry"][];
+        };
         AiVisibilityProviderSeriesEntry: {
             provider?: string;
             runCount?: number;
@@ -8713,7 +9441,7 @@ export interface components {
              * @description Static source-type sub-classification; null when the job predates it
              * @enum {string|null}
              */
-            sourceType?: "VENDOR" | "UGC" | "REVIEW_SITE" | "REFERENCE" | "NEWS" | "SOCIAL" | "DOCS" | "EDITORIAL" | null;
+            sourceType?: "VENDOR" | "UGC" | "REVIEW_SITE" | "REFERENCE" | "NEWS" | "SOCIAL" | "DOCS" | "MARKETPLACE" | "EDITORIAL" | null;
             /** @description Citations of this domain across the aggregated jobs */
             citationCount: number;
             /** @description Distinct prompts whose answers cited this domain */
@@ -8739,35 +9467,6 @@ export interface components {
             /** @description Number of completed AI-visibility jobs aggregated */
             jobsIncluded: number;
         };
-        BacklinkGraphSummaryResponse: {
-            /** @description Whether a link-graph refresh has ever completed for this project */
-            available: boolean;
-            /** @description Whether this server has DataForSEO credentials, i.e. whether a refresh can be run at all */
-            configured: boolean;
-            /** @description Referring domains in the whole link profile, per the provider */
-            referringDomainsTotal: number;
-            /**
-             * Format: int64
-             * @description Total inbound links in the whole link profile
-             */
-            backlinksTotal: number;
-            /**
-             * Format: int64
-             * @description How many of those links are dofollow
-             */
-            dofollowTotal: number;
-            /** @description Authority rank (0–1000) of the project's own domain */
-            targetRank?: number | null;
-            /** @description Referring domains actually stored, after the bounded top-N cap — never more than referringDomainsTotal */
-            storedDomains: number;
-            /** @description Stored referring domains that also appear in the traffic-derived sources table — links that actually sent someone. The gap between this and referringDomainsTotal is the insight. */
-            domainsWithTraffic: number;
-            /**
-             * Format: date-time
-             * @description When the link graph was last refreshed
-             */
-            refreshedAt?: string | null;
-        };
         BacklinkCompetitorGapEntry: {
             /** @description Normalized referring host that links to competitors but not to this site */
             domain: string;
@@ -8788,6 +9487,8 @@ export interface components {
             trackedCompetitors: number;
             /** @description The competitor domains the stored gap actually names, sorted — the valid values for the competitor filter. Derived from the gap rows rather than from the tracked-brand list, because a refresh compares against a capped number of brands and a brand added since the last refresh appears in no row: offering it would be a filter that can only ever return nothing. */
             competitors: string[];
+            /** @description Tracked competitors whose link profile has never been pulled, sorted. They contribute nothing to the gap, so an empty list with tracked competitors present means "pull their profiles" rather than "there is no gap" — the client cannot tell those apart on its own. */
+            competitorsWithoutProfile?: string[];
             /** @description The normalized competitor filter this response was built with; null when unfiltered. Lets a client confirm what it is looking at without re-deriving the normalization. */
             appliedCompetitor?: string | null;
             /**
@@ -8844,16 +9545,224 @@ export interface components {
             /** @description Competitor-gap rows removed */
             deletedGaps: number;
         };
-        StartBacklinkRefreshJobResponse: {
-            jobId: string;
+        /**
+         * @description Which DataForSEO API serves keyword data for a market. Not a preference — a coverage fact that decides what a row costs and which of its columns are necessarily null. `google_ads` markets carry no keyword difficulty and no search intent.
+         * @enum {string}
+         */
+        KeywordDataProviderEnum: "labs" | "google_ads";
+        KeywordLanguageResponse: {
+            /** @description DataForSEO language code (e.g. `en`, `zh-TW`) */
+            code: string;
+            label: string;
         };
-        BacklinkRefreshRunStateResponse: {
-            /** @description Whether a link-graph refresh is currently active for this project */
-            running: boolean;
+        KeywordMarketResponse: {
+            /** @description DataForSEO location code (e.g. 2840 = United States) */
+            locationCode: number;
+            /** @description Country name */
+            label: string;
+            /** @description Two-letter display code; `UK` rather than ISO's `GB` */
+            shortLabel: string;
+            /** @description Used when a request names a market but no language */
+            defaultLanguageCode: string;
+            provider: components["schemas"]["KeywordDataProviderEnum"];
+            /** @description Every language DataForSEO serves in this country. A combination outside this list is rejected before any provider call — the keyword-data APIs charge for a task they then reject as "Invalid Field: 'language_code'." */
+            languages: components["schemas"]["KeywordLanguageResponse"][];
+        };
+        KeywordMarketsResponse: {
+            markets: components["schemas"]["KeywordMarketResponse"][];
+            /** @description The market used when neither the request nor the project names one */
+            defaultLocationCode: number;
+        };
+        /**
+         * @description What a searcher is trying to do, from DataForSEO's search intent analysis. `unknown` covers both "the provider was unsure" and "this market has no intent data at all" — Google-Ads-served countries never carry it.
+         * @enum {string}
+         */
+        KeywordIntentEnum: "informational" | "commercial" | "transactional" | "navigational" | "unknown";
+        /**
+         * @description Which idea source to ask. `auto` walks related → suggestions → ideas and stops as soon as it has enough non-seed keywords, so it costs between one and three billed calls. Google-Ads-served markets have no source modes and normalize to `auto`.
+         * @enum {string}
+         */
+        KeywordResearchModeEnum: "auto" | "related" | "suggestions" | "ideas";
+        /**
+         * @description The source that actually produced the returned rows.
+         * @enum {string}
+         */
+        KeywordResearchSourceEnum: "related" | "suggestions" | "ideas" | "google_ads";
+        MonthlySearchResponse: {
+            year: number;
+            month: number;
+            searchVolume: number;
+        };
+        /** @description One keyword and its market metrics. Every metric is nullable, and null means "the provider does not measure this here" — never zero. Google-Ads-served markets return no `keywordDifficulty` and always `unknown` intent. */
+        KeywordRowResponse: {
+            keyword: string;
+            /** @description Average monthly searches */
+            searchVolume?: number | null;
+            /** @description Average cost per click in USD */
+            cpc?: number | null;
+            /** @description Paid competition, 0-1 */
+            competition?: number | null;
+            /** @description Organic ranking difficulty, 0-100. Null in Google-Ads-served markets. */
+            keywordDifficulty?: number | null;
+            intent: components["schemas"]["KeywordIntentEnum"];
+            /** @description Up to twelve months of volume history, newest first */
+            monthlySearches: components["schemas"]["MonthlySearchResponse"][];
+        };
+        ResearchKeywordsRequest: {
+            /** @description The topic to expand. Trimmed and lowercased server-side. */
+            seedKeyword: string;
+            /** @description Overrides the project's default market. Omit to use the project's stored market (US when it has none). */
+            locationCode?: number | null;
+            /** @description Overrides the market's default language. Rejected with 400 when DataForSEO does not serve it in that country. */
+            languageCode?: string | null;
+            /**
+             * @description Rows to request. Labs bills per row, so this is a price knob.
+             * @default 150
+             * @enum {integer}
+             */
+            resultLimit: 150 | 300 | 500;
+            mode?: components["schemas"]["KeywordResearchModeEnum"];
+            /**
+             * @description Buy clickstream-refined search volumes. DOUBLES the request price and is ignored in Google-Ads-served markets, which do not offer it.
+             * @default false
+             */
+            clickstream: boolean;
+        };
+        /** @description One billed provider call inside an `auto` walk. */
+        KeywordSourceAttemptResponse: {
+            source: components["schemas"]["KeywordResearchSourceEnum"];
+            rows: number;
+            /** @description Rows other than the seed itself — what the threshold measures */
+            nonSeedRows: number;
+            satisfiedThreshold: boolean;
+        };
+        /** @description Why the answer looks the way it does. Persisted with the cached result, so a cached `auto` answer can still say which of its up-to-three calls produced the rows. */
+        KeywordResearchDiagnosticsResponse: {
+            requestedMode: components["schemas"]["KeywordResearchModeEnum"];
+            minNonSeedThreshold: number;
+            attempts: components["schemas"]["KeywordSourceAttemptResponse"][];
+        };
+        KeywordResearchResponse: {
+            rows: components["schemas"]["KeywordRowResponse"][];
+            source: components["schemas"]["KeywordResearchSourceEnum"];
+            /** @description True when the requested source was thin and another one served the rows */
+            usedFallback: boolean;
+            diagnostics: components["schemas"]["KeywordResearchDiagnosticsResponse"];
+            /** @description True when this answer cost nothing — show the caller how old it is */
+            fromCache: boolean;
+            /**
+             * Format: date-time
+             * @description When the underlying provider call was made, cached or not
+             */
+            fetchedAt: string;
+            /** @description The market actually used, after project defaults were applied */
+            locationCode: number;
+            languageCode: string;
+            provider: components["schemas"]["KeywordDataProviderEnum"];
+        };
+        KeywordSerpRequest: {
+            keyword: string;
+            locationCode?: number | null;
+            languageCode?: string | null;
+        };
+        SerpResultRowResponse: {
+            /** @description Position among ORGANIC results, so ads do not inflate it */
+            rank: number;
+            title: string;
+            url: string;
+            domain: string;
+            description?: string | null;
+            /** @description Provider's estimated monthly organic traffic value for this position */
+            etv?: number | null;
+            /** @description What the same traffic would cost to buy */
+            estimatedPaidTrafficCost?: number | null;
+            referringDomains?: number | null;
+            backlinks?: number | null;
+        };
+        /**
+         * @description Why the result set is empty, when it is.
+         * @enum {string}
+         */
+        KeywordSerpNoResultsReasonEnum: "no_organic_results";
+        KeywordSerpResponse: {
+            keyword: string;
+            items: components["schemas"]["SerpResultRowResponse"][];
+            reason?: components["schemas"]["KeywordSerpNoResultsReasonEnum"];
+            fromCache: boolean;
             /** Format: date-time */
-            lastFinishedAt?: string | null;
-            /** @description Status of the most recent finished refresh (COMPLETED | FAILED | CANCELLED) */
-            lastJobStatus?: string | null;
+            fetchedAt: string;
+            locationCode: number;
+            languageCode: string;
+        };
+        /**
+         * @default createdAt
+         * @enum {string}
+         */
+        SavedKeywordSortEnum: "createdAt" | "keyword" | "searchVolume" | "cpc" | "competition" | "keywordDifficulty" | "fetchedAt";
+        SavedKeywordTagRefResponse: {
+            id: string;
+            name: string;
+            /** @description Palette key, not a hex value — the dashboard owns what each key renders as */
+            color?: string | null;
+        };
+        SavedKeywordResponse: {
+            id: string;
+            keyword: string;
+            locationCode: number;
+            languageCode: string;
+            /** Format: date-time */
+            createdAt: string;
+            searchVolume?: number | null;
+            cpc?: number | null;
+            competition?: number | null;
+            keywordDifficulty?: number | null;
+            intent: components["schemas"]["KeywordIntentEnum"];
+            monthlySearches: components["schemas"]["MonthlySearchResponse"][];
+            /**
+             * Format: date-time
+             * @description When these metrics were last fetched; null when they never have been
+             */
+            fetchedAt?: string | null;
+            tags: components["schemas"]["SavedKeywordTagRefResponse"][];
+        };
+        PaginatedSavedKeywordResponse: {
+            items: components["schemas"]["SavedKeywordResponse"][];
+            page: number;
+            size: number;
+            /** @description Rows matching the current filters, not rows in the project */
+            total: number;
+        };
+        /** @description Metrics the caller already holds for a keyword, carried inline so the save costs nothing. Omit any the caller does not have — a missing metric stays null rather than becoming zero. */
+        SavedKeywordMetricInput: {
+            keyword: string;
+            searchVolume?: number | null;
+            cpc?: number | null;
+            competition?: number | null;
+            keywordDifficulty?: number | null;
+            intent?: components["schemas"]["KeywordIntentEnum"];
+            monthlySearches?: components["schemas"]["MonthlySearchResponse"][];
+        };
+        /**
+         * @description `append` adds the given tags; `replace` removes every existing tag from the affected keywords first.
+         * @enum {string}
+         */
+        KeywordTagModeEnum: "append" | "replace";
+        SaveKeywordsRequest: {
+            keywords: string[];
+            /** @description Market to save them for; defaults to the project's own */
+            locationCode?: number | null;
+            languageCode?: string | null;
+            /** @description Tag names to apply. Ones that do not exist yet are created. */
+            tags?: string[];
+            tagMode?: components["schemas"]["KeywordTagModeEnum"];
+            /** @description Metrics already in hand, so the save re-buys nothing */
+            metrics?: components["schemas"]["SavedKeywordMetricInput"][];
+        };
+        SaveKeywordsResponse: {
+            /** @description Keywords newly added to the list */
+            saved: number;
+            /** @description Keywords that were already on it — ignored, not an error */
+            alreadySaved: number;
         };
         /** @description A character: a named point of view that can read this project's data. Ships as one of ours or is written by the customer. */
         AgentCharacterResponse: {
@@ -9222,7 +10131,7 @@ export interface components {
          * @description How the action got into the log.
          * @enum {string}
          */
-        TrackableActionSourceEnum: "MANUAL" | "DETECTED";
+        TrackableActionSourceEnum: "MANUAL" | "DETECTED" | "RECOMMENDATION";
         /**
          * @description How much of the funnel this action can be measured against. Derived from the scope, never stored, so it cannot drift: FULL is our own site (crawls, citations and sessions all available), PARTIAL is someone else's URL (no crawler logs — it is not our server), TRAFFIC_ONLY is an action with no URL at all.
          * @enum {string}
@@ -9248,6 +10157,8 @@ export interface components {
             endedOn?: string | null;
             source: components["schemas"]["TrackableActionSourceEnum"];
             confirmed: boolean;
+            /** @description The content recommendation this action came from, when somebody marked one done. It is what lets that recommendation come back weeks later and say whether it worked. */
+            sourceRecommendationId?: string | null;
             createdBy?: string | null;
             /** Format: date-time */
             createdAt: string;
@@ -9291,8 +10202,104 @@ export interface components {
              * @description Omit to keep the stored value. Cannot be cleared.
              */
             endedOn?: string | null;
-            /** @description Promotes a detected candidate into a tracked action. */
+            /** @description Promotes a detected candidate into a tracked action. Setting it true also clears any dismissal. */
             confirmed?: boolean;
+            /** @description Refuses a detected candidate. The row is kept rather than deleted, so a later sweep does not propose the same page again — a suggestion you have already refused coming back daily is how an inbox stops being read. */
+            dismissed?: boolean;
+        };
+        TrackableActionBotHit: {
+            botName: string;
+            vendor?: string | null;
+            hits: number;
+            /** Format: date-time */
+            lastSeenAt?: string | null;
+        };
+        /** @description AI-crawler activity on the action's page. ABSENT — not empty — unless the action is on the project's own site: these are our server logs, and we have none for anybody else's host. An empty list would read as "no crawler came", which is a different answer from "we cannot see". */
+        TrackableActionCrawlStage: {
+            /**
+             * Format: date-time
+             * @description First AI-crawler hit after the action. Null means not fetched yet.
+             */
+            firstAt?: string | null;
+            bots: components["schemas"]["TrackableActionBotHit"][];
+        };
+        TrackableActionEngineCount: {
+            provider: components["schemas"]["AiVisibilityProviderEnum"];
+            count: number;
+        };
+        /** @description Citations of this exact URL in AI answers, before and after. Counts of events rather than a rate — at one sample per prompt per engine per day a rate cannot carry a single action's signal, but "cited 0 times, then 23" survives it. */
+        TrackableActionCiteStage: {
+            before: number;
+            after: number;
+            /** Format: date-time */
+            firstAt?: string | null;
+            /** @description Distinct prompts whose answer cited it in the after window. */
+            promptCount: number;
+            engines: components["schemas"]["TrackableActionEngineCount"][];
+        };
+        /**
+         * @description The project's own sponsored placements inside AI answers, before and after. Present only when the action names an answer engine whose ad block we can read — absent, not zeroed, otherwise, because "we cannot see" and "your ad never appeared" are different answers.
+         *
+         *     A SAMPLE, never impressions: these are the ads that appeared in the answers we sampled for this project's tracked prompts, at one run per engine per day. The advertiser's own console holds the real impression count and this will not match it. Ads the provider reported as served but never painted are excluded.
+         */
+        TrackableActionAdStage: {
+            before: number;
+            /** @description Sampled answers carrying the project's ad after the action began. */
+            after: number;
+            /** @description Distinct tracked prompts whose answer carried it. */
+            promptCount: number;
+            engines: components["schemas"]["TrackableActionEngineCount"][];
+        };
+        TrackableActionReferrerCount: {
+            host: string;
+            sessions: number;
+        };
+        /** @description Sessions landing on the action's page, before and after. */
+        TrackableActionReferralStage: {
+            before: number;
+            after: number;
+            byReferrer: components["schemas"]["TrackableActionReferrerCount"][];
+        };
+        /** @description Something else that overlaps the after window and could account for a movement. Reported rather than corrected for — the honest ceiling here is a caveated read, not a controlled experiment. */
+        TrackableActionConfounder: {
+            /** @enum {string} */
+            kind: "OVERLAPPING_ACTION" | "OPEN_CAMPAIGN" | "MODEL_VERSION_CHANGE";
+            label: string;
+            /** Format: date */
+            startedOn?: string | null;
+            /** Format: date */
+            endedOn?: string | null;
+        };
+        /** @description Pages the crawl noticed that nobody logged. A candidate is NOT an entry: it stays out of the log, out of every measurement and off every chart until it is confirmed. */
+        TrackableActionCandidateListResponse: {
+            candidates: components["schemas"]["TrackableActionResponse"][];
+            /** @description All waiting candidates, which is the number the banner shows. */
+            total: number;
+        };
+        /** @description An answer engine changing the model behind it. The one confounder this product can be certain about: every run records the model version the provider echoed back, so a swap is visible in our own history without any external feed. It moves everyone's numbers at once and nobody's customer did it. */
+        TrackableActionModelChange: {
+            provider: components["schemas"]["AiVisibilityProviderEnum"];
+            fromVersion?: string | null;
+            toVersion: string;
+            /**
+             * Format: date-time
+             * @description The first answer that came back on the new version.
+             */
+            at: string;
+        };
+        /** @description Things inside a window that nobody's customer did. Google core updates are deliberately NOT here — we have no trustworthy source for their dates, and a band drawn on the wrong fortnight would cause exactly the mis-attribution this feature exists to prevent. */
+        TrackableActionSystemEventsResponse: {
+            modelChanges: components["schemas"]["TrackableActionModelChange"][];
+        };
+        TrackableActionImpactResponse: {
+            action: components["schemas"]["TrackableActionResponse"];
+            /** @description Days measured on each side of the action's start date. */
+            windowDays: number;
+            crawled?: components["schemas"]["TrackableActionCrawlStage"];
+            cited: components["schemas"]["TrackableActionCiteStage"];
+            referred: components["schemas"]["TrackableActionReferralStage"];
+            ads?: components["schemas"]["TrackableActionAdStage"];
+            confounders: components["schemas"]["TrackableActionConfounder"][];
         };
     };
     responses: {
@@ -12468,6 +13475,150 @@ export interface operations {
             404: components["responses"]["NotFoundError"];
         };
     };
+    getAiVisibilityExplorationProviders: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Executable exploration engines retrieved */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiVisibilityExplorationProvidersResponse"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+        };
+    };
+    listAiVisibilityExplorations: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Explorations retrieved */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiVisibilityExplorationSummary"][];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+        };
+    };
+    createAiVisibilityExploration: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AiVisibilityExplorationRequest"];
+            };
+        };
+        responses: {
+            /** @description Exploration executed */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiVisibilityExplorationResponse"];
+                };
+            };
+            400: components["responses"]["ValidationError"];
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+        };
+    };
+    getAiVisibilityExploration: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+                explorationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Exploration retrieved */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiVisibilityExplorationResponse"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            404: components["responses"]["NotFoundError"];
+        };
+    };
+    deleteAiVisibilityExploration: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+                explorationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Exploration deleted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            404: components["responses"]["NotFoundError"];
+        };
+    };
     listAgentCharacters: {
         parameters: {
             query?: never;
@@ -13026,33 +14177,6 @@ export interface operations {
             403: components["responses"]["ForbiddenError"];
         };
     };
-    getBacklinkGraphSummary: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Organization slug */
-                orgSlug: components["parameters"]["OrgSlugPath"];
-                /** @description Project ID */
-                projectId: components["parameters"]["projectIdPathParam"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Link profile summary retrieved successfully */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["BacklinkGraphSummaryResponse"];
-                };
-            };
-            401: components["responses"]["UnauthorizedError"];
-            403: components["responses"]["ForbiddenError"];
-        };
-    };
     getBacklinkCompetitorGap: {
         parameters: {
             query?: {
@@ -13083,62 +14207,6 @@ export interface operations {
             };
             401: components["responses"]["UnauthorizedError"];
             403: components["responses"]["ForbiddenError"];
-        };
-    };
-    getBacklinkRefreshRunState: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Organization slug */
-                orgSlug: components["parameters"]["OrgSlugPath"];
-                /** @description Project ID */
-                projectId: components["parameters"]["projectIdPathParam"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Refresh state retrieved successfully */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["BacklinkRefreshRunStateResponse"];
-                };
-            };
-            401: components["responses"]["UnauthorizedError"];
-            403: components["responses"]["ForbiddenError"];
-        };
-    };
-    startBacklinkRefreshJob: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Organization slug */
-                orgSlug: components["parameters"]["OrgSlugPath"];
-                /** @description Project ID */
-                projectId: components["parameters"]["projectIdPathParam"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Refresh accepted */
-            202: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StartBacklinkRefreshJobResponse"];
-                };
-            };
-            400: components["responses"]["BadRequestError"];
-            401: components["responses"]["UnauthorizedError"];
-            403: components["responses"]["ForbiddenError"];
-            409: components["responses"]["ConflictError"];
         };
     };
     listBacklinkLinks: {
@@ -13203,6 +14271,192 @@ export interface operations {
             401: components["responses"]["UnauthorizedError"];
             403: components["responses"]["ForbiddenError"];
             409: components["responses"]["ConflictError"];
+        };
+    };
+    listKeywordMarkets: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Markets retrieved successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["KeywordMarketsResponse"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+        };
+    };
+    researchKeywords: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResearchKeywordsRequest"];
+            };
+        };
+        responses: {
+            /** @description Keyword ideas retrieved */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["KeywordResearchResponse"];
+                };
+            };
+            400: components["responses"]["BadRequestError"];
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            /** @description The keyword data provider's account-wide rate limit is saturated */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getKeywordSerp: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["KeywordSerpRequest"];
+            };
+        };
+        responses: {
+            /** @description SERP retrieved */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["KeywordSerpResponse"];
+                };
+            };
+            400: components["responses"]["BadRequestError"];
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            /** @description The keyword data provider's account-wide rate limit is saturated */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    listSavedKeywords: {
+        parameters: {
+            query?: {
+                /** @description Zero-based page index */
+                page?: number;
+                size?: number;
+                /** @description Substring match on the keyword */
+                q?: string;
+                /** @description Keep only keywords containing every one of these terms */
+                include?: string[];
+                /** @description Drop keywords containing any of these terms */
+                exclude?: string[];
+                minVolume?: number;
+                maxVolume?: number;
+                minCpc?: number;
+                maxCpc?: number;
+                minDifficulty?: number;
+                maxDifficulty?: number;
+                /** @description Keep keywords carrying any of these tags */
+                tagIds?: string[];
+                sort?: components["schemas"]["SavedKeywordSortEnum"];
+                order?: "asc" | "desc";
+            };
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Saved keywords retrieved */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedSavedKeywordResponse"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+        };
+    };
+    saveKeywords: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveKeywordsRequest"];
+            };
+        };
+        responses: {
+            /** @description Keywords saved */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SaveKeywordsResponse"];
+                };
+            };
+            400: components["responses"]["BadRequestError"];
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
         };
     };
     listDataImports: {
@@ -13374,6 +14628,346 @@ export interface operations {
                     "application/json": components["schemas"]["Ga4PropertyListResponse"];
                 };
             };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            404: components["responses"]["NotFoundError"];
+        };
+    };
+    getSiteAuditConfig: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Configuration retrieved successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SiteAuditConfigResponse"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+        };
+    };
+    listSiteAudits: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Audits retrieved successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SiteAuditSummaryResponse"][];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+        };
+    };
+    startSiteAudit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SiteAuditStartRequest"];
+            };
+        };
+        responses: {
+            /** @description Audit started */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SiteAuditDetailResponse"];
+                };
+            };
+            400: components["responses"]["ValidationError"];
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            409: components["responses"]["ConflictError"];
+        };
+    };
+    getLatestSiteAudit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Audit retrieved successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SiteAuditDetailResponse"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            404: components["responses"]["NotFoundError"];
+        };
+    };
+    getSiteAudit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+                auditId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Audit retrieved successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SiteAuditDetailResponse"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            404: components["responses"]["NotFoundError"];
+        };
+    };
+    getSiteAuditSummary: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+                auditId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Summary retrieved successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SiteAuditSummaryStats"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            404: components["responses"]["NotFoundError"];
+        };
+    };
+    listSiteAuditFindingGroups: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+                auditId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Finding groups retrieved successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SiteAuditFindingGroup"][];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            404: components["responses"]["NotFoundError"];
+        };
+    };
+    listSiteAuditFindings: {
+        parameters: {
+            query?: {
+                source?: "CRAWL" | "CHECKLIST" | "PAGE_CHECK" | "SITE_CHECK" | "CONTENT_CHECK";
+                findingId?: string;
+                severity?: "CRITICAL" | "WARNING" | "INFO";
+                scope?: "PAGE" | "SITE";
+                /** @description Substring match on the page URL */
+                q?: string;
+                page?: number;
+                size?: number;
+            };
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+                auditId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Findings retrieved successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedSiteAuditFindings"];
+                };
+            };
+            400: components["responses"]["ValidationError"];
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            404: components["responses"]["NotFoundError"];
+        };
+    };
+    listSiteAuditPages: {
+        parameters: {
+            query?: {
+                /** @description Substring match on the URL */
+                q?: string;
+                status?: "ALL" | "OK" | "REDIRECT" | "BROKEN" | "SERVER_ERROR" | "BLOCKED" | "MISSING";
+                /** @description Only pages carrying at least one image without alt text */
+                missingAlt?: boolean;
+                indexable?: boolean;
+                minDepth?: number;
+                sort?: "URL" | "STATUS" | "SPEED" | "WORDS" | "DEPTH";
+                page?: number;
+                size?: number;
+            };
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+                auditId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pages retrieved successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedSiteAuditPages"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            404: components["responses"]["NotFoundError"];
+        };
+    };
+    getSiteAuditProgress: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+                auditId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Progress retrieved successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SiteAuditProgressResponse"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            404: components["responses"]["NotFoundError"];
+        };
+    };
+    cancelSiteAudit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+                auditId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Cancellation requested */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["ValidationError"];
             401: components["responses"]["UnauthorizedError"];
             403: components["responses"]["ForbiddenError"];
             404: components["responses"]["NotFoundError"];
@@ -16839,6 +18433,8 @@ export interface operations {
                 platform?: string;
                 /** @description Free-text match against the description. */
                 q?: string;
+                /** @description Only the action produced by this content recommendation, if any. */
+                recommendationId?: string;
                 /** @description Only actions that started on or after this date. */
                 from?: string;
                 /** @description Only actions that started on or before this date. */
@@ -16990,6 +18586,98 @@ export interface operations {
             401: components["responses"]["UnauthorizedError"];
             403: components["responses"]["ForbiddenError"];
             404: components["responses"]["NotFoundError"];
+        };
+    };
+    getTrackableActionImpact: {
+        parameters: {
+            query?: {
+                /** @description Days on each side of the start date. Defaults to 21, max 90. */
+                windowDays?: number;
+            };
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+                actionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Impact retrieved successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TrackableActionImpactResponse"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            404: components["responses"]["NotFoundError"];
+        };
+    };
+    listTrackableActionCandidates: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Candidates retrieved successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TrackableActionCandidateListResponse"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+        };
+    };
+    listTrackableActionSystemEvents: {
+        parameters: {
+            query: {
+                from: string;
+                to: string;
+            };
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description System events retrieved successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TrackableActionSystemEventsResponse"];
+                };
+            };
+            400: components["responses"]["ValidationError"];
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
         };
     };
 }

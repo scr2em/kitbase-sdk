@@ -10,6 +10,7 @@ export default class TrackableActionsList extends ApiOperationCommand {
 		"verb": Flags.string({ options: ["PUBLISHED","CHANGED_ACCESS","RAN_CAMPAIGN","CHANGED_IDENTITY"] }),
 		"platform": Flags.string({  }),
 		"q": Flags.string({ description: "Free-text match against the description." }),
+		"recommendationId": Flags.string({ description: "Only the action produced by this content recommendation, if any." }),
 		"from": Flags.string({ description: "Only actions that started on or after this date." }),
 		"to": Flags.string({ description: "Only actions that started on or before this date." }),
 		"page": Flags.integer({  }),

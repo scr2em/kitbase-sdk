@@ -48,7 +48,12 @@ export function flagLiteral(flag: FlagSpec, enforceRequired: boolean): string {
 	const oclifType = flag.kind === "integer" ? "Flags.integer" : flag.kind === "boolean" ? "Flags.boolean" : "Flags.string";
 	const props: string[] = [];
 	if (flag.description) props.push(`description: ${JSON.stringify(flag.description)}`);
-	if (flag.options && flag.options.length > 0) props.push(`options: ${JSON.stringify(flag.options)}`);
+	// oclif checks `options` against the raw string the user typed, before any
+	// parsing, so its type is string[] whatever the flag parses to. An integer
+	// enum (`resultLimit: [150, 300, 500]`) emitted as numbers does not compile.
+	if (flag.options && flag.options.length > 0) {
+		props.push(`options: ${JSON.stringify(flag.options.map((option) => String(option)))}`);
+	}
 	if (flag.multiple) props.push("multiple: true");
 	// Body-field flags are never oclif-`required`, even when the schema marks them required —
 	// `--data`/stdin is an equally valid way to supply them, and operation-command.ts already
