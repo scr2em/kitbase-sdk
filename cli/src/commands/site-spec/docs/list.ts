@@ -4,8 +4,8 @@ import { Args, Flags } from "@oclif/core";
 import { ApiOperationCommand } from "../../../runtime/operation-command.js";
 import { descriptors } from "../../../generated/descriptors.js";
 
-export default class SiteContentAnalysisCross extends ApiOperationCommand {
-	static description = "Read every page's positioning together";
+export default class SiteSpecDocsList extends ApiOperationCommand {
+	static description = "List the planning documents this site is graded against";
 
-	descriptor = descriptors["runSiteContentCrossAnalysis"];
+	descriptor = descriptors["listSpecDocs"];
 }

@@ -1,10 +1,10 @@
 // @generated from openapi.yaml — do not edit. Run `npm run generate:commands`.
 import { Args, Flags } from "@oclif/core";
 
-import { ApiOperationCommand } from "../../../../runtime/operation-command.js";
-import { descriptors } from "../../../../generated/descriptors.js";
+import { ApiOperationCommand } from "../../../runtime/operation-command.js";
+import { descriptors } from "../../../generated/descriptors.js";
 
-export default class SiteContentSpecRulesUpdate extends ApiOperationCommand {
+export default class SiteSpecRulesUpdate extends ApiOperationCommand {
 	static description = "Approve, reject or correct one rule";
 	static args = {
 		"ruleId": Args.string({ description: "ruleId", required: true }),

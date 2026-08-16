@@ -1,10 +1,10 @@
 // @generated from openapi.yaml — do not edit. Run `npm run generate:commands`.
 import { Args, Flags } from "@oclif/core";
 
-import { ApiOperationCommand } from "../../../../runtime/operation-command.js";
-import { descriptors } from "../../../../generated/descriptors.js";
+import { ApiOperationCommand } from "../../../runtime/operation-command.js";
+import { descriptors } from "../../../generated/descriptors.js";
 
-export default class SiteContentSpecDocsCreate extends ApiOperationCommand {
+export default class SiteSpecDocsCreate extends ApiOperationCommand {
 	static description = "Upload a planning document";
 	static flags = {
 		"title": Flags.string({ description: "How the document will be cited, e.g. \"Wireframe v15\"" }),

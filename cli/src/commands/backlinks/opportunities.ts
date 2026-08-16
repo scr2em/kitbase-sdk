@@ -8,7 +8,7 @@ export default class BacklinksOpportunities extends ApiOperationCommand {
 	static description = "AI-cited domains to seek links from";
 	static flags = {
 		"jobs": Flags.integer({ description: "Number of most recent completed AI-visibility jobs to aggregate" }),
-		"limit": Flags.integer({ description: "Maximum number of domains to return" }),
+		"limit": Flags.integer({ description: "Maximum number of domains to return. Clamped to 1..200 server-side; `totalDomains` in the response says how many candidates there were before the cut.\n" }),
 	};
 
 	descriptor = descriptors["getBacklinkOpportunities"];

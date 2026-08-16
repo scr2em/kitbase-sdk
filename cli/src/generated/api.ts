@@ -1674,132 +1674,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/{orgSlug}/projects/{projectId}/site-content/pages/audit": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Grade one page against the rest of the site
-         * @description Whether this page says something the site already says differently — a figure restated, a structure counted another way, a reserved word applied to something the site does not classify that way, or a title a live page already carries. Deterministic and free. Requires sitecontent.view.
-         */
-        get: operations["auditSiteContentPage"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/{orgSlug}/projects/{projectId}/site-content/pages/ai-analysis": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Have AI read one page as a marketer would
-         * @description Asks the organization's configured model what question the page answers, what it presents itself as, and whether that is the story the rest of the site tells — the half counting cannot reach.
-         *     POST because it spends: one page per call, metered to the AI budget, and never run across the whole inventory on its own initiative. Returns 204 when no provider is configured or the model declined, so the free findings can still be shown. Requires sitecontent.manage, since it costs money.
-         */
-        post: operations["analyzeSiteContentPageWithAi"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/{orgSlug}/projects/{projectId}/site-content/system-of-record": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Where the site contradicts itself
-         * @description The site-level checklist, as opposed to the per-page one: whether the navigation lists as many things as the homepage says exist, whether the header and footer classify a group the same way, whether one figure is stated two ways on two pages, whether navigation links leave the domain, whether any pages are linked from nowhere, and whether template sample pages are live. Every finding is a relation between two things the site publishes, so no per-page check can produce one.
-         *     Computed from the stored page index on each call; deterministic and free. Returns an empty checklist when the project has never been indexed, which is a real state rather than an error. Requires sitecontent.view.
-         */
-        get: operations["getSiteSystemOfRecord"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/{orgSlug}/projects/{projectId}/site-content/analysis/cross": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Read every page's positioning together
-         * @description Asks the organization's configured model where two pages collide: two answering the same buyer question, a page describing itself as something the navigation files differently, one thing carried under two names, and the buyer questions no page answers.
-         *     The findings none of the counted checks can produce, because the pages that actually compete rarely share a title. It reads the short fields the per-page AI step already stored rather than the pages themselves, so it costs one call whatever the site's size, and the results are appended to the latest round.
-         *     POST because it spends, and by hand rather than on every crawl: a site's collisions do not change between two crawls that changed nothing. Returns 204 when there is no round yet, no provider is configured, fewer than two pages carry a per-page reading, or the model declined. Requires sitecontent.manage.
-         *     Accepted, not awaited: this is one model call over the whole inventory and takes a minute or more, so it runs as a job. Poll `crossAnalysisRunning` on the system-of-record response; the findings are appended to the current round.
-         */
-        post: operations["runSiteContentCrossAnalysis"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/{orgSlug}/projects/{projectId}/site-content/pages/history": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * One page across analysis rounds
-         * @description What each crawl found about this page, newest first — its build score, whether it contradicted the rest of the site, and how the AI read its positioning. The comparison read: an unchanged page carries its previous AI reading forward, and aiCarried says so, so a stale reading is never mistaken for a fresh one. Requires sitecontent.view.
-         */
-        get: operations["getSiteContentPageHistory"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/{orgSlug}/projects/{projectId}/site-content/rounds": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List analysis rounds
-         * @description One round per crawl, newest first, with what each covered. Coverage is part of the result: a round that spent its AI budget on 50 of 500 pages is not the same statement as one that read them all, and pagesAiSkipped is how a reader tells which they are looking at. Requires sitecontent.view.
-         */
-        get: operations["listSiteContentRounds"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/{orgSlug}/projects/{projectId}/site-content/spec/docs": {
+    "/{orgSlug}/projects/{projectId}/site-spec/docs": {
         parameters: {
             query?: never;
             header?: never;
@@ -1808,13 +1683,13 @@ export interface paths {
         };
         /**
          * List the planning documents this site is graded against
-         * @description The approved plan, messaging or build standard a project has uploaded. Without one, every check grades the site against what it says about itself; with one, findings can say "this is not what you approved". Requires sitecontent.view.
+         * @description The approved plan, messaging or build standard a project has uploaded. Without one, every check grades the site against what it says about itself; with one, findings can say "this is not what you approved". Requires siteaudit.view.
          */
         get: operations["listSpecDocs"];
         put?: never;
         /**
          * Upload a planning document
-         * @description Stores the document and reads the requirements it sets, using the organization's configured model. Extracted rules are NOT enforced until a person approves each one: a wrong rule mis-grades the whole site against a requirement nobody set, and it does it silently. Text and Markdown in v1. Requires sitecontent.manage, since extraction spends AI budget.
+         * @description Stores the document and reads the requirements it sets, using the organization's configured model. Extracted rules are NOT enforced until a person approves each one: a wrong rule mis-grades the whole site against a requirement nobody set, and it does it silently. Text and Markdown in v1. Requires siteaudit.manage, since extraction spends AI budget.
          */
         post: operations["uploadSpecDoc"];
         delete?: never;
@@ -1823,7 +1698,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/{orgSlug}/projects/{projectId}/site-content/spec/rules": {
+    "/{orgSlug}/projects/{projectId}/site-spec/rules": {
         parameters: {
             query?: never;
             header?: never;
@@ -1832,7 +1707,7 @@ export interface paths {
         };
         /**
          * List the rules read from the planning documents
-         * @description Each rule beside the sentence it was read from, so a reviewer can approve or reject it in seconds. Only APPROVED rules are ever graded against. Requires sitecontent.view.
+         * @description Each rule beside the sentence it was read from, so a reviewer can approve or reject it in seconds. Only APPROVED rules are ever graded against. Requires siteaudit.view.
          */
         get: operations["listSpecRules"];
         put?: never;
@@ -1843,7 +1718,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/{orgSlug}/projects/{projectId}/site-content/spec/rules/{ruleId}": {
+    "/{orgSlug}/projects/{projectId}/site-spec/rules/{ruleId}": {
         parameters: {
             query?: never;
             header?: never;
@@ -1858,30 +1733,9 @@ export interface paths {
         head?: never;
         /**
          * Approve, reject or correct one rule
-         * @description Approving is what lets a rule grade the site. Editing one re-approves it — the person changing it is the one vouching for it. Requires sitecontent.manage.
+         * @description Approving is what lets a rule grade the site. Editing one re-approves it — the person changing it is the one vouching for it. Requires siteaudit.manage.
          */
         patch: operations["reviewSpecRule"];
-        trace?: never;
-    };
-    "/{orgSlug}/projects/{projectId}/site-content/rounds/{roundId}/report": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * The whole record of one crawl
-         * @description Everything one round established, assembled from stored rows: the scale numbers, the site-level findings by area, a record per page, the process rules from any approved plan, and what the round did and did not cover.
-         *     Nothing is recomputed and no model is called — a report is a reading of a crawl that already happened, and re-deriving it would date it "now" while describing then. Every citation is a join, which is what makes "Wireframe v15, July 13" checkable rather than a claim. Requires sitecontent.view.
-         */
-        get: operations["getSiteContentReport"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
         trace?: never;
     };
     "/{orgSlug}/projects/{projectId}/backlinks": {
@@ -2296,7 +2150,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get the latest site audit with live progress */
+        /**
+         * Get the latest site audit with live progress
+         * @description The project's most recent audit, whatever state it is in. `completedOnly` narrows that to the most recent run that actually finished, which is what a reader that wants a report rather than a progress bar asks for; `target` narrows it to runs of the project's own website, so an audit somebody pointed at a competitor cannot answer for it.
+         */
         get: operations["getLatestSiteAudit"];
         put?: never;
         post?: never;
@@ -2334,7 +2191,7 @@ export interface paths {
          * Get one audit's headline statistics
          * @description The report's tile strip: how much was crawled, how many issues by severity, how fast the site answered, and the AI-readiness score. Computed in SQL rather than from a page list, because the page list can hold thousands of rows.
          *
-         *     Counts are computed after the caller's permission filter. `availableSections` names the finding producers this caller may read: SITE_CHECK and CONTENT_CHECK additionally require sitecontent.view.
+         *     `availableSections` names the finding producers the counts were computed across. Every producer is readable under siteaudit.view, which this endpoint has already required.
          */
         get: operations["getSiteAuditSummary"];
         put?: never;
@@ -2396,9 +2253,113 @@ export interface paths {
         };
         /**
          * List an audit's crawled pages
-         * @description The crawl snapshot, filtered and sorted server-side because it can hold thousands of rows. This is one run's snapshot; the site-content inventory remains the living view across runs.
+         * @description The crawl snapshot, filtered and sorted server-side because it can hold thousands of rows. This is one run's snapshot; compare two audits to see what changed between them.
          */
         get: operations["listSiteAuditPages"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/site-audit/audits/{auditId}/pages/{pageId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get one crawled page in full
+         * @description The drill-down behind a row of the pages list: what the crawl measured, which checklist rules the page failed and what each of them found, what a model made of the copy, and the pages nearest to it by meaning.
+         *
+         *     `pageId` is the id from the pages list, and belongs to this audit — the same URL crawled again has a different id.
+         */
+        get: operations["getSiteAuditPage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/site-audit/audits/{auditId}/pages/{pageId}/traffic": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get one crawled page's recent human and AI traffic
+         * @description Daily human page views and AI-crawler hits for this page's path over the recent window — live analytics beside the crawl's snapshot, so the report can say not only what the page contains but whether anyone, human or machine, is actually reading it.
+         */
+        get: operations["getSiteAuditPageTraffic"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/site-audit/audits/{auditId}/similarity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get the audit's duplicate and near-duplicate groups
+         * @description Which pages of the crawl say the same thing, grouped rather than paired: three pages that each duplicate the next are one problem with three pages in it, and reporting them as pairs would triple the apparent count.
+         *
+         *     Read from the stored vectors, so it costs nothing and is empty when the run had no embeddings model available.
+         */
+        get: operations["getSiteAuditSimilarity"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/site-audit/audits/{auditId}/facts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get the audit's full graded checklist, passes included
+         * @description Every site-wide check this run graded, whether it holds up or not. The findings resources can only ever list what is wrong, so this is the only place that can say "seventeen checks ran and fifteen hold up" — which is what turns an accusation into a measurement.
+         */
+        get: operations["getSiteAuditFacts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{orgSlug}/projects/{projectId}/site-audit/audits/{auditId}/lighthouse": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List an audit's Lighthouse measurements
+         * @description What each measured page costs to load, one row per page per device. The measurement run is a separate job that starts once the crawl completes, so this is empty while a crawl is still going and stays empty when no Lighthouse provider is configured.
+         */
+        get: operations["listSiteAuditLighthouse"];
         put?: never;
         post?: never;
         delete?: never;
@@ -4870,7 +4831,7 @@ export interface components {
          * @description Permission code enum representing all available permissions in the system
          * @enum {string}
          */
-        PermissionCode: "organization.update" | "organization.view" | "member.view" | "member.invite" | "member.remove" | "member.update_role" | "project.read" | "project.create" | "project.update" | "project.delete" | "build.view" | "build.delete" | "sdk_key.view" | "sdk_key.create" | "sdk_key.delete" | "private_api_key.view" | "private_api_key.create" | "private_api_key.delete" | "environment.view" | "environment.create" | "environment.update" | "environment.delete" | "in_app_message.view" | "in_app_message.create" | "in_app_message.update" | "in_app_message.delete" | "event.view" | "event.create" | "event.update" | "event.delete" | "ota.view" | "ota.create" | "ota.update" | "ota.delete" | "analytics.view" | "support.operations" | "webhook.view" | "webhook.create" | "webhook.update" | "webhook.delete" | "feature_flag.view" | "feature_flag.create" | "feature_flag.update" | "feature_flag.delete" | "audit.read" | "integration.view" | "integration.create" | "integration.update" | "integration.delete" | "integration.subscription.view" | "integration.subscription.create" | "integration.subscription.update" | "integration.subscription.delete" | "billing.subscription.view" | "billing.subscription.manage" | "billing.usage.view" | "billing.entitlements.view" | "dashboard.view" | "dashboard.manage" | "flutter.view" | "flutter.create" | "flutter.update" | "flutter.delete" | "invitation.cancel" | "invitation.delete" | "aivisibility.view" | "aivisibility.manage" | "siteaudit.view" | "siteaudit.manage" | "engagement.view" | "engagement.manage" | "dataimport.view" | "dataimport.manage" | "contentrecs.view" | "contentrecs.manage" | "sitecontent.view" | "sitecontent.manage" | "backlinks.view" | "backlinks.manage" | "marketplace.view" | "marketplace.order" | "workflow.view" | "workflow.manage" | "workflow.run" | "contentdraft.view" | "contentdraft.manage" | "trackable_actions.view" | "trackable_actions.manage" | "keywords.view" | "keywords.manage";
+        PermissionCode: "organization.update" | "organization.view" | "member.view" | "member.invite" | "member.remove" | "member.update_role" | "project.read" | "project.create" | "project.update" | "project.delete" | "build.view" | "build.delete" | "sdk_key.view" | "sdk_key.create" | "sdk_key.delete" | "private_api_key.view" | "private_api_key.create" | "private_api_key.delete" | "environment.view" | "environment.create" | "environment.update" | "environment.delete" | "in_app_message.view" | "in_app_message.create" | "in_app_message.update" | "in_app_message.delete" | "event.view" | "event.create" | "event.update" | "event.delete" | "ota.view" | "ota.create" | "ota.update" | "ota.delete" | "analytics.view" | "support.operations" | "webhook.view" | "webhook.create" | "webhook.update" | "webhook.delete" | "feature_flag.view" | "feature_flag.create" | "feature_flag.update" | "feature_flag.delete" | "audit.read" | "integration.view" | "integration.create" | "integration.update" | "integration.delete" | "integration.subscription.view" | "integration.subscription.create" | "integration.subscription.update" | "integration.subscription.delete" | "billing.subscription.view" | "billing.subscription.manage" | "billing.usage.view" | "billing.entitlements.view" | "dashboard.view" | "dashboard.manage" | "flutter.view" | "flutter.create" | "flutter.update" | "flutter.delete" | "invitation.cancel" | "invitation.delete" | "aivisibility.view" | "aivisibility.manage" | "siteaudit.view" | "siteaudit.manage" | "engagement.view" | "engagement.manage" | "dataimport.view" | "dataimport.manage" | "contentrecs.view" | "contentrecs.manage" | "backlinks.view" | "backlinks.manage" | "marketplace.view" | "marketplace.order" | "workflow.view" | "workflow.manage" | "workflow.run" | "contentdraft.view" | "contentdraft.manage" | "trackable_actions.view" | "trackable_actions.manage" | "keywords.view" | "keywords.manage";
         /** @description Role information with associated permissions */
         RoleWithPermissionsResponse: {
             /** @description Role ID */
@@ -8267,11 +8228,29 @@ export interface components {
             /** @description AI engines this job ran (or is running) units against */
             providers?: string[];
         };
+        /**
+         * @description One audit capability the user can see in the start dialog. Core crawl steps (ROBOTS, LLMS_TXT, SITEMAP, HOMEPAGE, PAGE_CRAWL) always run; the rest can be deselected per run.
+         * @enum {string}
+         */
+        SiteAuditCheckId: "ROBOTS" | "LLMS_TXT" | "SITEMAP" | "HOMEPAGE" | "PAGE_CRAWL" | "WAF_PROBE" | "ANALYTICS" | "PAGE_CHECKS" | "CONSISTENCY" | "SPEC_COMPLIANCE" | "AI_READ" | "SIMILARITY" | "LIGHTHOUSE";
+        /** @description One entry of the start dialog's check list, served from the auditor registry so the dashboard never hardcodes check names — a new capability appears here with zero frontend work. */
+        SiteAuditAvailableCheck: {
+            id: components["schemas"]["SiteAuditCheckId"];
+            label: string;
+            description: string;
+            /** @description False for core crawl steps, which always run. */
+            selectable: boolean;
+            /** @description Always true today — every check starts checked. */
+            defaultSelected: boolean;
+            /** @description Set when the check cannot run on this server or plan (no provider configured, no AI model). The dialog shows it disabled with this sentence. */
+            unavailableReason?: string | null;
+        };
         SiteAuditConfigResponse: {
             /** @description Domain to audit (registrable eTLD+1) — the project's website domain, which is its only source. Null when the project has no website set. */
             domain?: string | null;
             /** @description Prefill suggestion when no website is set: the AI-visibility self-brand's primary domain. Equal to `domain` once one is set. */
             suggestedDomain?: string | null;
+            availableChecks?: components["schemas"]["SiteAuditAvailableCheck"][];
         };
         SiteAuditProgress: {
             totalUnits?: number;
@@ -8336,6 +8315,12 @@ export interface components {
         SiteAuditDetailResponse: {
             id?: string;
             domain?: string;
+            /** @description The domain this run actually audited — same value as `domain`, named for the any-target world. */
+            targetDomain?: string;
+            /** @description True when this run audited the project's configured website (as of start time). Own-site audits feed site search, recommendations and workflow data; external ones never do. */
+            isOwnSite?: boolean;
+            /** @description The check selection this run started with. Null = everything. */
+            selectedChecks?: components["schemas"]["SiteAuditCheckId"][] | null;
             /** @enum {string} */
             status?: "RUNNING" | "PAUSE_REQUESTED" | "PAUSED" | "CANCEL_REQUESTED" | "CANCELLED" | "COMPLETED" | "FAILED";
             progress?: components["schemas"]["SiteAuditProgress"];
@@ -8345,10 +8330,23 @@ export interface components {
             summary?: components["schemas"]["SiteAuditSummaryStats"];
             /** @description The first 50 crawled pages only. Superseded by the paginated pages resource — an audit can now crawl thousands of pages, which cannot travel inline. Kept populated so a dashboard deployed against an older contract keeps working. */
             pages?: components["schemas"]["SiteAuditPageResponse"][];
+            share?: components["schemas"]["SiteAuditShareResponse"] | null;
+            /** @description The follow-up lanes that join the report after the crawl (page speed, AI analysis). They never delay `status: COMPLETED` — a reader that sees a lane PENDING or RUNNING should keep polling and say "still measuring" instead of treating the data as absent. */
+            extras?: components["schemas"]["SiteAuditExtraLane"][];
             /** Format: date-time */
             createdAt?: string;
             /** Format: date-time */
             finishedAt?: string | null;
+        };
+        /** @description One follow-up lane of an audit run and where it stands. */
+        SiteAuditExtraLane: {
+            /** @enum {string} */
+            lane: "PAGE_SPEED" | "AI_ANALYSIS";
+            /**
+             * @description PENDING — the crawl hasn't finished, so the lane hasn't started. RUNNING — the lane is measuring now; its results slot into the report when it lands. SKIPPED — this run will not produce the lane (deselected at start, no provider configured, budget exhausted, nothing to measure, or cancelled).
+             * @enum {string}
+             */
+            status: "PENDING" | "RUNNING" | "COMPLETED" | "FAILED" | "SKIPPED";
         };
         /** @description Run options. The whole body is optional; omitting it runs with the service defaults. */
         SiteAuditStartRequest: {
@@ -8356,6 +8354,10 @@ export interface components {
             maxPages?: number | null;
             /** @description Follow internal links as well as the sitemap. False audits only what the sitemap lists, which is faster and blind to anything unlisted. */
             followLinks?: boolean | null;
+            /** @description Any http(s) address to audit. Omitted = the project's configured website domain. The address is reduced to its domain — a path or query is discarded, and IP literals, ports and credentials are rejected. Auditing a site other than the project's own counts against a daily allowance. */
+            targetUrl?: string | null;
+            /** @description Which checks to run. Omitted or null = all of them (the start dialog shows everything pre-checked). Core crawl steps run regardless. Deselected checks appear in the report as "skipped — not selected for this run". */
+            checks?: components["schemas"]["SiteAuditCheckId"][] | null;
         };
         /** @description The report's headline row, computed server-side. Every count here is produced after the caller's permission filter, so a hidden producer cannot be inferred from a total. */
         SiteAuditSummaryStats: {
@@ -8376,8 +8378,16 @@ export interface components {
             serverErrorPages?: number;
             overallScore?: number | null;
             categoryScores?: components["schemas"]["SiteAuditCategoryScores"];
-            /** @description Which finding producers this caller may read. SITE_CHECK and CONTENT_CHECK additionally require sitecontent.view. */
+            /** @description Which finding producers this report draws on. Every producer is readable under siteaudit.view. */
             availableSections?: ("CRAWL" | "CHECKLIST" | "PAGE_CHECK" | "SITE_CHECK" | "CONTENT_CHECK")[];
+            /** @description Lighthouse measurements recorded for this audit, successes and failures together. Zero means no measurement run happened — no provider is configured, the audit predates Lighthouse, or the run is still going. The dashboard hides the four tiles below when this is zero rather than showing four empty ones. */
+            lighthouseTests?: number;
+            /** @description Measurements the provider could not complete. */
+            lighthouseFailures?: number;
+            /** @description Mean over the measurements that produced a score. Failed runs are excluded rather than counted as zero. */
+            avgLighthousePerformance?: number | null;
+            avgLighthouseSeo?: number | null;
+            avgLighthouseAccessibility?: number | null;
         };
         SiteAuditSeverityCounts: {
             critical?: number;
@@ -8433,6 +8443,8 @@ export interface components {
         };
         /** @description One crawled page, as the Pages tab shows it. */
         SiteAuditPageRow: {
+            /** @description This crawl's row for the page — what the page-detail resource is addressed by. Belongs to one audit; the same URL crawled again has a different id. */
+            id?: string;
             url?: string;
             finalUrl?: string | null;
             statusCode?: number | null;
@@ -8470,14 +8482,224 @@ export interface components {
         };
         /** @description Live progress while an audit runs. */
         SiteAuditProgressResponse: {
-            /** @enum {string} */
-            phase?: "DISCOVERY" | "CRAWLING" | "FINALIZING" | "DONE";
+            /**
+             * @description LIGHTHOUSE and ANALYZING both mean the crawl is finished and the report is readable — the page-speed measurement (then the AI analysis) is still filling in. Only DONE means nothing is left to watch, so poll until DONE, not until the audit's status settles.
+             * @enum {string}
+             */
+            phase?: "DISCOVERY" | "CRAWLING" | "FINALIZING" | "LIGHTHOUSE" | "ANALYZING" | "DONE";
             pagesCrawled?: number;
             pagesDiscovered?: number;
             totalUnits?: number;
             completedUnits?: number;
             failedUnits?: number;
+            /** @description Measurements the downstream Lighthouse job will make, 0 when no run was started. During the LIGHTHOUSE phase the progress bar counts these instead of crawl units. */
+            lighthouseTotal?: number;
+            lighthouseCompleted?: number;
             recentPages?: components["schemas"]["SiteAuditRecentPage"][];
+        };
+        /** @description One Lighthouse measurement of one page on one device. Scores are 0-100; every score is null when `errorMessage` is set. */
+        SiteAuditLighthouseRow: {
+            id?: string;
+            url?: string;
+            /** @enum {string} */
+            device?: "MOBILE" | "DESKTOP";
+            performanceScore?: number | null;
+            accessibilityScore?: number | null;
+            seoScore?: number | null;
+            bestPracticesScore?: number | null;
+            /** @description Largest Contentful Paint. */
+            lcpMs?: number | null;
+            /** @description First Contentful Paint. */
+            fcpMs?: number | null;
+            /** @description Cumulative Layout Shift; unitless. */
+            cls?: number | null;
+            /** @description Total Blocking Time — the lab stand-in for INP. INP itself is a field metric that a lab run cannot measure, so it is not reported. */
+            tbtMs?: number | null;
+            /** @description Server response time. */
+            ttfbMs?: number | null;
+            speedIndexMs?: number | null;
+            /** @description Set when the provider could not measure the page. */
+            errorMessage?: string | null;
+            /** Format: date-time */
+            measuredAt?: string | null;
+        };
+        /** @description Paginated Lighthouse measurements for one audit */
+        PaginatedSiteAuditLighthouse: {
+            data: components["schemas"]["SiteAuditLighthouseRow"][];
+            page: number;
+            size: number;
+            totalElements: number;
+            totalPages: number;
+        };
+        /** @description One page-checklist verdict on one page, with the copy that explains it. Only the checks that did not pass are recorded, so `status` is FAIL or WARNING in practice — a page with nothing wrong carries no rows here rather than thirty passing ones. */
+        SiteAuditPageCheck: {
+            /** @description The rule's id, as list_site_audit_issues and the findings resource report it. */
+            checkId: string;
+            /** @enum {string} */
+            status: "PASS" | "FAIL" | "WARNING" | "INFO";
+            /** @description What the check is, phrased as the good outcome */
+            title: string;
+            /** @description Why it matters — the same sentence whichever page it is */
+            description: string;
+            /** @description What this page measured, in a sentence. Null for rules whose evidence this release cannot re-read into a shape; `evidence` still carries the measurement. */
+            detail?: string | null;
+            fix: string;
+            /** @description The measurement the check recorded, as it was stored. */
+            evidence?: {
+                [key: string]: unknown;
+            } | null;
+        };
+        /** @description What a model made of this page, pinned to the crawl whose copy it read. Absent when the audit ran without the AI lane, or when this page was not one of the pages it read. */
+        SiteAuditPageAiRead: {
+            /** @description The question a buyer arrives with that this page answers. */
+            buyerQuestion?: string | null;
+            /** @description What the page says it is, in its own terms. */
+            presentsItselfAs?: string | null;
+            /** @description How the page sits against what the rest of the site claims. */
+            positioning?: string | null;
+            recommendation?: string | null;
+        };
+        /** @description One page near this one, and how near. */
+        SiteAuditSimilarPage: {
+            pageId: string;
+            url: string;
+            title?: string | null;
+            /** @description Cosine similarity, 0..1. 1 is the same copy. */
+            score: number;
+        };
+        SiteAuditPageTrafficPoint: {
+            /** Format: date */
+            day: string;
+            /** @description Human page views recorded for the path that day. */
+            views: number;
+            /** @description AI-crawler requests recorded for the path that day. */
+            aiHits: number;
+        };
+        /** @description The page's recent audience, human and machine, day by day. Zero-filled days are omitted; the window says how far back the series looks. */
+        SiteAuditPageTrafficResponse: {
+            windowDays: number;
+            points: components["schemas"]["SiteAuditPageTrafficPoint"][];
+        };
+        /** @description Everything one crawl knows about one page: the facts it measured, the checklist verdicts it recorded, what a model made of the copy, and the pages nearest to it. The retained markup is deliberately not part of this — it is an input to the checks, not a report. */
+        SiteAuditPageDetailResponse: {
+            id: string;
+            url: string;
+            /** @description Where the fetch ended up, when it was redirected. */
+            finalUrl?: string | null;
+            statusCode?: number | null;
+            /** @enum {string|null} */
+            fetchClass?: "OK" | "REDIRECT" | "BROKEN" | "SERVER_ERROR" | "BLOCKED" | "ERROR" | null;
+            title?: string | null;
+            metaDescription?: string | null;
+            canonicalUrl?: string | null;
+            h1Count?: number | null;
+            headingCount?: number | null;
+            wordCount?: number | null;
+            imagesTotal?: number | null;
+            imagesMissingAlt?: number | null;
+            internalLinkCount?: number | null;
+            externalLinkCount?: number | null;
+            contentBytes?: number | null;
+            /** @description How long the whole fetch took, including redirects. */
+            fetchMs?: number | null;
+            /** @description How long the terminal response took, which is what the site is judged on. */
+            responseTimeMs?: number | null;
+            /** @description Clicks from the homepage; null for a page seeded from the sitemap. */
+            crawlDepth?: number | null;
+            inSitemap: boolean;
+            indexable?: boolean | null;
+            /**
+             * @description How the crawl first reached this page.
+             * @enum {string}
+             */
+            discoverySource?: "HOMEPAGE" | "SITEMAP" | "LINK";
+            /**
+             * Format: date-time
+             * @description When an own-site audit first saw this address. Carried forward between runs, so it predates this audit; null for a page with no earlier snapshot to carry from.
+             */
+            firstSeenAt?: string | null;
+            /**
+             * Format: date-time
+             * @description When the page's content last differed from the previous run's.
+             */
+            lastChangedAt?: string | null;
+            /** Format: date-time */
+            crawledAt?: string | null;
+            errorMessage?: string | null;
+            /** @description Findings of every producer attached to this page, after the caller's permission filter — so it can exceed the length of `checks`, which is only the page checklist. */
+            findingsCount: number;
+            /** @description This page's checklist verdicts. Empty when the audit ran no page checks, which is not the same as the page having passed everything. */
+            checks: components["schemas"]["SiteAuditPageCheck"][];
+            aiRead?: components["schemas"]["SiteAuditPageAiRead"] | null;
+            /** @description Nearest pages by meaning, best first. Empty when the audit ran without the similarity pass, or when nothing scored above the naming threshold. */
+            similarPages: components["schemas"]["SiteAuditSimilarPage"][];
+        };
+        SiteAuditClusterPage: {
+            pageId: string;
+            url: string;
+            title?: string | null;
+        };
+        /** @description A group of pages that are all reachable from each other above the threshold — one problem with several pages in it, not several pairs. */
+        SiteAuditSimilarityCluster: {
+            pages: components["schemas"]["SiteAuditClusterPage"][];
+            /** @description The tightest link inside the cluster, 0..1. */
+            score: number;
+            /**
+             * @description NEAR_DUPLICATE when the tightest link is at or above the near-duplicate threshold — two pages that are nearly the same page. RELATED is normal for a site that covers one subject and is reported so a reader can see what the grouping is made of.
+             * @enum {string}
+             */
+            verdict: "NEAR_DUPLICATE" | "RELATED";
+        };
+        /** @description What the audit's embeddings say about duplication. Empty clusters with a zero `pagesCompared` means the similarity pass did not run — no embeddings model, or the run predates it. */
+        SiteAuditSimilarityResponse: {
+            /** @description Tightest first. */
+            clusters: components["schemas"]["SiteAuditSimilarityCluster"][];
+            /** @description Pages that carried a vector and so took part in the ranking at all. */
+            pagesCompared: number;
+            /** @description Pages that landed in a cluster of two or more. */
+            pagesInClusters: number;
+            nearDuplicateClusters: number;
+            relatedClusters: number;
+        };
+        /** @description One page a site check names, and what is true of it. */
+        SiteAuditAffectedPage: {
+            path: string;
+            /** @description What is true of this page in a few words; null when naming the page says everything. */
+            note?: string | null;
+        };
+        /** @description One graded site-wide check, passes included. `source` and `checkId` together are the identity — the ids collide across catalogs. */
+        SiteAuditSiteCheckRow: {
+            /** @enum {string} */
+            source: "CRAWL" | "CHECKLIST" | "PAGE_CHECK" | "SITE_CHECK" | "CONTENT_CHECK";
+            checkId: string;
+            /**
+             * @description WORKS is the check holding up — this resource is the only one that reports it.
+             * @enum {string}
+             */
+            severity: "BROKEN" | "WARNING" | "WORKS";
+            title: string;
+            description: string;
+            /** @description What this run measured, in the check's own words. */
+            detail?: string | null;
+            fix: string;
+            /** @description The pages the check names. Empty when the finding is a count or a comparison rather than a set of pages. */
+            affectedPages?: components["schemas"]["SiteAuditAffectedPage"][];
+        };
+        /** @description The whole graded checklist for one audit, including the checks that hold up. The findings resources are structurally issues-only — a finding exists because something is wrong — so this is the only place that can say how many checks ran. */
+        SiteAuditFactsResponse: {
+            /** @description Worst first. */
+            checks: components["schemas"]["SiteAuditSiteCheckRow"][];
+            /** @description The denominator — how many checks this audit graded at all. */
+            checksRun: number;
+        };
+        /** @description A public link to one finished audit. Carried on the audit detail response as `share` — null there when the audit has never been shared or the link was revoked — so the report can re-show a link that already exists rather than minting a second one. */
+        SiteAuditShareResponse: {
+            /** @description The whole credential. Anyone holding it can read the redacted report, so it is shown rather than hashed, and revoking is how it is turned off. */
+            token: string;
+            /** @description The link to hand somebody, built from the dashboard's own base URL. */
+            url: string;
+            /** Format: date-time */
+            createdAt: string;
         };
         AiVisibilitySeriesPoint: {
             jobId?: string;
@@ -9328,11 +9550,6 @@ export interface components {
             /** @description Drafts for review — nothing is persisted. An auto-generated persona is reliably too broad to be useful, so it becomes real only when someone edits and saves it. */
             personas?: components["schemas"]["AiVisibilityPersonaDraft"][];
         };
-        /** @description The cross-page reading is a job, not a response. It is one model call carrying the whole inventory — a minute or more — and holding a connection for it lost answers that had already been paid for whenever a proxy timed out or a tab closed. */
-        StartCrossAnalysisResponse: {
-            /** @description False when a reading was already running for this project. Not an error: the answer the caller wanted is the one already on its way. */
-            started: boolean;
-        };
         /**
          * @description Whether the backlink source is shown (active) or dismissed as noise (ignored)
          * @enum {string}
@@ -9431,7 +9648,7 @@ export interface components {
         };
         BacklinkReclamationResponse: {
             items: components["schemas"]["BacklinkReclamationItem"][];
-            /** @description False when the project has no indexed page inventory yet — run a site-content index to enable reclamation */
+            /** @description False when the project has never finished a site audit — reclamation matches inbound links against crawled pages, and there are none to match */
             siteIndexAvailable: boolean;
         };
         BacklinkOpportunityEntry: {
@@ -9466,6 +9683,8 @@ export interface components {
             items: components["schemas"]["BacklinkOpportunityEntry"][];
             /** @description Number of completed AI-visibility jobs aggregated */
             jobsIncluded: number;
+            /** @description Candidate domains found before `limit` truncated the list. Equal to `items.length` when nothing was dropped, so a client can say how many rows it is not showing. */
+            totalDomains: number;
         };
         BacklinkCompetitorGapEntry: {
             /** @description Normalized referring host that links to competitors but not to this site */
@@ -9793,75 +10012,6 @@ export interface components {
             output: string;
             toolsCalled: string[];
         };
-        ContentAuditFinding: {
-            /** @enum {string} */
-            id: "CLAIM_CONFLICT" | "STRUCTURE_COUNT" | "RESERVED_LABEL" | "DUPLICATE_TITLE";
-            title: string;
-            /** @enum {string} */
-            severity: "BROKEN" | "WARNING" | "WORKS";
-            detail: string;
-            fix?: string | null;
-        };
-        /** @description One page graded against the rest of the site. Distinct from the page checklist, which grades a page on its own: every finding here is a relation to another page, so it cannot be produced without the rest of the inventory. */
-        ContentAuditResponse: {
-            path?: string | null;
-            title?: string | null;
-            /**
-             * @description The worst thing found on this page.
-             * @enum {string}
-             */
-            verdict: "BLOCK" | "WARN" | "CLEAR";
-            findings: components["schemas"]["ContentAuditFinding"][];
-        };
-        /** @description A model's read of one page against what the site says it is. Absent when the organization has no AI provider configured or the model declined — the deterministic findings stand on their own either way. */
-        AiPageAnalysisResponse: {
-            /** @description The question a buyer would type that this page answers */
-            buyerQuestion: string;
-            /** @description What the page says it is, in its own framing */
-            presentsItselfAs: string;
-            /**
-             * @description How the page's story sits against the rest of the site
-             * @enum {string}
-             */
-            positioning: "ALIGNED" | "DRIFTED" | "CONTRADICTS";
-            strengths: string[];
-            gaps: string[];
-            recommendation: string;
-        };
-        /** @description One site-level verdict, carrying the copy that explains it. Served rather than kept in the frontend for the same reason as SiteContentPageCheck: the same findings are delivered by workflows into email, Slack and webhooks, where no client is there to look the wording up. */
-        SiteSystemOfRecordCheck: {
-            /** @enum {string} */
-            id: "DECLARED_STRUCTURE_COUNT" | "TAXONOMY_SURFACE_AGREEMENT" | "CLAIM_CONSISTENCY" | "NAV_OFFSITE_LINKS" | "ORPHAN_PAGES" | "BOILERPLATE_PAGES" | "ANSWER_LAYER_COVERAGE" | "DUPLICATE_CONTENT" | "BROKEN_INTERNAL_LINKS" | "MOVED_PAGES" | "AI_COMPETING_ANSWERS" | "AI_SELF_CLASSIFICATION" | "AI_TERMINOLOGY_DRIFT" | "AI_COVERAGE_GAPS" | "PLAN_ADDRESS" | "PLAN_FIGURE" | "PLAN_TERM";
-            /**
-             * @description POSITIONING is the one group that is not counted — those four checks are a model's reading of what the pages mean, produced only when the cross-page analysis is run. PLAN is the only group graded against something other than the site: those findings say "this is not what you approved", and exist only for a project that has uploaded a planning document and approved the rules read from it. Everything else compares two things the site published and can name both.
-             * @enum {string}
-             */
-            category: "TAXONOMY" | "CLAIMS" | "NAVIGATION" | "INVENTORY" | "POSITIONING" | "PLAN";
-            /** @description Reader-facing name of the category */
-            area: string;
-            /** @description What the check is, phrased as the good outcome */
-            title: string;
-            /** @description Why it matters — the same sentence whatever the verdict */
-            description: string;
-            /**
-             * @description BROKEN means the site contradicts something it already publishes — a relation between two surfaces, not a page falling short of a threshold. WORKS is returned rather than omitted so a reader can tell "we looked and it holds" from "we never looked".
-             * @enum {string}
-             */
-            severity: "BROKEN" | "WARNING" | "WORKS";
-            /** @description What was actually found on this site, with the measured specifics */
-            detail: string;
-            /** @description What to do about it; null on a passing check */
-            fix?: string | null;
-            /** @description The pages this finding is about, as pages rather than as prose. Empty for the checks whose finding is a count or a comparison; empty too for a round recorded before this existed, whose paths are still inside `detail`. A client renders `detail` either way and renders this list when it has one. */
-            affectedPages?: components["schemas"]["SiteFindingPage"][];
-        };
-        /** @description One page a finding names, and what is true of it. */
-        SiteFindingPage: {
-            /** @description Where it lives, so a client can link to the page's own record */
-            path: string;
-            /** @description What is true of this page, in a few words — which half of the answer layer is missing, what it duplicates, where it moved from. Null when naming the page says everything the finding has to say about it. */
-            note?: string | null;
-        };
         SpecDocsResponse: {
             docs: components["schemas"]["SpecDocResponse"][];
         };
@@ -9919,203 +10069,6 @@ export interface components {
             expectedValue?: string | null;
             /** @enum {string|null} */
             lockLevel?: "LOCKED" | "RESEARCH_BACKED" | "OPEN" | null;
-        };
-        SiteContentDuplicatePage: {
-            path: string;
-            url: string;
-            title?: string | null;
-        };
-        /** @description Pages that are all reachable from one another above the near-duplicate threshold. A group rather than a pair: three pages that each duplicate the next are one problem with three pages in it, not three problems. */
-        SiteContentDuplicateCluster: {
-            /** @description The closest pair inside this group, as a percentage. */
-            topScorePercent: number;
-            pages: components["schemas"]["SiteContentDuplicatePage"][];
-        };
-        /** @description Pages whose nearest neighbour scored inside this band. */
-        SiteContentSimilarityBand: {
-            minPercent: number;
-            maxPercent: number;
-            pages: number;
-        };
-        /** @description What the content embeddings say about pages repeating each other. Distinct from the round's own duplicate count, which groups by content hash and so only ever finds byte-identical copies; this finds pages that answer the same question in different words. */
-        SiteContentDuplication: {
-            /** @description False when there is nothing to say: no page in the project has been embedded yet, or this report is for an older round. Neighbours are stored per project rather than per round, so attaching them to a superseded round would date the answer "now" while the rest of the report describes then. */
-            available: boolean;
-            /**
-             * Format: date-time
-             * @description When these neighbours were last ranked.
-             */
-            computedAt?: string | null;
-            /** @description How near two pages must be to count as near-duplicates. */
-            thresholdPercent: number;
-            /** @description Pages carrying an embedding, and so taking part in the comparison at all. */
-            pagesCompared: number;
-            /** @description Pages whose nearest neighbour is at or above the threshold. */
-            pagesWithNearTwin: number;
-            /** @description Distribution of every compared page by how near its closest neighbour is. */
-            bands: components["schemas"]["SiteContentSimilarityBand"][];
-            /** @description Near-duplicate groups, tightest first. */
-            clusters: components["schemas"]["SiteContentDuplicateCluster"][];
-        };
-        /** @description One place a figure is stated. */
-        SiteContentBaselineClaimStatement: {
-            value: string;
-            path: string;
-            /** @description The sentence it was read from, when one was kept. */
-            sentence?: string | null;
-        };
-        /** @description One figure the site commits to, everywhere it is stated. More than one distinct value among the statements is the site disagreeing with itself. */
-        SiteContentBaselineClaim: {
-            key: string;
-            /** @description What the homepage says, or the most-stated value when the homepage is silent — the value a new page has to match. */
-            authoritativeValue: string;
-            statements: components["schemas"]["SiteContentBaselineClaimStatement"][];
-        };
-        /** @description One labelled group in the site's navigation, and what it says belongs to it. */
-        SiteContentTaxonomyGroup: {
-            label: string;
-            /** @enum {string} */
-            surface: "NAV" | "FOOTER";
-            memberLabels: string[];
-        };
-        /** @description The count the homepage commits to — "built on four core solutions". */
-        SiteContentDeclaredStructure: {
-            count: number;
-            noun: string;
-            /** @description The sentence the count was read from. */
-            sentence: string;
-        };
-        /** @description What the site said it was when this round graded it — the homepage's opening answer, the count it commits to, the navigation's taxonomy, and every figure stated in an opening answer. Stored with the round, so an old report keeps describing the site as it stood then. */
-        SiteContentReportBaseline: {
-            /** @description The homepage's opening answer; empty when it has none. */
-            declaredCategory: string;
-            declaredStructure?: components["schemas"]["SiteContentDeclaredStructure"];
-            taxonomy: components["schemas"]["SiteContentTaxonomyGroup"][];
-            claims: components["schemas"]["SiteContentBaselineClaim"][];
-        };
-        SiteContentReportResponse: {
-            round: components["schemas"]["SiteContentRound"];
-            scale: components["schemas"]["SiteContentReportScale"];
-            duplication: components["schemas"]["SiteContentDuplication"];
-            baseline?: components["schemas"]["SiteContentReportBaseline"];
-            /** @description Whole-site findings, worst first */
-            siteFindings: components["schemas"]["SiteSystemOfRecordCheck"][];
-            /** @description One record per page the round graded */
-            pages: components["schemas"]["SiteContentReportPage"][];
-            /** @description Approved rules about how changes are made rather than about the site. Nothing checks them; they are the report's standards section. */
-            processRules: components["schemas"]["SpecRuleResponse"][];
-        };
-        SiteContentReportScale: {
-            pagesLive: number;
-            /** @description Pages this round actually read. Lower than pagesLive when the site is larger than one round loads, and the difference is the part nobody graded. */
-            pagesGraded: number;
-            /** @description Pages an approved plan calls for, when one exists — the audit's "92 against 30" */
-            pagesPlanned?: number | null;
-            brokenCount: number;
-            warningCount: number;
-            /** @description Pages publishing copy that already exists at another address */
-            duplicatePages: number;
-            /** @description Pages missing an opening answer, coded questions, or both */
-            pagesMissingAnswerLayer: number;
-        };
-        SiteContentReportPage: {
-            path: string;
-            title?: string | null;
-            staticScore?: number | null;
-            /** @enum {string|null} */
-            consistencyVerdict?: "BLOCK" | "WARN" | "CLEAR" | null;
-            aiBuyerQuestion?: string | null;
-            aiPresentsItselfAs?: string | null;
-            /** @enum {string|null} */
-            aiPositioning?: "ALIGNED" | "DRIFTED" | "CONTRADICTS" | null;
-            /** @description The AI half was carried from an earlier round rather than read in this one */
-            aiCarried?: boolean;
-            /** @description What the AI reading said this page should do next, when it said anything. */
-            aiRecommendation?: string | null;
-            findings: components["schemas"]["SiteContentReportFinding"][];
-            /** @description Figures this page commits to, as the round read them */
-            figures?: components["schemas"]["SiteContentFigure"][];
-        };
-        /** @description One finding against a page. The id is a string rather than an enum because a page collects findings from two vocabularies — the per-page audit's, and the site-level checks that happen to name a page (a cross-page collision, a plan violation). Pinning it to either enum makes the other a 500. */
-        SiteContentReportFinding: {
-            id: string;
-            title: string;
-            /** @enum {string} */
-            severity: "BROKEN" | "WARNING" | "WORKS";
-            detail: string;
-            fix?: string | null;
-            /** @description Reader-facing category name when the finding's id belongs to the site vocabulary; null for per-page audit checks, which have no category. */
-            area?: string | null;
-        };
-        SiteContentFigure: {
-            attribute: string;
-            valueRaw: string;
-            /** @description The sentence it was read from — the evidence a reader checks it against */
-            verbatim: string;
-            /**
-             * @description REGEX counted it; AI read it. Kept apart because they fail differently.
-             * @enum {string}
-             */
-            source: "REGEX" | "AI";
-        };
-        SiteContentPageHistoryResponse: {
-            path: string;
-            rounds: components["schemas"]["SiteContentPageRound"][];
-        };
-        /** @description What one round found about one page. */
-        SiteContentPageRound: {
-            runId: string;
-            /** Format: date-time */
-            analyzedAt: string;
-            /** @description Percentage of this page's graded build checks that passed. INFO checks are excluded from both halves — they report rather than grade, so counting them as failures would mark a page down for a check with no opinion. */
-            staticScore?: number | null;
-            /**
-             * @description How the page stood against the rest of the site in this round
-             * @enum {string|null}
-             */
-            consistencyVerdict?: "BLOCK" | "WARN" | "CLEAR" | null;
-            /**
-             * @description Null when no AI reading stood for this page in this round
-             * @enum {string|null}
-             */
-            aiPositioning?: "ALIGNED" | "DRIFTED" | "CONTRADICTS" | null;
-            aiBuyerQuestion?: string | null;
-            aiPresentsItselfAs?: string | null;
-            aiRecommendation?: string | null;
-            /** @description True when the AI half was carried forward from an earlier round because the page had not changed, rather than read again in this one. Without this a stale reading is indistinguishable from a fresh one. */
-            aiCarried: boolean;
-            /** @description The round that actually paid for the reading, when it was carried */
-            aiFromRunId?: string | null;
-        };
-        SiteContentRoundsResponse: {
-            rounds: components["schemas"]["SiteContentRound"][];
-        };
-        /** @description One crawl's analysis, and what it covered. */
-        SiteContentRound: {
-            id: string;
-            /** Format: date-time */
-            finishedAt: string;
-            pagesAudited: number;
-            siteChecksRun: number;
-            brokenCount: number;
-            warningCount: number;
-            /** @description Pages an AI reading stands for in this round — read fresh by this crawl, or carried forward because the page has not changed since it was read */
-            pagesAiAnalyzed: number;
-            /** @description Pages the round did not read with AI — over the per-round cap, past the load cap, or refused by the model. Reported rather than dropped: partial coverage that reads as complete is worse than none. */
-            pagesAiSkipped: number;
-            /**
-             * Format: date-time
-             * @description When the cross-page reading was run against this round. Null means nobody has asked, which is not the same as asked-and-found-nothing.
-             */
-            aiCrossAnalyzedAt?: string | null;
-        };
-        SiteSystemOfRecordResponse: {
-            /** @description Every check that ran, passes included, and empty when the project has no indexed page that kept its markup. A check with nothing to compare against is omitted entirely rather than reported as passing. */
-            checks: components["schemas"]["SiteSystemOfRecordCheck"][];
-            brokenCount: number;
-            warningCount: number;
-            /** @description A cross-page reading is in flight for this project. The reading is a job now, so the client polls this rather than holding a request open; the button stays disabled and the findings refresh when it clears. */
-            crossAnalysisRunning?: boolean;
         };
         /**
          * @description What kind of thing was done. Four verbs cover everything customers track; the platform it was done on is a separate field, so "published a podcast / an app / an extension" is one verb rather than three.
@@ -13685,183 +13638,6 @@ export interface operations {
             403: components["responses"]["ForbiddenError"];
         };
     };
-    auditSiteContentPage: {
-        parameters: {
-            query: {
-                /** @description The indexed page's path */
-                path: string;
-            };
-            header?: never;
-            path: {
-                /** @description Organization slug */
-                orgSlug: components["parameters"]["OrgSlugPath"];
-                /** @description Project ID */
-                projectId: components["parameters"]["projectIdPathParam"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The page's audit */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ContentAuditResponse"];
-                };
-            };
-            401: components["responses"]["UnauthorizedError"];
-            403: components["responses"]["ForbiddenError"];
-        };
-    };
-    analyzeSiteContentPageWithAi: {
-        parameters: {
-            query: {
-                path: string;
-            };
-            header?: never;
-            path: {
-                /** @description Organization slug */
-                orgSlug: components["parameters"]["OrgSlugPath"];
-                /** @description Project ID */
-                projectId: components["parameters"]["projectIdPathParam"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The model's read of the page */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AiPageAnalysisResponse"];
-                };
-            };
-            /** @description No AI provider configured, page not indexed, or the model declined */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            401: components["responses"]["UnauthorizedError"];
-            403: components["responses"]["ForbiddenError"];
-        };
-    };
-    getSiteSystemOfRecord: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Organization slug */
-                orgSlug: components["parameters"]["OrgSlugPath"];
-                /** @description Project ID */
-                projectId: components["parameters"]["projectIdPathParam"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The site-level checklist */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SiteSystemOfRecordResponse"];
-                };
-            };
-            401: components["responses"]["UnauthorizedError"];
-            403: components["responses"]["ForbiddenError"];
-        };
-    };
-    runSiteContentCrossAnalysis: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Organization slug */
-                orgSlug: components["parameters"]["OrgSlugPath"];
-                /** @description Project ID */
-                projectId: components["parameters"]["projectIdPathParam"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The reading was accepted, not performed. `started` is false when one was already in flight for this project. */
-            202: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StartCrossAnalysisResponse"];
-                };
-            };
-            401: components["responses"]["UnauthorizedError"];
-            403: components["responses"]["ForbiddenError"];
-        };
-    };
-    getSiteContentPageHistory: {
-        parameters: {
-            query: {
-                /** @description The indexed page's path */
-                path: string;
-            };
-            header?: never;
-            path: {
-                /** @description Organization slug */
-                orgSlug: components["parameters"]["OrgSlugPath"];
-                /** @description Project ID */
-                projectId: components["parameters"]["projectIdPathParam"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The page's rounds, newest first */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SiteContentPageHistoryResponse"];
-                };
-            };
-            401: components["responses"]["UnauthorizedError"];
-            403: components["responses"]["ForbiddenError"];
-        };
-    };
-    listSiteContentRounds: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Organization slug */
-                orgSlug: components["parameters"]["OrgSlugPath"];
-                /** @description Project ID */
-                projectId: components["parameters"]["projectIdPathParam"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The project's retained rounds */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SiteContentRoundsResponse"];
-                };
-            };
-            401: components["responses"]["UnauthorizedError"];
-            403: components["responses"]["ForbiddenError"];
-        };
-    };
     listSpecDocs: {
         parameters: {
             query?: never;
@@ -13975,35 +13751,6 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
-            };
-            401: components["responses"]["UnauthorizedError"];
-            403: components["responses"]["ForbiddenError"];
-            404: components["responses"]["NotFoundError"];
-        };
-    };
-    getSiteContentReport: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Organization slug */
-                orgSlug: components["parameters"]["OrgSlugPath"];
-                /** @description Project ID */
-                projectId: components["parameters"]["projectIdPathParam"];
-                roundId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The round's record */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SiteContentReportResponse"];
-                };
             };
             401: components["responses"]["UnauthorizedError"];
             403: components["responses"]["ForbiddenError"];
@@ -14150,7 +13897,7 @@ export interface operations {
             query?: {
                 /** @description Number of most recent completed AI-visibility jobs to aggregate */
                 jobs?: number;
-                /** @description Maximum number of domains to return */
+                /** @description Maximum number of domains to return. Clamped to 1..200 server-side; `totalDomains` in the response says how many candidates there were before the cut. */
                 limit?: number;
             };
             header?: never;
@@ -14724,7 +14471,12 @@ export interface operations {
     };
     getLatestSiteAudit: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Only consider audits whose job completed. */
+                completedOnly?: boolean;
+                /** @description `own` considers only audits of the project's configured website; `any` also considers audits of other sites. */
+                target?: "own" | "any";
+            };
             header?: never;
             path: {
                 /** @description Organization slug */
@@ -14909,6 +14661,164 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PaginatedSiteAuditPages"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            404: components["responses"]["NotFoundError"];
+        };
+    };
+    getSiteAuditPage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+                auditId: string;
+                pageId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Page retrieved successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SiteAuditPageDetailResponse"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            404: components["responses"]["NotFoundError"];
+        };
+    };
+    getSiteAuditPageTraffic: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+                auditId: string;
+                pageId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Traffic series retrieved successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SiteAuditPageTrafficResponse"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            404: components["responses"]["NotFoundError"];
+        };
+    };
+    getSiteAuditSimilarity: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+                auditId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Similarity retrieved successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SiteAuditSimilarityResponse"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            404: components["responses"]["NotFoundError"];
+        };
+    };
+    getSiteAuditFacts: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+                auditId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Checklist retrieved successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SiteAuditFactsResponse"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            404: components["responses"]["NotFoundError"];
+        };
+    };
+    listSiteAuditLighthouse: {
+        parameters: {
+            query?: {
+                /** @description Substring match on the URL */
+                q?: string;
+                device?: "ALL" | "MOBILE" | "DESKTOP";
+                /** @description Performance score band, on the same thresholds the rings use: GOOD >= 90, NEEDS_WORK >= 50, POOR below that. */
+                band?: "ALL" | "GOOD" | "NEEDS_WORK" | "POOR";
+                /** @description Only measurements the provider could not complete */
+                failuresOnly?: boolean;
+                sort?: "PERFORMANCE" | "URL" | "LCP" | "CLS" | "TTFB";
+                page?: number;
+                size?: number;
+            };
+            header?: never;
+            path: {
+                /** @description Organization slug */
+                orgSlug: components["parameters"]["OrgSlugPath"];
+                /** @description Project ID */
+                projectId: components["parameters"]["projectIdPathParam"];
+                auditId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Measurements retrieved successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedSiteAuditLighthouse"];
                 };
             };
             401: components["responses"]["UnauthorizedError"];

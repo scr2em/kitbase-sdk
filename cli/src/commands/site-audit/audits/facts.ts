@@ -4,11 +4,11 @@ import { Args, Flags } from "@oclif/core";
 import { ApiOperationCommand } from "../../../runtime/operation-command.js";
 import { descriptors } from "../../../generated/descriptors.js";
 
-export default class SiteContentRoundsReport extends ApiOperationCommand {
-	static description = "The whole record of one crawl";
+export default class SiteAuditAuditsFacts extends ApiOperationCommand {
+	static description = "Get the audit's full graded checklist, passes included";
 	static args = {
-		"roundId": Args.string({ description: "roundId", required: true }),
+		"auditId": Args.string({ description: "auditId", required: true }),
 	};
 
-	descriptor = descriptors["getSiteContentReport"];
+	descriptor = descriptors["getSiteAuditFacts"];
 }
