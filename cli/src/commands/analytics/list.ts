@@ -7,8 +7,8 @@ import { descriptors } from "../../generated/descriptors.js";
 export default class AnalyticsList extends ApiOperationCommand {
 	static description = "Get project analytics";
 	static flags = {
-		"from": Flags.string({ description: "Start date for events analytics (ISO 8601 format)", required: true }),
-		"to": Flags.string({ description: "End date for events analytics (ISO 8601 format)", required: true }),
+		"from": Flags.string({ description: "Start date filter (inclusive, YYYY-MM-DD), in the project's reporting timezone", required: true }),
+		"to": Flags.string({ description: "End date filter (inclusive, YYYY-MM-DD), in the project's reporting timezone", required: true }),
 	};
 
 	descriptor = descriptors["getProjectAnalytics"];

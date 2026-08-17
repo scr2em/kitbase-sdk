@@ -6912,6 +6912,19 @@ export interface components {
         /** @description Complete funnel analysis result */
         FunnelAnalysisResponse: {
             analysisMode: components["schemas"]["FunnelAnalysisMode"];
+            /**
+             * Format: date
+             * @description First day the analysis covers, in the project's reporting timezone. Echoed
+             *     because the window is resolved on the server — `last_7_days` is today plus the
+             *     six days before it — so a caller labels the period it actually got, not the one
+             *     it believes it asked for.
+             */
+            from: string;
+            /**
+             * Format: date
+             * @description Last day the analysis covers (inclusive), in the project's reporting timezone.
+             */
+            to: string;
             steps: components["schemas"]["FunnelStepResult"][];
         };
         /** @description Summary of a session that reached or dropped at a funnel step */
@@ -11702,9 +11715,9 @@ export interface operations {
     getProjectAnalytics: {
         parameters: {
             query: {
-                /** @description Start date for events analytics (ISO 8601 format) */
+                /** @description Start date filter (inclusive, YYYY-MM-DD), in the project's reporting timezone */
                 from: string;
-                /** @description End date for events analytics (ISO 8601 format) */
+                /** @description End date filter (inclusive, YYYY-MM-DD), in the project's reporting timezone */
                 to: string;
             };
             header?: never;
@@ -16472,9 +16485,9 @@ export interface operations {
                 user_id?: string;
                 /** @description Predefined date range preset. When provided, overrides from/to parameters. */
                 preset?: components["schemas"]["DateRangePreset"];
-                /** @description Start of time range */
+                /** @description Start date filter (inclusive, YYYY-MM-DD) */
                 from?: string;
-                /** @description End of time range */
+                /** @description End date filter (inclusive, YYYY-MM-DD) */
                 to?: string;
                 /** @description Page number */
                 page?: number;
@@ -16591,9 +16604,9 @@ export interface operations {
             query?: {
                 /** @description Filter by event name (partial match) */
                 event?: string;
-                /** @description Start of time range */
+                /** @description Start date filter (inclusive, YYYY-MM-DD) */
                 from?: string;
-                /** @description End of time range */
+                /** @description End date filter (inclusive, YYYY-MM-DD) */
                 to?: string;
                 /** @description Page number */
                 page?: number;
@@ -18561,9 +18574,13 @@ export interface operations {
     };
     listTrackableActionSystemEvents: {
         parameters: {
-            query: {
-                from: string;
-                to: string;
+            query?: {
+                /** @description Predefined date range preset, resolved in the project's reporting timezone. Takes precedence over from/to. */
+                preset?: components["schemas"]["DateRangePreset"];
+                /** @description Start date filter (inclusive, YYYY-MM-DD). Used when preset is not provided; send with `to`. */
+                from?: string;
+                /** @description End date filter (inclusive, YYYY-MM-DD). Used when preset is not provided; send with `from`. */
+                to?: string;
             };
             header?: never;
             path: {

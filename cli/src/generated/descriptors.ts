@@ -2408,7 +2408,7 @@ export const descriptors: Record<string, OperationDescriptor> = {
 		needsOrg: true,
 		needsProject: true,
 		pathParams: [],
-		queryParams: ["from","to"],
+		queryParams: ["preset","from","to"],
 		bodyFields: [],
 		requiredBodyFields: [],
 	},

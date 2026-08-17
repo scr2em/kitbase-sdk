@@ -11,8 +11,8 @@ export default class EventsUsersGet extends ApiOperationCommand {
 	};
 	static flags = {
 		"event": Flags.string({ description: "Filter by event name (partial match)" }),
-		"from": Flags.string({ description: "Start of time range" }),
-		"to": Flags.string({ description: "End of time range" }),
+		"from": Flags.string({ description: "Start date filter (inclusive, YYYY-MM-DD)" }),
+		"to": Flags.string({ description: "End date filter (inclusive, YYYY-MM-DD)" }),
 		"page": Flags.integer({ description: "Page number" }),
 		"size": Flags.integer({ description: "Page size" }),
 		"sort": Flags.string({ description: "Sort order by timestamp", options: ["asc","desc"] }),
